@@ -3,6 +3,7 @@
 *.~m
 *.~*
 *.DS_Store
+*.Lnk
 
 # ignore all files in any directory named xxx
 temp/
