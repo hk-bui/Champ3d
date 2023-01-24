@@ -2,6 +2,7 @@
 *.mat
 *.~m
 *.~*
+*.DS_Store
 
 # ignore all files in any directory named xxx
 temp/
