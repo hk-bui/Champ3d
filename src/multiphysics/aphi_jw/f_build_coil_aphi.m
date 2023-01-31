@@ -50,10 +50,12 @@ if isfield(design3d,'coil')
                 if strcmpi(design3d.coil(i).coil_mode,'transmitter')
                     %dom3d.coil(i).Js = cfield.Js;
                     for j = 1:length(design3d.coil(i).petrode)
-                        iNoPhi = setdiff(iNoPhi,design3d.coil(i).petrode(j).id_node);
+                        %iNoPhi = setdiff(iNoPhi,design3d.coil(i).petrode(j).id_node);
+                        iNoPhi = [iNoPhi design3d.coil(i).petrode(j).id_node];
                     end
                     for j = 1:length(design3d.coil(i).netrode)
-                        iNoPhi = setdiff(iNoPhi,design3d.coil(i).netrode(j).id_node);
+                        %iNoPhi = setdiff(iNoPhi,design3d.coil(i).netrode(j).id_node);
+                        iNoPhi = [iNoPhi design3d.coil(i).netrode(j).id_node];
                     end
                 end
             case 't4'
@@ -64,10 +66,10 @@ if isfield(design3d,'coil')
                 if strcmpi(design3d.coil(i).coil_mode,'transmitter')
                     %dom3d.coil(i).Js = cfield.Js;
                     for j = 1:length(design3d.coil(i).petrode)
-                        iNoPhi = setdiff(iNoPhi,design3d.coil(i).petrode(j).id_node);
+                        iNoPhi = [iNoPhi design3d.coil(i).petrode(j).id_node];
                     end
                     for j = 1:length(design3d.coil(i).netrode)
-                        iNoPhi = setdiff(iNoPhi,design3d.coil(i).netrode(j).id_node);
+                        iNoPhi = [iNoPhi design3d.coil(i).netrode(j).id_node];
                     end
                 end
             otherwise
@@ -75,7 +77,9 @@ if isfield(design3d,'coil')
     end
 end
 %--------------------------------------------------------------------------
-design3d.aphi.id_node_phi = unique([design3d.aphi.id_node_phi iNoPhi]);
+iNoPhi = unique(iNoPhi);
+design3d.aphi.id_node_phi = unique(setdiff(design3d.aphi.id_node_phi, iNoPhi));
+%design3d.aphi.id_node_phi = unique([design3d.aphi.id_node_phi iNoPhi]);
 %--------------------------------------------------------------------------
 
 
