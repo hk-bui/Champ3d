@@ -37,8 +37,7 @@ for i = 1:length(layer)
 end
 
 codeLayer = f_str2code(IDLayer);
-IDLayer
-codeLayer
+
 %%
 
 % build vertices (node) in 3D
