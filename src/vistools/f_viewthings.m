@@ -10,7 +10,7 @@ node = [];
 edge = [];
 face = [];
 elem = [];
-
+edge_color = [];
 for i = 1:nargin/2
     eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
 end
@@ -103,17 +103,29 @@ switch type
                 if strcmpi(color,'non')
                     patchinfo.EdgeColor = 'k';
                 else
-                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                    if isempty(edge_color)
+                        patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                    else
+                        patchinfo.EdgeColor = edge_color;
+                    end
                 end
                 alpha(0.5);
             elseif ~exist('node_field','var')
                 patchinfo.FaceColor = 'flat';
                 patchinfo.FaceVertexCData = f_tocolv(field(id_face{i}));
-                patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                if isempty(edge_color)
+                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                else
+                    patchinfo.EdgeColor = edge_color;
+                end
             else
                 patchinfo.FaceColor = 'interp';
                 patchinfo.FaceVertexCData = f_tocolv(node_field);
-                patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                if isempty(edge_color)
+                    patchinfo.EdgeColor = [80 80 80]./255; %'non';
+                else
+                    patchinfo.EdgeColor = edge_color;
+                end
             end
             patch(patchinfo); hold on;
             h = colorbar;
@@ -159,9 +171,9 @@ switch type
         IDElem = IDElem(iIDElem);
         if ~exist('field','var')
             f_viewthings('type','face','node',mesh.node,...
-                         'face',mesh.face,'color',color);
+                         'face',mesh.face,'color',color,'edge_color',edge_color);
         else
-            f_viewthings('type','face','node',mesh.node,...
+            f_viewthings('type','face','node',mesh.node,'edge_color',edge_color, ...
                          'face',mesh.face(:,IDFace),'field',f_tocolv(field(IDElem)));
         end
     otherwise
