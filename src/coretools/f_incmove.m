@@ -53,22 +53,43 @@ end
 %--------------------------------------------------------------------------
 dcz = [1  find(diff(cmov))+1];
 %--------------------------------------------------------------------------
-for k = 1:nb_step
-    for i = 1 : length(dcz)-1
-        iP0 = dcz(i) : dcz(i+1)-1;
-        if i < length(dcz)-1
-            iP1 = dcz(i+1) : dcz(i+2)-1;
-            if i == 1
-                f0 = field(iP0);
-            end
-            field(iP0) = field(iP1);
+nb_cmov = length(dcz) - 1;
+for i = 1 : nb_cmov
+    iP{i} = dcz(i) : dcz(i+1)-1; % all have same cmov
+    f{i}  = field(iP{i});
+end
+%--------------------------------------------------------------------------
+for i = 1 : nb_cmov
+    k = i + nb_step;
+    if k <= nb_cmov
+        field(iP{k}) = f{i};
+    else
+        if ~cyclic_move
+            field(iP{i}) = 0;
         else
-            if ~cyclic_move
-                field(iP0) = 0;
-            else
-                field(iP0) = f0;
-            end
+            k = mod(k,nb_cmov); if k == 0; k = nb_cmov; end
+            field(iP{k}) = f{i};
         end
     end
 end
+
+
+% for k = 1:nb_step
+%     for i = 1 : length(dcz)-1
+%         iP0 = dcz(i) : dcz(i+1)-1;
+%         if i < length(dcz)-1
+%             iP1 = dcz(i+1) : dcz(i+2)-1;
+%             if i == 1
+%                 f0 = field(iP0);
+%             end
+%             field(iP0) = field(iP1);
+%         else
+%             if ~cyclic_move
+%                 field(iP0) = 0;
+%             else
+%                 field(iP0) = f0;
+%             end
+%         end
+%     end
+% end
 %--------------------------------------------------------------------------
