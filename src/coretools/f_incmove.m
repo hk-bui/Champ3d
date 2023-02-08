@@ -59,19 +59,32 @@ for i = 1 : nb_cmov
     f{i}  = field(iP{i});
 end
 %--------------------------------------------------------------------------
-for i = 1 : nb_cmov
-    k = i + nb_step;
-    if k <= nb_cmov
-        field(iP{k}) = f{i};
-    else
-        if ~cyclic_move
-            field(iP{i}) = 0;
+if ~cyclic_move
+    i0 = (1:nb_cmov).';
+    imov = circshift(i0,nb_step);
+    for i = 1 : nb_cmov
+        if nb_step > 0
+            if i >= nb_step
+                field(iP{i}) = f{imov(i)};
+            else
+                field(iP{i}) = 0;
+            end
         else
-            k = mod(k,nb_cmov); if k == 0; k = nb_cmov; end
-            field(iP{k}) = f{i};
+            if i <= nb_cmov - abs(nb_step)
+                field(iP{i}) = f{imov(i)};
+            else
+                field(iP{i}) = 0;
+            end
         end
     end
+else
+    i0 = (1:nb_cmov).';
+    imov = circshift(i0,nb_step);
+    for i = 1 : nb_cmov
+        field(iP{i}) = f{imov(i)};
+    end
 end
+
 
 
 % for k = 1:nb_step
