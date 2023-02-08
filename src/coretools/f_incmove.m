@@ -12,9 +12,10 @@ function [field, node, id_node] = f_incmove(field,node,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'direction','nb_step','cyclic_move'};
+arglist = {'id_node','direction','nb_step','cyclic_move'};
 
 % --- default input value
+id_node = [];
 direction = [];
 nb_step = 1;
 cyclic_move = 0;
@@ -29,7 +30,9 @@ for i = 1:(nargin-2)/2
 end
 
 %--------------------------------------------------------------------------
-id_node = 1:length(field);
+if isempty(id_node)
+    id_node = 1:length(field);
+end
 %--------------------------------------------------------------------------
 if strcmpi(direction,'x')
     [node, id] = f_multisort(node,'sort_order',[1 2 3]);
