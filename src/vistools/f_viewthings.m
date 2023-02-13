@@ -122,6 +122,7 @@ switch type
                 else
                     patchinfo.EdgeColor = edge_color;
                 end
+                cax = [min(patchinfo.FaceVertexCData) max(patchinfo.FaceVertexCData)];
             else
                 patchinfo.FaceColor = 'interp';
                 patchinfo.FaceVertexCData = f_tocolv(node_field);
@@ -130,11 +131,12 @@ switch type
                 else
                     patchinfo.EdgeColor = edge_color;
                 end
+                cax = [min(node_field(allnode)) max(node_field(allnode))];
             end
             patch(patchinfo); hold on;
             h = colorbar;
             allnode = unique(allnode);
-            caxis([min(node_field(allnode)) max(node_field(allnode))]);
+            caxis(cax);
             h.Label.String = 'Enter Unit';
             f_colormap;
         end
