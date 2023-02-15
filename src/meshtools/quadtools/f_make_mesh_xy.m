@@ -91,8 +91,10 @@ for ik = 1:size(y1,1)
     y2 = [y2 y1(ik,:)];
 end
 %----- centering
-x2 = x2 - (max(x2) - min(x2))/2;
-y2 = y2 - (max(y2) - min(y2))/2;
+
+% x2 = x2 - (max(x2) - min(x2))/2;
+% y2 = y2 - (max(y2) - min(y2))/2;
+
 %-----
 p2d = [x2;y2];
 %-----
