@@ -95,25 +95,3 @@ else
         fieldOut(iP{i}) = f{imov(i)};
     end
 end
-
-
-
-% for k = 1:nb_step
-%     for i = 1 : length(dcz)-1
-%         iP0 = dcz(i) : dcz(i+1)-1;
-%         if i < length(dcz)-1
-%             iP1 = dcz(i+1) : dcz(i+2)-1;
-%             if i == 1
-%                 f0 = field(iP0);
-%             end
-%             field(iP0) = field(iP1);
-%         else
-%             if ~cyclic_move
-%                 field(iP0) = 0;
-%             else
-%                 field(iP0) = f0;
-%             end
-%         end
-%     end
-% end
-%--------------------------------------------------------------------------
