@@ -84,11 +84,15 @@ iNoPhi2Remove = unique(iNoPhi2Remove);
 design3d.aphi.id_node_phi = unique(setdiff(design3d.aphi.id_node_phi, iNoPhi2Remove));
 %--------------------------------------------------------------------------
 
-iEdA = setdiff(1:nbEdge,iEdAfixed);
-iEdA(iEdA == 0) = [];
-iEdA = unique(iEdA);
 % ---
-design3d.aphi.id_edge_a = unique([design3d.aphi.id_edge_a iEdA]);
+% iEdA = setdiff(1:nbEdge,iEdAfixed);
+% iEdA(iEdA == 0) = [];
+% iEdA = unique(iEdA);
+% design3d.aphi.id_edge_a = unique([design3d.aphi.id_edge_a iEdA]);
+% ---
+
+iEdAfixed = unique(iEdAfixed);
+design3d.aphi.id_edge_a = unique(setdiff(design3d.aphi.id_edge_a,iEdAfixed));
 %--------------------------------------------------------------------------
 
 
