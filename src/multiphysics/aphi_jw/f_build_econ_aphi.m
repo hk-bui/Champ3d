@@ -48,6 +48,8 @@ if isfield(design3d,'econductor')
     if isempty(id_dom3d)
         for i = 1:nb_dom
             %---------------------------------------------
+            fprintf(['Building econ ' design3d.econductor(i).id_dom3d '\n']);
+            %---------------------------------------------
             iNoPhi = [iNoPhi reshape(design3d.mesh.elem(1:con.nbNo_inEl,design3d.econductor(i).id_elem),...
                                      1,con.nbNo_inEl*length(design3d.econductor(i).id_elem))];
             %---------------------------------------------
@@ -66,6 +68,8 @@ if isfield(design3d,'econductor')
     else
         for i = 1:nb_dom
             if strcmpi(design3d.econductor(i).id_dom3d,id_dom3d)
+                %---------------------------------------------
+                fprintf(['Building econ ' design3d.econductor(i).id_dom3d '\n']);
                 %---------------------------------------------
                 iNoPhi = [iNoPhi reshape(design3d.mesh.elem(1:con.nbNo_inEl,design3d.econductor(i).id_elem),...
                                          1,con.nbNo_inEl*length(design3d.econductor(i).id_elem))];
