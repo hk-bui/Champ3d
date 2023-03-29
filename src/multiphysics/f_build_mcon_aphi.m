@@ -42,12 +42,14 @@ if isfield(design3d,'mconductor')
                 %---------------------------------------------
                 fprintf(['Building mcon ' design3d.mconductor(idom).id_dom3d '\n']);
                 %--------------------------------------------------------------
-                ltensor.main_value = f_calparam(design3d,design3d.mconductor(idom).mur.main_value,'id_elem',design3d.mconductor(idom).id_elem);
-                ltensor.ort1_value = f_calparam(design3d,design3d.mconductor(idom).mur.ort1_value,'id_elem',design3d.mconductor(idom).id_elem);
-                ltensor.ort2_value = f_calparam(design3d,design3d.mconductor(idom).mur.ort2_value,'id_elem',design3d.mconductor(idom).id_elem);
-                ltensor.main_dir = f_calparam(design3d,design3d.mconductor(idom).mur.main_dir,'id_elem',design3d.mconductor(idom).id_elem);
-                ltensor.ort1_dir = f_calparam(design3d,design3d.mconductor(idom).mur.ort1_dir,'id_elem',design3d.mconductor(idom).id_elem);
-                ltensor.ort2_dir = f_calparam(design3d,design3d.mconductor(idom).mur.ort2_dir,'id_elem',design3d.mconductor(idom).id_elem);
+                IDElem = design3d.mconductor(idom).id_elem;
+                mur = design3d.mconductor(idom).mur;
+                ltensor.main_value = f_calparam(design3d,mur.main_value,'id_elem',IDElem);
+                ltensor.ort1_value = f_calparam(design3d,mur.ort1_value,'id_elem',IDElem);
+                ltensor.ort2_value = f_calparam(design3d,mur.ort2_value,'id_elem',IDElem);
+                ltensor.main_dir = f_calparam(design3d,mur.main_dir,'id_elem',IDElem);
+                ltensor.ort1_dir = f_calparam(design3d,mur.ort1_dir,'id_elem',IDElem);
+                ltensor.ort2_dir = f_calparam(design3d,mur.ort2_dir,'id_elem',IDElem);
                 gtensor = f_gtensor(ltensor);
                 design3d.mconductor(idom).gtensor = gtensor;
                 %--------------------------------------------------------------
@@ -55,11 +57,12 @@ if isfield(design3d,'mconductor')
                 %--------------------------------------------------------------
                 design3d.aphi.SWfnuWf = design3d.aphi.SWfnuWf + ...
                                       f_cwfwf(design3d.mesh,'coef',nu,...
-                                      'id_elem',design3d.mconductor(idom).id_elem);
+                                      'id_elem',IDElem);
                 %--------------------------------------------------------------
-                id_elem_mc = [id_elem_mc design3d.mconductor(idom).id_elem];
+                id_elem_mc = [id_elem_mc IDElem];
                 %--------------------------------------------------------------
             else
+                %----- TODO ------
                 % --- Flux
                 Flux = design3d.mesh.R * design3d.aphi.MVP;
                 % --- Flux density
@@ -135,12 +138,14 @@ if isfield(design3d,'mconductor')
                     %---------------------------------------------
                     fprintf(['Building mcon ' design3d.mconductor(idom).id_dom3d '\n']);
                     %--------------------------------------------------------------
-                    ltensor.main_value = f_calparam(design3d,design3d.mconductor(idom).mur.main_value,'id_elem',design3d.mconductor(idom).id_elem);
-                    ltensor.ort1_value = f_calparam(design3d,design3d.mconductor(idom).mur.ort1_value,'id_elem',design3d.mconductor(idom).id_elem);
-                    ltensor.ort2_value = f_calparam(design3d,design3d.mconductor(idom).mur.ort2_value,'id_elem',design3d.mconductor(idom).id_elem);
-                    ltensor.main_dir = f_calparam(design3d,design3d.mconductor(idom).mur.main_dir,'id_elem',design3d.mconductor(idom).id_elem);
-                    ltensor.ort1_dir = f_calparam(design3d,design3d.mconductor(idom).mur.ort1_dir,'id_elem',design3d.mconductor(idom).id_elem);
-                    ltensor.ort2_dir = f_calparam(design3d,design3d.mconductor(idom).mur.ort2_dir,'id_elem',design3d.mconductor(idom).id_elem);
+                    IDElem = design3d.mconductor(idom).id_elem;
+                    mur = design3d.mconductor(idom).mur;
+                    ltensor.main_value = f_calparam(design3d,mur.main_value,'id_elem',IDElem);
+                    ltensor.ort1_value = f_calparam(design3d,mur.ort1_value,'id_elem',IDElem);
+                    ltensor.ort2_value = f_calparam(design3d,mur.ort2_value,'id_elem',IDElem);
+                    ltensor.main_dir = f_calparam(design3d,mur.main_dir,'id_elem',IDElem);
+                    ltensor.ort1_dir = f_calparam(design3d,mur.ort1_dir,'id_elem',IDElem);
+                    ltensor.ort2_dir = f_calparam(design3d,mur.ort2_dir,'id_elem',IDElem);
                     gtensor = f_gtensor(ltensor);
                     design3d.mconductor(idom).gtensor = gtensor;
                     %--------------------------------------------------------------
@@ -148,9 +153,9 @@ if isfield(design3d,'mconductor')
                     %--------------------------------------------------------------
                     design3d.aphi.SWfnuWf = design3d.aphi.SWfnuWf + ...
                                           f_cwfwf(design3d.mesh,'coef',nu,...
-                                          'id_elem',design3d.mconductor(idom).id_elem);
+                                          'id_elem',IDElem);
                     %--------------------------------------------------------------
-                    id_elem_mc = [id_elem_mc design3d.mconductor(idom).id_elem];
+                    id_elem_mc = [id_elem_mc IDElem];
                     %--------------------------------------------------------------
                 end
             end
