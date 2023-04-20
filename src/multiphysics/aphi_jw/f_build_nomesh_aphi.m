@@ -10,7 +10,7 @@ if isfield(design3d,'nomesh')
     nb_nomesh = length(design3d.nomesh);
     for i = 1:nb_nomesh
         design3d.aphi.id_edge_a = unique(setdiff(...
-            design3d.aphi.id_edge_a,design3d.nomesh.id_inside_edge));
+            design3d.aphi.id_edge_a,design3d.nomesh(i).id_inside_edge));
     end
 end
 
