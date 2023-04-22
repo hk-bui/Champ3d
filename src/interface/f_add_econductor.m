@@ -19,13 +19,10 @@ sigma    = 0;
 
 %--------------------------------------------------------------------------
 if ~isfield(design3d,'econductor')
-    iec = 0;
-else
-    iec = length(design3d.econductor);
+    design3d.econductor = [];
 end
-
-id_econductor = ['econ' num2str(iec+1)];
-
+%--------------------------------------------------------------------------
+id_econductor = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No conductor to add!']);
@@ -41,42 +38,44 @@ for i = 1:(nargin-1)/2
 end
 %--------------------------------------------------------------------------
 
+if isempty(id_econductor)
+    error([mfilename ': id_econductor must be defined !'])
+end
+
 if ~isfield(design3d,'dom3d')
     error([mfilename ': dom3d is not defined !']);
 end
 
-if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be defined !'])
-end
-
-if ~isfield(design3d.dom3d,id_dom3d)
-    error([mfilename ': ' id_dom3d ' is not defined !']);
+if isempty(id_dom3d) && isempty(id_elem)
+    error([mfilename ': id_dom3d or id_elem must be defined !'])
 end
 
 %--------------------------------------------------------------------------
-design3d.econductor(iec+1).id_econductor  = id_econductor;
-design3d.econductor(iec+1).id_dom3d = id_dom3d;
-
 if isempty(id_elem)
-    design3d.econductor(iec+1).id_elem  = design3d.dom3d.(id_dom3d).id_elem;
+    design3d.econductor.(id_econductor).id_elem  = design3d.dom3d.(id_dom3d).id_elem;
 else
-    design3d.econductor(iec+1).id_elem  = id_elem;
+    design3d.econductor.(id_econductor).id_elem  = id_elem;
 end
+% ---
+design3d.econductor.(id_econductor).id_dom3d = id_dom3d;
+design3d.econductor.(id_econductor).sigma = sigma;
 
-if isstruct(sigma)
-    design3d.econductor(iec+1).sigma = sigma;
-elseif isnumeric(sigma)
-    if numel(sigma) == 1 % scalar
-    design3d.econductor(iec+1).sigma = ...
-        f_make_gtensor('type','gtensor','main_value',sigma,'ort1_value',sigma,'ort2_value',sigma,...
-                       'main_dir',[1 0 0],'ort1_dir',[0 1 0],'ort2_dir',[0 0 1]);
-    end
-    if numel(sigma) == 9 % tensor
-        design3d.econductor(iec+1).sigma = sigma;
-    end
-end
-
-end
+% --- info message
+fprintf(['Add econ ' id_econductor ' - done \n']);
 
 
+
+%
+% if isstruct(sigma)
+%     design3d.econductor.(id_econductor).sigma = sigma;
+% elseif isnumeric(sigma)
+%     if numel(sigma) == 1 % scalar
+%     design3d.econductor.(id_econductor).sigma = ...
+%         f_make_gtensor('type','gtensor','main_value',sigma,'ort1_value',sigma,'ort2_value',sigma,...
+%                        'main_dir',[1 0 0],'ort1_dir',[0 1 0],'ort2_dir',[0 0 1]);
+%     end
+%     if numel(sigma) == 9 % tensor
+%         design3d.econductor.(id_econductor).sigma = sigma;
+%     end
+% end
 
