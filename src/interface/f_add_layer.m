@@ -16,7 +16,7 @@ end
 %--------------------------------------------------------------------------
 % --- default input value
 len = length(layer) + 1;
-id_layer  = ['XXLayerNo' num2str(len)];
+id_layer  = ['LayerNo' num2str(len)];
 thickness = 0;
 nb_slice  = 1;
 z_type    = 'lin';
@@ -61,9 +61,9 @@ switch z_type(1:3)
 end
 %--------------------------------------------------------------------------
 % --- output
-layer(len).id_layer  = id_layer;
-layer(len).nb_slice  = nb_slice;
-layer(len).z_type    = z_type;
-layer(len).thickness = lthickness;
-
+layer.(id_layer).nb_slice  = nb_slice;
+layer.(id_layer).z_type    = z_type;
+layer.(id_layer).thickness = lthickness;
+% --- info message
+fprintf(['Add ' id_layer ' - done \n']);
 
