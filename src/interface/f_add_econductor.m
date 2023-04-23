@@ -47,15 +47,14 @@ if isempty(id_dom3d) && isempty(id_elem)
 end
 
 %--------------------------------------------------------------------------
-if isempty(id_elem)
-    design3d.econductor.(id_econductor).id_elem  = design3d.dom3d.(id_dom3d).id_elem;
-else
-    design3d.econductor.(id_econductor).id_elem  = id_elem;
+if ~isempty(id_dom3d)
+    id_elem = design3d.dom3d.(id_dom3d).id_elem;
 end
-% ---
+%--------------------------------------------------------------------------
+% --- Output
 design3d.econductor.(id_econductor).id_dom3d = id_dom3d;
+design3d.econductor.(id_econductor).id_elem = id_elem;
 design3d.econductor.(id_econductor).sigma = sigma;
-
 % --- info message
 fprintf(['Add econ ' id_econductor ' - done \n']);
 

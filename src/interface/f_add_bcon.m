@@ -9,106 +9,74 @@ function design3d = f_add_bcon(design3d,varargin)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-if isempty(design3d)
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'defined_on','id_bcon','id_dom3d','id_elem','bc_type','bc_value',...
+           'sigma','mur'};
+
+% --- default input value
+
+id_dom3d = [];
+id_elem  = [];
+bc_type  = [];
+id_bcon  = [];
+defined_on = [];
+bc_value = 0;
+bc_coef  = 0;
+sigma    = 0;
+mur      = 1;
+%--------------------------------------------------------------------------
+if ~isfield(design3d,'bcon')
     design3d.bcon = [];
 end
-
-if ~isfield(design3d,'bcon')
-    iec = 0;
-else
-    iec = length(design3d.bcon);
-end
-
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error('No boundary condition to add!');
+    error([mfilename ': No boundary condition to add!']);
 end
 %--------------------------------------------------------------------------
-datin = [];
+% --- check and update input
 for i = 1:(nargin-1)/2
-    datin.(lower(varargin{2*i-1})) = varargin{2*i};
-    design3d.bcon(iec+1).(lower(varargin{2*i-1})) = varargin{2*i};
-end
-
-%--------------------------------------------------------------------------
-if isfield(datin,'bc_type')
-    design3d.bcon(iec+1).bc_type = datin.bc_type;
-    %------------------------------------------------------
-    switch datin.bc_type
-        %--------------------------------------------------
-        case 'fixed'
-            if isfield(datin,'bc_value')
-                design3d.bcon(iec+1).bc_value = datin.bc_value;
-            else
-                design3d.bcon(iec+1).bc_value = 0;
-            end
-        %--------------------------------------------------
-        case 'neumann'
-            if ~isfield(datin,'bc_coef')
-                design3d.bcon(iec+1).bc_coef = 0;
-            end
-            if ~isfield(datin,'bc_value')
-                design3d.bcon(iec+1).bc_value = 0;
-            end
-        %--------------------------------------------------
-        case 'sibc'
-            if ~isfield(datin,'bc_sigma')
-                design3d.bcon(iec+1).bc_sigma = 0;
-            end
-        %--------------------------------------------------
-        case 'periodic'
-        %--------------------------------------------------
-        case 'anti-periodic'
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
     end
 end
-
 %--------------------------------------------------------------------------
-if ~isfield(datin,'sigma')
-    design3d.bcon(iec+1).gtsigma = [1 0 0; 0 1 0; 0 0 1];
-elseif length(datin.sigma) == 1 & ~isfield(datin.sigma,'main_value')
-    design3d.bcon(iec+1).gtsigma = [datin.sigma 0 0; 0 datin.sigma 0; 0 0 datin.sigma];
-elseif length(datin.sigma) == [3,3] & ~isfield(datin.sigma,'main_value')
-    design3d.bcon(iec+1).gtsigma = datin.sigma;
-elseif isfield(datin.sigma,'main_value')
-    design3d.bcon(iec+1).gtsigma = f_gtensor(datin.sigma);
+
+if isempty(id_bcon)
+    error([mfilename ': id_bcon must be defined !'])
+end
+
+if isempty(defined_on)
+    error([mfilename ': defined_on must be specified !'])
+end
+
+if ~isfield(design3d,'dom3d')
+    error([mfilename ': dom3d is not defined !']);
+end
+
+if isempty(id_dom3d) && isempty(id_elem)
+    error([mfilename ': id_dom3d or id_elem must be defined !'])
 end
 
 %--------------------------------------------------------------------------
-if ~isfield(datin,'mur')
-    design3d.bcon(iec+1).gtmur = [1 0 0; 0 1 0; 0 0 1];
-elseif length(datin.mur) == 1 & ~isfield(datin.mur,'main_value')
-    design3d.bcon(iec+1).gtmur = [datin.mur 0 0; 0 datin.mur 0; 0 0 datin.mur];
-elseif length(datin.mur) == [3,3] & ~isfield(datin.mur,'main_value')
-    design3d.bcon(iec+1).gtmur = datin.mur;
-elseif isfield(datin.mur,'main_value')
-    design3d.bcon(iec+1).gtmur = f_gtensor(datin.mur);
+if isempty(bc_type)
+    error([mfilename ': bc_type (fixed, neumann, sibc) must be defined !']);
 end
-
 %--------------------------------------------------------------------------
+if ~isempty(id_dom3d)
+    id_elem = design3d.dom3d.(id_dom3d).id_elem;
+end
+%--------------------------------------------------------------------------
+bcmesh = f_make_mds(design3d.mesh.node,...
+                    design3d.mesh.elem(:,id_elem),...
+                    design3d.mesh.elem_type);
+% ---
 con = f_connexion(design3d.mesh.elem_type);
 nbNo_inFa_max = max(con.nbNo_inFa);
-if isfield(datin,'defined_on')
-    design3d.bcon(iec+1).defined_on = datin.defined_on;
-end
-%---------
-if isfield(datin,'id_elem')
-    datin.id_elem = unique(datin.id_elem);
-else
-    datin.id_elem = [];
-end
-%---------
-if isfield(datin,'id_dom3d')
-    design3d.bcon(iec+1).id_elem  = design3d.dom3d.(datin.id_dom3d).id_elem;
-else
-    design3d.bcon(iec+1).id_elem  = datin.id_elem;
-end
-%---------
-bcmesh = f_make_mds(design3d.mesh.node,design3d.mesh.elem(:,design3d.bcon(iec+1).id_elem),design3d.mesh.elem_type);
-%--------------------------------------------------------------------------
-id_face = ...
-    f_findvec(bcmesh.bound(1:nbNo_inFa_max,:),design3d.mesh.face(1:nbNo_inFa_max,:));
-design3d.bcon(iec+1).id_face = id_face;
-design3d.bcon(iec+1).s_face = f_measure(design3d.mesh.node,design3d.mesh.face(:,id_face),'face');
+id_face = f_findvec(bcmesh.bound(1:nbNo_inFa_max,:),...
+                    design3d.mesh.face(1:nbNo_inFa_max,:));
+s_face  = f_measure(design3d.mesh.node,design3d.mesh.face(:,id_face),'face');
 %--------------------------------------------------------------------------
 nbEd_inFa_max = 0;
 for i = 1:length(con.nbEd_inFa)
@@ -119,14 +87,32 @@ id_edge = reshape(design3d.mesh.edge_in_face(1:nbEd_inFa_max,id_face),...
                   1,nbEd_inFa_max*length(id_face));
 id_edge = unique(id_edge);
 id_edge(id_edge == 0) = [];
-design3d.bcon(iec+1).id_edge = id_edge;
 %--------------------------------------------------------------------------
 id_node = reshape(design3d.mesh.edge(1:2,id_edge),...
                   1,2*length(id_edge));
 id_node = unique(id_node);
 id_node(id_node == 0) = [];
-design3d.bcon(iec+1).id_node = id_node;
 %--------------------------------------------------------------------------
+% --- Output
+design3d.bcon.(id_bcon).id_dom3d = id_dom3d;
+design3d.bcon.(id_bcon).bc_type  = bc_type;
+design3d.bcon.(id_bcon).bc_value = bc_value;
+design3d.bcon.(id_bcon).bc_coef  = bc_coef;
+design3d.bcon.(id_bcon).sigma    = sigma;
+design3d.bcon.(id_bcon).mur      = mur;
+design3d.bcon.(id_bcon).defined_on = defined_on;
+design3d.bcon.(id_bcon).id_elem = id_elem;
+design3d.bcon.(id_bcon).id_face = id_face;
+design3d.bcon.(id_bcon).id_edge = id_edge;
+design3d.bcon.(id_bcon).id_node = id_node;
+design3d.bcon.(id_bcon).s_face  = s_face;
+
+% --- info message
+fprintf(['Add bcon ' id_bcon ' - done \n']);
+
+
+
+
 
 %%
 % if strcmpi(datin.bc_type,'sibc')

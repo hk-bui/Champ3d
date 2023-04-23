@@ -48,15 +48,14 @@ if isempty(id_dom3d) && isempty(id_elem)
 end
 
 %--------------------------------------------------------------------------
-if isempty(id_elem)
-    design3d.mconductor.(id_mconductor).id_elem  = design3d.dom3d.(id_dom3d).id_elem;
-else
-    design3d.mconductor.(id_mconductor).id_elem  = id_elem;
+if ~isempty(id_dom3d)
+    id_elem = design3d.dom3d.(id_dom3d).id_elem;
 end
-% ---
+%--------------------------------------------------------------------------
+% --- Output
 design3d.mconductor.(id_mconductor).id_dom3d = id_dom3d;
+design3d.mconductor.(id_mconductor).id_elem  = id_elem;
 design3d.mconductor.(id_mconductor).mur = mur;
-
 % --- info message
 fprintf(['Add mcon ' id_mconductor ' - done \n']);
 
