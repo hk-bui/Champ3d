@@ -374,4 +374,55 @@ end
 
 end
 
+%% Last worked
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+% fprintf('Building aphi system .... \n');
+% tic
+% %--------------------------------------------------------------------------
+% design3d.aphi.fr            = 0;
+% design3d.aphi.id_node_phi   = [];
+% design3d.aphi.id_edge_a     = [];
+% design3d.aphi.MVP           = [];
+% design3d.aphi.Phi           = [];
+% design3d.aphi.id_bcon_sibc  = [];
+% design3d.aphi.id_bcon_for_a = [];
+% %--------------------------------------------------------------------------
+% for i = 1:(nargin-1)/2
+%     design3d.aphi.(lower(varargin{2*i-1})) = varargin{2*i};
+% end
+% for i = 1:(nargin-1)/2
+%     eval([(lower(varargin{2*i-1})) '= varargin{2*i};']);
+% end
+% %--------------------------------------------------------------------------
+% 
+% nbElem = design3d.mesh.nbElem;
+% nbEdge = design3d.mesh.nbEdge;
+% nbFace = design3d.mesh.nbFace;
+% nbNode = design3d.mesh.nbNode;
+% con = f_connexion(design3d.mesh.elem_type);
+% 
+% design3d.aphi.id_edge_a = 1:design3d.mesh.nbEdge;
+% design3d.aphi.id_elem_nomesh = [];
+% 
+% %--------------------------------------------------------------------------
+% design3d = f_build_econ_aphi(design3d);
+% %--------------------------------------------------------------------------
+% %design3d = f_build_mcon_aphi(design3d);
+% %--------------------------------------------------------------------------
+% %design3d = f_build_air_aphi(design3d);
+% %--------------------------------------------------------------------------
+% design3d = f_build_sfield_aphi(design3d);
+% %--------------------------------------------------------------------------
+% fprintf('... %.4f s \n',toc);
+
+
+
+
+
 

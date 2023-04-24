@@ -10,6 +10,11 @@ function f_colormap(varargin)
 %--------------------------------------------------------------------------
 
 cmap = 'champ3d';
+nbcolor = 256;
+
+for i = 1:nargin/2
+    eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+end
 
 if nargin > 0
     cmap = varargin{1};
@@ -19,5 +24,5 @@ switch lower(cmap)
     case 'champ3d'
         cpmap = interp1([1 52 103 154 205 256],...
                     [0 0 0; 0 0 .75; .5 0 .8; 1 .1 0; 1 .7 0; 1 1 0],1:256);
-        colormap(cpmap);
+        colormap(cpmap(round(linspace(1,256,nbcolor)),:));
 end
