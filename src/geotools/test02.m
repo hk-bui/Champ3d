@@ -56,10 +56,15 @@ geo = f_add_dom2d(geo,'id_mesh2d','mesh2d_light',...
         'id_x', {'xplate_a','xcoil','xplate_b'},...
         'id_y', {'yplate_a','yplate_esurf'});
 
+geo = f_add_dom2d(geo,'id_dom2d','coil2d','id_x','xcoil','id_y',{'ycoil'});
+geo = f_add_dom2d(geo,'id_dom2d','esurf2d','id_x',{'xplate_a','xcoil','xplate_b'},'id_y','yplate_esurf');
 
 figure
-f_view_mesh2d(geo,'color',f_color(10)); hold on
-f_view_mesh2d(geo,'id_dom2d','plate2d','color',f_color(2));
+f_view_mesh2d(geo,'color','w'); hold on
+f_view_mesh2d(geo,'id_dom2d','plate2d','color',f_color(1));
+f_view_mesh2d(geo,'id_dom2d','coil2d','color',f_color(2));
+f_view_mesh2d(geo,'id_dom2d','esurf2d','color',f_color(3));
+
 
 
 return
