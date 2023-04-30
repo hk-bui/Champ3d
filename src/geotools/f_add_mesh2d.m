@@ -35,14 +35,8 @@ end
 %--------------------------------------------------------------------------
 if strcmpi(build_from,'geo1d')
     %----------------------------------------------------------------------
-    keeparg = {'flog','id_x','id_y'};
-    argtopass = {};
-    for i = 1:length(keeparg)
-        argtopass{2*i-1} = keeparg{i};
-        argtopass{2*i}   = eval(keeparg{i});
-    end
     % --- Output
-    geo.geo2d.mesh2d.(id_mesh2d) = f_mesh2dgeo1d(geo.geo1d,argtopass{:});
+    geo = f_mesh2dgeo1d(geo,varargin{:});
     % --- Log message
     fprintf(['Add mesh2d #' id_mesh2d ' - done \n']);
 

@@ -1,4 +1,4 @@
-function mesh2d = f_mesh2dgeo1d(geo1d,varargin)
+function geo = f_mesh2dgeo1d(geo,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,7 +7,7 @@ function mesh2d = f_mesh2dgeo1d(geo1d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'flog','id_x','id_y'};
+arglist = {'build_from','id_mesh2d','flog','id_x','id_y'};
 
 % --- default input value
 flog = 1.05; % log factor when making log mesh
@@ -23,6 +23,8 @@ for i = 1:(nargin-1)/2
     end
 end
 
+% -------------------------------------------------------------------------
+geo1d = geo.geo1d;
 % -------------------------------------------------------------------------
 if isempty(id_x)
     id_x = fieldnames(geo1d.x);
@@ -119,13 +121,13 @@ nb_node = size(node,2);
 nb_elem = size(elem,2);
 %--------------------------------------------------------------------------
 % --- Output
-mesh2d.mesher = 'mesh2dgeo1d';
-mesh2d.node = node;
-mesh2d.nb_node = nb_node;
-mesh2d.elem = elem;
-mesh2d.nb_elem = nb_elem;
-mesh2d.elem_code = elem_code;
-mesh2d.elem_type = 'quad';
+geo.geo2d.mesh2d.(id_mesh2d).mesher = 'mesh2dgeo1d';
+geo.geo2d.mesh2d.(id_mesh2d).node = node;
+geo.geo2d.mesh2d.(id_mesh2d).nb_node = nb_node;
+geo.geo2d.mesh2d.(id_mesh2d).elem = elem;
+geo.geo2d.mesh2d.(id_mesh2d).nb_elem = nb_elem;
+geo.geo2d.mesh2d.(id_mesh2d).elem_code = elem_code;
+geo.geo2d.mesh2d.(id_mesh2d).elem_type = 'quad';
 % ---
 % for i = 1:lenx
 %     mesh2d.(id_x{i}).id_elem = all_id_elem(elem_code == i);
@@ -134,10 +136,10 @@ mesh2d.elem_type = 'quad';
 %     mesh2d.(id_y{i}).id_elem = all_id_elem(idy_elem == i);
 % end
 % ---
-mesh2d.cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
-mesh2d.cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
+geo.geo2d.mesh2d.(id_mesh2d).cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
+geo.geo2d.mesh2d.(id_mesh2d).cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
 % ---
-mesh2d.id_elemdom = -1; % <-- old t4 from femm, t5 from quad
+geo.geo2d.mesh2d.(id_mesh2d).id_elemdom = -1; % <-- old t4 from femm, t5 from quad
 % --- Log message
 fprintf('done ----- in %.2f s \n',toc);
 

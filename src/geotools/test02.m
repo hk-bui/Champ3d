@@ -59,15 +59,35 @@ geo = f_add_dom2d(geo,'id_mesh2d','mesh2d_light',...
 geo = f_add_dom2d(geo,'id_dom2d','coil2d','id_x','xcoil','id_y',{'ycoil'});
 geo = f_add_dom2d(geo,'id_dom2d','esurf2d','id_x',{'xplate_a','xcoil','xplate_b'},'id_y','yplate_esurf');
 
-% figure
-% f_view_mesh2d(geo,'color','w'); hold on
-% f_view_mesh2d(geo,'id_dom2d','plate2d','color',f_color(1));
-% f_view_mesh2d(geo,'id_dom2d','coil2d','color',f_color(2));
-% f_view_mesh2d(geo,'id_dom2d','esurf2d','color',f_color(3));
+figure
+f_view_mesh2d(geo,'color','w'); hold on
+f_view_mesh2d(geo,'id_dom2d','plate2d','color',f_color(1));
+f_view_mesh2d(geo,'id_dom2d','coil2d','color',f_color(2));
+f_view_mesh2d(geo,'id_dom2d','esurf2d','color',f_color(3));
 
 
 geo = f_add_mesh3d(geo,'id_mesh3d','mesh1','mesher','champ3d_hexa',...
                        'id_mesh2d',{'mesh2d_light'},'id_layer',{'layer_a','lLine','layer_b'});
+
+geo = f_add_dom3d(geo,'id_dom3d','coil', 'id_mesh3d','mesh1', ...
+                      'id_dom2d','coil2d','id_layer',{'layer_a','lLine','layer_b'});
+                  
+geo = f_add_dom3d(geo,'id_dom3d','plate', 'id_mesh3d','mesh1', ...
+                      'id_dom2d',{'plate2d','esurf2d'},'id_layer',{'layer_a','lLine','layer_b'});
+
+
+figure
+IDElem = design3d.dom3d.plate.id_elem;
+f_viewthings('type','elem','node',design3d.mesh.node,'elem',design3d.mesh.elem(:,IDElem),...
+             'elem_type','hex','color',f_randcolor); hold on;
+title('plate');
+axis equal; axis tight; hold on
+%---
+IDElem = design3d.dom3d.coil.id_elem;
+f_viewthings('type','elem','node',design3d.mesh.node,'elem',design3d.mesh.elem(:,IDElem),...
+             'elem_type','hex','color',f_randcolor); hold on;
+title('coil');
+axis equal; axis tight; hold on
 
 return
 

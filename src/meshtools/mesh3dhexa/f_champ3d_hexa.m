@@ -98,6 +98,7 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
+geo.geo3d.mesh3d.(id_mesh3d).mesher = 'champ3d_hexa';
 geo.geo3d.mesh3d.(id_mesh3d).node = node;
 geo.geo3d.mesh3d.(id_mesh3d).nb_node = nb_node;
 geo.geo3d.mesh3d.(id_mesh3d).elem = elem;
