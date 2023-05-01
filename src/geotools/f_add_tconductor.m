@@ -1,4 +1,4 @@
-function design3d = f_add_econductor(design3d,varargin)
+function design3d = f_add_tconductor(design3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,21 +7,28 @@ function design3d = f_add_econductor(design3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_econductor','id_dom3d','id_elem','sigma'};
+arglist = {'design3d','id_tconductor','id_dom3d','id_elem',...
+           'flambda','frho','fcp','frhocp',...
+           'lambda','rho','cp','rhocp'};
 
 % --- default input value
 id_dom3d = [];
 id_elem  = [];
-sigma    = 0;
-id_econductor = [];
-
+flambda  = [];
+frho     = [];
+fcp      = [];
+lambda   = [];
+rho      = [];
+cp       = [];
+rhocp    = [];
+id_tconductor = [];
 %--------------------------------------------------------------------------
-if ~isfield(design3d,'econductor')
-    design3d.econductor = [];
+if ~isfield(design3d,'tconductor')
+    design3d.tconductor = [];
 end
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No econductor to add!']);
+    error([mfilename ': No tconductor to add!']);
 end
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -33,9 +40,8 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-
-if isempty(id_econductor)
-    error([mfilename ': id_econductor must be defined !'])
+if isempty(id_tconductor)
+    error([mfilename ': id_tconductor must be defined !'])
 end
 
 if ~isfield(design3d,'dom3d')
@@ -52,25 +58,17 @@ if ~isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
-design3d.econductor.(id_econductor).id_dom3d = id_dom3d;
-design3d.econductor.(id_econductor).id_elem = id_elem;
-design3d.econductor.(id_econductor).sigma = sigma;
+design3d.tconductor.(id_tconductor).id_dom3d = id_dom3d;
+design3d.tconductor.(id_tconductor).id_elem = id_elem;
+design3d.tconductor.(id_tconductor).flambda = flambda;
+design3d.tconductor.(id_tconductor).frho = frho;
+design3d.tconductor.(id_tconductor).fcp = fcp;
+design3d.tconductor.(id_tconductor).lambda = lambda;
+design3d.tconductor.(id_tconductor).rho = rho;
+design3d.tconductor.(id_tconductor).cp = cp;
+design3d.tconductor.(id_tconductor).rhocp = rhocp;
 % --- info message
-fprintf(['Add econ ' id_econductor ' - done \n']);
+fprintf(['Add tcon ' id_tconductor '\n']);
 
 
-
-%
-% if isstruct(sigma)
-%     design3d.econductor.(id_econductor).sigma = sigma;
-% elseif isnumeric(sigma)
-%     if numel(sigma) == 1 % scalar
-%     design3d.econductor.(id_econductor).sigma = ...
-%         f_make_gtensor('type','gtensor','main_value',sigma,'ort1_value',sigma,'ort2_value',sigma,...
-%                        'main_dir',[1 0 0],'ort1_dir',[0 1 0],'ort2_dir',[0 0 1]);
-%     end
-%     if numel(sigma) == 9 % tensor
-%         design3d.econductor.(id_econductor).sigma = sigma;
-%     end
-% end
 

@@ -10,6 +10,7 @@ function geo = f_mesh2dgeo1d(geo,varargin)
 arglist = {'build_from','id_mesh2d','flog','id_x','id_y'};
 
 % --- default input value
+id_mesh2d = [];
 flog = 1.05; % log factor when making log mesh
 id_x = [];
 id_y = [];
@@ -36,7 +37,9 @@ end
 % -------------------------------------------------------------------------
 
 tic;
-fprintf('Making mesh2d from geo1d ...')
+fprintf(['Making mesh2d #' id_mesh2d 'from geo1d with : \n']);
+fprintf(['id_x #' strjoin(id_x,', #') '\n']);
+fprintf(['id_y #' strjoin(id_y,', #')])
 
 % -------------------------------------------------------------------------
 xDom    = [];
@@ -129,19 +132,12 @@ geo.geo2d.mesh2d.(id_mesh2d).nb_elem = nb_elem;
 geo.geo2d.mesh2d.(id_mesh2d).elem_code = elem_code;
 geo.geo2d.mesh2d.(id_mesh2d).elem_type = 'quad';
 % ---
-% for i = 1:lenx
-%     mesh2d.(id_x{i}).id_elem = all_id_elem(elem_code == i);
-% end
-% for i = 1:leny
-%     mesh2d.(id_y{i}).id_elem = all_id_elem(idy_elem == i);
-% end
+% geo.geo2d.mesh2d.(id_mesh2d).cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
+% geo.geo2d.mesh2d.(id_mesh2d).cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
 % ---
-geo.geo2d.mesh2d.(id_mesh2d).cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
-geo.geo2d.mesh2d.(id_mesh2d).cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
-% ---
-geo.geo2d.mesh2d.(id_mesh2d).id_elemdom = -1; % <-- old t4 from femm, t5 from quad
+%geo.geo2d.mesh2d.(id_mesh2d).id_elemdom = -1; % <-- old t4 from femm, t5 from quad
 % --- Log message
-fprintf('done ----- in %.2f s \n',toc);
+fprintf(' --- in %.2f s \n',toc);
 
 
 

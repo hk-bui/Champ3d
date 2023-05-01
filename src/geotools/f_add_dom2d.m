@@ -1,4 +1,4 @@
-function geo = f_add_dom2d(geo,varargin)
+function c3dobj = f_add_dom2d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -27,7 +27,7 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh2d)
-    id_mesh2d = fieldnames(geo.geo2d.mesh2d);
+    id_mesh2d = fieldnames(c3dobj.geo2d.mesh2d);
     id_mesh2d = id_mesh2d{1};
 end
 
@@ -36,7 +36,7 @@ if isempty(id_dom2d)
 end
 
 %--------------------------------------------------------------------------
-switch geo.geo2d.mesh2d.(id_mesh2d).mesher
+switch c3dobj.geo2d.mesh2d.(id_mesh2d).mesher
     case 'mesh2dgeo1d'
         %------------------------------------------------------------------
         if isempty(id_x) || isempty(id_y)
@@ -47,22 +47,28 @@ switch geo.geo2d.mesh2d.(id_mesh2d).mesher
         id_y = f_to_dcellargin(id_y);
         [id_x, id_y] = f_pairing_cellargin(id_x, id_y);
         %------------------------------------------------------------------
-        id_all_elem = 1:geo.geo2d.mesh2d.(id_mesh2d).nb_elem;
-        elem_code = geo.geo2d.mesh2d.(id_mesh2d).elem_code;
+        id_all_elem = 1:c3dobj.geo2d.mesh2d.(id_mesh2d).nb_elem;
+        all_elem_code = c3dobj.geo2d.mesh2d.(id_mesh2d).elem_code;
         id_elem = [];
+        elem_code = [];
         for i = 1:length(id_x)
             for j = 1:length(id_x{i})
                 codeidx = f_str2code(id_x{i}{j});
                 for k = 1:length(id_y{i})
                     codeidy = f_str2code(id_y{i}{k});
                     id_elem = [id_elem ...
-                               id_all_elem(elem_code == codeidx * codeidy)];
+                               id_all_elem(all_elem_code == codeidx * codeidy)];
+                    elem_code = [elem_code codeidx * codeidy];
                 end
             end
         end
         id_elem = unique(id_elem);
+        elem_code = unique(elem_code);
         %------------------------------------------------------------------
-        geo.geo2d.dom2d.(id_dom2d).id_elem = id_elem;
+        c3dobj.geo2d.dom2d.(id_dom2d).id_elem = id_elem;
+        c3dobj.geo2d.dom2d.(id_dom2d).elem_code = elem_code;
+        %------------------------------------------------------------------
+        fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
         %------------------------------------------------------------------
     case 'quadmesh'
     case 'triangle-femm'

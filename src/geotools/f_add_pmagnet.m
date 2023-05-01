@@ -60,7 +60,7 @@ design3d.pmagnet.(id_pmagnet).br_value = br_value;
 design3d.pmagnet.(id_pmagnet).br_ori   = br_ori;
 design3d.pmagnet.(id_pmagnet).id_bcon  = id_bcon;
 % --- info message
-fprintf(['Add pmagnet ' id_pmagnet ' - done \n']);
+fprintf(['Add pmagnet ' id_pmagnet '\n']);
 
 
 

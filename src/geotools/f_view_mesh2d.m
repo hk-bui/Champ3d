@@ -1,4 +1,4 @@
-function f_view_mesh2d(geo,varargin)
+function f_view_mesh2d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -26,25 +26,27 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh2d)
-    id_mesh2d = fieldnames(geo.geo2d.mesh2d);
+    id_mesh2d = fieldnames(c3dobj.geo2d.mesh2d);
     id_mesh2d = id_mesh2d{1};
 end
 if isempty(id_dom2d)
     id_dom2d = {''};
-    id_elem = 1:geo.geo2d.mesh2d.(id_mesh2d).nb_elem;
+    id_elem = 1:c3dobj.geo2d.mesh2d.(id_mesh2d).nb_elem;
     disptext = {'all-elem'};
 else
-    id_elem = geo.geo2d.dom2d.(id_dom2d).id_elem;
+    id_elem = c3dobj.geo2d.dom2d.(id_dom2d).id_elem;
     disptext = id_dom2d;
 end
 %--------------------------------------------------------------------------
 clear msh;
-msh.Vertices = geo.geo2d.mesh2d.(id_mesh2d).node.';
-msh.Faces = geo.geo2d.mesh2d.(id_mesh2d).elem(:,id_elem).';
+msh.Vertices = c3dobj.geo2d.mesh2d.(id_mesh2d).node.';
+msh.Faces = c3dobj.geo2d.mesh2d.(id_mesh2d).elem(:,id_elem).';
 msh.FaceColor = color;
 msh.EdgeColor = 'k'; % [0.7 0.7 0.7] --> gray
 patch(msh); axis equal; alpha(0.5); hold on
-node1x = geo.geo2d.mesh2d.(id_mesh2d).cnode(1,id_elem(1));
-node1y = geo.geo2d.mesh2d.(id_mesh2d).cnode(2,id_elem(1));
+node1x = mean(c3dobj.geo2d.mesh2d.(id_mesh2d).node(1, ...
+              c3dobj.geo2d.mesh2d.(id_mesh2d).elem(1:4,id_elem(1))));
+node1y = mean(c3dobj.geo2d.mesh2d.(id_mesh2d).node(2, ...
+              c3dobj.geo2d.mesh2d.(id_mesh2d).elem(1:4,id_elem(1))));
 text(node1x, node1y, disptext, 'color', 'blue', 'HorizontalAlignment', 'center');
 

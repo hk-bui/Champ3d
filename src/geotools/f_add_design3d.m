@@ -1,5 +1,4 @@
-function c3dobj = f_add_geo1d(c3dobj,varargin)
-% F_ADD_GEO1D ...
+function c3dobj = f_add_design3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -8,17 +7,11 @@ function c3dobj = f_add_geo1d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'geo1d_axis','id_x','id_y','id_layer','d','dtype','dnum','flog'};
+arglist = {'id_mesh3d','id_design3d'};
 
 % --- default input value
-geo1d_axis = 'x'; % or 'y', 'layer'
-d = 0;
-dtype = 'lin';
-dnum = '1';
-id_x = [];
-id_y = [];
-id_layer = [];
-flog = 1.05;
+id_mesh3d = [];
+id_design3d = [];
 
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -28,27 +21,27 @@ for i = 1:(nargin-1)/2
         error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
     end
 end
-%--------------------------------------------------------------------------
-if isempty(id_x) && isempty(id_y) && isempty(id_layer)
-    error([mfilename ' : #id must be given !']);
-end
-%--------------------------------------------------------------------------
-if ~isempty(id_x)
-    id = id_x;
-elseif ~isempty(id_y)
-    id = id_y;
-elseif ~isempty(id_layer)
-    id = id_layer;
-end
-%--------------------------------------------------------------------------
-% --- Output
-c3dobj.geo1d.(geo1d_axis).(id).d = d;
-c3dobj.geo1d.(geo1d_axis).(id).dtype = dtype;
-c3dobj.geo1d.(geo1d_axis).(id).dnum = dnum;
-c3dobj.geo1d.(geo1d_axis).(id).flog = flog;
-% --- Log message
-% fprintf(['Add ' geo1d_axis '-1d : #' id '\n']);
 
+%--------------------------------------------------------------------------
+if isempty(id_mesh3d)
+    id_mesh3d = fieldnames(c3dobj.geo3d.mesh3d);
+    id_mesh3d = id_mesh3d{1};
+end
+
+if isempty(id_design3d)
+    error([mfilename ' : #id_design3d must be given !']);
+end
+
+%--------------------------------------------------------------------------
+c3dobj.design3d.(id_design3d).id_mesh3d = id_mesh3d;
+% --- Log message
+if iscell(id_mesh3d)
+    fprintf(['Add design3d #' id_design3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
+elseif ischar(id_mesh3d)
+    fprintf(['Add design3d #' id_design3d ' with mesh3d #' id_mesh3d '\n']);
+else
+    fprintf(['Add design3d #' id_design3d '\n']);
+end
 
 
 

@@ -1,4 +1,4 @@
-function geo = f_add_dom3d(geo,varargin)
+function c3dobj = f_add_dom3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -27,7 +27,7 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh3d)
-    id_mesh3d = fieldnames(geo.geo3d.mesh3d);
+    id_mesh3d = fieldnames(c3dobj.geo3d.mesh3d);
     id_mesh3d = id_mesh3d{1};
 end
 
@@ -36,10 +36,10 @@ if isempty(id_dom3d)
 end
 
 %--------------------------------------------------------------------------
-switch geo.geo3d.mesh3d.(id_mesh3d).mesher
-    case 'champ3d_hexa'
+switch c3dobj.geo3d.mesh3d.(id_mesh3d).mesher
+    case 'c3d_hexamesh'
         tic;
-        fprintf(['Define dom3d #' id_dom3d ' in mesh3d #' id_mesh3d ' ... ']);
+        fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
         %------------------------------------------------------------------
         if isempty(id_dom2d) || isempty(id_layer)
             error([mfilename ' : #id_dom2d and #id_layer must be given !']);
@@ -49,27 +49,30 @@ switch geo.geo3d.mesh3d.(id_mesh3d).mesher
         id_layer = f_to_dcellargin(id_layer);
         [id_dom2d, id_layer] = f_pairing_cellargin(id_dom2d, id_layer);
         %------------------------------------------------------------------
-        id_all_elem = 1:geo.geo3d.mesh3d.(id_mesh3d).nb_elem;
-        elem_code = geo.geo3d.mesh3d.(id_mesh3d).elem_code;
+        id_all_elem = 1:c3dobj.geo3d.mesh3d.(id_mesh3d).nb_elem;
+        elem_code   =   c3dobj.geo3d.mesh3d.(id_mesh3d).elem_code;
         id_elem = [];
         for i = 1:length(id_dom2d)
             for j = 1:length(id_dom2d{i})
-                codeidd2d = f_str2code(id_dom2d{i}{j});
-                for k = 1:length(id_layer{i})
-                    codeidlay = f_str2code(id_layer{i}{k});
-                    id_elem = [id_elem ...
-                               id_all_elem(elem_code == codeidd2d * codeidlay)];
+                codeidd2d = c3dobj.geo2d.dom2d.(id_dom2d{i}{j}).elem_code;
+                %codeidd2d = f_str2code(id_dom2d{i}{j});
+                for m = 1:length(codeidd2d)
+                    for k = 1:length(id_layer{i})
+                        codeidlay = f_str2code(id_layer{i}{k});
+                        id_elem = [id_elem ...
+                                   id_all_elem(elem_code == codeidd2d(m) * codeidlay)];
+                    end
                 end
             end
         end
         id_elem = unique(id_elem);
         %------------------------------------------------------------------
-        geo.geo3d.dom3d.(id_dom3d).id_elem = id_elem;
+        c3dobj.geo3d.dom3d.(id_dom3d).id_elem = id_elem;
         %------------------------------------------------------------------
         % --- Log message
-        fprintf('done ----- in %.2f s \n',toc);
+        fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
         %------------------------------------------------------------------
-    case 'champ3d_prism'
+    case 'c3d_prismmesh'
     case 'gmsh'
 end
 

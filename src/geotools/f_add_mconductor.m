@@ -1,4 +1,4 @@
-function design3d = f_add_tconductor(design3d,varargin)
+function design3d = f_add_mconductor(design3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,28 +7,22 @@ function design3d = f_add_tconductor(design3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_tconductor','id_dom3d','id_elem',...
-           'flambda','frho','fcp','frhocp',...
-           'lambda','rho','cp','rhocp'};
+arglist = {'design3d','id_mconductor','id_dom3d','id_elem','mur'};
 
 % --- default input value
+
 id_dom3d = [];
 id_elem  = [];
-flambda  = [];
-frho     = [];
-fcp      = [];
-lambda   = [];
-rho      = [];
-cp       = [];
-rhocp    = [];
-id_tconductor = [];
+mur      = 1;
+id_mconductor = [];
+
 %--------------------------------------------------------------------------
-if ~isfield(design3d,'tconductor')
-    design3d.tconductor = [];
+if ~isfield(design3d,'mconductor')
+    design3d.mconductor = [];
 end
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No tconductor to add!']);
+    error([mfilename ': No mconductor to add!']);
 end
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -40,8 +34,9 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_tconductor)
-    error([mfilename ': id_tconductor must be defined !'])
+
+if isempty(id_mconductor)
+    error([mfilename ': id_mconductor must be defined !'])
 end
 
 if ~isfield(design3d,'dom3d')
@@ -58,17 +53,11 @@ if ~isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
-design3d.tconductor.(id_tconductor).id_dom3d = id_dom3d;
-design3d.tconductor.(id_tconductor).id_elem = id_elem;
-design3d.tconductor.(id_tconductor).flambda = flambda;
-design3d.tconductor.(id_tconductor).frho = frho;
-design3d.tconductor.(id_tconductor).fcp = fcp;
-design3d.tconductor.(id_tconductor).lambda = lambda;
-design3d.tconductor.(id_tconductor).rho = rho;
-design3d.tconductor.(id_tconductor).cp = cp;
-design3d.tconductor.(id_tconductor).rhocp = rhocp;
+design3d.mconductor.(id_mconductor).id_dom3d = id_dom3d;
+design3d.mconductor.(id_mconductor).id_elem  = id_elem;
+design3d.mconductor.(id_mconductor).mur = mur;
 % --- info message
-fprintf(['Add tcon ' id_tconductor ' - done \n']);
+fprintf(['Add mcon ' id_mconductor '\n']);
 
 
 

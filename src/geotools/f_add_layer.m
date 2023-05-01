@@ -1,4 +1,4 @@
-function geo = f_add_layer(geo,varargin)
+function c3dobj = f_add_layer(c3dobj,varargin)
 % F_ADD_LAYER ...
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
@@ -7,4 +7,4 @@ function geo = f_add_layer(geo,varargin)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-geo = f_add_geo1d(geo,'geo1d_axis','layer',varargin{:});
+c3dobj = f_add_geo1d(c3dobj,'geo1d_axis','layer',varargin{:});

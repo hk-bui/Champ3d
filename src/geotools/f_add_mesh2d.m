@@ -1,4 +1,4 @@
-function geo = f_add_mesh2d(geo,varargin)
+function c3dobj = f_add_mesh2d(c3dobj,varargin)
 % F_ADD_MESH2D ...
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
@@ -36,9 +36,9 @@ end
 if strcmpi(build_from,'geo1d')
     %----------------------------------------------------------------------
     % --- Output
-    geo = f_mesh2dgeo1d(geo,varargin{:});
+    c3dobj = f_mesh2dgeo1d(c3dobj,varargin{:});
     % --- Log message
-    fprintf(['Add mesh2d #' id_mesh2d ' - done \n']);
+    fprintf(['Add mesh2d #' id_mesh2d '\n']);
 
 elseif strcmpi(build_from,'geoquad')
     % TODO

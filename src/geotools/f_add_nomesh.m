@@ -1,4 +1,4 @@
-function design3d = f_add_sfield(design3d,varargin)
+function design3d = f_add_nomesh(design3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,20 +7,19 @@ function design3d = f_add_sfield(design3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_dom3d','id_elem','id_sfield'};
+arglist = {'design3d','id_dom3d','id_elem','id_nomesh'};
 
 % --- default input value
-id_sfield  = [];
-id_dom3d   = [];
-id_elem    = [];
-defined_on = [];
+id_nomesh = [];
+id_dom3d = [];
+id_elem  = [];
 %--------------------------------------------------------------------------
-if ~isfield(design3d,'sfield')
-    design3d.sfield = [];
+if ~isfield(design3d,'mconductor')
+    design3d.mconductor = [];
 end
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error('No source field to add!');
+    error('No no-mesh to add!');
 end
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -33,12 +32,8 @@ for i = 1:(nargin-1)/2
 end
 %--------------------------------------------------------------------------
 
-if isempty(id_sfield)
-    error([mfilename ': id_sfield must be defined !'])
-end
-
-if isempty(defined_on)
-    error([mfilename ': defined_on must be specified !'])
+if isempty(id_nomesh)
+    error([mfilename ': id_nomesh must be defined !'])
 end
 
 if ~isfield(design3d,'dom3d')
@@ -85,14 +80,12 @@ id_inside_edge = unique(id_inside_edge);
 id_inside_edge(id_inside_edge == 0) = [];
 %--------------------------------------------------------------------------
 % --- Output
-design3d.sfield.(id_sfield).id_dom3d = id_dom3d;
-design3d.sfield.(id_sfield).id_elem  = id_elem;
-design3d.sfield.(id_sfield).id_face  = id_face;
-design3d.sfield.(id_sfield).id_edge  = id_edge;
-design3d.sfield.(id_sfield).id_node  = id_node;
-design3d.sfield.(id_sfield).s_face   = s_face;
-design3d.sfield.(id_sfield).id_inside_edge = id_inside_edge;
-design3d.sfield.(id_sfield).defined_on = defined_on;
+design3d.nomesh.(id_nomesh).id_dom3d = id_dom3d;
+design3d.nomesh.(id_nomesh).id_elem  = id_elem;
+design3d.nomesh.(id_nomesh).id_face  = id_face;
+design3d.nomesh.(id_nomesh).id_edge  = id_edge;
+design3d.nomesh.(id_nomesh).id_node  = id_node;
+design3d.nomesh.(id_nomesh).s_face   = s_face;
+design3d.nomesh.(id_nomesh).id_inside_edge = id_inside_edge;
 % --- info message
-fprintf(['Add sfield ' id_nomesh ' - done \n']);
-
+fprintf(['Add nomesh ' id_nomesh '\n']);

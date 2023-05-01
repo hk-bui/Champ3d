@@ -1,4 +1,4 @@
-function f_view_mesh3d(dom3D,varargin)
+function f_view_mesh3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -26,23 +26,23 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh3d)
-    id_mesh3d = fieldnames(geo.geo2d.mesh2d);
+    id_mesh3d = fieldnames(c3dobj.geo2d.mesh2d);
     id_mesh3d = id_mesh3d{1};
 end
 if isempty(id_dom3d)
     id_dom3d = {''};
-    id_elem = 1:geo.geo3d.mesh3d.(id_mesh3d).nb_elem;
+    id_elem = 1:c3dobj.geo3d.mesh3d.(id_mesh3d).nb_elem;
     disptext = {'all-elem'};
 else
-    id_elem = geo.geo3d.dom3d.(id_dom3d).id_elem;
+    id_elem = c3dobj.geo3d.dom3d.(id_dom3d).id_elem;
     disptext = id_dom3d;
 end
 %--------------------------------------------------------------------------
 
-node = geo.geo3d.mesh3d.(id_mesh3d).node;
-elem = geo.geo3d.mesh3d.(id_mesh3d).elem(:,id_elem);
+node = c3dobj.geo3d.mesh3d.(id_mesh3d).node;
+elem = c3dobj.geo3d.mesh3d.(id_mesh3d).elem(:,id_elem);
 
-
+return
 
 
 face = geo.geo3d.mesh3d.(id_mesh3d).face;

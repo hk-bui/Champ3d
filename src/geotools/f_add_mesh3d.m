@@ -1,4 +1,4 @@
-function geo = f_add_mesh3d(geo,varargin)
+function c3dobj = f_add_mesh3d(c3dobj,varargin)
 % F_ADD_MESH3D ...
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
@@ -11,7 +11,7 @@ function geo = f_add_mesh3d(geo,varargin)
 arglist = {'id_mesh3d','mesher','id_mesh2d','id_layer'};
 
 % --- default input value
-mesher    = []; % 'champ3d_hexa', 'champ3d_prism', 'gmsh', 'datfile'
+mesher    = []; % 'c3d_hexamesh', 'c3d_prismmesh', 'gmsh', 'datfile'
 id_mesh3d = []; 
 id_mesh2d = [];
 id_layer  = [];
@@ -33,10 +33,11 @@ if isempty(id_mesh3d)
 end
 %--------------------------------------------------------------------------
 switch mesher
-    case 'champ3d_hexa'
+    case 'c3d_hexamesh'
         %------------------------------------------------------------------
-        geo = f_champ3d_hexa(geo,varargin{:});
-        %mesh = f_intkit3d(mesh);
+        c3dobj = f_c3d_hexamesh(c3dobj,varargin{:});
+        % --- Log message
+        fprintf(['Add mesh3d #' id_mesh3d '\n']);
         %------------------------------------------------------------------
     case 'champ3d_prism'
         % TODO
