@@ -1,4 +1,4 @@
-function c3dobj = f_add_nomesh(c3dobj,varargin)
+function c3dobj = f_add_tcapacitor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,16 +7,23 @@ function c3dobj = f_add_nomesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_dom3d','id_nomesh'};
+arglist = {'id_design3d','id_tcapacitor','id_dom3d','id_elem',...
+           'flambda','frho','fcp','frhocp',...
+           'lambda','rho','cp','rhocp'};
 
 % --- default input value
 id_design3d = [];
-id_nomesh = [];
 id_dom3d = [];
+frho     = [];
+fcp      = [];
+rho      = [];
+cp       = [];
+rhocp    = [];
+id_tcapacitor = [];
 
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No nomesh to add!']);
+    error([mfilename ': No tcapacitor to add!']);
 end
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -28,23 +35,29 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-
 if isempty(id_design3d)
     id_design3d = fieldnames(c3dobj.design3d);
     id_design3d = id_design3d{1};
 end
 
-if isempty(id_nomesh)
-    error([mfilename ': id_nomesh must be defined !'])
+if isempty(id_tcapacitor)
+    error([mfilename ': id_tcapacitor must be defined !'])
 end
 
 if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be defined !'])
+    error([mfilename ': id_dom3d must be given !'])
 end
 
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.design3d.(id_design3d).nomesh.(id_nomesh).id_dom3d = id_dom3d;
+c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).id_dom3d = id_dom3d;
+c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).frho = frho;
+c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).fcp = fcp;
+c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).rho = rho;
+c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).cp = cp;
+c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).rhocp = rhocp;
 % --- info message
-fprintf(['Add nomesh #' id_nomesh ' to design3d #' id_design3d '\n']);
+fprintf(['Add tcon #' id_tcapacitor ' to design3d #' id_design3d '\n']);
+
+
 

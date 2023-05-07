@@ -1,4 +1,4 @@
-function c3dobj = f_add_nomesh(c3dobj,varargin)
+function c3dobj = f_add_si_bc(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,16 +7,18 @@ function c3dobj = f_add_nomesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_dom3d','id_nomesh'};
+arglist = {'id_design3d','id_bc','id_dom3d','defined_on','sigma','mur'};
 
 % --- default input value
 id_design3d = [];
-id_nomesh = [];
 id_dom3d = [];
-
+id_bc = [];
+defined_on = [];
+sigma = 0;
+mur = 1;
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No nomesh to add!']);
+    error([mfilename ': No bc to add!']);
 end
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -34,17 +36,22 @@ if isempty(id_design3d)
     id_design3d = id_design3d{1};
 end
 
-if isempty(id_nomesh)
-    error([mfilename ': id_nomesh must be defined !'])
+if isempty(id_bc)
+    error([mfilename ': id_bc must be defined !'])
 end
 
 if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be defined !'])
+    error([mfilename ': id_dom3d must be given !'])
 end
 
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.design3d.(id_design3d).nomesh.(id_nomesh).id_dom3d = id_dom3d;
+c3dobj.design3d.(id_design3d).bc.(id_bc).id_dom3d = id_dom3d;
+c3dobj.design3d.(id_design3d).bc.(id_bc).bc_type = 'sibc';
+c3dobj.design3d.(id_design3d).bc.(id_bc).defined_on = defined_on;
+c3dobj.design3d.(id_design3d).bc.(id_bc).sigma = sigma;
+c3dobj.design3d.(id_design3d).bc.(id_bc).mur = mur;
 % --- info message
-fprintf(['Add nomesh #' id_nomesh ' to design3d #' id_design3d '\n']);
+fprintf(['Add surface impedance bc #' id_bc ' to design3d #' id_design3d '\n']);
+
 

@@ -8,9 +8,10 @@ function c3dobj = f_add_geo1d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'geo1d_axis','id_x','id_y','id_layer','d','dtype','dnum','flog'};
+arglist = {'geo1d_axis','id_mesh1d','id_x','id_y','id_layer','d','dtype','dnum','flog'};
 
 % --- default input value
+id_mesh1d = [];
 geo1d_axis = 'x'; % or 'y', 'layer'
 d = 0;
 dtype = 'lin';
@@ -33,6 +34,10 @@ if isempty(id_x) && isempty(id_y) && isempty(id_layer)
     error([mfilename ' : #id must be given !']);
 end
 %--------------------------------------------------------------------------
+if isempty(id_mesh1d)
+    id_mesh1d = 'mesh1d_01';
+end
+%--------------------------------------------------------------------------
 if ~isempty(id_x)
     id = id_x;
 elseif ~isempty(id_y)
@@ -42,10 +47,10 @@ elseif ~isempty(id_layer)
 end
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.geo1d.(geo1d_axis).(id).d = d;
-c3dobj.geo1d.(geo1d_axis).(id).dtype = dtype;
-c3dobj.geo1d.(geo1d_axis).(id).dnum = dnum;
-c3dobj.geo1d.(geo1d_axis).(id).flog = flog;
+c3dobj.mesh1d.(id_mesh1d).(geo1d_axis).(id).d = d;
+c3dobj.mesh1d.(id_mesh1d).(geo1d_axis).(id).dtype = dtype;
+c3dobj.mesh1d.(id_mesh1d).(geo1d_axis).(id).dnum = dnum;
+c3dobj.mesh1d.(id_mesh1d).(geo1d_axis).(id).flog = flog;
 % --- Log message
 % fprintf(['Add ' geo1d_axis '-1d : #' id '\n']);
 

@@ -1,4 +1,4 @@
-function geo = f_mesh2dgeo1d(geo,varargin)
+function c3dobj = f_mesh2dgeo1d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,10 +7,11 @@ function geo = f_mesh2dgeo1d(geo,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'build_from','id_mesh2d','flog','id_x','id_y'};
+arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y'};
 
 % --- default input value
 id_mesh2d = [];
+id_mesh1d = [];
 flog = 1.05; % log factor when making log mesh
 id_x = [];
 id_y = [];
@@ -23,21 +24,25 @@ for i = 1:(nargin-1)/2
         error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
     end
 end
-
 % -------------------------------------------------------------------------
-geo1d = geo.geo1d;
+if isempty(id_mesh1d)
+    id_mesh1d = fieldnames(c3dobj.mesh1d);
+    id_mesh1d = id_mesh1d{1};
+end
+% -------------------------------------------------------------------------
+mesh1d = c3dobj.mesh1d.(id_mesh1d);
 % -------------------------------------------------------------------------
 if isempty(id_x)
-    id_x = fieldnames(geo1d.x);
+    id_x = fieldnames(mesh1d.x);
 end
 %--------------------------------------------------------------------------
 if isempty(id_y)
-    id_y = fieldnames(geo1d.y);
+    id_y = fieldnames(mesh1d.y);
 end
 % -------------------------------------------------------------------------
 
 tic;
-fprintf(['Making mesh2d #' id_mesh2d 'from geo1d with : \n']);
+fprintf(['Making mesh2d #' id_mesh2d 'from mesh1d with : \n']);
 fprintf(['id_x #' strjoin(id_x,', #') '\n']);
 fprintf(['id_y #' strjoin(id_y,', #')])
 
@@ -47,7 +52,7 @@ id_xdom = [];
 lenx    = numel(id_x);
 for ilay = 1:lenx
     % ---
-    x     = f_div1d(geo1d.x.(id_x{ilay}));
+    x     = f_div1d(mesh1d.x.(id_x{ilay}));
     xDom  = [xDom x];
     % ---
     id = [];
@@ -66,7 +71,7 @@ yDom    = [];
 id_ydom = []; 
 leny    = numel(id_y);
 for ilay = 1:leny
-    y     = f_div1d(geo1d.y.(id_y{ilay}));
+    y     = f_div1d(mesh1d.y.(id_y{ilay}));
     yDom = [yDom y];
     % ---
     id = [];
@@ -124,18 +129,19 @@ nb_node = size(node,2);
 nb_elem = size(elem,2);
 %--------------------------------------------------------------------------
 % --- Output
-geo.geo2d.mesh2d.(id_mesh2d).mesher = 'mesh2dgeo1d';
-geo.geo2d.mesh2d.(id_mesh2d).node = node;
-geo.geo2d.mesh2d.(id_mesh2d).nb_node = nb_node;
-geo.geo2d.mesh2d.(id_mesh2d).elem = elem;
-geo.geo2d.mesh2d.(id_mesh2d).nb_elem = nb_elem;
-geo.geo2d.mesh2d.(id_mesh2d).elem_code = elem_code;
-geo.geo2d.mesh2d.(id_mesh2d).elem_type = 'quad';
+c3dobj.mesh2d.(id_mesh2d).mesher = 'mesh2dgeo1d';
+c3dobj.mesh2d.(id_mesh2d).id_mesh1d = id_mesh1d;
+c3dobj.mesh2d.(id_mesh2d).node = node;
+c3dobj.mesh2d.(id_mesh2d).nb_node = nb_node;
+c3dobj.mesh2d.(id_mesh2d).elem = elem;
+c3dobj.mesh2d.(id_mesh2d).nb_elem = nb_elem;
+c3dobj.mesh2d.(id_mesh2d).elem_code = elem_code;
+c3dobj.mesh2d.(id_mesh2d).elem_type = 'quad';
 % ---
-% geo.geo2d.mesh2d.(id_mesh2d).cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
-% geo.geo2d.mesh2d.(id_mesh2d).cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
+% c3dobj.mesh2d.(id_mesh2d).cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
+% c3dobj.mesh2d.(id_mesh2d).cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
 % ---
-%geo.geo2d.mesh2d.(id_mesh2d).id_elemdom = -1; % <-- old t4 from femm, t5 from quad
+% c3dobj.mesh2d.(id_mesh2d).id_elemdom = -1; % <-- old t4 from femm, t5 from quad
 % --- Log message
 fprintf(' --- in %.2f s \n',toc);
 

@@ -27,7 +27,7 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh2d)
-    id_mesh2d = fieldnames(c3dobj.geo2d.mesh2d);
+    id_mesh2d = fieldnames(c3dobj.mesh2d);
     id_mesh2d = id_mesh2d{1};
 end
 
@@ -36,7 +36,7 @@ if isempty(id_dom2d)
 end
 
 %--------------------------------------------------------------------------
-switch c3dobj.geo2d.mesh2d.(id_mesh2d).mesher
+switch c3dobj.mesh2d.(id_mesh2d).mesher
     case 'mesh2dgeo1d'
         if isempty(elem_code)
             %--------------------------------------------------------------
@@ -48,10 +48,10 @@ switch c3dobj.geo2d.mesh2d.(id_mesh2d).mesher
             id_y = f_to_dcellargin(id_y);
             [id_x, id_y] = f_pairing_cellargin(id_x, id_y);
             %--------------------------------------------------------------
-            id_all_elem = 1:c3dobj.geo2d.mesh2d.(id_mesh2d).nb_elem;
-            all_elem_code = c3dobj.geo2d.mesh2d.(id_mesh2d).elem_code;
-            all_id_x = fieldnames(c3dobj.geo1d.x);
-            all_id_y = fieldnames(c3dobj.geo1d.y);
+            id_all_elem = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
+            all_elem_code = c3dobj.mesh2d.(id_mesh2d).elem_code;
+            all_id_x = fieldnames(c3dobj.mesh1d.(c3dobj.mesh2d.(id_mesh2d).id_mesh1d).x);
+            all_id_y = fieldnames(c3dobj.mesh1d.(c3dobj.mesh2d.(id_mesh2d).id_mesh1d).y);
             id_elem = [];
             elem_code = [];
             for i = 1:length(id_x)
@@ -88,8 +88,8 @@ switch c3dobj.geo2d.mesh2d.(id_mesh2d).mesher
             id_elem = unique(id_elem);
             elem_code = unique(elem_code);
             %--------------------------------------------------------------
-            c3dobj.geo2d.dom2d.(id_dom2d).id_elem = id_elem;
-            c3dobj.geo2d.dom2d.(id_dom2d).elem_code = elem_code;
+            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
+            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
             %--------------------------------------------------------------
             fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
             %--------------------------------------------------------------
@@ -97,12 +97,12 @@ switch c3dobj.geo2d.mesh2d.(id_mesh2d).mesher
             id_elem = [];
             for i = 1:length(elem_code)
                 id_elem = [id_elem ...
-                    find(c3dobj.geo2d.mesh2d.(id_mesh2d).elem_code == elem_code(i))];
+                    find(c3dobj.mesh2d.(id_mesh2d).elem_code == elem_code(i))];
             end
             id_elem = unique(id_elem);
             %--------------------------------------------------------------
-            c3dobj.geo2d.dom2d.(id_dom2d).id_elem = id_elem;
-            c3dobj.geo2d.dom2d.(id_dom2d).elem_code = elem_code;
+            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
+            c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
             %--------------------------------------------------------------
             fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
             %--------------------------------------------------------------

@@ -27,7 +27,7 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh3d)
-    id_mesh3d = fieldnames(c3dobj.geo3d.mesh3d);
+    id_mesh3d = fieldnames(c3dobj.mesh3d);
     id_mesh3d = id_mesh3d{1};
 end
 
@@ -36,7 +36,7 @@ if isempty(id_dom3d)
 end
 
 %--------------------------------------------------------------------------
-switch c3dobj.geo3d.mesh3d.(id_mesh3d).mesher
+switch c3dobj.mesh3d.(id_mesh3d).mesher
     case 'c3d_hexamesh'
         if isempty(elem_code)
             tic;
@@ -50,13 +50,13 @@ switch c3dobj.geo3d.mesh3d.(id_mesh3d).mesher
             id_layer = f_to_dcellargin(id_layer);
             [id_dom2d, id_layer] = f_pairing_cellargin(id_dom2d, id_layer);
             %--------------------------------------------------------------
-            id_all_elem = 1:c3dobj.geo3d.mesh3d.(id_mesh3d).nb_elem;
-            all_id_lay  = fieldnames(c3dobj.geo1d.layer);
-            elem_code   =   c3dobj.geo3d.mesh3d.(id_mesh3d).elem_code;
+            id_all_elem = 1:c3dobj.mesh3d.(id_mesh3d).nb_elem;
+            all_id_lay  = fieldnames(c3dobj.mesh1d.(c3dobj.mesh3d.(id_mesh3d).id_mesh1d).layer);
+            elem_code   = c3dobj.mesh3d.(id_mesh3d).elem_code;
             id_elem = [];
             for i = 1:length(id_dom2d)
                 for j = 1:length(id_dom2d{i})
-                    codeidd2d = c3dobj.geo2d.dom2d.(id_dom2d{i}{j}).elem_code;
+                    codeidd2d = c3dobj.mesh2d.(c3dobj.mesh3d.(id_mesh3d).id_mesh2d).dom2d.(id_dom2d{i}{j}).elem_code;
                     %codeidd2d = f_str2code(id_dom2d{i}{j});
                     for m = 1:length(codeidd2d)
                         for k = 1:length(id_layer{i})
@@ -78,9 +78,9 @@ switch c3dobj.geo3d.mesh3d.(id_mesh3d).mesher
             end
             id_elem = unique(id_elem);
             %--------------------------------------------------------------
-            c3dobj.geo3d.dom3d.(id_dom3d).id_elem = id_elem;
-            c3dobj.geo3d.dom3d.(id_dom3d).elem_code = ...
-                unique(c3dobj.geo3d.mesh3d.(id_mesh3d).elem_code(id_elem));
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = ...
+                unique(c3dobj.mesh3d.(id_mesh3d).elem_code(id_elem));
             %--------------------------------------------------------------
             % --- Log message
             fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
@@ -92,12 +92,12 @@ switch c3dobj.geo3d.mesh3d.(id_mesh3d).mesher
             id_elem = [];
             for i = 1:length(elem_code)
                 id_elem = [id_elem ...
-                    find(c3dobj.geo3d.mesh3d.(id_mesh3d).elem_code == elem_code(i))];
+                    find(c3dobj.mesh3d.(id_mesh3d).elem_code == elem_code(i))];
             end
             id_elem = unique(id_elem);
             %--------------------------------------------------------------
-            c3dobj.geo3d.dom3d.(id_dom3d).id_elem = id_elem;
-            c3dobj.geo3d.dom3d.(id_dom3d).elem_code = elem_code;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
             %--------------------------------------------------------------
             % --- Log message
             fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);

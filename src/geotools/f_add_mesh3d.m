@@ -8,12 +8,13 @@ function c3dobj = f_add_mesh3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','mesher','id_mesh2d','id_layer'};
+arglist = {'id_mesh3d','mesher','id_mesh2d','id_mesh1d','id_layer'};
 
 % --- default input value
 mesher    = []; % 'c3d_hexamesh', 'c3d_prismmesh', 'gmsh', 'datfile'
 id_mesh3d = []; 
 id_mesh2d = [];
+id_mesh1d = [];
 id_layer  = [];
 
 % --- check and update input
