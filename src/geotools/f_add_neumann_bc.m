@@ -7,10 +7,11 @@ function c3dobj = f_add_neumann_bc(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_bc','id_dom3d','defined_on','bc_value'};
+arglist = {'id_emdesign3d','id_thdesign3d','id_bc','id_dom3d','defined_on','bc_value'};
 
 % --- default input value
-id_design3d = [];
+id_emdesign3d = [];
+id_thdesign3d = [];
 id_dom3d = [];
 id_bc = [];
 defined_on = [];
@@ -30,9 +31,10 @@ for i = 1:(nargin-1)/2
 end
 %--------------------------------------------------------------------------
 
-if isempty(id_design3d)
-    id_design3d = fieldnames(c3dobj.design3d);
-    id_design3d = id_design3d{1};
+if isempty(id_emdesign3d) && isempty(id_thdesign3d)
+    error([mfilename ': id_emdesign3d or id_thdesign3d must be given !'])
+    %id_emdesign3d = fieldnames(c3dobj.emdesign3d);
+    %id_emdesign3d = id_emdesign3d{1};
 end
 
 if isempty(id_bc)
@@ -45,11 +47,19 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.design3d.(id_design3d).bc.(id_bc).id_dom3d = id_dom3d;
-c3dobj.design3d.(id_design3d).bc.(id_bc).bc_type = 'neumann';
-c3dobj.design3d.(id_design3d).bc.(id_bc).defined_on = defined_on;
-c3dobj.design3d.(id_design3d).bc.(id_bc).bc_value = bc_value;
+if ~isempty(id_emdesign3d)
+    design3d = 'emdesign3d';
+    id_design3d = id_emdesign3d;
+elseif ~isempty(id_thdesign3d)
+    design3d = 'thdesign3d';
+    id_design3d = id_thdesign3d;
+end
+%--------------------------------------------------------------------------
+% --- Output
+c3dobj.(design3d).(id_design3d).bc.(id_bc).id_dom3d = id_dom3d;
+c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_type = 'neumann';
+c3dobj.(design3d).(id_design3d).bc.(id_bc).defined_on = defined_on;
+c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_value = bc_value;
 % --- info message
-fprintf(['Add neumann boundary condition #' id_bc ' to design3d #' id_design3d '\n']);
-
+fprintf(['Add neumann boundary condition #' id_bc ' to ' design3d ' #' id_design3d '\n']);
 

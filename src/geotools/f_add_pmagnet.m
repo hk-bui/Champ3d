@@ -7,10 +7,10 @@ function c3dobj = f_add_pmagnet(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_dom3d','mur','br_value','br_ori','id_bcon'};
+arglist = {'id_emdesign3d','id_dom3d','mur','br_value','br_ori','id_bcon'};
 
 % --- default input value
-id_design3d = [];
+id_emdesign3d = [];
 id_dom3d = [];
 br_value = 0;
 br_ori   = [];
@@ -36,9 +36,9 @@ for i = 1:(nargin-1)/2
 end
 %--------------------------------------------------------------------------
 
-if isempty(id_design3d)
-    id_design3d = fieldnames(c3dobj.design3d);
-    id_design3d = id_design3d{1};
+if isempty(id_emdesign3d)
+    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
+    id_emdesign3d = id_emdesign3d{1};
 end
 
 if isempty(id_pmagnet)
@@ -50,13 +50,13 @@ if isempty(id_dom3d)
 end
 
 %--------------------------------------------------------------------------
-c3dobj.design3d.(id_design3d).pmagnet.(id_pmagnet).id_dom3d = id_dom3d;
-c3dobj.design3d.(id_design3d).pmagnet.(id_pmagnet).mur      = mur;
-c3dobj.design3d.(id_design3d).pmagnet.(id_pmagnet).br_value = br_value;
-c3dobj.design3d.(id_design3d).pmagnet.(id_pmagnet).br_ori   = br_ori;
-c3dobj.design3d.(id_design3d).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_dom3d = id_dom3d;
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).mur      = mur;
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_value = br_value;
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_ori   = br_ori;
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
 % --- info message
-fprintf(['Add pmagnet #' id_pmagnet ' to design3d #' id_design3d '\n']);
+fprintf(['Add pmagnet #' id_pmagnet ' to emdesign3d #' id_emdesign3d '\n']);
 
 
 

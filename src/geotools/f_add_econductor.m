@@ -7,10 +7,10 @@ function c3dobj = f_add_econductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_econductor','id_dom3d','sigma'};
+arglist = {'id_emdesign3d','id_econductor','id_dom3d','sigma'};
 
 % --- default input value
-id_design3d = [];
+id_emdesign3d = [];
 id_dom3d = [];
 sigma    = 0;
 id_econductor = [];
@@ -30,9 +30,9 @@ for i = 1:(nargin-1)/2
 end
 %--------------------------------------------------------------------------
 
-if isempty(id_design3d)
-    id_design3d = fieldnames(c3dobj.design3d);
-    id_design3d = id_design3d{1};
+if isempty(id_emdesign3d)
+    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
+    id_emdesign3d = id_emdesign3d{1};
 end
 
 if isempty(id_econductor)
@@ -45,9 +45,9 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.design3d.(id_design3d).econductor.(id_econductor).id_dom3d = id_dom3d;
-c3dobj.design3d.(id_design3d).econductor.(id_econductor).sigma = sigma;
+c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_dom3d = id_dom3d;
+c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).sigma = sigma;
 % --- info message
-fprintf(['Add econ #' id_econductor ' to design3d #' id_design3d '\n']);
+fprintf(['Add econ #' id_econductor ' to emdesign3d #' id_emdesign3d '\n']);
 
 
