@@ -26,7 +26,7 @@ tsigPlate = f_make_gtensor('type','gtensor',...
     'main_dir',[0 0 1],'ort1_dir',[1 0 0],'ort2_dir',[0 1 0]);
 
 %% 2D mesh
-msize = 5;
+msize = 2;
 
 c3dobj = [];
 c3dobj = f_add_x(c3dobj,'id_x','xair_a','d',lPlate,'dnum',msize,'dtype','log-');
@@ -95,6 +95,19 @@ c3dobj = f_add_econductor(c3dobj,'id_emdesign3d','Inf_coil_over_plate',...
                           'id_econductor','coil', ...
                           'id_dom3d','coil','sigma',tsigCoil);
 
+%
+node = c3dobj.mesh3d.mesh1.node;
+elem = c3dobj.mesh3d.mesh1.elem;
+geo = f_findnode(node,elem,'cut_equation','x == max(x) & z >= max(z)/2','elem_type','hex');
+IDElem = geo.id_elem;
+figure
+f_viewthings('type','elem','node',node,'elem',elem(:,:),...
+             'elem_type','hex','color','none','edge_color','k'); hold on;
+f_viewthings('type','elem','node',node,'elem',elem(:,IDElem),...
+             'elem_type','hex','color',f_color(1)); hold on;
+f_viewthings('type','node','node',node(:,geo.id_node),'color',f_color(2)); hold on;
+axis equal; axis tight; hold on
+%
 return
 c3dobj = f_add_coil(c3dobj,'id_dom3d','coil',...
                          'coil_type','massive',...

@@ -100,127 +100,43 @@ if isempty(id_dom3d)
     error([mfilename ' : #id_dom3d must be given !']);
 end
 
+if isempty(id_coil)
+    error([mfilename ' : #id_coil must be given !']);
+end
+
 %--------------------------------------------------------------------------
-% if isempty(c3dobj.coil(iec+1).i_coil)
-%     if isempty(c3dobj.coil(iec+1).cs_area) | isempty(c3dobj.coil(iec+1).j_coil)
-%         c3dobj.coil(iec+1).i_coil = 1;
-%     else
-%         c3dobj.coil(iec+1).i_coil = c3dobj.coil(iec+1).j_coil .* ...
-%                                       c3dobj.coil(iec+1).cs_area;
-%     end
-% end
-%--------------------------------------------------------------------------
-if isempty(c3dobj.coil(iec+1).j_coil)
-    if ~isempty(c3dobj.coil(iec+1).i_coil) & ~isempty(c3dobj.coil(iec+1).nb_turn) & ~isempty(c3dobj.coil(iec+1).cs_area)
-        c3dobj.coil(iec+1).j_coil = ...
-            c3dobj.coil(iec+1).i_coil*c3dobj.coil(iec+1).nb_turn/c3dobj.coil(iec+1).cs_area;
+if ~isempty(c3dobj.coil(iec+1).petrode_equation)
+    if ~iscell(c3dobj.coil(iec+1).petrode_equation)
+        petrode_equation{1} = c3dobj.coil(iec+1).petrode_equation;
     else
-        c3dobj.coil(iec+1).j_coil = 0;
+        petrode_equation = c3dobj.coil(iec+1).petrode_equation;
+    end
+    for itrod = 1:length(c3dobj.coil(iec+1).petrode_equation)
+        geo = f_findnode(c3dobj.mesh.node,c3dobj.mesh.elem(:,c3dobj.coil(iec+1).id_elem),...
+                'elem_type',c3dobj.mesh.elem_type,...
+                'cut_equation',petrode_equation{itrod});
+        geo.id_elem = c3dobj.coil(iec+1).id_elem(geo.id_elem); % !!!
+        %------
+        c3dobj.coil(iec+1).petrode(itrod) = geo;
+        %------
     end
 end
 %--------------------------------------------------------------------------
-
-coilModel = [lower(c3dobj.coil(iec+1).coil_type), ...
-             lower(c3dobj.coil(iec+1).stype)];
-
-switch coilModel
-    case {['stranded','j'],['massive','j']}
-        %--------------------------
-        if ~isempty(c3dobj.coil(iec+1).field_vector_v) & ~isempty(c3dobj.coil(iec+1).field_vector_o)
-            c3dobj.coil(iec+1).coil_model = 't1';
-        end
-        %--------------------------
-        if ~isempty(c3dobj.coil(iec+1).cs_equation)
-            c3dobj.coil(iec+1).coil_model = 't2';
-        end
-        %--------------------------
-        if ~isempty(c3dobj.coil(iec+1).petrode_equation) & ~isempty(c3dobj.coil(iec+1).netrode_equation)
-            c3dobj.coil(iec+1).coil_model = 't2';
-        end
-    case ['massive','i']
-        %--------------------------
-%         if ~isempty(emdesign3d.coil(iec+1).cs_equation)
-%             emdesign3d.coil(iec+1).coil_model = 't3';
-%         end
-        c3dobj.coil(iec+1).coil_model = 't3';
-    case ['massive','v']
-        %--------------------------
-%         if ~isempty(emdesign3d.coil(iec+1).cs_equation)
-%             emdesign3d.coil(iec+1).coil_model = 't4';
-%         end
-        c3dobj.coil(iec+1).coil_model = 't4';
+if ~isempty(c3dobj.coil(iec+1).netrode_equation)
+    if ~iscell(c3dobj.coil(iec+1).netrode_equation)
+        netrode_equation{1} = c3dobj.coil(iec+1).netrode_equation;
+    else
+        netrode_equation = c3dobj.coil(iec+1).netrode_equation;
+    end
+    for itrod = 1:length(c3dobj.coil(iec+1).netrode_equation)
+        geo = f_findnode(c3dobj.mesh.node,c3dobj.mesh.elem(:,c3dobj.coil(iec+1).id_elem),...
+                'elem_type',c3dobj.mesh.elem_type,...
+                'cut_equation',netrode_equation{itrod});
+        geo.id_elem = c3dobj.coil(iec+1).id_elem(geo.id_elem); % !!!
+        %------
+        c3dobj.coil(iec+1).netrode(itrod) = geo;
+        %------
+    end
 end
-%--------------------------------------------------------------------------
-if isempty(c3dobj.coil(iec+1).id_elem)
-    c3dobj.coil(iec+1).id_elem  = c3dobj.dom3d.(c3dobj.coil(iec+1).id_dom3d).id_elem;
-else
-    c3dobj.coil(iec+1).id_elem  = id_elem;
-end
-% ---
-con = f_connexion(c3dobj.mesh.elem_type);
-c3dobj.coil(iec+1).id_node = unique(c3dobj.mesh.elem(1:con.nbNo_inEl,c3dobj.coil(iec+1).id_elem));
-
-%--------------------------------------------------------------------------
-% coil_type = dom3d.coil(iec+1).coil_type;
-etrode_type = c3dobj.coil(iec+1).etrode_type;
-switch etrode_type
-    case 'close'
-        if ~isempty(c3dobj.coil(iec+1).cs_equation)
-            if ~iscell(c3dobj.coil(iec+1).cs_equation)
-                cs_equation{1} = c3dobj.coil(iec+1).cs_equation;
-            else
-                cs_equation = c3dobj.coil(iec+1).cs_equation;
-            end
-            geo = f_cutdom(c3dobj.mesh.node,c3dobj.mesh.elem(:,c3dobj.coil(iec+1).id_elem),...
-                    'elem_type',c3dobj.mesh.elem_type,...
-                    'cut_equation',cs_equation{1});
-            geo.id_elem = c3dobj.coil(iec+1).id_elem(geo.id_elem); % !!!
-            %------
-            c3dobj.coil(iec+1).etrode = geo;
-            c3dobj.coil(iec+1).petrode.id_elem = geo.id_elem;
-            c3dobj.coil(iec+1).petrode.id_node = geo.node_positive;
-            c3dobj.coil(iec+1).netrode.id_elem = geo.id_elem;
-            c3dobj.coil(iec+1).netrode.id_node = geo.node_negative;
-            c3dobj.coil(iec+1).id_elem = ...
-                setdiff(c3dobj.coil(iec+1).id_elem,geo.id_elem);
-            cutnode = f_uniquenode(c3dobj.mesh.elem(:,geo.id_elem),...
-                          'nb_vertices',6);
-            c3dobj.coil(iec+1).id_node = ...
-                setdiff(c3dobj.coil(iec+1).id_node,cutnode);
-            %------
-        end
-    case 'open'
-        if ~isempty(c3dobj.coil(iec+1).petrode_equation)
-            if ~iscell(c3dobj.coil(iec+1).petrode_equation)
-                petrode_equation{1} = c3dobj.coil(iec+1).petrode_equation;
-            else
-                petrode_equation = c3dobj.coil(iec+1).petrode_equation;
-            end
-            for itrod = 1:length(c3dobj.coil(iec+1).petrode_equation)
-                geo = f_findnode(c3dobj.mesh.node,c3dobj.mesh.elem(:,c3dobj.coil(iec+1).id_elem),...
-                        'elem_type',c3dobj.mesh.elem_type,...
-                        'cut_equation',petrode_equation{itrod});
-                geo.id_elem = c3dobj.coil(iec+1).id_elem(geo.id_elem); % !!!
-                %------
-                c3dobj.coil(iec+1).petrode(itrod) = geo;
-                %------
-            end
-        end
-        if ~isempty(c3dobj.coil(iec+1).netrode_equation)
-            if ~iscell(c3dobj.coil(iec+1).netrode_equation)
-                netrode_equation{1} = c3dobj.coil(iec+1).netrode_equation;
-            else
-                netrode_equation = c3dobj.coil(iec+1).netrode_equation;
-            end
-            for itrod = 1:length(c3dobj.coil(iec+1).netrode_equation)
-                geo = f_findnode(c3dobj.mesh.node,c3dobj.mesh.elem(:,c3dobj.coil(iec+1).id_elem),...
-                        'elem_type',c3dobj.mesh.elem_type,...
-                        'cut_equation',netrode_equation{itrod});
-                geo.id_elem = c3dobj.coil(iec+1).id_elem(geo.id_elem); % !!!
-                %------
-                c3dobj.coil(iec+1).netrode(itrod) = geo;
-                %------
-            end
-        end
 end
 
