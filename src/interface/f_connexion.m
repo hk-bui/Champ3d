@@ -20,7 +20,7 @@ switch elem_type
         con = f_contetra;
     case {69,'prism'}
         con = f_conprism;
-    case {812,'hex'}
+    case {812,'hex','hexa'}
         con = f_conhexa;
     case 'xxx'
         % con = f_xxx;
