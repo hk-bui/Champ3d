@@ -1,6 +1,5 @@
-function design3d = f_create_design3d(varargin)
-
-
+function c3dobj = f_add_x(c3dobj,varargin)
+% F_ADD_X ...
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -8,6 +7,9 @@ function design3d = f_create_design3d(varargin)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-for i = 1:nargin/2
-    design3d.(lower(varargin{2*i-1})) = varargin{2*i};
-end
+c3dobj = f_add_geo1d(c3dobj,'geo1d_axis','x',varargin{:});
+
+
+
+
+

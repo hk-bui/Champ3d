@@ -11,12 +11,11 @@ function layer = f_add_layer(layer,varargin)
 arglist = {'id_layer','thickness','nb_slice','z_type'};
 %--------------------------------------------------------------------------
 if nargin <= 1
-    error([mfilename ': No conductor to add!']);
+    error([mfilename ': No layer to add!']);
 end
 %--------------------------------------------------------------------------
 % --- default input value
-len = length(layer) + 1;
-id_layer  = ['XXLayerNo' num2str(len)];
+id_layer  = [];
 thickness = 0;
 nb_slice  = 1;
 z_type    = 'lin';
@@ -28,6 +27,10 @@ for i = 1:(nargin-1)/2
     else
         error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
     end
+end
+%--------------------------------------------------------------------------
+if isempty(id_layer)
+    error([mfilename ': id_layer must be defined !'])
 end
 %--------------------------------------------------------------------------
 switch z_type(1:3)
@@ -61,9 +64,9 @@ switch z_type(1:3)
 end
 %--------------------------------------------------------------------------
 % --- output
-layer(len).id_layer  = id_layer;
-layer(len).nb_slice  = nb_slice;
-layer(len).z_type    = z_type;
-layer(len).thickness = lthickness;
-
+layer.(id_layer).nb_slice  = nb_slice;
+layer.(id_layer).z_type    = z_type;
+layer.(id_layer).thickness = lthickness;
+% --- info message
+fprintf(['Add layer ' id_layer ' - done \n']);
 

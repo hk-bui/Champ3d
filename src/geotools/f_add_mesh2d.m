@@ -1,6 +1,5 @@
-function IDNode = f_uniquenode(elem,varargin)
-% F_uniquenode returns the (unique) nodes that build up the elements.
-% p_value : array of values of the parameter computed for each element
+function c3dobj = f_add_mesh2d(c3dobj,varargin)
+% F_ADD_MESH2D ...
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -9,9 +8,16 @@ function IDNode = f_uniquenode(elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem','nb_vertices'};
+arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y'};
+
 % --- default input value
-nb_vertices = size(elem,1);
+build_from = 'mesh1d'; % 'mesh1d', 'geoquad'
+id_mesh2d = [];
+id_mesh1d = [];
+flog = 1.05; % log factor when making log mesh
+id_x = [];
+id_y = [];
+
 % --- check and update input
 for i = 1:(nargin-1)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -21,13 +27,23 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-elem = elem(1:nb_vertices,:);
+if ~strcmpi(build_from,'mesh1d') && ~strcmpi(build_from,'geoquad')
+    error([mfilename ' : #build_from should be #mesh1d or #geoquad !']);
+end
+if isempty(id_mesh2d)
+    error([mfilename ' : #id_mesh2d must be given !']);
+end
 %--------------------------------------------------------------------------
-allNodeID = reshape(elem,1,numel(elem));
-IDNode = unique(allNodeID);
+if strcmpi(build_from,'mesh1d')
+    %----------------------------------------------------------------------
+    % --- Output
+    c3dobj = f_mesh2dgeo1d(c3dobj,varargin{:});
+    % --- Log message
+    fprintf(['Add mesh2d #' id_mesh2d '\n']);
 
-
-
+elseif strcmpi(build_from,'geoquad')
+    % TODO
+end
 
 
 

@@ -1,17 +1,55 @@
 function design3d = f_build_bcon_aphi(design3d,varargin)
-% F_BUILD_BCON_APHI returns the matrix system
-% related to mconductor for A-phi formulation. 
 %--------------------------------------------------------------------------
-% System = F_BUILD_BCON_APHI(dom3D,option);
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
-% Questions and inquiries can be addressed to the author:
-% Dr. H-K. Bui
-% Lab. IREENA
-% Dep. Mesures Physiques, IUT of Saint Nazaire
-% University of Nantes, France
-% Email : huu-kien.bui@univ-nantes.fr
-% Copyright (c) 2019 Huu-Kien Bui. All Rights Reserved.
+
+
 %--------------------------------------------------------------------------
+bcmesh = f_make_mds(design3d.mesh.node,...
+                    design3d.mesh.elem(:,id_elem),...
+                    design3d.mesh.elem_type);
+% ---
+con = f_connexion(design3d.mesh.elem_type);
+nbNo_inFa_max = max(con.nbNo_inFa);
+id_face = f_findvec(bcmesh.bound(1:nbNo_inFa_max,:),...
+                    design3d.mesh.face(1:nbNo_inFa_max,:));
+s_face  = f_measure(design3d.mesh.node,design3d.mesh.face(:,id_face),'face');
+%--------------------------------------------------------------------------
+nbEd_inFa_max = 0;
+for i = 1:length(con.nbEd_inFa)
+    nbEd_inFa_max = max([nbEd_inFa_max con.nbEd_inFa{i}]);
+end
+%--------------------------------------------------------------------------
+id_edge = reshape(design3d.mesh.edge_in_face(1:nbEd_inFa_max,id_face),...
+                  1,nbEd_inFa_max*length(id_face));
+id_edge = unique(id_edge);
+id_edge(id_edge == 0) = [];
+%--------------------------------------------------------------------------
+id_node = reshape(design3d.mesh.edge(1:2,id_edge),...
+                  1,2*length(id_edge));
+id_node = unique(id_node);
+id_node(id_node == 0) = [];
+%--------------------------------------------------------------------------
+% --- Output
+design3d.bcon.(id_bcon).id_dom3d = id_dom3d;
+design3d.bcon.(id_bcon).bc_type  = bc_type;
+design3d.bcon.(id_bcon).bc_value = bc_value;
+design3d.bcon.(id_bcon).bc_coef  = bc_coef;
+design3d.bcon.(id_bcon).sigma    = sigma;
+design3d.bcon.(id_bcon).mur      = mur;
+design3d.bcon.(id_bcon).defined_on = defined_on;
+design3d.bcon.(id_bcon).id_elem = id_elem;
+design3d.bcon.(id_bcon).id_face = id_face;
+design3d.bcon.(id_bcon).id_edge = id_edge;
+design3d.bcon.(id_bcon).id_node = id_node;
+design3d.bcon.(id_bcon).s_face  = s_face;
+
+
+%--------------------------------------------------------------------------
+
 
 nbElem = design3d.mesh.nbElem;
 nbEdge = design3d.mesh.nbEdge;
@@ -75,7 +113,8 @@ if isfield(design3d.aphi,'id_bcon_sibc')
                          f_build_sibc(design3d.mesh,'id_face',design3d.bcon(id_bcon).id_face,...
                            'fr',design3d.aphi.fr,...
                            'gtsigma',design3d.bcon(id_bcon).gtsigma,...
-                           'gtmur',design3d.bcon(id_bcon).gtmur);
+                           'gtmur',design3d.bcon(id_bcon).gtmur,...
+                           'cparam',[]);
         end
     end
 end
