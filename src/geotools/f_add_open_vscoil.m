@@ -69,7 +69,8 @@ netrode_equation = [];
 v_petrode = 1;
 v_netrode = 0;
 stype     = [];
-i_coil    = 0;
+i_coil    = [];
+j_coil    = [];
 v_coil    = 0;
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -140,17 +141,18 @@ end
 %--------------------------------------------------------------------------
 % --- Output
 % -
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode_equation = petrode_equation;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = netrode_equation;
+% -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
-% -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'open_vscoil';
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode_equation = [];
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = [];
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_petrode = v_petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_netrode = v_netrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'vs';
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).j_coil    = j_coil;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).i_coil    = i_coil;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_coil    = v_coil;
 % --- info message

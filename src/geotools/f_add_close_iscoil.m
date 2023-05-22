@@ -1,49 +1,5 @@
-function c3dobj = f_add_close_jscoil(c3dobj,varargin)
-% F_ADD_COIL ...
-%--------------------------------------------------------------------------
-% FIXED INPUT
-% emdesign3d : actual design
-%--------------------------------------------------------------------------
-% OPTIONAL INPUT
-% 'id_dom3d' : ids of 3D domains
-% 'id_bcon'  : ids of the applied boundary condition
-% 'id_elem'  : elements' ids (used if id_dom3d is not available)
-% 'coil_mode' = 'transmitter' or 'receiver'
-%     + use 'transmitter' for source coil
-% 'etrode_type' : electrode type : 'close' or 'open'
-%     + for 'close'-type coil
-%         o 'cs_equation' : cross section equation
-%     + for 'open'-type coil
-%         o 'petrode_equation' : equation to define positive electrode nodes
-%         o 'netrode_equation' : equation to define negative electrode nodes
-% 'v_petrode' : positive electrode potential
-% 'v_netrode' : negative electrode potential
-% 'stype' : source type
-%     + 'j' : impressed j
-%         o 'jcoil' : given j
-%         o 'cs_area' : cross section area
-%     + 'i' : impressed i
-%     + 'v' : impressed v
-% 'field_vector_o' : coordinates of the origine of the field vector
-% 'field_vector_v' : the field vector that indicates approximatively
-%                    the orientation of the source field
-% 'field_vector_rounding' : rounding or not corner and straight edge
-%--------------------------------------------------------------------------
-% OUTPUT
-% emdesign3d with added coil
-%--------------------------------------------------------------------------
-% EXAMPLE
-% emdesign3d = f_add_coil(emdesign3d,'id_dom3d','coil',...
-%                          'coil_type','stranded',...
-%                          'coil_mode','transmitter',...
-%                          'etrode_type','open',...
-%                          'petrode_equation',{'z == max(z) & x < 0'},...
-%                          'netrode_equation',{'z == max(z) & x > 0'},...
-%                          'v_petrode',1,...
-%                          'v_netrode',0,...
-%                          'stype','j','j_coil',Icoil/coilSection,...
-%                          'cs_area',coilSection,...
-%                          'id_bcon',1);
+function c3dobj = f_add_close_iscoil(c3dobj,varargin)
+
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -69,12 +25,9 @@ v_petrode = 1;
 v_netrode = 0;
 stype     = [];
 cs_area   = 1;
-j_coil    = 1;
-i_coil    = 1;
-nb_turn   = 1;
-field_vector_o = [];
-field_vector_v = [];
-field_vector_rounding = 0;
+j_coil    = [];
+i_coil    = [];
+v_coil    = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -145,17 +98,15 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'close_jscoil';
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'close_iscoil';
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_petrode = v_petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_netrode = v_netrode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'js';
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'is';
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).cs_area   = cs_area;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).j_coil    = j_coil;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).i_coil    = i_coil;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).nb_turn   = nb_turn;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_o = field_vector_o;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_v = field_vector_v;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_rounding = field_vector_rounding;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_coil    = v_coil;
+
 % --- info message
 fprintf(['Add close-jscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
 

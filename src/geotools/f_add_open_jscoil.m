@@ -147,14 +147,14 @@ end
 %--------------------------------------------------------------------------
 % --- Output
 % -
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode_equation = petrode_equation;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = netrode_equation;
+% -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
-% -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'open_jscoil';
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode_equation = [];
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = [];
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_petrode = v_petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_netrode = v_netrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'js';
