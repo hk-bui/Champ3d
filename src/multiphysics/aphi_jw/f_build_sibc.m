@@ -21,7 +21,7 @@ mu  = mu0 *  det(gtmur)^(1/3);
 
 skindepth = sqrt(2/(2*pi*fr*mu*sig));
 
-if ~exist('cparam','var')
+if isempty(cparam)
     Zsibc = (1+1j)/(skindepth*sig);
 else
     Zsibc = (1+1j)/(skindepth*sig) * (1 + (1-1j)/4 * skindepth * 1/cparam);

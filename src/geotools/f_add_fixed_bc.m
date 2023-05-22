@@ -14,7 +14,7 @@ id_emdesign3d = [];
 id_thdesign3d = [];
 id_dom3d = [];
 id_bc = [];
-defined_on = [];
+defined_on = []; % 'edge_bound', 'face_bound', 'edge', 'face'
 bc_value = 0;
 %--------------------------------------------------------------------------
 if nargin <= 1

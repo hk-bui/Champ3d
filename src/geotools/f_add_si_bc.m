@@ -13,9 +13,10 @@ arglist = {'id_emdesign3d','id_bc','id_dom3d','defined_on','sigma','mur'};
 id_emdesign3d = [];
 id_dom3d = [];
 id_bc = [];
-defined_on = [];
+defined_on = []; % 'edge_bound', 'face_bound', 'edge', 'face'
 sigma = 0;
 mur = 1;
+cparam = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
     error([mfilename ': No bc to add!']);
@@ -51,6 +52,7 @@ c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bc_type = 'sibc';
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).defined_on = defined_on;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).sigma = sigma;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).mur = mur;
+c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).cparam = cparam;
 % --- info message
 fprintf(['Add surface impedance bc #' id_bc ' to emdesign3d #' id_emdesign3d '\n']);
 
