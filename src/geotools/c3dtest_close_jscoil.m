@@ -56,7 +56,7 @@ tsig_plate_t = f_make_gtensor('type','gtensor',...
               'rot_axis',uaxis,'angle',rot_ang);
 
 %% build 1D mesh
-msize  = 2;
+msize  = 5;
 c3dobj = [];
 % ---
 c3dobj = f_add_x(c3dobj,'id_x','xair_l'   ,'d',x_airbox/2 - x_plate/2,'dnum',2*msize,'dtype','log-');
