@@ -7,7 +7,7 @@ function f_viewthings(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'type','node','elem','edge','face','color','edge_color','linewidth', ...
+arglist = {'type','node','elem','edge','face','elem_type','color','edge_color','linewidth', ...
            'field','node_field'};
        
 
@@ -112,7 +112,7 @@ switch type
             patchinfo.Vertices = node.';
             patchinfo.Faces = f.';
             cax = [];
-            if ~exist('field','var') && ~exist('node_field','var')
+            if isempty(field) && isempty(node_field)
                 patchinfo.FaceColor = color;
                 if strcmpi(color,'non')
                     patchinfo.EdgeColor = 'k';
@@ -124,7 +124,7 @@ switch type
                     end
                 end
                 alpha(0.5);
-            elseif ~exist('node_field','var')
+            elseif isempty(node_field)
                 patchinfo.FaceColor = 'flat';
                 patchinfo.FaceVertexCData = f_tocolv(field(id_face{i}));
                 if isempty(edge_color)
@@ -187,7 +187,7 @@ switch type
         end
         [IDFace,iIDElem] = unique(IDFace);
         IDElem = IDElem(iIDElem);
-        if ~exist('field','var')
+        if isempty(field)
             f_viewthings('type','face','node',mesh.node,...
                          'face',mesh.face,'color',color,'edge_color',edge_color);
         else
