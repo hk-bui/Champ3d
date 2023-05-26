@@ -63,7 +63,7 @@ c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).id_dom3d = id_dom3d
 c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).flambda = flambda;
 c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).lambda = lambda;
 % --- info message
-fprintf(['Add tcon #' id_tconductor ' to thdesign3d #' id_thdesign3d '\n']);
+fprintf(['Add tcon #' id_tconductor ' to thdesign3d #' id_thdesign3d ' in mesh3d #' id_mesh3d '\n']);
 
 
 

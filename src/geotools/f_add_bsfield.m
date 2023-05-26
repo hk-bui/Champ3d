@@ -55,7 +55,7 @@ c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).Bs = Bs;
 % --- info message
-fprintf(['Add bsfield #' id_bsfield ' to emdesign3d #' id_emdesign3d '\n']);
+fprintf(['Add bsfield #' id_bsfield ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
 
 
 

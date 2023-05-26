@@ -61,6 +61,6 @@ c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).sigma = sigma;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).mur = mur;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).cparam = cparam;
 % --- info message
-fprintf(['Add surface impedance bc #' id_bc ' to emdesign3d #' id_emdesign3d '\n']);
+fprintf(['Add surface impedance bc #' id_bc ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
 
 

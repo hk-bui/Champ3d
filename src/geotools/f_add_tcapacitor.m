@@ -64,7 +64,7 @@ c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rho = rho;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).cp = cp;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rhocp = rhocp;
 % --- info message
-fprintf(['Add tcon #' id_tcapacitor ' to thdesign3d #' id_thdesign3d '\n']);
+fprintf(['Add tcon #' id_tcapacitor ' to thdesign3d #' id_thdesign3d ' in mesh3d #' id_mesh3d '\n']);
 
 
 

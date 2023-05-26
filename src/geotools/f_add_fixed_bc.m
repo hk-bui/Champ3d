@@ -67,6 +67,6 @@ c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_type = 'fixed';
 c3dobj.(design3d).(id_design3d).bc.(id_bc).defined_on = defined_on;
 c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_value = bc_value;
 % --- info message
-fprintf(['Add fixed boundary condition #' id_bc ' to ' design3d ' #' id_design3d '\n']);
+fprintf(['Add fixed boundary condition #' id_bc ' to ' design3d ' #' id_design3d ' in mesh3d #' id_mesh3d '\n']);
 
 

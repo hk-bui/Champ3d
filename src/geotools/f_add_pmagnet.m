@@ -59,7 +59,7 @@ c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_value = br_value;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_ori   = br_ori;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
 % --- info message
-fprintf(['Add pmagnet #' id_pmagnet ' to emdesign3d #' id_emdesign3d '\n']);
+fprintf(['Add pmagnet #' id_pmagnet ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
 
 
 

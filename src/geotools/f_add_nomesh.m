@@ -53,5 +53,5 @@ end
 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_dom3d = id_dom3d;
 % --- info message
-fprintf(['Add nomesh #' id_nomesh ' to emdesign3d #' id_emdesign3d '\n']);
+fprintf(['Add nomesh #' id_nomesh ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
 

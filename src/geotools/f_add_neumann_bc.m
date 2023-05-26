@@ -68,5 +68,5 @@ c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_type = 'neumann';
 c3dobj.(design3d).(id_design3d).bc.(id_bc).defined_on = defined_on;
 c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_value = bc_coef;
 % --- info message
-fprintf(['Add neumann boundary condition #' id_bc ' to ' design3d ' #' id_design3d '\n']);
+fprintf(['Add neumann boundary condition #' id_bc ' to ' design3d ' #' id_design3d ' in mesh3d #' id_mesh3d '\n']);
 

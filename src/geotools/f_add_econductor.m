@@ -55,6 +55,6 @@ c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_mesh3d = id_mesh
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).sigma = sigma;
 % --- info message
-fprintf(['Add econ #' id_econductor ' to emdesign3d #' id_emdesign3d '\n']);
+fprintf(['Add econ #' id_econductor ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
 
 
