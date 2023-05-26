@@ -7,12 +7,13 @@ function c3dobj = f_add_mconductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_mconductor','id_dom3d','mur'};
+arglist = {'id_emdesign3d','id_mconductor','id_mesh3d','id_dom3d','mur'};
 
 % --- default input value
 id_emdesign3d = [];
-id_dom3d = [];
-mur      = 1;
+id_mesh3d     = [];
+id_dom3d      = [];
+mur           = 1;
 id_mconductor = [];
 
 %--------------------------------------------------------------------------
@@ -35,6 +36,11 @@ if isempty(id_emdesign3d)
     id_emdesign3d = id_emdesign3d{1};
 end
 
+if isempty(id_mesh3d)
+    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+    id_mesh3d = id_mesh3d{1};
+end
+
 if isempty(id_mconductor)
     error([mfilename ': id_mconductor must be defined !'])
 end
@@ -45,8 +51,9 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).sigma = mur;
+c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).mur = mur;
 % --- info message
 fprintf(['Add mcon #' id_mconductor ' to emdesign3d #' id_emdesign3d '\n']);
 

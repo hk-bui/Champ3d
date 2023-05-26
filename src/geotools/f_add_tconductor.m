@@ -7,12 +7,13 @@ function c3dobj = f_add_tconductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_tconductor','id_dom3d','id_elem',...
+arglist = {'id_thdesign3d','id_tconductor','id_mesh3d','id_dom3d','id_elem',...
            'flambda','frho','fcp','frhocp',...
            'lambda','rho','cp','rhocp'};
 
 % --- default input value
-id_design3d = [];
+id_thdesign3d = [];
+id_mesh3d     = [];
 id_dom3d = [];
 flambda  = [];
 frho     = [];
@@ -37,9 +38,14 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_design3d)
-    id_design3d = fieldnames(c3dobj.design3d);
-    id_design3d = id_design3d{1};
+if isempty(id_thdesign3d)
+    id_thdesign3d = fieldnames(c3dobj.thdesign3d);
+    id_thdesign3d = id_thdesign3d{1};
+end
+
+if isempty(id_mesh3d)
+    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
+    id_mesh3d = id_mesh3d{1};
 end
 
 if isempty(id_tconductor)
@@ -52,11 +58,12 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.design3d.(id_design3d).tconductor.(id_tconductor).id_dom3d = id_dom3d;
-c3dobj.design3d.(id_design3d).tconductor.(id_tconductor).flambda = flambda;
-c3dobj.design3d.(id_design3d).tconductor.(id_tconductor).lambda = lambda;
+c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).id_mesh3d = id_mesh3d;
+c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).id_dom3d = id_dom3d;
+c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).flambda = flambda;
+c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).lambda = lambda;
 % --- info message
-fprintf(['Add tcon #' id_tconductor ' to design3d #' id_design3d '\n']);
+fprintf(['Add tcon #' id_tconductor ' to thdesign3d #' id_thdesign3d '\n']);
 
 
 

@@ -7,12 +7,13 @@ function c3dobj = f_add_tcapacitor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_design3d','id_tcapacitor','id_dom3d','id_elem',...
+arglist = {'id_thdesign3d','id_tcapacitor','id_mesh3d','id_dom3d','id_elem',...
            'flambda','frho','fcp','frhocp',...
            'lambda','rho','cp','rhocp'};
 
 % --- default input value
-id_design3d = [];
+id_thdesign3d = [];
+id_mesh3d   = [];
 id_dom3d = [];
 frho     = [];
 fcp      = [];
@@ -35,9 +36,14 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_design3d)
-    id_design3d = fieldnames(c3dobj.design3d);
-    id_design3d = id_design3d{1};
+if isempty(id_thdesign3d)
+    id_thdesign3d = fieldnames(c3dobj.thdesign3d);
+    id_thdesign3d = id_thdesign3d{1};
+end
+
+if isempty(id_mesh3d)
+    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
+    id_mesh3d = id_mesh3d{1};
 end
 
 if isempty(id_tcapacitor)
@@ -50,14 +56,15 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).id_dom3d = id_dom3d;
-c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).frho = frho;
-c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).fcp = fcp;
-c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).rho = rho;
-c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).cp = cp;
-c3dobj.design3d.(id_design3d).tcapacitor.(id_tcapacitor).rhocp = rhocp;
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).id_mesh3d = id_mesh3d;
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).id_dom3d = id_dom3d;
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).frho = frho;
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).fcp = fcp;
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rho = rho;
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).cp = cp;
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rhocp = rhocp;
 % --- info message
-fprintf(['Add tcon #' id_tcapacitor ' to design3d #' id_design3d '\n']);
+fprintf(['Add tcon #' id_tcapacitor ' to thdesign3d #' id_thdesign3d '\n']);
 
 
 

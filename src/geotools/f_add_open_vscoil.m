@@ -52,7 +52,7 @@ function c3dobj = f_add_open_vscoil(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_coil','id_dom3d','id_elem','etrode_type',...
+arglist = {'id_emdesign3d','id_coil','id_mesh3d','id_dom3d','id_elem','etrode_type',...
            'coil_mode','coil_type',...
            'cs_equation','petrode_equation','netrode_equation',...
            'field_vector_o','field_vector_v','nb_turn', ...
@@ -61,6 +61,7 @@ arglist = {'id_emdesign3d','id_coil','id_dom3d','id_elem','etrode_type',...
 
 % --- default input value
 id_emdesign3d = [];
+id_mesh3d     = [];
 id_coil       = [];
 id_dom3d      = [];
 coil_mode     = 'tx'; % or 'tx'; 'receiver' or 'rx'
@@ -88,6 +89,11 @@ if isempty(id_emdesign3d)
     id_emdesign3d = id_emdesign3d{1};
 end
 
+if isempty(id_mesh3d)
+    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+    id_mesh3d = id_mesh3d{1};
+end
+
 if isempty(id_dom3d)
     error([mfilename ' : #id_dom3d must be given !']);
 end
@@ -101,7 +107,6 @@ if isempty(petrode_equation) || isempty(netrode_equation)
 end
 
 %--------------------------------------------------------------------------
-id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
 id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 node = c3dobj.mesh3d.(id_mesh3d).node;
 elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
@@ -146,6 +151,7 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = netrode_equa
 % -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'open_vscoil';

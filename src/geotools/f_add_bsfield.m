@@ -7,13 +7,14 @@ function c3dobj = f_add_bsfield(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_sfield','id_dom3d','Bs'};
+arglist = {'id_emdesign3d','id_sfield','id_mesh3d','id_dom3d','Bs'};
 
 % --- default input value
 id_emdesign3d = [];
-id_dom3d    = [];
-Bs          = 0;
-id_bsfield  = [];
+id_mesh3d     = [];
+id_dom3d      = [];
+Bs            = 0;
+id_bsfield    = [];
 
 %--------------------------------------------------------------------------
 if nargin <= 1
@@ -35,6 +36,11 @@ if isempty(id_emdesign3d)
     id_emdesign3d = id_emdesign3d{1};
 end
 
+if isempty(id_mesh3d)
+    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+    id_mesh3d = id_mesh3d{1};
+end
+
 if isempty(id_bsfield)
     error([mfilename ': id_bsfield must be defined !'])
 end
@@ -45,6 +51,7 @@ end
 
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).Bs = Bs;
 % --- info message
