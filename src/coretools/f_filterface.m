@@ -20,6 +20,10 @@ function [filface,id_face] = f_filterface(face)
 % Huu-Kien.Bui@univ-nantes.fr
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+% !!! Only work with mixed faces of 2 types with 0 last
+% 
 [r,c] = find(face == 0);
 nbFace = size(face,2);
 gr = {}; % groupe of /strange/ faces
