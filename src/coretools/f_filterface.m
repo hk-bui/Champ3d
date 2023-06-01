@@ -22,20 +22,22 @@ function [filface,id_face] = f_filterface(face)
 %--------------------------------------------------------------------------
 [r,c] = find(face == 0);
 nbFace = size(face,2);
-gr = {};
+gr = {}; % groupe of /strange/ faces
 if ~isempty(r)
     ir = unique(r);
     for i = 1:length(ir)
         gr{i} = find(r == ir(i));
     end
-    for i = 1:size(gr,2)
-        iElem = c(gr{i});
-        filface{i} = face(1:ir(i)-1,iElem);
+    nb_gr = size(gr,2);
+    for i = 1:nb_gr
+        iElem = c(gr{i}); % c is index of face
+        filface{i} = face(1:ir(i)-1,iElem); % work only with 0 last
         id_face{i} = iElem;
     end
-    n = setdiff(1:size(face,2),c);
-    filface{size(gr,2)+1} = face(:,n);
-    id_face{size(gr,2)+1} = n;
+    % /normal/ faces
+    n = setdiff(1:nbFace,c);
+    filface{nb_gr+1} = face(:,n);
+    id_face{nb_gr+1} = n;
 else
     filface{1} = face;
     id_face{1} = 1:nbFace;
