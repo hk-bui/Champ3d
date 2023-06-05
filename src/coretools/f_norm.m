@@ -10,7 +10,6 @@ function VM = f_norm(V,varargin)
 %--------------------------------------------------------------------------
 
 ntype = 2;
-[dim,len] = size(V);
 
 if nargin > 1
     ntype = varargin{1};
@@ -18,11 +17,9 @@ end
 
 switch ntype
     case 2
-        VM = zeros(1,len);
-        for i = 1:dim
-            VM = VM + V(i,:).^2;
-        end
-        VM = sqrt(VM);
+        VM = sqrt(sum(V.^2));
+    otherwise
+        VM = sqrt(sum(V.^2));
 end
 
 
