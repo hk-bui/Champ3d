@@ -15,6 +15,7 @@ elseif size(elem,1) == 2
     elem = sort(elem);
     flag(:) = 1;
 else
+    elem(elem == 0) = [];
     dim = size(elem,1); len = size(elem,2);
     [~,imin] = sort(elem); ormin = mod(imin(1,:),dim); ormin(ormin==0) = dim;
     ornex = mod(ormin + 1, dim); ornex(ornex==0) = dim;

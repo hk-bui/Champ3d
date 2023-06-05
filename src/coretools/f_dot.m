@@ -1,0 +1,45 @@
+function M1dotM2 = f_dot(M1,M2,varargin)
+% F_DOT computes the dot product array of two arrays of vectors
+%--------------------------------------------------------------------------
+% FIXED INPUT
+% M1 : nD x nb_vectors
+% M2 : nD x nb_vectors
+%--------------------------------------------------------------------------
+% OPTIONAL INPUT
+%--------------------------------------------------------------------------
+% OUTPUT
+% M1dotM2 : 1 x nb_vectors
+%--------------------------------------------------------------------------
+% EXAMPLE
+% M1dotM2 = F_DOT(M1,M2);
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'idim'};
+
+% --- default input value
+idim = 1; % index of the dimension
+
+%--------------------------------------------------------------------------
+% --- check and update input
+for i = 1:(nargin-2)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+
+%--------------------------------------------------------------------------
+M1 = squeeze(M1);
+M2 = squeeze(M2);
+M1dotM2 = dot(M1,M2,idim);
+
+
+
+end
