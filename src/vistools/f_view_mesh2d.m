@@ -33,7 +33,7 @@ switch elem_type
     case {'quad'}
         msh.Faces = elem(1:4,:).';
     otherwise
-        msh.Faces = elem(:,:).';
+        msh.Faces = elem.';
 end
 %--------------------------------------------------------------------------
 msh.FaceColor = face_color;
