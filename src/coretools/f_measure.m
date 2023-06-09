@@ -41,7 +41,12 @@ switch lower(datin.element_type)
             for j = 1:(nbVert-2)
                 vec1 = node(:,filterface{i}(j+1,:)) - node(:,filterface{i}(1,:));
                 vec2 = node(:,filterface{i}(j+2,:)) - node(:,filterface{i}(1,:));
-                meas(id_face{i}) = meas(id_face{i}) + 1/2 .* f_dot(vec1,vec2);
+                len1 = f_norm(vec1);
+                len2 = f_norm(vec2);
+                cosang = f_dot(vec1,vec2) ./ (len1 .* len2);
+                sinang = sin(acos(cosang));
+                meas(id_face{i}) = meas(id_face{i}) + ...
+                                   1/2 .* len1 .* len2 .* sinang;
             end
         end
     case 'elem'
