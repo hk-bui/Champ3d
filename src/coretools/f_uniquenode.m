@@ -1,6 +1,5 @@
 function IDNode = f_uniquenode(elem,varargin)
-% F_uniquenode returns the (unique) nodes that build up the elements.
-% p_value : array of values of the parameter computed for each element
+% f_uniquenode returns the (unique) nodes that build up the elements.
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'

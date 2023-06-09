@@ -25,7 +25,8 @@ for i = 1:(nargin-1)/2
         error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
     end
 end
-
+%--------------------------------------------------------------------------
+mnum = 1.141592653589793;
 %--------------------------------------------------------------------------
 switch position
     case {1,'urow','row','r'}
@@ -33,7 +34,6 @@ switch position
         position  = 1;
         tmat = sort(mat, position);
         smat = size(mat);
-        mnum = sqrt(2);
         % ---
         dimm = smat(1);
         mvec = ones(dimm, 1);
@@ -48,7 +48,6 @@ switch position
         position  = 2;
         tmat = sort(mat, position);
         smat = size(mat);
-        mnum = sqrt(2);
         % ---
         dimm = smat(2);
         mvec = ones(1, dimm);
