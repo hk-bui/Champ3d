@@ -1,5 +1,13 @@
 function f_geo_addRect(xcen,ycen,w,h,domName,varargin)
-
+%--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 % -------------------------------------------------------------------------
 automesh = 0;
 meshsize = 0;

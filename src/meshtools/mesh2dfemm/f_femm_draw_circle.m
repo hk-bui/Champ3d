@@ -5,6 +5,10 @@ function draw2d = f_femm_draw_circle(draw2d,varargin)
 % 'r' : radius
 % 'max_anglen' : maximal angle of segment (default = 2 deg)
 %--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
+%--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 % Huu-Kien.Bui@univ-nantes.fr

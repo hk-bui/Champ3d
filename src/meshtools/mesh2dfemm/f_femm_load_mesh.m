@@ -1,8 +1,12 @@
-function dom2d = f_load_femm_mesh(dom2d,varargin)
+function dom2d = f_femm_load_mesh(dom2d,varargin)
 % f_load_femm_mesh ...
 %--------------------------------------------------------------------------
 % dom2D = f_load_femm_mesh(dom2D,'mesh_type','simple')
 % dom2D = f_load_femm_mesh(dom2D,'mesh_type','full')
+%--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'

@@ -7,6 +7,10 @@ function draw2d = f_femm_draw_straightrect(draw2d,varargin)
 % 'theta_size' : exterior radius
 % 'c_xy' : xy-coordinates of the center
 %--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
+%--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 % Huu-Kien.Bui@univ-nantes.fr

@@ -18,6 +18,10 @@ function f_femm_set_block(draw2d,varargin)
 %     +  0 --> no set
 % 'meshsize'  : meshsize (see FEMM)
 %--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
+%--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 % Huu-Kien.Bui@univ-nantes.fr
