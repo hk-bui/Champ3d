@@ -8,15 +8,17 @@ function c3dobj = f_add_mesh2d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y'};
+arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y',...
+           'mesh_file'};
 
 % --- default input value
-build_from = 'mesh1d'; % 'mesh1d', 'geoquad'
+build_from = 'mesh1d'; % 'mesh1d', 'geoquad', 'femm'
 id_mesh2d = [];
 id_mesh1d = [];
 flog = 1.05; % log factor when making log mesh
 id_x = [];
 id_y = [];
+mesh_file = [];
 
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -27,8 +29,13 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if ~strcmpi(build_from,'mesh1d') && ~strcmpi(build_from,'geoquad')
-    error([mfilename ' : #build_from should be #mesh1d or #geoquad !']);
+if ~any(strcmpi(build_from,{'mesh1d','geoquad','femm'}))
+    error([mfilename ' : #build_from should be #mesh1d, #geoquad or #femm !']);
+end
+if any(strcmpi(build_from,{'femm'}))
+    if isempty(mesh_file)
+        error([mfilename ' : #mesh_file should be given !']);
+    end
 end
 if isempty(id_mesh2d)
     error([mfilename ' : #id_mesh2d must be given !']);
@@ -41,6 +48,11 @@ if strcmpi(build_from,'mesh1d')
     % --- Log message
     fprintf(['Add mesh2d #' id_mesh2d '\n']);
 
+elseif strcmpi(build_from,'femm')
+    c3dobj = f_femm_loadmeshfile(c3dobj,varargin{:});
+    % --- Log message
+    fprintf(['Add mesh2d #' id_mesh2d '\n']);
+    
 elseif strcmpi(build_from,'geoquad')
     % TODO
 end

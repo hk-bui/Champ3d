@@ -103,17 +103,6 @@ elem2d = [c3dobj.mesh2d.(id_mesh2d).elem(1,:); ...
 ie0 = 0;
 for k = 1:nb_layer	% k : current layer
     % ---------------------------------------------------------------------
-    % lower face
-    %elem(1,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * (k-1);
-    %elem(2,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * (k-1);
-    %elem(3,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * (k-1);
-    %elem(4,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * (k-1);
-    % upper face
-    %elem(5,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * k;
-    %elem(6,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * k;
-    %elem(7,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * k;
-    %elem(8,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * k;
-    % ---------------------------------------------------------------------
     elem(1:4,ie0+1 : ie0+nbElem2D) = elem2d + nbNode2D * (k-1);
     elem(5:8,ie0+1 : ie0+nbElem2D) = elem2d + nbNode2D *  k;
     % ---------------------------------------------------------------------

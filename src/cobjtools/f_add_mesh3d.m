@@ -41,9 +41,10 @@ switch mesher
         fprintf(['Add mesh3d #' id_mesh3d '\n']);
         %------------------------------------------------------------------
     case {'c3d_prismmesh','c3d_prismesh'}
-        % TODO
-        %mesh = f_prism2dto3d(dom2d,layer);
-        %mesh = f_intkit3d(mesh);
+        c3dobj = f_c3d_prismmesh(c3dobj,'id_mesh3d',id_mesh3d,'id_mesh2d',id_mesh2d,...
+                                        'id_layer',id_layer);
+        % --- Log message
+        fprintf(['Add mesh3d #' id_mesh3d '\n']);
     case 'gmsh'
         % TODO
 end

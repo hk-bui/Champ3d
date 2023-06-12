@@ -1,6 +1,6 @@
-function f_femm_closefemm(varargin)
+function f_femm_analyze(n)
 %--------------------------------------------------------------------------
-% Call closefemm
+% Call mi_analyze
 % FEMM
 % Author : David Meeker
 % Copyright (C) 1998-2015
@@ -11,4 +11,9 @@ function f_femm_closefemm(varargin)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-closefemm();
+tic;
+fprintf('Solving 2d problem with FEMM');
+% ---
+mi_analyze(n);
+% --- Log message
+fprintf(' --- in %.2f s \n',toc);

@@ -1,4 +1,4 @@
-function dom2d = f_femm_load_mesh(dom2d,varargin)
+function dom2d = f_femm_loadmesh(dom2d,varargin)
 % f_load_femm_mesh ...
 %--------------------------------------------------------------------------
 % dom2D = f_load_femm_mesh(dom2D,'mesh_type','simple')

@@ -12,7 +12,7 @@ arglist = {'elem_type','face_color','edge_color','alpha_value'};
 % --- default input value
 elem_type   = '';
 edge_color  = 'none';
-face_color  = 'w';
+face_color  = [0.7 0.7 0.7];
 alpha_value = 1;
 % --- check and update input
 for i = 1:(nargin-2)/2

@@ -1,6 +1,6 @@
-function f_femm_closefemm(varargin)
+function j = f_femm_getj(x,y)
 %--------------------------------------------------------------------------
-% Call closefemm
+% Call mo_getj
 % FEMM
 % Author : David Meeker
 % Copyright (C) 1998-2015
@@ -11,4 +11,4 @@ function f_femm_closefemm(varargin)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-closefemm();
+j = mo_getj(x,y);

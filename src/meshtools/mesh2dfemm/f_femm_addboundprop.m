@@ -1,6 +1,7 @@
-function f_femm_probdef(varargin)
+function f_femm_addboundprop(varargin)
+
 %--------------------------------------------------------------------------
-% Call mi_probdef
+% Call mi_addboundprop
 % FEMM
 % Author : David Meeker
 % Copyright (C) 1998-2015
@@ -12,16 +13,25 @@ function f_femm_probdef(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'fr','unit','problem_type','precision','depth','min_angle','acsolver'};
+arglist = {'id_bc','a0','a1','a2','phi','mu','sig','c0','c1','bc_type','ia','oa'};
 
 % --- default input value
-fr = 0;
-unit = 'meters';
-problem_type = 'planar'; % 'planar', 'axi
-precision = 1E-08;
-depth = 0;
-min_angle = 10;
-acsolver = 'newton'; % 'newton', 'successive_approximation'
+id_bc = 'bc';
+a0  = 0;
+a1  = 0;
+a2  = 0;
+phi = 0;
+mu  = 0;
+sig = 0;
+c0  = 0;
+c1  = 0;
+ia  = 0;
+oa  = 0;
+bc_type = 'a=0'; % 'a=0', 'sibc', 'mixed', 
+                 % 'dual_image', 'periodic', 'anti-periodic',
+                 % 'periodic-airgap', 'anti-periodic-airgap'
+
+
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin)/2
@@ -32,13 +42,21 @@ for i = 1:(nargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if strcmpi(acsolver,'newton')
-    acsolver = 1;
-else
-    acsolver = 0;
+switch bc_type
+    case 'a=0'
+        bc_type = 0;
+    case 'sibc'
+        bc_type = 1;
+    case 'mixed'
+        bc_type = 2;
+    case 'periodic'
+        bc_type = 4;
+    case 'anti-periodic'
+        bc_type = 5;
 end
+
 %--------------------------------------------------------------------------
-mi_probdef(fr, unit, problem_type, precision, depth, min_angle, acsolver);
+mi_addboundprop(id_bc, a0, a1, a2, phi, mu, sig, c0, c1, bc_type, ia, oa);
 %--------------------------------------------------------------------------
 
 

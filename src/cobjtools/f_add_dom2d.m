@@ -109,6 +109,19 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
         end
     case 'quadmesh'
     case 'triangle_femm'
+        id_elem = [];
+        for i = 1:length(elem_code)
+            id_elem = [id_elem ...
+                find(c3dobj.mesh2d.(id_mesh2d).elem_code == elem_code(i))];
+        end
+        id_elem = unique(id_elem);
+        %------------------------------------------------------------------
+        c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem = id_elem;
+        c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).elem_code = elem_code;
+        %------------------------------------------------------------------
+        fprintf(['Add dom2d #' id_dom2d ' - ' num2str(length(id_elem)) ' elem \n']);
+        %------------------------------------------------------------------
+
 end
 %--------------------------------------------------------------------------
 %------------------------------------------------------------------

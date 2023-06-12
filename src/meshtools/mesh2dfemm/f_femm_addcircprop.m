@@ -1,6 +1,7 @@
-function f_femm_probdef(varargin)
+function f_femm_addcircprop(varargin)
+
 %--------------------------------------------------------------------------
-% Call mi_probdef
+% Call mi_addcircprop
 % FEMM
 % Author : David Meeker
 % Copyright (C) 1998-2015
@@ -12,16 +13,14 @@ function f_femm_probdef(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'fr','unit','problem_type','precision','depth','min_angle','acsolver'};
+arglist = {'id_circuit','imax','circuit_type'};
 
 % --- default input value
-fr = 0;
-unit = 'meters';
-problem_type = 'planar'; % 'planar', 'axi
-precision = 1E-08;
-depth = 0;
-min_angle = 10;
-acsolver = 'newton'; % 'newton', 'successive_approximation'
+id_circuit = 'circuit';
+imax = 0;
+circuit_type = 'parallel'; % 'parallel', 'series'
+
+
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin)/2
@@ -32,13 +31,15 @@ for i = 1:(nargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if strcmpi(acsolver,'newton')
-    acsolver = 1;
-else
-    acsolver = 0;
+switch circuit_type
+    case {'par', 'parallel'}
+        circuit_type = 0;
+    case {'ser', 'series'}
+        circuit_type = 1;
 end
+
 %--------------------------------------------------------------------------
-mi_probdef(fr, unit, problem_type, precision, depth, min_angle, acsolver);
+mi_addcircprop(id_circuit,imax,circuit_type);
 %--------------------------------------------------------------------------
 
 

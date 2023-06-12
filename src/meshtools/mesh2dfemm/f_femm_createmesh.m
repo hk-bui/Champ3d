@@ -1,6 +1,6 @@
-function f_femm_closefemm(varargin)
+function z = f_femm_createmesh(varargin)
 %--------------------------------------------------------------------------
-% Call closefemm
+% Call mi_createmesh
 % FEMM
 % Author : David Meeker
 % Copyright (C) 1998-2015
@@ -11,4 +11,4 @@ function f_femm_closefemm(varargin)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-closefemm();
+z = mi_createmesh();
