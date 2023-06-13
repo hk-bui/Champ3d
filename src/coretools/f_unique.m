@@ -1,4 +1,4 @@
-function [mat,imat] = f_unique(mat,varargin)
+function [mat,imat,ibygroupe] = f_unique(mat,varargin)
 % F_UNIQUE returns the unique row (or column) of an 2D array.
 %--------------------------------------------------------------------------
 % [mat,imat] = f_unique(mat,'urow');
@@ -11,11 +11,12 @@ function [mat,imat] = f_unique(mat,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'position'};
+arglist = {'position','by','get'};
 
 % --- default input value
 position = 1; % index of the dimension
-
+get = []; % 'group' = 'groupsort' = 'gr'
+by  = []; % 'strict' = 'strict_value' = 'strictvalue'
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -32,7 +33,11 @@ switch position
     case {1,'urow','row','r'}
         % ---
         position  = 1;
-        tmat = sort(mat, position);
+        if any(strcmpi(by,{'strict', 'strict_value', 'strictvalue'}))
+            tmat = mat;
+        else
+            tmat = sort(mat, position);
+        end
         smat = size(mat);
         % ---
         dimm = smat(1);
@@ -46,7 +51,11 @@ switch position
     case {2,'ucol','col','c'}
         % ---
         position  = 2;
-        tmat = sort(mat, position);
+        if any(strcmpi(by,{'strict', 'strict_value', 'strictvalue'}))
+            tmat = mat;
+        else
+            tmat = sort(mat, position);
+        end
         smat = size(mat);
         % ---
         dimm = smat(2);
@@ -57,6 +66,10 @@ switch position
         magicsum = sum(tmat .* mvec, 2);
         [~,imat] = unique(magicsum);
         mat = mat(imat,:);
+end
+%--------------------------------------------------------------------------
+if any(strcmpi(get,{'group','groupe','gr','groupsort'}))
+    [~,ibygroupe] = f_groupsort(magicsum);
 end
 %--------------------------------------------------------------------------
 end
