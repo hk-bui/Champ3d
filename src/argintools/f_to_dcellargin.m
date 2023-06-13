@@ -32,7 +32,9 @@ else
         has_cell = has_cell + iscell(argin{i});
     end
     if ~has_cell
-        tocellargin = {argin};
+        for i = 1:lenargin
+            tocellargin{i} = argin{i};
+        end
     else
         for i = 1:lenargin
             if iscell(argin{i})
