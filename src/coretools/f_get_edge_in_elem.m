@@ -28,6 +28,12 @@ elseif any(strcmpi(defined_on,{'face','fa'}))
     elem = mesh3d.face;
 end
 %--------------------------------------------------------------------------
+if isfield(mesh3d,'edge')
+    edge = mesh3d.edge;
+else
+    error([mfilename ': no edge data !']);
+end
+%--------------------------------------------------------------------------
 if isempty(elem_type)
     nbnoinel = size(elem, 1);
     if any(strcmpi(defined_on,{'elem','el'}))
@@ -66,16 +72,9 @@ e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
 real_ori_edge_in_elem = squeeze(sign(diff(e, 1, 2)));
 e = sort(e, 2);
 %--------------------------------------------------------------------------
-edge = reshape(permute(e,[2 1 3]), nbNo_inEd, []);
-edge = f_unique(edge);
-%nbEdge = length(edge(1,:));
-%--------------------------------------------------------------------------
 edge_in_elem = f_findvecnd(e,edge,'position',2);
 %--------------------------------------------------------------------------
 % --- Outputs
-mesh3d.edge = edge;
-mesh3d.real_ori_edge_in_elem = real_ori_edge_in_elem;
 mesh3d.edge_in_elem = edge_in_elem;
-%mesh3d.nbEdge = nbEdge;
 
 end
