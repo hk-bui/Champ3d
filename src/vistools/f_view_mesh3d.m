@@ -48,7 +48,7 @@ switch defined_on
         mshds.node = node;
         mshds.elem = elem;
         %mshds = f_meshds3d(mshds,'output_list','face');
-        mshds = f_getboundface(mshds,'elem_type',elem_type);
+        mshds = f_get_bound_face(mshds,'elem_type',elem_type);
         % ---
         %face_in_elem = mshds.face_in_elem;
         %face = mshds.face;

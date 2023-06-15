@@ -50,7 +50,7 @@ con = f_connexion(elem_type);
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 if ~isfield(mesh3d,'face_in_elem') || ~isfield(mesh3d,'si_face_in_elem')
-    mesh3d = f_getface(mesh3d,'elem_type',elem_type);
+    mesh3d = f_get_face(mesh3d,'elem_type',elem_type);
 end
 %--------------------------------------------------------------------------
 face = mesh3d.face;

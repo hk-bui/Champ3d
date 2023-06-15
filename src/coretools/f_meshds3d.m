@@ -63,19 +63,19 @@ end
 
 %----- edges
 if any(strcmpi(get,{'all', 'edge'}))
-    mesh3d = f_getedge(mesh3d,'elem_type',mesh3d.elem_type);
+    mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
 end
 
 %----- faces
 if any(strcmpi(get,{'all', 'face'}))
-    mesh3d = f_getface(mesh3d,'elem_type',mesh3d.elem_type);
+    mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
 end
 
 %----- D
 if any(strcmpi(get,{'all', 'D', 'Div'}))
     % ---
     if ~all(isfield(mesh3d,{'face','elem','face_in_elem','si_face_in_elem'}))
-        mesh3d = f_getface(mesh3d,'elem_type',mesh3d.elem_type);
+        mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
     end
     % ---
     face_in_elem = mesh3d.face_in_elem;
@@ -95,8 +95,8 @@ end
 if any(strcmpi(get,{'all', 'R', 'Rot', 'Curl'}))
     % ---
     if ~all(isfield(mesh3d,{'edge','face','edge_in_face','si_edge_in_face'}))
-        mesh3d = f_getedge(mesh3d,'elem_type',mesh3d.elem_type);
-        mesh3d = f_getface(mesh3d,'elem_type',mesh3d.elem_type);
+        mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
+        mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
     end
     % ---
     edge_in_face = mesh3d.edge_in_face;
@@ -125,8 +125,8 @@ end
 %----- G
 if any(strcmpi(get,{'all', 'G', 'Grad', 'Gradient'}))
     if ~all(isfield(mesh3d,{'node','edge','edge_in_face','si_edge_in_face'}))
-        mesh3d = f_getedge(mesh3d,'elem_type',mesh3d.elem_type);
-        mesh3d = f_getface(mesh3d,'elem_type',mesh3d.elem_type);
+        mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
+        mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
     end
     edge = mesh3d.edge;
     nbNode = size(mesh3d.node, 2);

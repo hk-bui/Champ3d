@@ -73,7 +73,7 @@ for i = 1:length(of_dom3d)
     for j = 1:length(of_dom3d{i})
         msh.elem = [msh.elem  mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
     end
-     msh = f_getboundface(msh,'n_direction',n_direction);
+     msh = f_get_bound_face(msh,'n_direction',n_direction);
      bface{id3d} = msh.bound_face;
      id_bface{id3d} = msh.idl_bound_face;
 end

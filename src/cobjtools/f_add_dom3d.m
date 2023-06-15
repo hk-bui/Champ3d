@@ -89,7 +89,7 @@ switch defined_on
                     domlist = [domlist '#' of_dom3d{i}{j} ' '];
                 end
             end
-            msh = f_getboundface(msh);
+            msh = f_get_bound_face(msh);
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
@@ -117,7 +117,7 @@ switch defined_on
             msh.elem = c3dobj.mesh3d.(id_mesh3d).elem;
             msh.dom3d = c3dobj.mesh3d.(id_mesh3d).dom3d;
             domlist = ['#' of_dom3d{1}{1}];
-            msh = f_getinterface(msh,'of_dom3d',of_dom3d);
+            msh = f_get_inter_face(msh,'of_dom3d',of_dom3d);
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
