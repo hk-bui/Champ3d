@@ -7,12 +7,12 @@ function mesh3d = f_getboundface(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','get'};
+arglist = {'elem_type','get','n_component'};
 
 % --- default input value
 elem_type = [];
-get = []; % 'ndecomposition'
-
+get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
+n_component = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -82,11 +82,15 @@ bound_face = [face(:,ibO) f_invori(face(:,ibI))];
 id_bound_face = [ibO ibI];
 %--------------------------------------------------------------------------
 % --- bound with n-decomposition
-if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
+if any(strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
     bf = bound_face;
     id_bf = id_bound_face;
     nface = f_chavec(mesh3d.node,bound_face);
-    [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');
+    if isempty(n_component)
+        [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');
+    elseif isnumeric(n_component)
+        [~,inface] = f_groupsort(nface,'group_component',n_component);
+    end
     nb_gr = length(inface);
     bound_face = {};
     id_bound_face = {};
@@ -100,33 +104,3 @@ end
 % --- Outputs
 mesh3d.bound_face = bound_face;
 mesh3d.id_bound_face = id_bound_face;
-
-
-
-
-
-
-
-%----- interface
-% if nargin == 2 | isfield(datin,'full') | isfield(datin,'interface') 
-%     iDom = unique(elem(nbNo_inEl+1,:));
-%     iDom = combnk(iDom,2);
-%     nb2D = size(iDom,1);
-%     iinf = [];
-%     for i = 1:nb2D
-%         iinf = [iinf find((domL_of_face == iDom(i,1) & domR_of_face == iDom(i,2)) | ...
-%                           (domR_of_face == iDom(i,1) & domL_of_face == iDom(i,2)))];
-%     end
-%     nbInt = length(iinf);
-%     if ~isempty(iinf)
-%         interface = zeros(maxnbNo_inFa+3,nbInt);
-%         interface(1:maxnbNo_inFa,:) = face(1:maxnbNo_inFa,iinf);
-%         interface(maxnbNo_inFa+1,:) = domL_of_face(iinf);
-%         interface(maxnbNo_inFa+2,:) = domR_of_face(iinf);
-%         interface(maxnbNo_inFa+3,:) = iinf;
-%         %----- out
-%         mesh.interface = interface;
-%     else
-%         mesh.interface = [];
-%     end
-% end

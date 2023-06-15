@@ -8,11 +8,11 @@ function dcellargin = f_to_dcellargin(argin,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'duplicate'};
+arglist = {'duplicate','forced'};
 
 % --- default input value
 duplicate = 0;
-
+forced = 0;
 % --- check and update input
 for i = 1:(nargin-1)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -22,32 +22,49 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-tocellargin = {};
-if ~iscell(argin)
-    tocellargin = {{argin}};
-else
-    lenargin = length(argin);
-    has_cell = 0;
-    for i = 1:lenargin
-        has_cell = has_cell + iscell(argin{i});
-    end
-    if ~has_cell
-        tocellargin = {argin};
-        %for i = 1:lenargin
-        %    tocellargin{i} = argin{i};
-        %end
-    else
-        for i = 1:lenargin
-            if iscell(argin{i})
-                tocellargin{i} = argin{i};
-            else
+
+switch forced
+    %--------------------------------------------------------------------------
+    case {1,'on','yes'}
+        if ~iscell(argin)
+            argin = {argin};
+        end
+        tocellargin = {};
+        for i = 1:length(argin)
+            if ~iscell(argin{i})
                 tocellargin{i} = {argin{i}};
+            else
+                tocellargin{i} = argin{i};
             end
         end
-    end
+    %--------------------------------------------------------------------------
+    otherwise
+        tocellargin = {};
+        if ~iscell(argin)
+            tocellargin = {{argin}};
+        else
+            lenargin = length(argin);
+            has_cell = 0;
+            for i = 1:lenargin
+                has_cell = has_cell + iscell(argin{i});
+            end
+            if ~has_cell
+                tocellargin = {argin};
+                %for i = 1:lenargin
+                %    tocellargin{i} = argin{i};
+                %end
+            else
+                for i = 1:lenargin
+                    if iscell(argin{i})
+                        tocellargin{i} = argin{i};
+                    else
+                        tocellargin{i} = {argin{i}};
+                    end
+                end
+            end
+        end
 end
-
-%--------------------------------------------------------------------------
+%------------------------------------------------------------------
 dcellargin = {};
 if duplicate > 1
     for i = 1:duplicate
@@ -59,6 +76,5 @@ if duplicate > 1
 else
     dcellargin = tocellargin;
 end
-
 
 

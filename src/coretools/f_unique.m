@@ -38,7 +38,7 @@ switch position
         else
             tmat = sort(mat, position);
         end
-        smat = size(mat);
+        smat = size(tmat);
         % ---
         dimm = smat(1);
         mvec = ones(dimm, 1);
@@ -56,7 +56,7 @@ switch position
         else
             tmat = sort(mat, position);
         end
-        smat = size(mat);
+        smat = size(tmat);
         % ---
         dimm = smat(2);
         mvec = ones(1, dimm);
@@ -68,7 +68,7 @@ switch position
         mat = mat(imat,:);
 end
 %--------------------------------------------------------------------------
-if any(strcmpi(get,{'group','groupe','gr','groupsort'}))
+if any(strcmpi(get,{'group','groupe','gr','groupsort','group_sort'}))
     [~,ibygroupe] = f_groupsort(magicsum);
 end
 %--------------------------------------------------------------------------

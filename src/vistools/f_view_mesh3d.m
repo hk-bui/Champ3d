@@ -43,7 +43,7 @@ end
 transarg = {'edge_color',edge_color,'face_color',face_color,'alpha_value',alpha_value};
 %--------------------------------------------------------------------------
 switch defined_on
-    case {'elem','volume'}
+    case {'elem'}
         % ---
         mshds.node = node;
         mshds.elem = elem;
@@ -72,7 +72,7 @@ switch defined_on
             f_view_face(node, quadface, transarg{:}); hold on
         end
         view(3);
-    case {'face','surface','bound_face','boundface','interface'}
+    case {'face'}
         id_face = 1:size(elem, 2);
         % 1/ triangle
         ind_tria = find(elem(end, :) == 0);
@@ -88,5 +88,5 @@ switch defined_on
             f_view_face(node, quadface, transarg{:}); hold off
         end
         view(3);
-    case {'edge','bound_edge','boundedge','interedge','line'}
+    case {'edge'}
 end
