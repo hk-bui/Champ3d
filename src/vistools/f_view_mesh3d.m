@@ -1,0 +1,92 @@
+function f_view_mesh3d(node,elem,varargin)
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'elem_type','defined_on','face_color','edge_color','alpha_value'};
+
+% --- default input value
+elem_type   = '';
+defined_on  = 'elem'; % elem, face, edge
+edge_color  = 'none';
+face_color  = 'w';
+alpha_value = 1;
+% --- check and update input
+for i = 1:(nargin-2)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+%--------------------------------------------------------------------------
+if isempty(elem_type)
+    nbnoinel = size(elem, 1);
+    if any(strcmpi(defined_on,{'elem','el'}))
+        switch nbnoinel
+            case 4
+                elem_type = 'tet';
+            case 6
+                elem_type = 'prism';
+            case 8
+                elem_type = 'hex';
+        end
+    elseif any(strcmpi(defined_on,{'face','fa'}))
+        
+    end
+end
+%--------------------------------------------------------------------------
+transarg = {'edge_color',edge_color,'face_color',face_color,'alpha_value',alpha_value};
+%--------------------------------------------------------------------------
+switch defined_on
+    case {'elem','volume'}
+        % ---
+        mshds.node = node;
+        mshds.elem = elem;
+        %mshds = f_meshds3d(mshds,'output_list','face');
+        mshds = f_getboundface(mshds,'elem_type',elem_type);
+        % ---
+        %face_in_elem = mshds.face_in_elem;
+        %face = mshds.face;
+        %id_face = reshape(face_in_elem, 1, []);
+        %id_face = unique(id_face);
+        % ---
+        face = mshds.bound_face;
+        id_face = 1:size(face,2);
+        % ---
+        % 1/ triangle
+        ind_tria = find(face(end, id_face) == 0);
+        if ~isempty(ind_tria)
+            triface  = face(1:3,id_face(ind_tria));
+            f_view_face(node, triface, transarg{:}); hold on
+        end
+        % ---
+        % 2/ quad
+        ind_quad = find(face(end, id_face) ~= 0);
+        if ~isempty(ind_quad)
+            quadface = face(1:4,id_face(ind_quad));
+            f_view_face(node, quadface, transarg{:}); hold on
+        end
+        view(3);
+    case {'face','surface','bound_face','boundface','interface'}
+        id_face = 1:size(elem, 2);
+        % 1/ triangle
+        ind_tria = find(elem(end, :) == 0);
+        if ~isempty(ind_tria)
+            triface  = elem(1:3,ind_tria);
+            f_view_face(node, triface, transarg{:}); hold on
+        end
+        % ---
+        % 2/ quad
+        ind_quad = setdiff(id_face, ind_tria);
+        if ~isempty(ind_quad)
+            quadface  = elem(1:4,ind_quad);
+            f_view_face(node, quadface, transarg{:}); hold off
+        end
+        view(3);
+    case {'edge','bound_edge','boundedge','interedge','line'}
+end
