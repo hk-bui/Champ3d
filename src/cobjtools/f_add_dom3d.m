@@ -8,7 +8,7 @@ function c3dobj = f_add_dom3d(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'id_mesh3d','id_dom3d','id_dom2d','id_layer','elem_code',...
-           'defined_on','of_dom3d'};
+           'defined_on','of_dom3d','n_direction'};
 
 % --- default input value
 id_mesh3d = [];
@@ -93,10 +93,13 @@ switch defined_on
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = msh.id_bound_face;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).lid_face = msh.lid_bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = msh.bound_face;
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = ...
+                f_findvecnd(c3dobj.mesh3d.(id_mesh3d).face,...
+                            msh.bound_face);
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).info = ...
-                           ['bound_face with outward normal to dom3d ' domlist];
+                           [msh.info ', normal w.r.t dom3d #' domlist];
             %c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
         end
     case {'interface'}

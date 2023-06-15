@@ -1,4 +1,4 @@
-function mesh3d = f_getface(mesh3d,varargin)
+function mesh3d = f_get_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'

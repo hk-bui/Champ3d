@@ -1,4 +1,4 @@
-function mesh3d = f_getedge(mesh3d,varargin)
+function mesh3d = f_get_edge_in_elem(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -68,7 +68,7 @@ e = sort(e, 2);
 %--------------------------------------------------------------------------
 edge = reshape(permute(e,[2 1 3]), nbNo_inEd, []);
 edge = f_unique(edge);
-nbEdge = length(edge(1,:));
+%nbEdge = length(edge(1,:));
 %--------------------------------------------------------------------------
 edge_in_elem = f_findvecnd(e,edge,'position',2);
 %--------------------------------------------------------------------------
@@ -76,6 +76,6 @@ edge_in_elem = f_findvecnd(e,edge,'position',2);
 mesh3d.edge = edge;
 mesh3d.real_ori_edge_in_elem = real_ori_edge_in_elem;
 mesh3d.edge_in_elem = edge_in_elem;
-mesh3d.nbEdge = nbEdge;
+%mesh3d.nbEdge = nbEdge;
 
 end

@@ -1,4 +1,4 @@
-function mesh3d = f_getinterface(mesh3d,varargin)
+function mesh3d = f_get_inter_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,13 +7,15 @@ function mesh3d = f_getinterface(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','of_dom3d','get','n_component'};
+arglist = {'elem_type','of_dom3d','get','n_component','n_direction'};
 
 % --- default input value
 elem_type = [];
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
 of_dom3d = [];
 n_component = [];
+n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
+                         % otherwise : 'automatic' = 'natural' = 'auto'
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -60,22 +62,25 @@ for i = length(of_dom3d)
     end
 end
 %--------------------------------------------------------------------------
-msh.node = mesh3d.node;
+
+%--------------------------------------------------------------------------
 for i = 1:length(of_dom3d)
+    msh = [];
+    msh.node = mesh3d.node;
     id3d = i;
     if id3d > 2; id3d = 2; end
     msh.elem = [];
     for j = 1:length(of_dom3d{i})
         msh.elem = [msh.elem  mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
     end
-     msh = f_getboundface(msh);
+     msh = f_getboundface(msh,'n_direction',n_direction);
      bface{id3d} = msh.bound_face;
-     id_bface{id3d} = msh.id_bound_face;
-     msh.bound_face = [];
-     msh.id_bound_face = [];
+     id_bface{id3d} = msh.idl_bound_face;
 end
+id_inter_face = f_findvecnd(bface{2},bface{1});
 [id_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
-inter_face = bface{i}(:,id_bfof1);
+inter_face = bface{1}(:,id_bfof1);
+
 
 %--------------------------------------------------------------------------
 % --- bound with n-decomposition

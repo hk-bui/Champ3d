@@ -52,8 +52,8 @@ if dimref ~= dimin
     error([mfilename ': #vref and #vin do not have the same dimension !']);
 end
 %--------------------------------------------------------------------------
-svin  = f_magicsum(vin,position);
-svref = f_magicsum(vref,position);
+svin  = f_magicsum(vin,'position',position);
+svref = f_magicsum(vref,'position',position);
 %--------------------------------------------------------------------------
 iref = 1:lenref;
 %-----

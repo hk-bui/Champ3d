@@ -1,4 +1,4 @@
-function mesh3d = f_getboundface(mesh3d,varargin)
+function mesh3d = f_get_bound_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,11 +7,13 @@ function mesh3d = f_getboundface(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','get','n_component'};
+arglist = {'elem_type','n_direction','get','n_component'};
 
 % --- default input value
 elem_type = [];
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
+n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
+                         % otherwise : 'automatic' = 'natural' = 'auto'
 n_component = [];
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -77,30 +79,51 @@ dom_right_of_face(elem_right_of_face > 0) = 1 ;%elem_code(elem_right_of_face(ele
 % --- bound with outward normal
 ibO = find(dom_left_of_face  == 1 & dom_right_of_face == 0);
 ibI = find(dom_right_of_face == 1 & dom_left_of_face  == 0);
-bound_face = [face(:,ibO) f_invori(face(:,ibI))];
 %--------------------------------------------------------------------------
-id_bound_face = [ibO ibI];
+switch n_direction
+    case {'o','out','outward'}
+        bound_face = [face(:,ibO) f_invori(face(:,ibI))];
+    case {'i','in','inward'}
+        bound_face = [f_invori(face(:,ibO)) face(:,ibI)];
+    otherwise
+        bound_face = [face(:,ibO) face(:,ibI)];
+end
+%--------------------------------------------------------------------------
+% id_bound_face is local to mesh3d
+lid_bound_face = [ibO ibI];
+%--------------------------------------------------------------------------
+% Add information
+info = ['bound_face with ' n_direction '-normal'];
+
 %--------------------------------------------------------------------------
 % --- bound with n-decomposition
 if any(strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
     bf = bound_face;
-    id_bf = id_bound_face;
+    id_bf = lid_bound_face;
     nface = f_chavec(mesh3d.node,bound_face);
     if isempty(n_component)
         [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');
+        addinfo = [];
     elseif isnumeric(n_component)
         [~,inface] = f_groupsort(nface,'group_component',n_component);
+        addinfo = [' by ' n_component '-component'];
     end
     nb_gr = length(inface);
     bound_face = {};
-    id_bound_face = {};
+    lid_bound_face = {};
     for i = 1:nb_gr
         bound_face{i} = bf(:,inface{i});
-        id_bound_face{i} = id_bf(inface{i});
+        lid_bound_face{i} = id_bf(inface{i});
     end
+    %----------------------------------------------------------------------
+    % Add information
+    info = [info ' with n-decomposition' addinfo];
 end
 
 %--------------------------------------------------------------------------
 % --- Outputs
 mesh3d.bound_face = bound_face;
-mesh3d.id_bound_face = id_bound_face;
+mesh3d.lid_bound_face = lid_bound_face;
+mesh3d.info = info;
+
+
