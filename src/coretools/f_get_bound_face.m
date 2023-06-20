@@ -39,7 +39,7 @@ if isempty(elem_type)
         case 8
             elem_type = 'hex';
     end
-    fprintf(['Get boundface for ' elem_type ' element \n']);
+    fprintf(['Get boundface for ' elem_type ' mesh \n']);
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
