@@ -10,7 +10,7 @@ function f_comparestruct(str1, str2, varargin)
 arglist = {'field_name'};
 
 % --- default input value
-field_name = [];
+field_name = 'all';
 
 %--------------------------------------------------------------------------
 % --- check and update input

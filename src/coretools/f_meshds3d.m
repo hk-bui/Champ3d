@@ -74,12 +74,12 @@ end
 %----- D
 if any(strcmpi(get,{'all', 'D', 'Div'}))
     % ---
-    if ~all(isfield(mesh3d,{'face','elem','face_in_elem','si_face_in_elem'}))
+    if ~all(isfield(mesh3d,{'face','elem','face_in_elem','sign_face_in_elem'}))
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
     end
     % ---
     face_in_elem = mesh3d.face_in_elem;
-    si_face_in_elem = mesh3d.si_face_in_elem;
+    sign_face_in_elem = mesh3d.sign_face_in_elem;
     nbElem = size(mesh3d.elem, 2);
     nbFace = size(mesh3d.face, 2);
     con = f_connexion(elem_type);
@@ -87,7 +87,7 @@ if any(strcmpi(get,{'all', 'D', 'Div'}))
     % ---
     mesh3d.D = sparse(nbElem,nbFace);
     for i = 1:nbFa_inEl
-        mesh3d.D = mesh3d.D + sparse(1:nbElem,face_in_elem(i,:),si_face_in_elem(i,:),nbElem,nbFace);
+        mesh3d.D = mesh3d.D + sparse(1:nbElem,face_in_elem(i,:),sign_face_in_elem(i,:),nbElem,nbFace);
     end
 end
 
