@@ -40,7 +40,7 @@ if isempty(elem_type)
         case 8
             elem_type = 'hex';
     end
-    fprintf(['Get interface for ' elem_type ' element \n']);
+    fprintf(['Get interface for ' elem_type ' mesh \n']);
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
