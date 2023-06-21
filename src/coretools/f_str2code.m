@@ -9,9 +9,8 @@ function code = f_str2code(str)
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
 
-% length of str should not too high (how many char ?)
-
 typestr = class(str);
+mnum = 1.141592653589793;
 
 switch typestr
     case 'cell'
@@ -21,7 +20,7 @@ switch typestr
             mystr = replace(str{i},'...','');
             lenstr = length(mystr);
             for j = 1:lenstr
-                code(i) = code(i) + pi^j * mystr(j);
+                code(i) = code(i) + mnum^j * mystr(j);
             end
         end
     case 'char'
@@ -29,7 +28,7 @@ switch typestr
         str = replace(str,'...','');
         lenstr = length(str);
         for i = 1:lenstr
-            code = code + pi^i * str(i);
+            code = code + mnum^i * str(i);
         end
 end
 %--------------------------------------------------------------------------

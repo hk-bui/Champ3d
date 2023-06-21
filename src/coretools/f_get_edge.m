@@ -7,11 +7,12 @@ function mesh3d = f_get_edge(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','defined_on'};
+arglist = {'elem_type','defined_on','of_dom3d'};
 
 % --- default input value
 elem_type = [];
 defined_on = 'elem'; % 'elem, 'face'
+of_dom3d = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -22,10 +23,14 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if any(strcmpi(defined_on,{'elem','el'}))
-    elem = mesh3d.elem;
-elseif any(strcmpi(defined_on,{'face','fa'}))
-    elem = mesh3d.face;
+if isempty(of_dom3d)
+    if any(strcmpi(defined_on,{'elem','el'}))
+        elem = mesh3d.elem;
+    elseif any(strcmpi(defined_on,{'face','fa'}))
+        elem = mesh3d.face;
+    end
+else
+    defined_on = mesh3d.dom3d.
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type) && isfield(mesh3d,'elem_type')
