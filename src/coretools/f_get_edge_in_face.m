@@ -40,18 +40,18 @@ if isempty(elem_type)
 end
 %--------------------------------------------------------------------------
 if ~isfield(mesh3d,'edge')
-    mesh3d = f_get_edge(mesh3d);
+    edge = f_get_edge(mesh3d);
 elseif isempty(mesh3d.edge)
-    mesh3d = f_get_edge(mesh3d);
+    edge = f_get_edge(mesh3d);
 end
 %--------------------------------------------------------------------------
 if ~isfield(mesh3d,'face')
-    mesh3d = f_get_face(mesh3d);
+    face = f_get_face(mesh3d);
 elseif isempty(mesh3d.face)
-    mesh3d = f_get_face(mesh3d);
+    face = f_get_face(mesh3d);
 end
 %--------------------------------------------------------------------------
-nbFace = size(mesh3d.face,2);
+nbFace = size(face,2);
 %--------------------------------------------------------------------------
 if isempty(elem_type)
     error([mfilename ' : #elem_type must be given !']);
@@ -67,7 +67,7 @@ nbNo_inEd = con.nbNo_inEd;
 maxnbEd_inFa = max(cell2mat(nbEd_inFa));
 fe = zeros(maxnbEd_inFa,nbNo_inEd,nbFace);
 sign_edge_in_face = zeros(maxnbEd_inFa,nbFace);
-itria = find(mesh3d.face(4,:) == 0);
+itria = find(face(4,:) == 0);
 iquad = setdiff(1:nbFace,itria);
 for k = 1:2 %---- 2 faceType
     switch k
@@ -79,7 +79,7 @@ for k = 1:2 %---- 2 faceType
     for i = 1:nbEd_inFa{k}
         fet = [];
         for j = 1:nbNo_inEd
-            fet = [fet; mesh3d.face(EdNo_inFa{k}(i,j),iface)];
+            fet = [fet; face(EdNo_inFa{k}(i,j),iface)];
         end
         fe(i,:,iface) = fet;
         sign_edge_in_face(i,iface) = siEd_inFa{k}(i) .* sign(fet(2,:)-fet(1,:));
@@ -87,7 +87,7 @@ for k = 1:2 %---- 2 faceType
 end
 
 %--------------------------------------------------------------------------
-edge_in_face = f_findvecnd(fe,mesh3d.edge,'position',2);
+edge_in_face = f_findvecnd(fe,edge,'position',2);
 edge_in_face(isnan(edge_in_face)) = 0;
 %--------------------------------------------------------------------------
 % --- Outputs

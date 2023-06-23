@@ -7,11 +7,10 @@ function [edge_in_elem, ori_edge_in_elem] = f_get_edge_in_elem(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','defined_on','of_dom3d'};
+arglist = {'elem_type','of_dom3d'};
 
 % --- default input value
 elem_type = [];
-defined_on = 'elem'; % 'elem, 'face'
 of_dom3d = [];
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -25,6 +24,36 @@ end
 %--------------------------------------------------------------------------
 if isempty(elem_type) && isfield(mesh3d,'elem_type')
     elem_type = mesh3d.elem_type;
+end
+%--------------------------------------------------------------------------
+if isempty(of_dom3d)
+    elem = mesh3d.elem;
+    defined_on = 'elem';
+    %----------------------------------------------------------------------
+    if ~isfield(mesh3d,'edge')
+        edge = f_get_edge(mesh3d);
+    elseif isempty(mesh3d.edge)
+        edge = f_get_edge(mesh3d);
+    else
+        edge = mesh3d.edge;
+    end
+else
+    if ~iscell(of_dom3d)
+        of_dom3d = {of_dom3d};
+    end
+    elem = [];
+    for i = 1:length(of_dom3d)
+        defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
+        if ~any(strcmpi('elem',defined_on))
+            error([mfilename ': #of_dom3d list must defined_on elem!']);
+        end
+        elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
+    end
+    %----------------------------------------------------------------------
+    mesh3d = [];
+    mesh3d.elem = elem;
+    edge = f_get_edge(mesh3d);
+    %----------------------------------------------------------------------
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
@@ -57,59 +86,6 @@ con = f_connexion(elem_type);
 nbNo_inEd = con.nbNo_inEd;
 nbEd_inEl = con.nbEd_inEl;
 EdNo_inEl = con.EdNo_inEl;
-%--------------------------------------------------------------------------
-if isempty(of_dom3d)
-    if any(strcmpi(defined_on,'elem'))
-        elem = mesh3d.elem;
-    elseif any(strcmpi(defined_on,'face'))
-        elem = mesh3d.face;
-    end
-    %----------------------------------------------------------------------
-    if ~isfield(mesh3d,'edge')
-        edge = f_get_edge(mesh3d);
-    elseif isempty(mesh3d.edge)
-        edge = f_get_edge(mesh3d);
-    else
-        edge = mesh3d.edge;
-    end
-else
-    if ~iscell(of_dom3d)
-        of_dom3d = {of_dom3d};
-    end
-    elem = [];
-    for i = 1:length(of_dom3d)
-        doncheck = mesh3d.dom3d.(of_dom3d{1}).defined_on;
-        defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
-        if ~strcmpi(doncheck,defined_on)
-            error([mfilename ': #of_dom3d list must defined_on same type (elem, face, edge)!']);
-        end
-        if any(strcmpi(defined_on,'elem'))
-            elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
-        elseif any(strcmpi(defined_on,'face'))
-            elem = [elem mesh3d.face(:,mesh3d.dom3d.(of_dom3d{i}).id_face)];
-        end
-    end
-    %----------------------------------------------------------------------
-    
-    %----------------------------------------------------------------------
-    edge = f_get_edge(mesh3d);
-    %----------------------------------------------------------------------
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 %--------------------------------------------------------------------------
 nbElem = size(elem,2);
 %--------------------------------------------------------------------------
