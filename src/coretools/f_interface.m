@@ -1,4 +1,4 @@
-function [inter_face, lid_inter_face] = f_get_inter_face(mesh3d,varargin)
+function [inter_face, lid_inter_face, info] = f_interface(elem1,elem2,node,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -12,13 +12,12 @@ arglist = {'elem_type','of_dom3d','get','n_component','n_direction'};
 % --- default input value
 elem_type = [];
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
-of_dom3d = [];
-n_component = [];
 n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
                          % otherwise : 'automatic' = 'natural' = 'auto'
+n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:(nargin-3)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
@@ -26,69 +25,40 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(elem_type) && isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
-end
-%--------------------------------------------------------------------------
-if isempty(elem_type) && isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
-end
-%--------------------------------------------------------------------------
-if isempty(elem_type)
-    nbnoinel = size(mesh3d.elem, 1);
-    switch nbnoinel
-        case 4
-            elem_type = 'tet';
-        case 6
-            elem_type = 'prism';
-        case 8
-            elem_type = 'hex';
-    end
-    fprintf(['Get interface for ' elem_type ' mesh \n']);
-end
-%--------------------------------------------------------------------------
 if isempty(elem_type)
     error([mfilename ' : #elem_type must be given !']);
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbFa_inEl = con.nbFa_inEl;
-%--------------------------------------------------------------------------
-of_dom3d = f_to_dcellargin(of_dom3d,'forced','on');
-%--------------------------------------------------------------------------
-node = mesh3d.node;
-elem = {};
-for i = length(of_dom3d)
-    elem{i} = [];
-    for j = 1:length(of_dom3d{i})
-        elem{i} = [elem{i} ...
-                   mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
-    end
+bface1 = f_boundface(elem1,node,'elem_type',elem_type,n_direction',n_direction);
+bface2 = [];
+if ~isempty(elem2)
+    bface2 = f_boundface(elem2,node,'elem_type',elem_type);
 end
 %--------------------------------------------------------------------------
-for i = 1:length(of_dom3d)
-    msh = [];
-    msh.node = mesh3d.node;
-    id3d = i;
-    if id3d > 2; id3d = 2; end
-    msh.elem = [];
-    for j = 1:length(of_dom3d{i})
-        msh.elem = [msh.elem  mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}{j}).id_elem)];
-    end
-     msh = f_get_bound_face(msh,'n_direction',n_direction);
-     bface{id3d} = msh.bound_face;
-     id_bface{id3d} = msh.idl_bound_face;
+if ~isempty(bface2)
+    inter_face = f_intersectvec(bface1,bface2); % with bface{1} as ref
+else
+    inter_face = bface1; % with bface{1} as ref
 end
-lid_inter_face = f_findvecnd(bface{2},bface{1});
-[lid_inter_face,id_bfof1] = intersect(id_bface{1},id_bface{2});
-inter_face = bface{1}(:,id_bfof1);
-
-
+%--------------------------------------------------------------------------
+lid_inter_face = [];
+id_bf = [];
+if any(strcmpi(get,{'local_id'}))
+    elem_type = f_elemtype(elem,'defined_on','elem');
+    face = f_face(elem,'elem_type',elem_type);
+    lid_inter_face = f_findvecnd(inter_face,bface1{1}); % with bface{1} as ref
+    id_bf = lid_inter_face;
+end
+%--------------------------------------------------------------------------
+% Add information
+info = [];
+if any(strcmpi(get,{'info'}))
+    info = ['inter_face with ' n_direction '-normal'];
+end
 %--------------------------------------------------------------------------
 % --- bound with n-decomposition
 if any(strcmpi(get,{'nd','ndec','ndecomposition','n-decomposition'}))
     bf = inter_face;
-    id_bf = lid_inter_face;
     nface = f_chavec(mesh3d.node,inter_face);
     if isempty(n_component)
         [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');

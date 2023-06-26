@@ -1,4 +1,4 @@
-function [bound_face, lid_bound_face, info] = f_get_bound_face(mesh3d,varargin)
+function [bound_face, lid_bound_face, info] = f_get_bound_face(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,15 +7,13 @@ function [bound_face, lid_bound_face, info] = f_get_bound_face(mesh3d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','n_direction','get','n_component','of_dom3d'};
+arglist = f_arglist('get_bound_face');
 
 % --- default input value
-elem_type = [];
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
 n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
                          %  otherwise : 'automatic' = 'natural' = 'auto'
-n_component = [];
-of_dom3d = [];
+n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -26,128 +24,38 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(elem_type) && isfield(mesh3d,'elem_type')
-    elem_type = mesh3d.elem_type;
-end
+meshobj   = f_get_meshobj(c3dobj,varargin{:});
+id_mesh3d = meshobj.id_mesh3d;
+of_dom3d  = meshobj.of_dom3d;
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    nbnoinel = size(mesh3d.elem, 1);
-    switch nbnoinel
-        case 4
-            elem_type = 'tet';
-        case 6
-            elem_type = 'prism';
-        case 8
-            elem_type = 'hex';
-    end
-    fprintf(['Get boundface for ' elem_type ' mesh \n']);
+if isempty(id_mesh3d)
+    error([mfilename ': no mesh3d found !']);
+else
+    mesh3d = c3dobj.mesh3d.(id_mesh3d);
 end
-%--------------------------------------------------------------------------
-if isempty(elem_type)
-    error([mfilename ' : #elem_type must be given !']);
-end
-%--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 node = mesh3d.node;
-%------------------------------------------------------------------------
-if isempty(of_dom3d)
-    if ~isfield(mesh3d,'face')
-        face = f_get_face(mesh3d,'elem_type',elem_type);
-    else
-        face = mesh3d.face;
-    end
-    if ~isfield(mesh3d,'face_in_elem') || ~isfield(mesh3d,'sign_face_in_elem')
-        [face_in_elem, sign_face_in_elem] = f_get_face_in_elem(mesh3d,'elem_type',elem_type);
-    else
-        face_in_elem = mesh3d.face_in_elem;
-        sign_face_in_elem = mesh3d.sign_face_in_elem;
-    end
+%--------------------------------------------------------------------------
+if f_isempty(of_dom3d)
+    elem = mesh3d.elem;
+    defined_on = 'elem';
 else
-    if ~iscell(of_dom3d)
-        of_dom3d = {of_dom3d};
-    end
+    %----------------------------------------------------------------------
+    of_dom3d = f_to_scellargin(of_dom3d);
+    %----------------------------------------------------------------------
     elem = [];
     for i = 1:length(of_dom3d)
+        defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
+        if ~any(strcmpi('elem',defined_on))
+            error([mfilename ': #of_dom3d list must defined_on elem !']);
+        end
         elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
     end
-    %----------------------------------------------------------------------
-    mesh3d = [];
-    mesh3d.node = node;
-    mesh3d.elem = elem; % !!! do not output
-    %----------------------------------------------------------------------
-    face = f_get_face(mesh3d,'elem_type',elem_type);
-    [face_in_elem, sign_face_in_elem] = f_get_face_in_elem(mesh3d,'elem_type',elem_type);
 end
 %--------------------------------------------------------------------------
-nb_face = size(face,2);
+elem_type = f_elemtype(elem,'defined_on',defined_on);
 %--------------------------------------------------------------------------
-%-----
-elem_left_of_face = zeros(1,nb_face); % !!! convention
-for i = 1:nbFa_inEl
-    elem_left_of_face(face_in_elem(i,sign_face_in_elem(i,:) > 0)) = find(sign_face_in_elem(i,:) > 0);
-end
-%-----
-dom_left_of_face = zeros(1,nb_face);
-dom_left_of_face(elem_left_of_face > 0) = 1 ;%elem_code(elem_left_of_face(elem_left_of_face > 0));
-%-----
-elem_right_of_face = zeros(1,nb_face);
-for i = 1:nbFa_inEl
-    elem_right_of_face(face_in_elem(i,sign_face_in_elem(i,:) < 0)) = find(sign_face_in_elem(i,:) < 0);
-end
-%-----
-dom_right_of_face = zeros(1,nb_face);
-dom_right_of_face(elem_right_of_face > 0) = 1 ;%elem_code(elem_right_of_face(elem_right_of_face > 0));
+[bound_face, lid_bound_face, info] = ...
+    f_boundface(elem,node,'elem_type',elem_type,'get',get,...
+                'n_direction',n_direction,'n_component',n_component);
 %--------------------------------------------------------------------------
-% --- bound with outward normal
-ibO = find(dom_left_of_face  == 1 & dom_right_of_face == 0);
-ibI = find(dom_right_of_face == 1 & dom_left_of_face  == 0);
-%--------------------------------------------------------------------------
-switch n_direction
-    case {'o','out','outward'}
-        bound_face = [face(:,ibO) f_invori(face(:,ibI))];
-    case {'i','in','inward'}
-        bound_face = [f_invori(face(:,ibO)) face(:,ibI)];
-    otherwise
-        bound_face = [face(:,ibO) face(:,ibI)];
-end
-%--------------------------------------------------------------------------
-% id_bound_face is local to mesh3d
-lid_bound_face = [ibO ibI];
-%--------------------------------------------------------------------------
-% Add information
-info = ['bound_face with ' n_direction '-normal'];
-
-%--------------------------------------------------------------------------
-% --- bound with n-decomposition
-if any(strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
-    bf = bound_face;
-    id_bf = lid_bound_face;
-    nface = f_chavec(node,bound_face);
-    if isempty(n_component)
-        [~,~,inface] = f_unique(nface,'by','strict_value','get','groupsort');
-        addinfo = [];
-    elseif isnumeric(n_component)
-        [~,inface] = f_groupsort(nface,'group_component',n_component);
-        addinfo = [' by ' n_component '-component'];
-    end
-    nb_gr = length(inface);
-    bound_face = {};
-    lid_bound_face = {};
-    for i = 1:nb_gr
-        bound_face{i} = bf(:,inface{i});
-        lid_bound_face{i} = id_bf(inface{i});
-    end
-    %----------------------------------------------------------------------
-    % Add information
-    info = [info ' with n-decomposition' addinfo];
-end
-
-%--------------------------------------------------------------------------
-% --- Outputs
-% mesh3d.bound_face = bound_face;
-% mesh3d.lid_bound_face = lid_bound_face;
-% mesh3d.info = info;
-
-

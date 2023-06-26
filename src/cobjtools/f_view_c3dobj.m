@@ -46,68 +46,9 @@ for i = 1:(nargin-1)/2
 end
 
 %--------------------------------------------------------------------------
-design3d = [];
-id_design3d = [];
-if ~isempty(id_emdesign3d)
-    design3d = 'emdesign3d';
-    id_design3d = id_emdesign3d;
-end
-if ~isempty(id_thdesign3d)
-    design3d = 'thdesign3d';
-    id_design3d = id_thdesign3d;
-end
-%--------------------------------------------------------------------------
-thing = [];
-id_thing = [];
-if ~isempty(id_econductor)
-    thing = 'econductor';
-    id_thing = id_econductor;
-end
-if ~isempty(id_mconducteur)
-    thing = 'mconducteur';
-    id_thing = id_mconducteur;
-end
-if ~isempty(id_coil)
-    thing = 'coil';
-    id_thing = id_coil;
-end
-if ~isempty(id_bc)
-    thing = 'bc';
-    id_thing = id_bc;
-end
-if ~isempty(id_nomesh)
-    thing = 'nomesh';
-    id_thing = id_nomesh;
-end
-if ~isempty(id_bsfield)
-    thing = 'bs_field';
-    id_thing = id_bsfield;
-end
-if ~isempty(id_pmagnet)
-    thing = 'pmagnet';
-    id_thing = id_pmagnet;
-end
-if ~isempty(id_tconductor)
-    thing = 'tconductor';
-    id_thing = id_tconductor;
-end
-if ~isempty(id_tcapacitor)
-    thing = 'tcapacitor';
-    id_thing = id_tcapacitor;
-end
-% if ~isempty()
-%     thing = '';
-%     id_thing = '';
-% end
-%--------------------------------------------------------------------------
-if ~isempty(design3d) && ~isempty(thing)
-    id_mesh3d = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_mesh3d;
-    id_dom3d  = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_dom3d;
-end
-%--------------------------------------------------------------------------
-% if isempty(id_mesh2d) && isempty(id_mesh3d)
-%     error([mfilename ' : #id_mesh2d or #id_mesh3d must be given !']);
-% end
+meshobj = f_get_meshobj(c3dobj,varargin{:});
+id_mesh3d = meshobj.id_mesh3d;
+id_dom3d  = meshobj.id_dom3d;
 %--------------------------------------------------------------------------
 elem_type = [];
 defined_on = 'elem';

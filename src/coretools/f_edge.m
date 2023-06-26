@@ -1,4 +1,4 @@
-function face = f_get_face(c3dobj,varargin)
+function edge = f_edge(elem,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,11 +7,10 @@ function face = f_get_face(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = f_arglist('getface');
+arglist = {'elem_type'};
 
 % --- default input value
-
-
+elem_type = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:(nargin-1)/2
@@ -22,37 +21,22 @@ for i = 1:(nargin-1)/2
     end
 end
 %--------------------------------------------------------------------------
-meshobj   = f_get_meshobj(c3dobj,varargin{:});
-id_mesh3d = meshobj.id_mesh3d;
-of_dom3d  = meshobj.of_dom3d;
-%--------------------------------------------------------------------------
-if isempty(id_mesh3d)
-    error([mfilename ': no mesh3d found !']);
-else
-    mesh3d = c3dobj.mesh3d.(id_mesh3d);
+if isempty(elem_type)
+    error([mfilename ' : #elem_type must be given !']);
 end
 %--------------------------------------------------------------------------
-if f_isempty(of_dom3d)
-    elem = mesh3d.elem;
-    defined_on = 'elem';
-else
-    %----------------------------------------------------------------------
-    of_dom3d = f_to_scellargin(of_dom3d);
-    %----------------------------------------------------------------------
-    elem = [];
-    for i = 1:length(of_dom3d)
-        defined_on = mesh3d.dom3d.(of_dom3d{i}).defined_on;
-        if ~any(strcmpi('elem',defined_on))
-            error([mfilename ': #of_dom3d list must defined_on elem !']);
-        end
-        elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
-    end
-end
+con = f_connexion(elem_type);
+nbNo_inEd = con.nbNo_inEd;
+nbEd_inEl = con.nbEd_inEl;
+EdNo_inEl = con.EdNo_inEl;
 %--------------------------------------------------------------------------
-elem_type = f_elemtype(elem,'defined_on',defined_on);
+nbElem = size(elem,2);
 %--------------------------------------------------------------------------
-face = f_face(elem,'elem_type',elem_type);
+e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
+             nbEd_inEl, nbNo_inEd, nbElem);
+e = sort(e, 2);
 %--------------------------------------------------------------------------
-
-
+edge = reshape(permute(e,[2 1 3]), nbNo_inEd, []);
+edge = f_unique(edge);
+%--------------------------------------------------------------------------
 end
