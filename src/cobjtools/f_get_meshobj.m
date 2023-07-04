@@ -8,6 +8,7 @@ function meshobj = f_get_meshobj(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = f_arglist('getmeshobj');
+varargin = f_validvarargin(varargin,arglist);
 
 % --- default input value
 id_mesh2d  = [];
@@ -27,7 +28,7 @@ id_pmagnet = [];
 id_tconductor = [];
 id_tcapacitor = [];
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
