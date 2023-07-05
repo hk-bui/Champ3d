@@ -14,12 +14,12 @@ function  set_up()
 if ispc
     addpath('C:\femm42\mfiles'); % !! may be changed to your own directory
 elseif ismac
-    fprintf('Under iOS : FEMM tools are not supported ! \n');
+    fprintf('Under macOS : FEMM tools are not supported ! \n');
 end
 %--------------------------------------------------------------------------
 Interpreter = 'tex'; % 'latex'
 fontSize = 14;
-fontName = 'Tahoma';
+fontName = 'Courier';
 cpmap = interp1([1 52 103 154 205 256],...
                 [0 0 0; 0 0 .75; .5 0 .8; 1 .1 0; 1 .7 0; 1 1 0],1:256);
 % ---
