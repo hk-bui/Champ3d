@@ -15,7 +15,7 @@ con.siNo_inEd = [1 -1]; % w.r.t edge
 con.siEd_inEl = [1; -1; 1; 1]; % w.r.t elem
 con.siEd_inFa = [1; -1; 1; 1]; % elem as face
 con.siFa_inEl = [1; -1; 1; 1];
-con.FaNo_inEl = [1 2; 1 4; 2 3; 3 4]; % (F1) (F2) (F3) (F4)
+con.FaNo_inEl = [1 2; 1 4; 2 3; 3 4]; % (F1) (F2) (F3) (F4), edge as face
 %-----
 con.NoFa_ofEd = [2 3; 1 4; 1 4; 3 2]; % !!! F(i,~j) - circular
 % con.NoFa_ofFa = [4 3 5 0; 4 3 5 0; 4 1 5 2; 3 1 5 2; 3 1 4 2]; % !!! F(i,~i+1) - circular
