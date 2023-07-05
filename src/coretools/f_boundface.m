@@ -87,7 +87,7 @@ if any(strcmpi(get,{'ndec','ndecomposition','n-decomposition'}))
         addinfo = [];
     elseif isnumeric(n_component)
         [~,inface] = f_groupsort(nface,'group_component',n_component);
-        addinfo = [' by ' n_component '-component'];
+        addinfo = [' by ' num2str(n_component) '-component'];
     end
     nb_gr = length(inface);
     bound_face = {};
