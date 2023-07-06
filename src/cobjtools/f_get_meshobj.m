@@ -11,6 +11,7 @@ arglist = f_arglist('getmeshobj');
 varargin = f_validvarargin(varargin,arglist);
 
 % --- default input value
+for3d      = 1;
 id_mesh2d  = [];
 id_dom2d   = [];
 id_mesh3d  = [];
@@ -34,6 +35,10 @@ for i = 1:length(varargin)/2
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
+end
+%--------------------------------------------------------------------------
+if ~isempty(id_mesh2d) || ~isempty(id_dom2d)
+    for3d = 0;
 end
 %--------------------------------------------------------------------------
 design3d = [];
@@ -110,6 +115,8 @@ if ~iscell(of_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
+meshobj.for3d     = for3d;
+% ---
 meshobj.id_mesh3d = id_mesh3d;
 meshobj.id_dom3d  = id_dom3d;
 meshobj.of_dom3d  = of_dom3d;

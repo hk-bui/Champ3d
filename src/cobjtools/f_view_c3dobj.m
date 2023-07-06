@@ -49,14 +49,13 @@ end
 meshobj = f_get_meshobj(c3dobj,varargin{:});
 id_mesh3d = meshobj.id_mesh3d;
 id_dom3d  = meshobj.id_dom3d;
+id_mesh2d = meshobj.id_mesh2d;
+id_dom2d  = meshobj.id_dom2d;
+for3d     = meshobj.for3d;
 %--------------------------------------------------------------------------
 elem_type = [];
 defined_on = 'elem';
-if isempty(id_mesh3d) && isempty(id_dom3d)
-    if isempty(id_mesh2d)
-        id_mesh2d = fieldnames(c3dobj.mesh2d);
-        id_mesh2d = id_mesh2d{1};
-    end
+if ~for3d
     %----------------------------------------------------------------------
     if isempty(id_dom2d)
         id_dom2d = {''};
@@ -70,11 +69,6 @@ if isempty(id_mesh3d) && isempty(id_dom3d)
     elem_type = c3dobj.mesh2d.(id_mesh2d).elem_type;
     %----------------------------------------------------------------------
 else
-    %----------------------------------------------------------------------
-    if isempty(id_mesh3d)
-        id_mesh3d = fieldnames(c3dobj.mesh3d);
-        id_mesh3d = id_mesh3d{1};
-    end
     %----------------------------------------------------------------------
     node = c3dobj.mesh3d.(id_mesh3d).node;
     %----------------------------------------------------------------------
@@ -103,7 +97,7 @@ else
     elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
 end
 %--------------------------------------------------------------------------
-if ~isempty(id_mesh2d)
+if ~for3d
     %----------------------------------------------------------------------
     f_view_mesh2d(c3dobj.mesh2d.(id_mesh2d).node, ...
                   c3dobj.mesh2d.(id_mesh2d).elem(:,id_elem), ...
@@ -119,7 +113,7 @@ if ~isempty(id_mesh2d)
         'FontSize', text_size,'HorizontalAlignment', 'center');
 end
 %--------------------------------------------------------------------------
-if ~isempty(id_mesh3d)
+if for3d
     %----------------------------------------------------------------------
     f_view_mesh3d(node, elem, ...
                   'elem_type',elem_type, ...
