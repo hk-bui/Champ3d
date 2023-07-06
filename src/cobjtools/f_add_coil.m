@@ -93,7 +93,7 @@ for i = 1:length(varargin)/2
         if any(strcmpi(arglist,varargin{2*i-1}))
             c3dobj.coil(iec+1).(lower(varargin{2*i-1})) = varargin{2*i};
         else
-            error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+            error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
         end
     end
 end

@@ -1,4 +1,4 @@
-function elem_type = f_elemtype(elem,varargin)
+function c3dobj = f_create_c3dobj(varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,10 +7,10 @@ function elem_type = f_elemtype(elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'defined_on'};
+arglist = f_arglist('create_c3dobj');
 
 % --- default input value
-elem_type  = [];
+
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -20,27 +20,5 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
-%--------------------------------------------------------------------------
-nbnoinel = size(elem, 1);
-if any(strcmpi(defined_on,{'elem'}))
-    switch nbnoinel
-        case 4
-            elem_type = 'tet';
-        case 6
-            elem_type = 'prism';
-        case 8
-            elem_type = 'hex';
-    end
-elseif any(strcmpi(defined_on,{'face'}))
-    switch nbnoinel
-        case 3
-            elem_type = 'tri';
-        case 4
-            elem_type = 'quad';
-    end
-end
-%--------------------------------------------------------------------------
-if isempty(elem_type)
-    error([mfilename ': cannot define #elem_type!']);
-end
 
+end
