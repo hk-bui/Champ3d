@@ -23,6 +23,7 @@ con.EdNo_inFa{1} = [1 2; 1 4; 2 3; 3 4]; % for FaType 1
 con.EdNo_inFa{2} = [1 2; 1 4; 2 3; 3 4]; % for FaType 2
 con.FaEd_inEl = [];
 con.siFa_inEl = [];
+con.siEd_inEl = [];
 con.siEd_inFa{1} = [1 -1 1 1]; % w.r.t face for FaType 1
 con.siEd_inFa{2} = [1 -1 1 1]; % w.r.t face for FaType 2
 %-----
@@ -36,7 +37,7 @@ con.Weigh =         [ 1  1  1  1  1  1  1 1];
 con.cU  = 0;
 con.cV  = 0;
 con.cW  = 0;
-con.cWeigh  = 8;
+con.cWeigh  = 8; % 2x2x2
 con.nbG = length(con.U);
 %-----
 con.N{1} = @(u,v,w) 1/8.*(1-u).*(1-v).*(1-w);
