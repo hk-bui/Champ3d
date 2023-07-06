@@ -14,7 +14,7 @@ id_mesh3d = [];
 id_emdesign3d = [];
 
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
@@ -24,12 +24,13 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh3d)
-    id_mesh3d = fieldnames(c3dobj.geo3d.mesh3d);
+    id_mesh3d = fieldnames(c3dobj.mesh3d);
     id_mesh3d = id_mesh3d{1};
 end
 
 if isempty(id_emdesign3d)
-    error([mfilename ' : #id_emdesign3d must be given !']);
+    id_emdesign3d = 'emdesign3d_01';
+    %error([mfilename ' : #id_emdesign3d must be given !']);
 end
 
 %--------------------------------------------------------------------------

@@ -18,6 +18,10 @@ function f_femm_set_block(draw2d,varargin)
 %     +  0 --> no set
 % 'meshsize'  : meshsize (see FEMM)
 %--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
+%--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 % Huu-Kien.Bui@univ-nantes.fr
@@ -38,7 +42,7 @@ group = 0;
 meshsize = 0;
 
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};'])
     else

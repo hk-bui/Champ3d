@@ -1,5 +1,5 @@
 function f_femm_addmaterial(varargin)
-
+% From FEMM documentation :
 % - material_name Material name
 % - mu x Relative permeability in the x- or r-direction.
 % - mu y Relative permeability in the y- or z-direction.
@@ -24,6 +24,10 @@ function f_femm_addmaterial(varargin)
 % - Phi_hy Hysteresis lag in degrees in the y-direction for linear problems.
 % - nstr Number of strands in the wire build. Should be 1 for Magnet or Square wire.
 % - dwire Diameter of each of the wire?s constituent strand in millimeters.
+%--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'

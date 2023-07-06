@@ -17,7 +17,7 @@ id_mesh1d = [];
 id_layer  = [];
 
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
@@ -103,17 +103,6 @@ elem2d = [c3dobj.mesh2d.(id_mesh2d).elem(1,:); ...
 ie0 = 0;
 for k = 1:nb_layer	% k : current layer
     % ---------------------------------------------------------------------
-    % lower face
-    %elem(1,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * (k-1);
-    %elem(2,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * (k-1);
-    %elem(3,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * (k-1);
-    %elem(4,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * (k-1);
-    % upper face
-    %elem(5,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(1,:) + nbNode2D * k;
-    %elem(6,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(2,:) + nbNode2D * k;
-    %elem(7,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(3,:) + nbNode2D * k;
-    %elem(8,ie0+1 : ie0+nbElem2D) = c3dobj.mesh2d.(id_mesh2d).elem(4,:) + nbNode2D * k;
-    % ---------------------------------------------------------------------
     elem(1:4,ie0+1 : ie0+nbElem2D) = elem2d + nbNode2D * (k-1);
     elem(5:8,ie0+1 : ie0+nbElem2D) = elem2d + nbNode2D *  k;
     % ---------------------------------------------------------------------
@@ -134,13 +123,17 @@ c3dobj.mesh3d.(id_mesh3d).elem = elem;
 c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
-% ---
+%--------------------------------------------------------------------------
+c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
+                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+c3dobj.mesh3d.(id_mesh3d).face = f_face(c3dobj.mesh3d.(id_mesh3d).elem, ...
+                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
+%--------------------------------------------------------------------------
+% --- Log message
+fprintf(' --- in %.2f s \n',toc);
+%--------------------------------------------------------------------------
 % c3dobj.mesh3d.(id_mesh3d).cnode(1,:) = mean(reshape(node(1,elem(1:8,:)),8,nb_elem));
 % c3dobj.mesh3d.(id_mesh3d).cnode(2,:) = mean(reshape(node(2,elem(1:8,:)),8,nb_elem));
 % c3dobj.mesh3d.(id_mesh3d).cnode(3,:) = mean(reshape(node(3,elem(1:8,:)),8,nb_elem));
-% --- Log message
-fprintf(' --- in %.2f s \n',toc);
-
-
 
 

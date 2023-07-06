@@ -1,5 +1,4 @@
 function c3dobj = f_c3d_prismmesh(c3dobj,varargin)
-% F_CHAMP3D_HEXA ...
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -8,7 +7,7 @@ function c3dobj = f_c3d_prismmesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh2d','id_mesh1d','id_layer','id_mesh3d','mesher'};
+arglist = {'id_mesh2d','id_layer','id_mesh3d','mesher'};
 
 % --- default input value
 id_mesh3d = [];
@@ -17,7 +16,7 @@ id_mesh1d = [];
 id_layer  = [];
 
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
@@ -29,10 +28,6 @@ end
 if isempty(id_mesh2d)
     error([mfilename ' : #id_mesh2d must be given !']);
 end
-% if isempty(id_mesh2d)
-%     id_mesh2d = fieldnames(c3dobj.mesh2d);
-%     id_mesh2d = id_mesh2d{1};
-% end
 %--------------------------------------------------------------------------
 while iscell(id_mesh2d)
     id_mesh2d = id_mesh2d{1};
@@ -41,7 +36,17 @@ end
 if isempty(id_layer)
     error([mfilename ' : #id_layer must be given !']);
 end
-
+%--------------------------------------------------------------------------
+if ~iscell(id_layer)
+    idl = id_layer;
+    id_layer = {};
+    id_layer{1} = idl;
+end
+%--------------------------------------------------------------------------
+if isempty(id_mesh1d)
+    id_mesh1d = fieldnames(c3dobj.mesh1d);
+    id_mesh1d = id_mesh1d{1};
+end
 %--------------------------------------------------------------------------
 tic;
 fprintf(['Making c3d_prismmesh #' id_mesh3d]);
@@ -120,7 +125,6 @@ c3dobj.mesh3d.(id_mesh3d).elem_type = 'prism';
 % c3dobj.mesh3d.(id_mesh3d).cnode(3,:) = mean(reshape(node(3,elem(1:8,:)),8,nb_elem));
 % --- Log message
 fprintf(' --- in %.2f s \n',toc);
-
 
 
 

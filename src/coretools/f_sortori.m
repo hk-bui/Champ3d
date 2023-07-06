@@ -12,9 +12,10 @@ flag = ones(1,size(elem,2));
 if size(elem,1) < 2
     return
 elseif size(elem,1) == 2
-    elem = sort(elem);
+    elem = sort(elem); % for 2d
     flag(:) = 1;
 else
+    elem(elem == 0) = [];
     dim = size(elem,1); len = size(elem,2);
     [~,imin] = sort(elem); ormin = mod(imin(1,:),dim); ormin(ormin==0) = dim;
     ornex = mod(ormin + 1, dim); ornex(ornex==0) = dim;

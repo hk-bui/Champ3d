@@ -1,0 +1,62 @@
+function f_femm_addboundprop(varargin)
+
+%--------------------------------------------------------------------------
+% Call mi_addboundprop
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'id_bc','a0','a1','a2','phi','mu','sig','c0','c1','bc_type','ia','oa'};
+
+% --- default input value
+id_bc = 'bc';
+a0  = 0;
+a1  = 0;
+a2  = 0;
+phi = 0;
+mu  = 0;
+sig = 0;
+c0  = 0;
+c1  = 0;
+ia  = 0;
+oa  = 0;
+bc_type = 'a=0'; % 'a=0', 'sibc', 'mixed', 
+                 % 'dual_image', 'periodic', 'anti-periodic',
+                 % 'periodic-airgap', 'anti-periodic-airgap'
+
+
+%--------------------------------------------------------------------------
+% --- check and update input
+for i = 1:(nargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+%--------------------------------------------------------------------------
+switch bc_type
+    case 'a=0'
+        bc_type = 0;
+    case 'sibc'
+        bc_type = 1;
+    case 'mixed'
+        bc_type = 2;
+    case 'periodic'
+        bc_type = 4;
+    case 'anti-periodic'
+        bc_type = 5;
+end
+
+%--------------------------------------------------------------------------
+mi_addboundprop(id_bc, a0, a1, a2, phi, mu, sig, c0, c1, bc_type, ia, oa);
+%--------------------------------------------------------------------------
+
+

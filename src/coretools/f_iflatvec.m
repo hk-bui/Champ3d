@@ -1,0 +1,42 @@
+function [vout] = f_iflatvec(vin,varargin)
+% F_FLATVEC 
+%--------------------------------------------------------------------------
+% CHAMP3D PROJECT
+% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% Huu-Kien.Bui@univ-nantes.fr
+% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+%--------------------------------------------------------------------------
+
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'return_position_list','return_len_list','for_index'};
+
+% --- default input value
+return_position_list = [];
+return_len_list = [];
+for_index = 0;
+%--------------------------------------------------------------------------
+% --- check and update input
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+    end
+end
+
+%--------------------------------------------------------------------------
+if isempty(return_position_list) || isempty(return_len_list)
+    error([mfilename ': #position_list and #len_list must be given !']);
+end
+%--------------------------------------------------------------------------
+if ~for_index
+    vout = ipermute(reshape(vin, return_len_list), return_position_list);
+else
+    vout = ipermute(reshape(vin, [1 return_len_list(2:end)]), return_position_list);
+    vout = squeeze(vout);
+end
+
+end
+
+
+

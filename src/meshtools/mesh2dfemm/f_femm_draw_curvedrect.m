@@ -7,6 +7,10 @@ function draw2d = f_femm_draw_curvedrect(draw2d,varargin)
 % 'arclen' : arc length
 % 'max_anglen' : maximal angle of segment (default = 2 deg)
 %--------------------------------------------------------------------------
+% FEMM
+% Author : David Meeker
+% Copyright (C) 1998-2015
+%--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 % Huu-Kien.Bui@univ-nantes.fr
@@ -26,7 +30,7 @@ id_draw2d = [];
 ocenter = [0 0];
 
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else

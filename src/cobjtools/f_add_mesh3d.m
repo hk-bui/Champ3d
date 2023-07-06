@@ -18,7 +18,7 @@ id_mesh1d = [];
 id_layer  = [];
 
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
@@ -41,10 +41,13 @@ switch mesher
         fprintf(['Add mesh3d #' id_mesh3d '\n']);
         %------------------------------------------------------------------
     case {'c3d_prismmesh','c3d_prismesh'}
-        % TODO
-        %mesh = f_prism2dto3d(dom2d,layer);
-        %mesh = f_intkit3d(mesh);
+        c3dobj = f_c3d_prismmesh(c3dobj,'id_mesh3d',id_mesh3d,'id_mesh2d',id_mesh2d,...
+                                        'id_layer',id_layer);
+        % --- Log message
+        fprintf(['Add mesh3d #' id_mesh3d '\n']);
     case 'gmsh'
+        % TODO
+    case {'c3d_mixedmesh','c3d_mixedhexaprismmesh','c3d_mixedhexaprism'}
         % TODO
 end
 

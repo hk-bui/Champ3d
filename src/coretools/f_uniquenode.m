@@ -1,6 +1,5 @@
 function IDNode = f_uniquenode(elem,varargin)
-% F_uniquenode returns the (unique) nodes that build up the elements.
-% p_value : array of values of the parameter computed for each element
+% f_uniquenode returns the (unique) nodes that build up the elements.
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -13,7 +12,7 @@ arglist = {'elem','nb_vertices'};
 % --- default input value
 nb_vertices = size(elem,1);
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else

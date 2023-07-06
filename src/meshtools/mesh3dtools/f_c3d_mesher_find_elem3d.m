@@ -1,4 +1,4 @@
-function [id_elem, elem_code] = f_c3d_hexamesh_find_elem3d(c3dobj,varargin)
+function [id_elem, elem_code] = f_c3d_mesher_find_elem3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,17 +7,16 @@ function [id_elem, elem_code] = f_c3d_hexamesh_find_elem3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','id_dom3d','id_dom2d','id_layer','elem_code'};
+arglist = {'id_mesh3d','id_dom2d','id_layer','elem_code'};
 
 % --- default input value
 id_mesh3d = [];
-id_dom3d = [];
 id_dom2d = [];
 id_layer = [];
 elem_code = [];
 
 % --- check and update input
-for i = 1:(nargin-1)/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
@@ -28,7 +27,6 @@ end
 %--------------------------------------------------------------------------
 if isempty(elem_code)
     tic;
-    fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
     %--------------------------------------------------------------
     if isempty(id_dom2d) || isempty(id_layer)
         error([mfilename ' : #id_dom2d and #id_layer must be given !']);
@@ -73,7 +71,6 @@ if isempty(elem_code)
     %--------------------------------------------------------------
 else
     tic;
-    fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
     %--------------------------------------------------------------
     id_elem = [];
     for i = 1:length(elem_code)
