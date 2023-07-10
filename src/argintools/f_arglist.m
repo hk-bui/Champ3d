@@ -10,9 +10,10 @@ function arglist = f_arglist(arglistcase)
 
 switch arglistcase
     case {'create_c3d','create_c3dobj'}
-        arglist = {'id_mesh3d','id_dom3d','id_dom2d','id_layer','elem_code', ...
-                   'defined_on','of_dom3d',...
-                   'get','n_direction','n_component'};
+        arglist = {'project_path'};
+        
+    case {'save_c3d','save_c3dobj'}
+        arglist = {'options'};
         
     case {'add_dom3d','adddom3d','f_add_dom3d'}
         arglist = {'id_mesh3d','id_dom3d','id_dom2d','id_layer','elem_code', ...

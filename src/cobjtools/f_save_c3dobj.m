@@ -1,4 +1,4 @@
-function c3dobj = f_create_c3dobj(varargin)
+function f_save_c3dobj(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,10 +7,10 @@ function c3dobj = f_create_c3dobj(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = f_arglist('create_c3dobj');
+arglist = f_arglist('save_c3dobj');
 
 % --- default input value
-project_path = [];
+options = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -22,7 +22,7 @@ for i = 1:length(varargin)/2
 end
 
 %--------------------------------------------------------------------------
-c3dobj.config.project_path = project_path;
+
 
 
 end
