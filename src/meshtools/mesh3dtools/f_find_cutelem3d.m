@@ -7,12 +7,12 @@ function id_elem = f_find_cutelem3d(node,elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'node','elem','cut_equation','elem_type','tol'};
+arglist = {'node','elem','cut_equation','elem_type','tol','defined_on'};
 
 % --- default input value
 cut_equation = '';
-elem_type = 'hex';
-
+elem_type = [];
+defined_on = 'elem';
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -30,6 +30,10 @@ eqcond = cut_equation.eqcond;
 neqcond = cut_equation.neqcond;
 %--------------------------------------------------------------------------
 nbEqcond = length(eqcond);
+%--------------------------------------------------------------------------
+if isempty(elem_type)
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
+end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
 nbNo_inEl = con.nbNo_inEl;

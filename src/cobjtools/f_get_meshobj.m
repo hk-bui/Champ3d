@@ -54,6 +54,7 @@ end
 %--------------------------------------------------------------------------
 thing = [];
 id_thing = [];
+additional = [];
 if ~isempty(id_econductor)
     thing = 'econductor';
     id_thing = id_econductor;
@@ -94,6 +95,11 @@ end
 if ~isempty(design3d) && ~isempty(thing)
     id_mesh3d = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_mesh3d;
     id_dom3d  = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_dom3d;
+    % ---
+    if strcmpi(thing,'coil')
+        additional = c3dobj.(design3d).(id_design3d).(thing).(id_thing);
+        additional.type = 'coil';
+    end
 end
 %--------------------------------------------------------------------------
 if isempty(id_mesh2d) && isfield(c3dobj,'mesh2d')
@@ -123,5 +129,5 @@ meshobj.of_dom3d  = of_dom3d;
 % ---
 meshobj.id_mesh2d = id_mesh2d;
 meshobj.id_dom2d  = id_dom2d;
-
-
+% ---
+meshobj.additional = additional;

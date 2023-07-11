@@ -1,4 +1,4 @@
-function id_node = f_find_cutnode3d(node,elem,varargin)
+function id_elem = f_find_elem3d(node,elem,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,12 +7,11 @@ function id_node = f_find_cutnode3d(node,elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'node','elem','cut_equation','elem_type','tol','defined_on'};
+arglist = {'node','elem','dom3d_equation','elem_type','tol','defined_on'};
 
 % --- default input value
-cut_equation = '';
+dom3d_equation = '';
 elem_type = [];
-tol = 1e-9; % tolerance
 defined_on = 'elem';
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -23,10 +22,10 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-cut_equation = f_cut_equation(cut_equation,varargin);
+dom3d_equation = f_cut_equation(dom3d_equation,varargin);
 %--------------------------------------------------------------------------
-eqcond = cut_equation.eqcond;
-neqcond = cut_equation.neqcond;
+eqcond = dom3d_equation.eqcond;
+neqcond = dom3d_equation.neqcond;
 %--------------------------------------------------------------------------
 nbEqcond = length(eqcond);
 %--------------------------------------------------------------------------
@@ -36,63 +35,36 @@ end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
 nbNo_inEl = con.nbNo_inEl;
-%--------------------------------------------------------------------------
-IDNode = [];
-for i = 1:nbNo_inEl
-    IDNode = [IDNode elem(i,:)];
-end
-x = node(1,IDNode);
-y = node(2,IDNode);
-z = node(3,IDNode);
-%--------------------------------------------------------------------------
-checksum = [];
-neqNode  = [];
-%--------------------------------------------------------------------------
+nbElem = size(elem,2);
+%----- barrycenter
+x = mean(reshape(node(1,elem(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
+y = mean(reshape(node(2,elem(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
+z = mean(reshape(node(3,elem(1:nbNo_inEl,:)),nbNo_inEl,nbElem));
+% ---
 if length(neqcond) > 1                      % 1 & something else
     eval(['checksum = (' neqcond ');']);
-    neqNode = find(checksum);
+    id_elem = find(checksum >= 1); 
 else
-    neqNode = 1:length(IDNode);
+    id_elem = 1:nbElem;
 end
-%--------------------------------------------------------------------------
+% ---
 for i = 1:nbEqcond
-    eqc = eqcond{i};
-    isep = strfind(eqc,'==');
-    eqcond_L = eqc(1:isep-1);
-    eqcond_R = eqc(isep+2:end);
-    % == with tolerance
-    eqc = [eqcond_L '<=' eqcond_R '+' num2str(tol) ' & ' ...
-           eqcond_L '>=' eqcond_R '-' num2str(tol)];
-    eval(['checksum = (' eqc ');']);
-    eqNode{i} = find(checksum);
+    eqcond_L = strrep(eqcond{i},'==','<');
+    eqcond_R = strrep(eqcond{i},'==','>');
+    eval(['iEqcond_L{i} = (' eqcond_L ');']);
+    eval(['iEqcond_R{i} = (' eqcond_R ');']);
+    checksum_L = sum(iEqcond_L{i});
+    checksum_R = sum(iEqcond_R{i});
+    checksum   = checksum_L + checksum_R;
+    % just need one node touched
+    iElemEqcond{i} = find( (checksum_L < nbNo_inEl & checksum_L > 0 & ...
+                            checksum_R < nbNo_inEl & checksum_R > 0)  ...
+                          |(checksum   < nbNo_inEl)); 
 end
-%--------------------------------------------------------------------------
-eNode = neqNode;
+% ---
 for i = 1:nbEqcond
-    eNode = intersect(eNode,eqNode{i});
+    id_elem = intersect(id_elem,iElemEqcond{i});
 end
-eNode(eNode == 0) = [];
 %--------------------------------------------------------------------------
-id_node = unique(IDNode(eNode));
+id_elem = unique(id_elem);
 %--------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
