@@ -25,56 +25,79 @@ function parameter = f_make_parameter(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'f','depend_on','from','b','h'};
+arglist = {'f','depend_on','from','id_design3d'};
+
 % --- default input value
-parameter.f = '';
-parameter.depend_on = '';
-parameter.from = '';
+f = [];
+depend_on = [];
+from = [];
+id_design3d = [];
+
 % --- check and update input
-for i = 1:nargin/2
+for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
-        parameter.(lower(varargin{2*i-1})) = varargin{2*i};
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
-if isa(parameter.f,'numeric')
-    ptype = 'number';
-elseif isa(parameter.f,'function_handle')
-    ptype = 'function';
-elseif isa(parameter.f,'char')
-    ptype = 'data';
+if isempty(f)
+    error([mfilename ' : #f must be given, numeric or function_handle !']);
+else
+    if isa(f,'numeric')
+        ptype = 'number';
+    elseif isa(f,'function_handle')
+        ptype = 'function';
+    end
 end
 %--------------------------------------------------------------------------
 switch ptype
     case 'number'
-        parameter.f = str2func(['@()' num2str(parameter.f)]);
+        f = str2func(['@()' num2str(f)]);
     case 'function'
-        %------------------------------------------------------------------
-        if ~iscell(parameter.depend_on)
-            parameter.depend_on = {parameter.depend_on};
+        %--------------------------------------------------------------------------
+        if isempty(from)
+            error([mfilename ': #from what ?!']);
         end
         %------------------------------------------------------------------
-        if nargin(parameter.f)
-            if nargin(parameter.f) ~= length(parameter.depend_on)
-                error([mfilename ': Check number of arguments !']);
+        depend_on = f_to_scellargin(depend_on);
+        %------------------------------------------------------------------
+        if nargin(f)
+            if nargin(f) ~= length(depend_on)
+                error([mfilename ': Check number of f arguments !']);
             end
         end
-    case 'data'
         %------------------------------------------------------------------
-        dattype = {'bhdata','bhfunction'};
-        if sum(any(strcmpi(dattype,parameter.f))) == 0
-            error([mfilename ' : ' parameter.f ' is not support !']);
+        from = f_to_scellargin(from);
+        %------------------------------------------------------------------
+        %if isempty(id_design3d)
+        %    for i = 1:length(from)
+        %        if any(strcmpi(from{i},{'emdesign3d','thdesign3d'}))
+        %            iddes3d = fieldnames(c3dobj.(from{i}));
+        %            id_design3d{i} = iddes3d{1};
+        %        end
+        %    end
+        %else
+        %    id_design3d = f_to_scellargin(id_design3d);
+        %end
+        %------------------------------------------------------------------
+        id_design3d = f_to_scellargin(id_design3d);
+        %------------------------------------------------------------------
+        while ((length(depend_on) ~= length(from)) || ...
+               (length(depend_on) ~= length(id_design3d)) || ...
+               (length(from) ~= length(id_design3d)))
+            [depend_on,from] = f_pairing_scellargin(depend_on,from);
+            [id_design3d,from] = f_pairing_scellargin(id_design3d,from);
+            [id_design3d,depend_on] = f_pairing_scellargin(id_design3d,depend_on);
         end
-        %------------------------------------------------------------------
-        if strcmpi(parameter.f,'bhdata')
-            parameter = f_calbhdata(parameter);
-        end
-        %------------------------------------------------------------------
 end
 %--------------------------------------------------------------------------
-
+% --- Output
+parameter.f = f;
+parameter.field = depend_on;
+parameter.design3d = from;
+parameter.id_design3d = id_design3d;
 
 
 

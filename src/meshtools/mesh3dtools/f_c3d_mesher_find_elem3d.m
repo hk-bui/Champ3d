@@ -34,7 +34,7 @@ if isempty(elem_code)
     %--------------------------------------------------------------
     id_dom2d = f_to_dcellargin(id_dom2d);
     id_layer = f_to_dcellargin(id_layer);
-    [id_dom2d, id_layer] = f_pairing_cellargin(id_dom2d, id_layer);
+    [id_dom2d, id_layer] = f_pairing_dcellargin(id_dom2d, id_layer);
     %--------------------------------------------------------------
     id_all_elem = 1:c3dobj.mesh3d.(id_mesh3d).nb_elem;
     all_id_lay  = fieldnames(c3dobj.mesh1d.(c3dobj.mesh3d.(id_mesh3d).id_mesh1d).layer);

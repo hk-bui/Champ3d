@@ -1,4 +1,4 @@
-function [argin1p,argin2p] = f_pairing_cellargin(argin1,argin2)
+function [argin1p,argin2p] = f_pairing_dcellargin(argin1,argin2)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -20,7 +20,7 @@ if length(argin1) == 1
     argin1p = f_to_dcellargin(argin1,'duplicate',length(argin2));
     argin2p = argin2;
 end
-%--------------------------------------------------------------------------
+% ---
 if length(argin2) == 1
     argin1p = argin1;
     argin2p = f_to_dcellargin(argin2,'duplicate',length(argin1));
