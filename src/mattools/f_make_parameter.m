@@ -33,6 +33,9 @@ depend_on = [];
 from = [];
 id_cobj = [];
 
+% --- valid depend_on
+valid_depend_on = {'cnode','b','h','temp'};
+
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -62,6 +65,12 @@ switch ptype
         end
         %------------------------------------------------------------------
         depend_on = f_to_scellargin(depend_on);
+        %--------------------------------------------------------------------------
+        for ido = 1:length(depend_on)
+            if ~any(strcmpi(depend_on{ido},valid_depend_on))
+                error([mfilename ' : #depend_on is not valid. Valid #depend_on are ' strjoin(valid_depend_on,', ') ' !']);
+            end
+        end
         %------------------------------------------------------------------
         if nargin(f)
             if nargin(f) ~= length(depend_on)

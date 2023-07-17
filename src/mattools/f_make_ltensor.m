@@ -45,11 +45,10 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
-
-if sum(strcmpi(type_valid,type)) == 0
-    error([mfilename ': valid tensor types are ' strjoin(type_valid,', ') ' !']);
+%--------------------------------------------------------------------------
+if ~any(strcmpi(type,type_valid))
+    error([mfilename ' : #type is not valid. Valid tensor types are ' strjoin(type_valid,', ') ' !']);
 end
-
 %--------------------------------------------------------------------------
 gtensor.main_value = [];
 gtensor.ort1_value = [];

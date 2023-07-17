@@ -45,25 +45,11 @@ for iem3d = 1:length(id_emdesign3d)
         %------------------------------------------------------------------
         phydomobj = c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec});
         %------------------------------------------------------------------
-        param_type = f_paramtype(phydomobj.sig);
-        parameter  = 'sigma';
+        coef_name  = 'sigma';
         %------------------------------------------------------------------
-        switch param_type
-            case {'num_iso_coef'}
-            case {'num_iso_array'}
-            case {'fun_iso_array'}
-            case {'num_tensor_coef'}
-            case {'fun_tensor_array'}
-                %ltensor.main_value = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
-                %ltensor.ort1_value = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
-                %ltensor.ort2_value = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
-                %ltensor.main_dir   = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
-                %ltensor.ort1_dir   = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
-                %ltensor.ort2_dir   = f_callparameter(c3dobj,'phydomobj',phydomobj,'parameter','sigma');
-                ltensor = f_callparameter(c3dobj,'phydomobj',phydomobj,...
-                              'parameter',parameter,'param_type',param_type);
-                gtensor = f_gtensor(ltensor);
-        end
+        ltensor = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                           'coefficient',coef_name);
+        gtensor = f_gtensor(ltensor);
         %------------------------------------------------------------------
         % --- Log message
         fprintf(' --- in %.2f s \n',toc);

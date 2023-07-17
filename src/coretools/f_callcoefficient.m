@@ -1,4 +1,4 @@
-function p_value = f_callcoefficient(c3dobj,varargin)
+function coef = f_callcoefficient(c3dobj,varargin)
 % F_CALLPARAMETER calculates and returns parameter value according to its dependency.
 % p_value : array of values of the parameter computed for each element
 %--------------------------------------------------------------------------
@@ -10,7 +10,7 @@ function p_value = f_callcoefficient(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'design3d','id_design3d','dom_type','id_dom',...
-           'phydomobj','parameter','parameter_type'};
+           'phydomobj','coefficient'};
 
 % --- default input value
 design3d = [];
@@ -19,10 +19,14 @@ dom_type  = [];
 id_dom    = [];
 phydomobj = [];
 coefficient = [];
-parameter_type = [];
+
+% --- valid coefficient type
+valid_coeftype = {'numeric_iso_value','numeric_iso_array','numeric_gtensor_value', ...
+                  'numeric_gtensor_array','numeric_ltensor_value',...
+                  'function_ltensor_array','function_iso_array'};
 
 % --- default output value
-p_value = [];
+coef = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -43,30 +47,37 @@ end
 %--------------------------------------------------------------------------
 coef = phydomobj.(coefficient);
 %--------------------------------------------------------------------------
-if isempty(parameter_type)
-    if isfield(coef,'main_value') && isfield(coef,'main_dir')
-        parameter_type = 'tensor';
-    end
-end
-%--------------------------------------------------------------------------
-if ~isstruct(coef)
-    error([mfilename ': #' coefficient ' is not valid ! Use f_make_parameter !']);
-end
-% if ~isa(param.f,'function_handle')
-%     error([mfilename ': #' parameter '.f must be a function_handle ! Use f_make_parameter !']);
-% end
-%--------------------------------------------------------------------------
 id_mesh3d = phydomobj.id_mesh3d;
 id_dom3d  = phydomobj.id_dom3d;
-id_elem   = c3dobj.mesh3d.(id_mesh3d).(id_dom3d).id_elem;
+id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 nbElem    = length(id_elem);
+%--------------------------------------------------------------------------
+coeftype = f_coeftype(coef);
+%--------------------------------------------------------------------------
+switch coeftype
+    case {'numeric_iso_value'}
+    case {'numeric_iso_array'}
+    case {'numeric_gtensor_value'}
+    case {'numeric_gtensor_array'}
+    case {'numeric_ltensor_value'}
+    case {'function_ltensor_array'}
+    case {'function_iso_array'}
+    otherwise
+        
+end
+
+
+
+
+
+return
 %--------------------------------------------------------------------------
 paramfields = fieldnames(phydomobj.(coefficient));
 %--------------------------------------------------------------------------
-for ipf = 1:length(paramfields)
+%for ipf = 1:length(paramfields)
 %--------------------------------------------------------------------------
 if nargin(param.f) == 0
-    p_value = ones(1,nbElem) .* param.f();
+    coef = ones(1,nbElem) .* param.f();
 else
     %----------------------------------------------------------------------
     nb_fargin = nargin(param.f);
@@ -84,20 +95,20 @@ else
     end
     %----------------------------------------------------------------------
     if nb_fargin == 1
-        p_value = feval(param.f,argu{1});
+        coef = feval(param.f,argu{1});
     elseif nb_fargin == 2
-        p_value = feval(param.f,argu{1},argu{2});
+        coef = feval(param.f,argu{1},argu{2});
     elseif nb_fargin == 3
-        p_value = feval(param.f,argu{1},argu{2},argu{3});
+        coef = feval(param.f,argu{1},argu{2},argu{3});
     elseif nb_fargin == 4
-        p_value = feval(param.f,argu{1},argu{2},argu{3},argu{4});
+        coef = feval(param.f,argu{1},argu{2},argu{3},argu{4});
     elseif nb_fargin == 5
-        p_value = feval(param.f,argu{1},argu{2},argu{3},argu{4},argu{5});
+        coef = feval(param.f,argu{1},argu{2},argu{3},argu{4},argu{5});
     end
 end
 %--------------------------------------------------------------------------
-if iscolumn(p_value)
-    p_value = p_value.';
+if iscolumn(coef)
+    coef = coef.';
 end
 %--------------------------------------------------------------------------
 %if isrow(eval(alist{ial}))
@@ -112,5 +123,15 @@ end
 %    fform = [fform ',' argu];
 %end
 %fform = [fform ');'];
-
+%--------------------------------------------------------------------------
+% switch param_type
+%     case {'num_iso_coef'}
+%     case {'num_iso_array'}
+%     case {'fun_iso_array'}
+%     case {'num_tensor_coef'}
+%     case {'fun_tensor_array'}
+%         ltensor = f_callparameter(c3dobj,'phydomobj',phydomobj,...
+%                       'parameter',parameter,'param_type',param_type);
+%         gtensor = f_gtensor(ltensor);
+% end
 
