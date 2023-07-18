@@ -124,6 +124,9 @@ c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
 %--------------------------------------------------------------------------
+celem = mean(reshape(node(:,elem(1:8,:)),3,8,nb_elem),2);
+c3dobj.mesh3d.(id_mesh3d).cnode = squeeze(celem);
+%--------------------------------------------------------------------------
 c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
 c3dobj.mesh3d.(id_mesh3d).face = f_face(c3dobj.mesh3d.(id_mesh3d).elem, ...

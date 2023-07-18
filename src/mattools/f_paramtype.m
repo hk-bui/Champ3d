@@ -17,8 +17,8 @@ if isa(param,'numeric')
 elseif isa(param,'struct') 
     % ---------------------------------------------------------------------
     if isfield(param,'f')
-        if isa(param.f,'function_handle')
-            paramtype = 'function';
+        if isa(param.f,'function_handle') && all(isfield(p5,{'from','id_cobj','field'}))
+            paramtype = 'c3d_parameter_function';
         end
     end
 else

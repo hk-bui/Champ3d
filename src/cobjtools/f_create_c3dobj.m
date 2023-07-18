@@ -29,6 +29,6 @@ c3dobj.mesh2d = [];
 c3dobj.mesh3d = [];
 c3dobj.em_design3d = [];
 c3dobj.th_design3d = [];
-
+c3dobj.time = [];
 
 end

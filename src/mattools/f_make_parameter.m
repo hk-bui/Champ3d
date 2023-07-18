@@ -34,7 +34,7 @@ from = [];
 id_cobj = [];
 
 % --- valid depend_on
-valid_depend_on = {'cnode','b','h','temp'};
+valid_depend_on = {'cnode','b','h','temp','j'};
 
 % --- check and update input
 for i = 1:length(varargin)/2

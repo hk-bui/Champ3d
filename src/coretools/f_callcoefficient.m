@@ -60,7 +60,9 @@ switch coeftype
     case {'numeric_gtensor_value'}
     case {'numeric_gtensor_array'}
     case {'numeric_ltensor_value'}
+        coef = f_gtensor(coef);
     case {'function_ltensor_array'}
+        ltensor = f_evalltensor(c3dobj,'phydomobj',phydomobj,'ltensor',coef);
     case {'function_iso_array'}
     otherwise
         
