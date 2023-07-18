@@ -47,10 +47,12 @@ for iem3d = 1:length(id_emdesign3d)
         %------------------------------------------------------------------
         coef_name  = 'sigma';
         %------------------------------------------------------------------
-        ltensor = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+        coef = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
                                            'coefficient',coef_name);
-        gtensor = f_gtensor(ltensor);
+        sigwewe = 
         %------------------------------------------------------------------
+        % --- Output
+        c3dobj.emdesign3d.(id_emdesign3d{iem3d}).econductor.(id_econductor{iec}).aphi.sigwewe = sigwewe;
         % --- Log message
         fprintf(' --- in %.2f s \n',toc);
     end
@@ -96,13 +98,13 @@ if isfield(c3dobj,'econductor')
             %---------------------------------------------
             sig = c3dobj.econductor(i).sigma;
             if isstruct(sig)
-                ltensor.main_value = f_callparameter(c3dobj,sig.main_value,'id_elem',IDElem);
-                ltensor.ort1_value = f_callparameter(c3dobj,sig.ort1_value,'id_elem',IDElem);
-                ltensor.ort2_value = f_callparameter(c3dobj,sig.ort2_value,'id_elem',IDElem);
-                ltensor.main_dir   = f_callparameter(c3dobj,sig.main_dir,'id_elem',IDElem);
-                ltensor.ort1_dir   = f_callparameter(c3dobj,sig.ort1_dir,'id_elem',IDElem);
-                ltensor.ort2_dir   = f_callparameter(c3dobj,sig.ort2_dir,'id_elem',IDElem);
-                gtensor = f_gtensor(ltensor);
+                coef.main_value = f_callparameter(c3dobj,sig.main_value,'id_elem',IDElem);
+                coef.ort1_value = f_callparameter(c3dobj,sig.ort1_value,'id_elem',IDElem);
+                coef.ort2_value = f_callparameter(c3dobj,sig.ort2_value,'id_elem',IDElem);
+                coef.main_dir   = f_callparameter(c3dobj,sig.main_dir,'id_elem',IDElem);
+                coef.ort1_dir   = f_callparameter(c3dobj,sig.ort1_dir,'id_elem',IDElem);
+                coef.ort2_dir   = f_callparameter(c3dobj,sig.ort2_dir,'id_elem',IDElem);
+                gtensor = f_gtensor(coef);
                 c3dobj.econductor(i).gtensor = gtensor;
                 c3dobj.aphi.SWeWe = c3dobj.aphi.SWeWe + ...
                         f_cwewe(c3dobj.mesh,'coef',c3dobj.econductor(i).gtensor,...
@@ -126,13 +128,13 @@ if isfield(c3dobj,'econductor')
                 %---------------------------------------------
                 sig = c3dobj.econductor(i).sigma;
                 if isstruct(sig)
-                    ltensor.main_value = f_calparam(c3dobj,sig.main_value,'id_elem',IDElem);
-                    ltensor.ort1_value = f_calparam(c3dobj,sig.ort1_value,'id_elem',IDElem);
-                    ltensor.ort2_value = f_calparam(c3dobj,sig.ort2_value,'id_elem',IDElem);
-                    ltensor.main_dir   = f_calparam(c3dobj,sig.main_dir,'id_elem',IDElem);
-                    ltensor.ort1_dir   = f_calparam(c3dobj,sig.ort1_dir,'id_elem',IDElem);
-                    ltensor.ort2_dir   = f_calparam(c3dobj,sig.ort2_dir,'id_elem',IDElem);
-                    gtensor = f_gtensor(ltensor);
+                    coef.main_value = f_calparam(c3dobj,sig.main_value,'id_elem',IDElem);
+                    coef.ort1_value = f_calparam(c3dobj,sig.ort1_value,'id_elem',IDElem);
+                    coef.ort2_value = f_calparam(c3dobj,sig.ort2_value,'id_elem',IDElem);
+                    coef.main_dir   = f_calparam(c3dobj,sig.main_dir,'id_elem',IDElem);
+                    coef.ort1_dir   = f_calparam(c3dobj,sig.ort1_dir,'id_elem',IDElem);
+                    coef.ort2_dir   = f_calparam(c3dobj,sig.ort2_dir,'id_elem',IDElem);
+                    gtensor = f_gtensor(coef);
                     c3dobj.econductor(i).gtensor = gtensor;
                     c3dobj.aphi.SWeWe = c3dobj.aphi.SWeWe + ...
                             f_cwewe(c3dobj.mesh,'coef',c3dobj.econductor(i).gtensor,...
