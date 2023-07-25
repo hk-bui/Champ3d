@@ -1,7 +1,7 @@
 function c3dobj = f_build_mconductor(c3dobj,varargin)
 % F_BUILD_MCONDUCTOR returns the em matrix system related to mconductor.
 %--------------------------------------------------------------------------
-% c3dobj = F_BUILD_mconductor(c3dobj,option);
+% c3dobj = F_BUILD_MCONDUCTOR(c3dobj,option);
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -54,11 +54,11 @@ for iec = 1:length(id_mconductor)
             %--------------------------------------------------------------
             coef_name  = 'mu_r';
             %--------------------------------------------------------------
-            murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
+            muwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
                                      'coefficient',coef_name);
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).(em_model).murwfwf = murwfwf;
+            c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).(em_model).muwfwf = muwfwf;
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
         case {'tomejw','tomets'}
