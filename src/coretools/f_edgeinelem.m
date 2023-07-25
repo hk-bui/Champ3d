@@ -7,11 +7,12 @@ function [id_edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = f_edgeinelem(e
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','get'};
+arglist = {'elem_type','defined_on','get'};
 
 % --- default input value
 elem_type = [];
 get = '_all';
+defined_on = 'elem';
 
 % --- default output value
 id_edge_in_elem = [];
@@ -28,7 +29,7 @@ for i = 1:length(varargin)/2
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
-    error([mfilename ' : #elem_type must be given !']);
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
 end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
@@ -44,7 +45,7 @@ e = reshape([elem(EdNo_inEl(:,1),:); elem(EdNo_inEl(:,2),:)], ...
 if any(f_strcmpi(get,{'_all','topo','ori','orientation'}))
     ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
     if any(strcmpi(elem_type,{'tri','quad','triangle'}))
-        sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl.';
+        sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl;
     end
 end
 % ---

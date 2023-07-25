@@ -56,19 +56,27 @@ for iec = 1:length(id_nomesh)
             if any(strcmpi(defined_on,'elem'))
                 id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
             elseif any(strcmpi(defined_on,'face'))
+                return;
                 % TODO
                 % id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
             end
             %--------------------------------------------------------------
-            nb_elem   = length(id_elem);
+            edge_list = c3dobj.mesh3d.(id_mesh3d).edge;
             %--------------------------------------------------------------
-            edge_list = f_edge(face,'defined_on',defined_on);
-            [id_edge_in_face, sign_edge_in_face] = ...
-                f_edgeinface(face,edge_list,'elem_type',elem_type,'get',get);
+            bound_face = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d);
+            %--------------------------------------------------------------
+            id_edge_in_bound_face = f_edgeinelem(bound_face,edge_list,'defined_on','face');
+            id_edge_in_bound_face = unique(id_edge_in_bound_face);
+            %--------------------------------------------------------------
+            elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+            id_edge_in_elem = f_edgeinelem(elem,edge_list);
+            id_edge_in_elem = unique(id_edge_in_elem);
+            %--------------------------------------------------------------
+            id_inner_edge = setdiff(id_edge_in_elem,id_edge_in_bound_face);
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).aphijw.id_elem = id_elem;
-            c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).aphijw.id_inner_edge = id_inner_edge;
+            c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).(em_model).id_elem = id_elem;
+            c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).(em_model).id_inner_edge = id_inner_edge;
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
         case {'tomejw','tomets'}

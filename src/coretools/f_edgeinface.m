@@ -25,10 +25,10 @@ end
 nbFace = size(face,2);
 %--------------------------------------------------------------------------
 if isempty(elem_type)
-    error([mfilename ' : #elem_type must be given !']);
+    elem_type = f_elemtype(face,'defined_on','face');
 end
 %--------------------------------------------------------------------------
-if any(strcmpi(elem_type,{'quad','tri','triangle'}))
+if ~any(strcmpi(elem_type,{'quad','tri','triangle'}))
     id_edge_in_face = [];
     sign_edge_in_face = [];
     return
@@ -70,7 +70,6 @@ for k = 1:2 %---- 2 faceType
         end
     end
 end
-
 %--------------------------------------------------------------------------
 id_edge_in_face = f_findvecnd(fe,edge_list,'position',2);
 id_edge_in_face(isnan(id_edge_in_face)) = 0;
