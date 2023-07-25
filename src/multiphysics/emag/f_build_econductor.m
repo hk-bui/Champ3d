@@ -47,7 +47,7 @@ for iec = 1:length(id_econductor)
              ' in emdesign3d #' id_emdesign3d ...
              ' for ' em_model]);
     switch em_model
-        case {'aphijw'}
+        case {'aphijw','aphits'}
             tic;
             %--------------------------------------------------------------
             phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec});
@@ -58,26 +58,14 @@ for iec = 1:length(id_econductor)
                                      'coefficient',coef_name);
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).aphijw.sigwewe = sigwewe;
+            if any(strcmpi(em_model,'aphijw'))
+                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).aphijw.sigwewe = sigwewe;
+            elseif any(strcmpi(em_model,'aphits'))
+                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).aphits.sigwewe = sigwewe;
+            end
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
-        case {'aphits'}
-            tic;
-            %--------------------------------------------------------------
-            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec});
-            %--------------------------------------------------------------
-            coef_name  = 'sigma';
-            %--------------------------------------------------------------
-            sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
-                                     'coefficient',coef_name);
-            %--------------------------------------------------------------
-            % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).aphits.sigwewe = sigwewe;
-            % --- Log message
-            fprintf(' --- in %.2f s \n',toc);
-        case {'tomejw'}
-            % TODO
-        case {'tomets'}
+        case {'tomejw','tomets'}
             % TODO
     end
 end

@@ -92,8 +92,11 @@ if ~isempty(id_tcapacitor)
     id_thing = id_tcapacitor;
 end
 %--------------------------------------------------------------------------
+if ~isempty(design3d)
+    id_mesh3d = c3dobj.(design3d).(id_design3d).id_mesh3d;
+end
+%--------------------------------------------------------------------------
 if ~isempty(design3d) && ~isempty(thing)
-    id_mesh3d = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_mesh3d;
     id_dom3d  = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_dom3d;
     % ---
     if strcmpi(thing,'coil')

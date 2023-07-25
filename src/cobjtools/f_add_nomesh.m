@@ -7,18 +7,13 @@ function c3dobj = f_add_nomesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_mesh3d','id_dom3d','id_nomesh'};
+arglist = {'id_emdesign3d','id_dom3d','id_nomesh'};
 
 % --- default input value
 id_emdesign3d = [];
-id_mesh3d     = [];
 id_nomesh     = [];
 id_dom3d      = [];
 
-%--------------------------------------------------------------------------
-if nargin <= 1
-    error([mfilename ': No nomesh to add!']);
-end
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -29,29 +24,21 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-
 if isempty(id_emdesign3d)
     id_emdesign3d = fieldnames(c3dobj.emdesign3d);
     id_emdesign3d = id_emdesign3d{1};
 end
-
-if isempty(id_mesh3d)
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-    id_mesh3d = id_mesh3d{1};
-end
-
+%--------------------------------------------------------------------------
 if isempty(id_nomesh)
     error([mfilename ': id_nomesh must be defined !'])
 end
-
+%--------------------------------------------------------------------------
 if isempty(id_dom3d)
     error([mfilename ': id_dom3d must be defined !'])
 end
-
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_dom3d = id_dom3d;
 % --- info message
-fprintf(['Add nomesh #' id_nomesh ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
+fprintf(['Add nomesh #' id_nomesh ' to emdesign3d #' id_emdesign3d '\n']);
 

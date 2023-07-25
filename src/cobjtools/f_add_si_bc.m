@@ -7,11 +7,10 @@ function c3dobj = f_add_si_bc(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_bc','id_mesh3d','id_dom3d','defined_on','sigma','mur'};
+arglist = {'id_emdesign3d','id_bc','id_dom3d','defined_on','sigma','mur'};
 
 % --- default input value
 id_emdesign3d = [];
-id_mesh3d     = [];
 id_dom3d      = [];
 id_bc         = [];
 defined_on    = []; % 'edge_bound', 'face_bound', 'edge', 'face'
@@ -32,28 +31,20 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-
 if isempty(id_emdesign3d)
     id_emdesign3d = fieldnames(c3dobj.emdesign3d);
     id_emdesign3d = id_emdesign3d{1};
 end
-
-if isempty(id_mesh3d)
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-    id_mesh3d = id_mesh3d{1};
-end
-
+%--------------------------------------------------------------------------
 if isempty(id_bc)
     error([mfilename ': id_bc must be defined !'])
 end
-
+%--------------------------------------------------------------------------
 if isempty(id_dom3d)
     error([mfilename ': id_dom3d must be given !'])
 end
-
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bc_type = 'sibc';
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).defined_on = defined_on;
@@ -61,6 +52,6 @@ c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).sigma = sigma;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).mur = mur;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).cparam = cparam;
 % --- info message
-fprintf(['Add surface impedance bc #' id_bc ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
+fprintf(['Add surface impedance bc #' id_bc ' to emdesign3d #' id_emdesign3d '\n']);
 
 

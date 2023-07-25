@@ -7,11 +7,10 @@ function c3dobj = f_add_airbox(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_airbox','id_mesh3d','id_dom3d','a_value'};
+arglist = {'id_emdesign3d','id_airbox','id_dom3d','a_value'};
 
 % --- default input value
 id_emdesign3d = [];
-id_mesh3d     = [];
 id_dom3d      = [];
 a_value       = 0;
 id_airbox     = [];
@@ -30,29 +29,20 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-
 if isempty(id_emdesign3d)
     id_emdesign3d = fieldnames(c3dobj.emdesign3d);
     id_emdesign3d = id_emdesign3d{1};
 end
-
-if isempty(id_mesh3d)
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-    id_mesh3d = id_mesh3d{1};
-end
-
+%--------------------------------------------------------------------------
 if isempty(id_airbox)
     error([mfilename ': id_airbox must be defined !'])
 end
-
 if isempty(id_dom3d)
     error([mfilename ': id_dom3d must be given !'])
 end
-
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).a_value   = a_value;
 % --- info message
-fprintf(['Add airbox #' id_airbox ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
+fprintf(['Add airbox #' id_airbox ' to emdesign3d #' id_emdesign3d '\n']);

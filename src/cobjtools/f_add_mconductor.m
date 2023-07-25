@@ -7,11 +7,10 @@ function c3dobj = f_add_mconductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_mconductor','id_mesh3d','id_dom3d','mu_r'};
+arglist = {'id_emdesign3d','id_mconductor','id_dom3d','mu_r'};
 
 % --- default input value
 id_emdesign3d = [];
-id_mesh3d     = [];
 id_dom3d      = [];
 mu_r           = 1;
 id_mconductor = [];
@@ -30,32 +29,24 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-
 if isempty(id_emdesign3d)
     id_emdesign3d = fieldnames(c3dobj.emdesign3d);
     id_emdesign3d = id_emdesign3d{1};
 end
-
-if isempty(id_mesh3d)
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-    id_mesh3d = id_mesh3d{1};
-end
-
+%--------------------------------------------------------------------------
 if isempty(id_mconductor)
     error([mfilename ': id_mconductor must be defined !'])
 end
-
+%--------------------------------------------------------------------------
 if isempty(id_dom3d)
     error([mfilename ': id_dom3d must be given !'])
 end
-
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).mu_r = mu_r;
 % --- info message
-fprintf(['Add mcon #' id_mconductor ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
+fprintf(['Add mcon #' id_mconductor ' to emdesign3d #' id_emdesign3d '\n']);
 
 
 

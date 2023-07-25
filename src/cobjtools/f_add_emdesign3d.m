@@ -33,12 +33,17 @@ if isempty(id_mesh3d)
     id_mesh3d = fieldnames(c3dobj.mesh3d);
     id_mesh3d = id_mesh3d{1};
 end
-
+%--------------------------------------------------------------------------
+if iscell(id_mesh3d)
+    if length(id_mesh3d) > 1
+        error([mfilename ' : only one mesh3d allowed !']);
+    end
+end
+%--------------------------------------------------------------------------
 if isempty(id_emdesign3d)
     id_emdesign3d = 'emdesign3d_01';
     %error([mfilename ' : #id_emdesign3d must be given !']);
 end
-
 %--------------------------------------------------------------------------
 if ~any(strcmpi(em_model,valid_em_model))
     error([mfilename ': #em_model ' em_model ' is not valid. Chose : ' strjoin(valid_em_model,', ') ' !']);
