@@ -53,9 +53,12 @@ for iec = 1:length(id_econductor)
             phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec});
             %--------------------------------------------------------------
             coef_name  = 'sigma';
+            [coef_array, coef_array_type] = ...
+                f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                         'coefficient',coef_name);
             %--------------------------------------------------------------
             sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
-                                     'coefficient',coef_name);
+                                     'coefficient',coef_array);
             %--------------------------------------------------------------
             % --- Output
             c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).(em_model).sigwewe = sigwewe;
