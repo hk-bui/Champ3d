@@ -58,11 +58,7 @@ for iec = 1:length(id_mconductor)
                                      'coefficient',coef_name);
             %--------------------------------------------------------------
             % --- Output
-            if any(strcmpi(em_model,'aphijw'))
-                c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).aphijw.murwfwf = murwfwf;
-            elseif any(strcmpi(em_model,'aphits'))
-                c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).aphits.murwfwf = murwfwf;
-            end
+            c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).(em_model).murwfwf = murwfwf;
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
         case {'tomejw','tomets'}

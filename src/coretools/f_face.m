@@ -7,11 +7,11 @@ function face = f_face(elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type'};
+arglist = {'elem_type','defined_on'};
 
 % --- default input value
 elem_type = [];
-
+defined_on = 'elem';
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -23,7 +23,7 @@ for i = 1:length(varargin)/2
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
-    error([mfilename ' : #elem_type must be given !']);
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
 end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);

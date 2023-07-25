@@ -65,7 +65,8 @@ for iec = 1:length(id_nomesh)
             %--------------------------------------------------------------
             bound_face = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d);
             %--------------------------------------------------------------
-            id_edge_in_bound_face = f_edgeinelem(bound_face,edge_list,'defined_on','face');
+            %id_edge_in_bound_face = f_edgeinelem(bound_face,edge_list,'defined_on','face');
+            id_edge_in_bound_face = f_edgeinface(bound_face,edge_list);
             id_edge_in_bound_face = unique(id_edge_in_bound_face);
             %--------------------------------------------------------------
             elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);

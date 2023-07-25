@@ -1,4 +1,4 @@
-function [id_edge_in_face, sign_edge_in_face] = f_edgeinface(face,edge_list,varargin)
+function [id_edge_in_face, ori_edge_in_face, sign_edge_in_face] = f_edgeinface(face,edge_list,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,11 +7,11 @@ function [id_edge_in_face, sign_edge_in_face] = f_edgeinface(face,edge_list,vara
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','get'};
+arglist = {'get'};
 
 % --- default input value
-elem_type = [];
-get = [];
+get = '_all';
+
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -22,56 +22,31 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-nbFace = size(face,2);
+nb_face = size(face,2);
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    elem_type = f_elemtype(face,'defined_on','face');
-end
-%--------------------------------------------------------------------------
-if ~any(strcmpi(elem_type,{'quad','tri','triangle'}))
-    id_edge_in_face = [];
-    sign_edge_in_face = [];
-    return
-end
-%--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-siEd_inFa = con.siEd_inFa;
-EdNo_inFa = con.EdNo_inFa;
-nbEd_inFa = con.nbEd_inFa;
-nbNo_inEd = con.nbNo_inEd;
-%--------------------------------------------------------------------------
-%----- face_edge
-maxnbEd_inFa = max(cell2mat(nbEd_inFa));
-fe = zeros(maxnbEd_inFa,nbNo_inEd,nbFace);
 itria = find(face(4,:) == 0);
-iquad = setdiff(1:nbFace,itria);
+iquad = setdiff(1:nb_face,itria);
 %--------------------------------------------------------------------------
-sign_edge_in_face = [];
-if any(strcmpi(get,{'topo','ori','orientation'}))
-    sign_edge_in_face = zeros(maxnbEd_inFa,nbFace);
+maxnbEd_inFa = 4;
+id_edge_in_face = zeros(maxnbEd_inFa,nb_face);
+ori_edge_in_face  = zeros(maxnbEd_inFa,nb_face);
+sign_edge_in_face = zeros(maxnbEd_inFa,nb_face);
+%--------------------------------------------------------------------------
+if ~isempty(itria)
+    face_ = face(1:3,itria);
+    [id_ed, ori_edge, sign_edge] = ...
+        f_edgeinelem(face_,edge_list,'defined_on','face','get',get);
+    id_edge_in_face(1:3,itria) = id_ed;
+    ori_edge_in_face(1:3,itria) = ori_edge;
+    sign_edge_in_face(1:3,itria) = sign_edge;
 end
 %--------------------------------------------------------------------------
-for k = 1:2 %---- 2 faceType
-    switch k
-        case 1
-            iface = itria;
-        case 2
-            iface = iquad;
-    end
-    for i = 1:nbEd_inFa{k}
-        fet = [];
-        for j = 1:nbNo_inEd
-            fet = [fet; face(EdNo_inFa{k}(i,j),iface)];
-        end
-        fe(i,:,iface) = fet;
-        % ---
-        if any(strcmpi(get,{'topo','ori','orientation'}))
-            sign_edge_in_face(i,iface) = siEd_inFa{k}(i) .* sign(fet(2,:)-fet(1,:));
-        end
-    end
+if ~isempty(iquad)
+    face_ = face(1:4,iquad);
+    [id_ed, ori_edge, sign_edge] = ...
+        f_edgeinelem(face_,edge_list,'defined_on','face','get',get);
+    id_edge_in_face(1:4,iquad) = id_ed;
+    ori_edge_in_face(1:4,iquad) = ori_edge;
+    sign_edge_in_face(1:4,iquad) = sign_edge;
 end
 %--------------------------------------------------------------------------
-id_edge_in_face = f_findvecnd(fe,edge_list,'position',2);
-id_edge_in_face(isnan(id_edge_in_face)) = 0;
-%--------------------------------------------------------------------------
-end

@@ -68,6 +68,6 @@ end
 elem_type = f_elemtype(face,'defined_on',defined_on);
 %--------------------------------------------------------------------------
 [id_edge_in_face, sign_edge_in_face] = ...
-    f_edgeinface(face,edge_list,'elem_type',elem_type,'get',get);
+    f_edgeinface(face,edge_list,'get',get);
 %--------------------------------------------------------------------------
 end
