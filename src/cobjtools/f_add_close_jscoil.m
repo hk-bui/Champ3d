@@ -142,6 +142,7 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_node = id_node;
 % -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'close_jscoil';

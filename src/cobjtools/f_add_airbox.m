@@ -42,6 +42,7 @@ if isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).a_value   = a_value;
 % --- info message

@@ -43,6 +43,7 @@ if isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).mu_r = mu_r;
 % --- info message

@@ -53,6 +53,7 @@ end
 id_mesh3d = c3dobj.(design3d).(id_design3d).id_mesh3d;
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.(design3d).(id_design3d).bc.(id_bc).id_emdesign3d = id_emdesign3d;
 c3dobj.(design3d).(id_design3d).bc.(id_bc).id_dom3d = id_dom3d;
 c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_type = 'fixed';
 c3dobj.(design3d).(id_design3d).bc.(id_bc).defined_on = defined_on;

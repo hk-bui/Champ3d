@@ -45,6 +45,7 @@ if isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bc_type = 'sibc';
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).defined_on = defined_on;

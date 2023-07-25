@@ -47,9 +47,10 @@ for iec = 1:length(id_nomesh)
         case {'aphijw','aphits'}
             tic;
             %--------------------------------------------------------------
+            id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+            %--------------------------------------------------------------
             phydomobj = c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec});
             %--------------------------------------------------------------
-            id_mesh3d = phydomobj.id_mesh3d;
             id_dom3d  = phydomobj.id_dom3d;
             defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on;
             if any(strcmpi(defined_on,'elem'))

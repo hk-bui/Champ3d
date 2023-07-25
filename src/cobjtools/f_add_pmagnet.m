@@ -44,6 +44,7 @@ if isempty(id_dom3d)
     error([mfilename ': id_dom3d must be given !'])
 end
 %--------------------------------------------------------------------------
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).mur      = mur;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_value = br_value;

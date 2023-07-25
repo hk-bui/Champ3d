@@ -49,6 +49,7 @@ if isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).id_thdesign3d = id_thdesign3d;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).id_dom3d = id_dom3d;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).frho = frho;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).fcp = fcp;

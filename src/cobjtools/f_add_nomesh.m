@@ -38,6 +38,7 @@ if isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
+c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_dom3d = id_dom3d;
 % --- info message
 fprintf(['Add nomesh #' id_nomesh ' to emdesign3d #' id_emdesign3d '\n']);
