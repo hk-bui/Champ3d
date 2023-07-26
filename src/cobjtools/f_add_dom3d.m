@@ -57,6 +57,10 @@ switch defined_on
             else
                 id_elem = 1:size(c3dobj.mesh3d.(id_mesh3d).elem, 2);
                 elem_code = c3dobj.mesh3d.(id_mesh3d).elem_code;
+                if isempty(dom3d_equation)
+                    % --- Log message
+                    fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
+                end
             end
             % ---
             if ~isempty(dom3d_equation)
@@ -64,8 +68,10 @@ switch defined_on
                     f_find_elem3d(c3dobj.mesh3d.(id_mesh3d).node,...
                      c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem),...
                     'dom3d_equation', dom3d_equation);
-                idElem = id_elem(idElem);
+                id_elem = id_elem(idElem);
                 elem_code = elem_code(idElem);
+                % --- Log message
+                fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
             end
         end
         %------------------------------------------------------------------

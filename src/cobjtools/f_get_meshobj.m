@@ -20,7 +20,7 @@ of_dom3d   = [];
 id_emdesign3d  = [];
 id_thdesign3d  = [];
 id_econductor  = [];
-id_mconducteur = [];
+id_mconductor = [];
 id_coil = [];
 id_bc = [];
 id_nomesh = [];
@@ -59,9 +59,9 @@ if ~isempty(id_econductor)
     thing = 'econductor';
     id_thing = id_econductor;
 end
-if ~isempty(id_mconducteur)
-    thing = 'mconducteur';
-    id_thing = id_mconducteur;
+if ~isempty(id_mconductor)
+    thing = 'mconductor';
+    id_thing = id_mconductor;
 end
 if ~isempty(id_coil)
     thing = 'coil';
