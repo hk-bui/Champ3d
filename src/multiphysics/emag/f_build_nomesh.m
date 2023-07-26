@@ -33,7 +33,11 @@ end
 id_nomesh = f_to_scellargin(id_nomesh);
 %--------------------------------------------------------------------------
 if any(strcmpi(id_nomesh,{'_all'}))
-    id_nomesh = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).nomesh);
+    if isfield(c3dobj.emdesign3d.(id_emdesign3d),'nomesh')
+        id_nomesh = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).nomesh);
+    else
+        return
+    end
 end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_nomesh)

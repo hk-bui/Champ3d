@@ -36,7 +36,11 @@ end
 id_bsfield = f_to_scellargin(id_bsfield);
 %--------------------------------------------------------------------------
 if any(strcmpi(id_bsfield,{'_all'}))
-    id_bsfield = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).bsfield);
+    if isfield(c3dobj.emdesign3d.(id_emdesign3d),'bsfield')
+        id_bsfield = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).bsfield);
+    else
+        return
+    end
 end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_bsfield)

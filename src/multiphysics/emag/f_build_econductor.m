@@ -36,7 +36,11 @@ end
 id_econductor = f_to_scellargin(id_econductor);
 %--------------------------------------------------------------------------
 if any(strcmpi(id_econductor,{'_all'}))
-    id_econductor = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).econductor);
+    if isfield(c3dobj.emdesign3d.(id_emdesign3d),'econductor')
+        id_econductor = fieldnames(c3dobj.emdesign3d.(id_emdesign3d).econductor);
+    else
+        return
+    end
 end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_econductor)
