@@ -29,7 +29,14 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-id_mesh3d = phydomobj.id_mesh3d;
+if isfield(phydomobj,'id_emdesign3d')
+    id_emdesign3d = phydomobj.id_emdesign3d;
+    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+elseif isfield(phydomobj,'id_thdesign3d')
+    id_thdesign3d = phydomobj.id_thdesign3d;
+    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
+end
+%--------------------------------------------------------------------------
 id_dom3d  = phydomobj.id_dom3d;
 id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 nb_elem   = length(id_elem);
@@ -47,10 +54,11 @@ for iltf = 1:length(ltfield__)
         %------------------------------------------------------------------
         alist = {};
         for ial = 1:nb_fargin
-            alist{ial} = ['c3dobj' ...
-                          '.' ltfield.from{ial} ...
-                          '.' ltfield.id_cobj{ial} ...
-                          '.' ltfield.field{ial}];
+            %alist{ial} = ['c3dobj' ...
+            %              '.' ltfield.from{ial} ...
+            %              '.' ltfield.id_cobj{ial} ...
+            %              '.' ltfield.field{ial}];
+            alist{ial} = ltfield.depend_on{ial};
         end
         %------------------------------------------------------------------
         for ial = 1:nb_fargin
