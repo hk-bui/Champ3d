@@ -20,11 +20,13 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
-elem_type = f_elemtype(elem,'defined_on',defined_on);
+if any(strcmpi(defined_on,{'elem','face'}))
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
+end
 %--------------------------------------------------------------------------
 transarg = {'edge_color',edge_color,'face_color',face_color,'alpha_value',alpha_value};
 %--------------------------------------------------------------------------
@@ -75,4 +77,15 @@ switch defined_on
         end
         view(3);
     case {'edge'}
+    case {'node'}
+        % ---
+        if size(node,1) == 2
+            plot(node(1,elem),node(2,elem),['o' face_color],'MarkerFaceColor',face_color);
+            axis tight; axis equal; box on;
+            xlabel('x (m)'); ylabel('y (m)');
+        elseif size(node,1) == 3
+            plot3(node(1,elem),node(2,elem),node(3,elem),['o' face_color],'MarkerFaceColor',face_color);
+            axis tight; axis equal; box on; view(3);
+            xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)'); 
+        end
 end

@@ -8,7 +8,7 @@ function c3dobj = f_add_close_vscoil(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_coil','id_mesh3d','id_dom3d','id_elem','etrode_type',...
+arglist = {'id_emdesign3d','id_coil','id_dom3d','id_elem','etrode_type',...
            'coil_mode','coil_type',...
            'cs_equation','petrode_equation','netrode_equation',...
            'field_vector_o','field_vector_v','nb_turn', ...
@@ -17,7 +17,6 @@ arglist = {'id_emdesign3d','id_coil','id_mesh3d','id_dom3d','id_elem','etrode_ty
 
 % --- default input value
 id_emdesign3d = [];
-id_mesh3d     = [];
 id_coil       = [];
 id_dom3d      = [];
 coil_mode     = 'transmitter'; % or 'tx'; 'receiver' or 'rx'
@@ -35,35 +34,30 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
-
 if isempty(id_emdesign3d)
     id_emdesign3d = fieldnames(c3dobj.emdesign3d);
     id_emdesign3d = id_emdesign3d{1};
 end
-
-if isempty(id_mesh3d)
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-    id_mesh3d = id_mesh3d{1};
-end
-
+%--------------------------------------------------------------------------
 if isempty(id_dom3d)
     error([mfilename ' : #id_dom3d must be given !']);
 end
-
+%--------------------------------------------------------------------------
 if isempty(id_coil)
     error([mfilename ' : #id_coil must be given !']);
 end
-
+%--------------------------------------------------------------------------
 if isempty(cs_equation)
     if isempty(field_vector_o) || isempty(field_vector_v)
         error([mfilename ' : #cs_equation or #field_vector_o and #field_vector_v must be given !']);
     end
 end
-
+%--------------------------------------------------------------------------
+id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
 %--------------------------------------------------------------------------
 id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 node = c3dobj.mesh3d.(id_mesh3d).node;
@@ -101,6 +95,7 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_node = id_node;
 % -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_mesh3d = id_mesh3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;

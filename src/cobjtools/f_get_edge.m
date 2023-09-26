@@ -18,7 +18,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
@@ -56,15 +56,7 @@ end
 %--------------------------------------------------------------------------
 elem_type = f_elemtype(elem,'defined_on',defined_on);
 %--------------------------------------------------------------------------
-edge = f_edge(elem,'elem_type',elem_type);
-%--------------------------------------------------------------------------
 % --- Outputs
-% if isempty(of_dom3d)
-%     mesh3d.edge = edge;
-% else
-%     for i = 1:length(of_dom3d)
-%         mesh3d.dom3d.(of_dom3d{i}).edge = edge;
-%     end
-% end
+edge = f_edge(elem,'elem_type',elem_type);
 %--------------------------------------------------------------------------
 end

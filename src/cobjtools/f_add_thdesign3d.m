@@ -18,7 +18,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 
@@ -27,11 +27,17 @@ if isempty(id_mesh3d)
     id_mesh3d = fieldnames(c3dobj.geo3d.mesh3d);
     id_mesh3d = id_mesh3d{1};
 end
-
-if isempty(id_thdesign3d)
-    error([mfilename ' : #id_thdesign3d must be given !']);
+%--------------------------------------------------------------------------
+if iscell(id_mesh3d)
+    if length(id_mesh3d) > 1
+        error([mfilename ' : only one mesh3d allowed !']);
+    end
 end
-
+%--------------------------------------------------------------------------
+if isempty(id_thdesign3d)
+    id_thdesign3d = 'thdesign3d_01';
+    %error([mfilename ' : #id_thdesign3d must be given !']);
+end
 %--------------------------------------------------------------------------
 c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d = id_mesh3d;
 % --- Log message

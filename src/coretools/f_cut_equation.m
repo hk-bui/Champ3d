@@ -17,14 +17,18 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
-
+%--------------------------------------------------------------------------
+if iscell(cut_equation)
+    cut_equation = cut_equation{1};
+end
 %--------------------------------------------------------------------------
 original = cut_equation;
 %--------------------------------------------------------------------------
 cut_equation(isspace(cut_equation)) = [];
+cut_equation = strrep(cut_equation,'&&','&');
 cut_equation = strrep(cut_equation,'max(x)','max(max(x))');
 cut_equation = strrep(cut_equation,'max(y)','max(max(y))');
 cut_equation = strrep(cut_equation,'max(z)','max(max(z))');

@@ -21,7 +21,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 
@@ -46,7 +46,7 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
             %--------------------------------------------------------------
             id_x = f_to_dcellargin(id_x);
             id_y = f_to_dcellargin(id_y);
-            [id_x, id_y] = f_pairing_cellargin(id_x, id_y);
+            [id_x, id_y] = f_pairing_dcellargin(id_x, id_y);
             %--------------------------------------------------------------
             id_all_elem = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
             all_elem_code = c3dobj.mesh2d.(id_mesh2d).elem_code;
@@ -127,7 +127,7 @@ end
 %------------------------------------------------------------------
 % id_x = f_to_dcellargin(id_x);
 % id_y = f_to_dcellargin(id_y);
-% [id_x, id_y] = f_pairing_cellargin(id_x, id_y);
+% [id_x, id_y] = f_pairing_dcellargin(id_x, id_y);
 % %------------------------------------------------------------------
 % id_elem_x = [];
 % id_elem_y = [];

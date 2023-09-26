@@ -10,7 +10,7 @@ function vtan = f_vtan(node,elem,varargin)
 %--------------------------------------------------------------------------
 
 if mod(nargin,2) ~= 0 
-    error([mfilename ': Check function arguments : #node, #elem, #dim, #nb_vertices !']);
+    error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : #node, #elem, #dim, #nb_vertices !']);
 end
 
 for i = 1:length(varargin)/2
@@ -18,7 +18,7 @@ for i = 1:length(varargin)/2
 end
 
 if ~exist('node','var') | ~exist('elem','var') | ~exist('dim','var')
-    error([mfilename ': Check function arguments : #node, #elem, #dim, #nb_vertices !']);
+    error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : #node, #elem, #dim, #nb_vertices !']);
 end
 if ~exist('nb_vertices','var')
     nb_vertices = 2;

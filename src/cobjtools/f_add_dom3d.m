@@ -16,6 +16,7 @@ id_dom2d = [];
 id_layer = [];
 elem_code = [];
 defined_on = 'elem'; % 'face', 'interface', 'bound_face', 'edge', 'bound_edge'
+dom3d_equation = [];
 of_dom3d = [];
 get = [];
 n_direction = 'outward';
@@ -25,7 +26,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 
@@ -46,21 +47,35 @@ mesher = c3dobj.mesh3d.(id_mesh3d).mesher;
 switch defined_on
     case {'elem','el'}
         %------------------------------------------------------------------
-        if strcmpi(mesher,'c3d_hexamesh')
+        if any(strcmpi(mesher,{'c3d_hexamesh','c3d_prismmesh'}))
             fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
-            [id_elem, elem_code] = f_c3d_mesher_find_elem3d(c3dobj, ...
-                'id_mesh3d',id_mesh3d,'id_dom2d',id_dom2d,...
-                'id_layer',id_layer,'elem_code',elem_code);
+            % ---
+            if ~isempty(id_dom2d) && ~isempty(id_layer)
+                [id_elem, elem_code] = f_c3d_mesher_find_elem3d(c3dobj, ...
+                    'id_mesh3d',id_mesh3d,'id_dom2d',id_dom2d,...
+                    'id_layer',id_layer,'elem_code',elem_code);
+            else
+                id_elem = 1:size(c3dobj.mesh3d.(id_mesh3d).elem, 2);
+                elem_code = c3dobj.mesh3d.(id_mesh3d).elem_code;
+                if isempty(dom3d_equation)
+                    % --- Log message
+                    fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
+                end
+            end
+            % ---
+            if ~isempty(dom3d_equation)
+                idElem = ...
+                    f_find_elem3d(c3dobj.mesh3d.(id_mesh3d).node,...
+                     c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem),...
+                    'dom3d_equation', dom3d_equation);
+                id_elem = id_elem(idElem);
+                elem_code = elem_code(idElem);
+                % --- Log message
+                fprintf(' - %d elem --- in %.2f s \n',length(id_elem),toc);
+            end
         end
         %------------------------------------------------------------------
-        if strcmpi(mesher,'c3d_prismmesh')
-            fprintf(['Add dom3d #' id_dom3d ' in mesh3d #' id_mesh3d]);
-            [id_elem, elem_code] = f_c3d_mesher_find_elem3d(c3dobj, ...
-                'id_mesh3d',id_mesh3d,'id_dom2d',id_dom2d,...
-                'id_layer',id_layer,'elem_code',elem_code);
-        end
-        %------------------------------------------------------------------
-        if strcmpi(mesher,'gmsh')
+        if any(strcmpi(mesher,{'gmsh'}))
             
         end
         %------------------------------------------------------------------
@@ -68,6 +83,7 @@ switch defined_on
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'elem',defined_on};
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
+        c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).dom3d_equation = dom3d_equation;
     case {'face','fa'}
         if strcmpi(mesher,'c3d_hexamesh')
             

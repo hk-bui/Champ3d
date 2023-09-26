@@ -1,4 +1,4 @@
-function c3dobj = f_add_design3d(c3dobj,varargin)
+function f_save_c3dobj(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -7,42 +7,27 @@ function c3dobj = f_add_design3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','id_design3d'};
+arglist = f_arglist('save_c3dobj');
 
 % --- default input value
-id_mesh3d = [];
-id_design3d = [];
+options = 'minimum';
 
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 
 %--------------------------------------------------------------------------
-if isempty(id_mesh3d)
-    id_mesh3d = fieldnames(c3dobj.geo3d.mesh3d);
-    id_mesh3d = id_mesh3d{1};
-end
-
-if isempty(id_design3d)
-    error([mfilename ' : #id_design3d must be given !']);
-end
-
+fname = [c3dobj.config.project_path '/c3dobj.mat'];
 %--------------------------------------------------------------------------
-c3dobj.design3d.(id_design3d).id_mesh3d = id_mesh3d;
-% --- Log message
-if iscell(id_mesh3d)
-    fprintf(['Add design3d #' id_design3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
-elseif ischar(id_mesh3d)
-    fprintf(['Add design3d #' id_design3d ' with mesh3d #' id_mesh3d '\n']);
-else
-    fprintf(['Add design3d #' id_design3d '\n']);
+if any(strcmpi(options,{'minimum'}))
+    save(fname,'c3dobj','-v7.3');
+elseif any(strcmpi(options,{'full'}))
+    save(fname,'c3dobj','-v7.3');
 end
 
-
-
-
+end

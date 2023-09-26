@@ -12,15 +12,19 @@ arglist = {'elem_type','get'};
 
 % --- default input value
 elem_type = [];
-get = 'all'; % 'cnode' = 'center', 'edge', 'face', 'bound', 'interface'
+get = '_all'; % 'cnode' = 'center', 'edge', 'face', 'bound', 'interface'
 
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
+end
+%--------------------------------------------------------------------------
+if ~isfield(mesh3d,'node') || ~isfield(mesh3d,'elem')
+    error([mfilename ': #mesh3d struct must contain at least .node and .elem !' ]);
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type) && isfield(mesh3d,'elem_type')
@@ -28,20 +32,7 @@ if isempty(elem_type) && isfield(mesh3d,'elem_type')
 end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
-    nbnoinel = size(mesh3d.elem, 1);
-    switch nbnoinel
-        case 4
-            elem_type = 'tet';
-        case 6
-            elem_type = 'prism';
-        case 8
-            elem_type = 'hex';
-    end
-    fprintf(['Build meshds for ' elem_type ' \n']);
-end
-%--------------------------------------------------------------------------
-if isempty(elem_type)
-    error([mfilename ': #elem_type must be given !']);
+    elem_type = f_elemtype(mesh3d.elem,'defined_on','elem');
 end
 %--------------------------------------------------------------------------
 if ~isfield(mesh3d,'elem_type')
@@ -52,27 +43,26 @@ end
 tic
 fprintf('Making meshds3d');
 
-
 %--------------------------------------------------------------------------
 %----- barrycenter
-if any(strcmpi(get,{'all', 'cnode','center'}))
+if any(strcmpi(get,{'_all', 'cnode','center'}))
     con = f_connexion(elem_type);
     nbNo_inEl = con.nbNo_inEl;
     mesh3d.celem = squeeze(mean(reshape(mesh3d.node(:,mesh3d.elem(1:nbNo_inEl,:)),3,nbNo_inEl,size(mesh3d.elem,2)),2));
 end
 
 %----- edges
-if any(strcmpi(get,{'all', 'edge'}))
+if any(strcmpi(get,{'_all', 'edge'}))
     mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
 end
 
 %----- faces
-if any(strcmpi(get,{'all', 'face'}))
+if any(strcmpi(get,{'_all', 'face'}))
     mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
 end
 
 %----- D
-if any(strcmpi(get,{'all', 'D', 'Div'}))
+if any(strcmpi(get,{'_all', 'D', 'Div'}))
     % ---
     if ~all(isfield(mesh3d,{'face'}))
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);
@@ -96,7 +86,7 @@ if any(strcmpi(get,{'all', 'D', 'Div'}))
 end
 
 %----- R
-if any(strcmpi(get,{'all', 'R', 'Rot', 'Curl'}))
+if any(strcmpi(get,{'_all', 'R', 'Rot', 'Curl'}))
     % ---
     if ~all(isfield(mesh3d,{'edge'}))
         mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
@@ -134,7 +124,7 @@ if any(strcmpi(get,{'all', 'R', 'Rot', 'Curl'}))
 end
 
 %----- G
-if any(strcmpi(get,{'all', 'G', 'Grad', 'Gradient'}))
+if any(strcmpi(get,{'_all', 'G', 'Grad', 'Gradient'}))
     if ~all(isfield(mesh3d,{'node','edge','edge_in_face','sign_edge_in_face'}))
         mesh3d = f_get_edge(mesh3d,'elem_type',mesh3d.elem_type);
         mesh3d = f_get_face(mesh3d,'elem_type',mesh3d.elem_type);

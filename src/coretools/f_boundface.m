@@ -21,7 +21,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
@@ -31,7 +31,7 @@ end
 %------------------------------------------------------------------------
 face = f_face(elem,'elem_type',elem_type);
 [face_in_elem, ~, sign_face_in_elem] = ...
-    f_faceinelem(elem,node,face,'elem_type',elem_type,'get','sign');
+    f_faceinelem(elem,node,face,'elem_type',elem_type,'get',{'id','sign'});
 %--------------------------------------------------------------------------
 nb_face = size(face,2);
 %--------------------------------------------------------------------------

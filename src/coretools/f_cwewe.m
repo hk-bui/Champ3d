@@ -1,18 +1,8 @@
-function CoefWeWe = f_cwewe(mesh,varargin)
+function coefwewe = f_cwewe(c3dobj,varargin)
 % F_CWEWE computes the mass matrix int_v(coef x We x We x dv)
 %--------------------------------------------------------------------------
-% FIXED INPUT
-% mesh : mesh data structure
-%--------------------------------------------------------------------------
-% OPTIONAL INPUT
-% 'id_elem' : array of indices of elements in the mesh
-% 'coef' : coefficient (scalar, tensor or matrix)
-%--------------------------------------------------------------------------
 % OUTPUT
-% CoefWeWe : nb_edges_in_volume x nb_edges_in_volume
-%--------------------------------------------------------------------------
-% EXAMPLE
-% CoefWeWe = F_CWEWE(mesh,'coef',1,'id_elem',[1 2 3],'dim',3);
+% coefwewe : nb_elem x nbEd_inEl x nbEd_inEl
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -21,84 +11,118 @@ function CoefWeWe = f_cwewe(mesh,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'mesh','coef','dim','id_elem'};
+arglist = {'design3d','id_design3d','dom_type','id_dom',...
+           'phydomobj','coefficient'};
 
 % --- default input value
-coef = 1;
-dim  = 3;
-id_elem = [];
+design3d = [];
+id_design3d = [];
+dom_type  = [];
+id_dom    = [];
+phydomobj = [];
+coefficient = [];
+
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
-
 %--------------------------------------------------------------------------
-con = f_connexion(mesh.elem_type);
-nbEd_inEl = con.nbEd_inEl;
-nbElem    = mesh.nbElem;
-nbEdge    = mesh.nbEdge;
-
-if isempty(id_elem)
-    id_elem = 1:nbElem;
+if isempty(phydomobj)
+    if ~isempty(design3d) && ~isempty(id_design3d) && ~isempty(dom_type) && ~isempty(id_dom)
+        phydomobj = c3dobj.(design3d).(id_design3d).(dom_type).(id_dom);
+    else
+        return;
+    end
 end
 %--------------------------------------------------------------------------
-
-matCoef = f_cmatrix(coef,'dim',dim,'id_elem',id_elem,'nb_elem',nbElem);
-
+if isfield(phydomobj,'id_emdesign3d')
+    id_mesh3d = c3dobj.emdesign3d.(phydomobj.id_emdesign3d).id_mesh3d;
+elseif isfield(phydomobj,'id_thdesign3d')
+    id_mesh3d = c3dobj.thdesign3d.(phydomobj.id_thdesign3d).id_mesh3d;
+end
 %--------------------------------------------------------------------------
-
-SWeWe = zeros(nbEd_inEl,nbElem,nbEd_inEl);
-for iG = 1:con.nbG
-    for i = 1:nbEd_inEl
-        for j = i:nbEd_inEl % !!! i
-            switch dim
-                case 3
-                    SWeWe(i,id_elem,j) = SWeWe(i,id_elem,j) + ...
-                        f_multrowv(con.Weigh(iG).*mesh.detJ{iG}(id_elem),...
-                        matCoef(1,1,id_elem).*mesh.We{iG}(1,i,id_elem).*mesh.We{iG}(1,j,id_elem)+...
-                        matCoef(1,2,id_elem).*mesh.We{iG}(2,i,id_elem).*mesh.We{iG}(1,j,id_elem)+...
-                        matCoef(1,3,id_elem).*mesh.We{iG}(3,i,id_elem).*mesh.We{iG}(1,j,id_elem)+...
-                        matCoef(2,1,id_elem).*mesh.We{iG}(1,i,id_elem).*mesh.We{iG}(2,j,id_elem)+...
-                        matCoef(2,2,id_elem).*mesh.We{iG}(2,i,id_elem).*mesh.We{iG}(2,j,id_elem)+...
-                        matCoef(2,3,id_elem).*mesh.We{iG}(3,i,id_elem).*mesh.We{iG}(2,j,id_elem)+...
-                        matCoef(3,1,id_elem).*mesh.We{iG}(1,i,id_elem).*mesh.We{iG}(3,j,id_elem)+...
-                        matCoef(3,2,id_elem).*mesh.We{iG}(2,i,id_elem).*mesh.We{iG}(3,j,id_elem)+...
-                        matCoef(3,3,id_elem).*mesh.We{iG}(3,i,id_elem).*mesh.We{iG}(3,j,id_elem));
-                case 2
-                    SWeWe(i,id_elem,j) = SWeWe(i,id_elem,j) + ...
-                        f_multrowv(con.Weigh(iG).*mesh.detJ{iG}(id_elem),...
-                        matCoef(1,1,id_elem).*mesh.We{iG}(1,i,id_elem).*mesh.We{iG}(1,j,id_elem)+...
-                        matCoef(1,2,id_elem).*mesh.We{iG}(2,i,id_elem).*mesh.We{iG}(1,j,id_elem)+...
-                        matCoef(2,1,id_elem).*mesh.We{iG}(1,i,id_elem).*mesh.We{iG}(2,j,id_elem)+...
-                        matCoef(2,2,id_elem).*mesh.We{iG}(2,i,id_elem).*mesh.We{iG}(2,j,id_elem));
+id_dom3d  = phydomobj.id_dom3d;
+id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+nb_elem   = length(id_elem);
+%--------------------------------------------------------------------------
+[coef_array, coef_array_type] = f_coef_array(coefficient);
+%--------------------------------------------------------------------------
+if isempty(coefficient)
+    coef_array = 1;
+    coef_array_type = 'iso_array';
+end
+%--------------------------------------------------------------------------
+if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
+    elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
+else
+    elem_type = f_elemtype(c3dobj.mesh3d.(id_mesh3d).elem,'defined_on','elem');
+end
+%--------------------------------------------------------------------------
+con = f_connexion(elem_type);
+nbG = con.nbG;
+Weigh = con.Weigh;
+nbEd_inEl = con.nbEd_inEl;
+%--------------------------------------------------------------------------
+for iG = 1:nbG
+    We{iG} = c3dobj.mesh3d.(id_mesh3d).We{iG}(id_elem,:,:);
+    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
+end
+%--------------------------------------------------------------------------
+coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
+%--------------------------------------------------------------------------
+if any(strcmpi(coef_array_type,{'iso_array'}))
+    %----------------------------------------------------------------------
+    for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
+        for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            weiz = We{iG}(:,3,i);
+            for j = i:nbEd_inEl % !!! i
+                wejx = We{iG}(:,1,j);
+                wejy = We{iG}(:,2,j);
+                wejz = We{iG}(:,3,j);
+                % ---
+                coefwewe(:,i,j) = coefwewe(:,i,j) + ...
+                    weigh .* dJ .* ( coef_array .* ...
+                    (weix .* wejx + weiy .* wejy + weiz .* wejz) );
             end
         end
     end
-end
-%--------------------------------------------------------------------------
-CoefWeWe = sparse(nbEdge,nbEdge);
-
-for i = 1:nbEd_inEl
-    for j = i+1 : nbEd_inEl
-        CoefWeWe = CoefWeWe + ...
-            sparse(mesh.edge_in_elem(i,:),mesh.edge_in_elem(j,:),...
-                   SWeWe(i,:,j),nbEdge,nbEdge);
+    %----------------------------------------------------------------------
+elseif any(strcmpi(coef_array_type,{'tensor_array'}))
+    %----------------------------------------------------------------------
+    for iG = 1:nbG
+        dJ    = f_tocolv(detJ{iG});
+        weigh = Weigh(iG);
+        for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            weiz = We{iG}(:,3,i);
+            for j = i:nbEd_inEl % !!! i
+                wejx = We{iG}(:,1,j);
+                wejy = We{iG}(:,2,j);
+                wejz = We{iG}(:,3,j);
+                % ---
+                coefwewe(:,i,j) = coefwewe(:,i,j) + ...
+                    weigh .* dJ .* (...
+                    coef_array(:,1,1) .* weix .* wejx +...
+                    coef_array(:,1,2) .* weiy .* wejx +...
+                    coef_array(:,1,3) .* weiz .* wejx +...
+                    coef_array(:,2,1) .* weix .* wejy +...
+                    coef_array(:,2,2) .* weiy .* wejy +...
+                    coef_array(:,2,3) .* weiz .* wejy +...
+                    coef_array(:,3,1) .* weix .* wejz +...
+                    coef_array(:,3,2) .* weiy .* wejz +...
+                    coef_array(:,3,3) .* weiz .* wejz );
+            end
+        end
     end
+    %----------------------------------------------------------------------
 end
-
-CoefWeWe = CoefWeWe + CoefWeWe.';
-
-for i = 1:nbEd_inEl
-    CoefWeWe = CoefWeWe + ...
-        sparse(mesh.edge_in_elem(i,:),mesh.edge_in_elem(i,:),...
-               SWeWe(i,:,i),nbEdge,nbEdge);
-end
-
-
-
-
 

@@ -7,19 +7,19 @@ function id_node = f_find_cutnode3d(node,elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'node','elem','cut_equation','elem_type','tol'};
+arglist = {'node','elem','cut_equation','elem_type','tol','defined_on'};
 
 % --- default input value
 cut_equation = '';
-elem_type = 'hex';
+elem_type = [];
 tol = 1e-9; % tolerance
-
+defined_on = 'elem';
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
@@ -29,6 +29,10 @@ eqcond = cut_equation.eqcond;
 neqcond = cut_equation.neqcond;
 %--------------------------------------------------------------------------
 nbEqcond = length(eqcond);
+%--------------------------------------------------------------------------
+if isempty(elem_type)
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
+end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
 nbNo_inEl = con.nbNo_inEl;

@@ -11,7 +11,7 @@ arglist = {'face_color','edge_color','alpha_value', 'text_color', 'text_size'...
            'id_mesh2d','id_dom2d',...
            'id_mesh3d','id_dom3d',...
            'id_emdesign3d','id_thdesign3d', ...
-           'id_econductor','id_mconducteur','id_coil','id_bc','id_nomesh',...
+           'id_econductor','id_mconductor','id_coil','id_bc','id_nomesh',...
            'id_bsfield','id_pmagnet',...
            'id_tconductor','id_tcapacitor'};
 
@@ -23,7 +23,7 @@ id_dom3d   = [];
 id_emdesign3d  = [];
 id_thdesign3d  = [];
 id_econductor  = [];
-id_mconducteur = [];
+id_mconductor = [];
 id_coil = [];
 id_bc = [];
 id_nomesh = [];
@@ -41,7 +41,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 
@@ -49,14 +49,14 @@ end
 meshobj = f_get_meshobj(c3dobj,varargin{:});
 id_mesh3d = meshobj.id_mesh3d;
 id_dom3d  = meshobj.id_dom3d;
+id_mesh2d = meshobj.id_mesh2d;
+id_dom2d  = meshobj.id_dom2d;
+for3d     = meshobj.for3d;
+additional= meshobj.additional;
 %--------------------------------------------------------------------------
 elem_type = [];
 defined_on = 'elem';
-if isempty(id_mesh3d) && isempty(id_dom3d)
-    if isempty(id_mesh2d)
-        id_mesh2d = fieldnames(c3dobj.mesh2d);
-        id_mesh2d = id_mesh2d{1};
-    end
+if ~for3d
     %----------------------------------------------------------------------
     if isempty(id_dom2d)
         id_dom2d = {''};
@@ -70,11 +70,6 @@ if isempty(id_mesh3d) && isempty(id_dom3d)
     elem_type = c3dobj.mesh2d.(id_mesh2d).elem_type;
     %----------------------------------------------------------------------
 else
-    %----------------------------------------------------------------------
-    if isempty(id_mesh3d)
-        id_mesh3d = fieldnames(c3dobj.mesh3d);
-        id_mesh3d = id_mesh3d{1};
-    end
     %----------------------------------------------------------------------
     node = c3dobj.mesh3d.(id_mesh3d).node;
     %----------------------------------------------------------------------
@@ -103,13 +98,13 @@ else
     elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
 end
 %--------------------------------------------------------------------------
-if ~isempty(id_mesh2d)
+if ~for3d
     %----------------------------------------------------------------------
     f_view_mesh2d(c3dobj.mesh2d.(id_mesh2d).node, ...
                   c3dobj.mesh2d.(id_mesh2d).elem(:,id_elem), ...
                   'elem_type',elem_type, ...
                   'face_color',face_color,'edge_color',edge_color,...
-                  'alpha_value',alpha_value);
+                  'alpha_value',alpha_value); hold on
     %----------------------------------------------------------------------
     % Info
     cnode = f_barrycenter(c3dobj.mesh2d.(id_mesh2d).node, ...
@@ -119,13 +114,46 @@ if ~isempty(id_mesh2d)
         'FontSize', text_size,'HorizontalAlignment', 'center');
 end
 %--------------------------------------------------------------------------
-if ~isempty(id_mesh3d)
+if for3d
     %----------------------------------------------------------------------
     f_view_mesh3d(node, elem, ...
                   'elem_type',elem_type, ...
                   'defined_on',defined_on, ...
                   'face_color',face_color,'edge_color',edge_color,...
-                  'alpha_value',alpha_value);
+                  'alpha_value',alpha_value); hold on
+    %----------------------------------------------------------------------
+    if ~isempty(additional)
+        if strcmpi(additional.type,'coil')
+            % ---
+            defined_on = 'elem';
+            addelem = c3dobj.mesh3d.(id_mesh3d).elem(:,additional.petrode.id_elem);
+            f_view_mesh3d(node, addelem, ...
+                  'defined_on',defined_on, ...
+                  'face_color','r','edge_color','r',...
+                  'alpha_value',0.2); hold on
+            % ---
+            defined_on = 'elem';
+            addelem = c3dobj.mesh3d.(id_mesh3d).elem(:,additional.netrode.id_elem);
+            f_view_mesh3d(node, addelem, ...
+                  'defined_on',defined_on, ...
+                  'face_color','b','edge_color','b',...
+                  'alpha_value',0.2); hold on
+            % ---
+            defined_on = 'node';
+            addelem = additional.petrode.id_node;
+            f_view_mesh3d(node, addelem, ...
+                  'defined_on',defined_on, ...
+                  'face_color','r','edge_color','r',...
+                  'alpha_value',0.2); hold on
+            % ---
+            defined_on = 'node';
+            addelem = additional.netrode.id_node;
+            f_view_mesh3d(node, addelem, ...
+                  'defined_on',defined_on, ...
+                  'face_color','b','edge_color','b',...
+                  'alpha_value',0.2); hold on
+        end
+    end
     %----------------------------------------------------------------------
     % Info
     cnode = f_barrycenter(node, elem(:,1));

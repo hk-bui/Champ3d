@@ -11,6 +11,7 @@ arglist = f_arglist('getmeshobj');
 varargin = f_validvarargin(varargin,arglist);
 
 % --- default input value
+for3d      = 1;
 id_mesh2d  = [];
 id_dom2d   = [];
 id_mesh3d  = [];
@@ -19,7 +20,7 @@ of_dom3d   = [];
 id_emdesign3d  = [];
 id_thdesign3d  = [];
 id_econductor  = [];
-id_mconducteur = [];
+id_mconductor = [];
 id_coil = [];
 id_bc = [];
 id_nomesh = [];
@@ -32,8 +33,12 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
+end
+%--------------------------------------------------------------------------
+if ~isempty(id_mesh2d) || ~isempty(id_dom2d)
+    for3d = 0;
 end
 %--------------------------------------------------------------------------
 design3d = [];
@@ -49,13 +54,14 @@ end
 %--------------------------------------------------------------------------
 thing = [];
 id_thing = [];
+additional = [];
 if ~isempty(id_econductor)
     thing = 'econductor';
     id_thing = id_econductor;
 end
-if ~isempty(id_mconducteur)
-    thing = 'mconducteur';
-    id_thing = id_mconducteur;
+if ~isempty(id_mconductor)
+    thing = 'mconductor';
+    id_thing = id_mconductor;
 end
 if ~isempty(id_coil)
     thing = 'coil';
@@ -86,9 +92,17 @@ if ~isempty(id_tcapacitor)
     id_thing = id_tcapacitor;
 end
 %--------------------------------------------------------------------------
+if ~isempty(design3d)
+    id_mesh3d = c3dobj.(design3d).(id_design3d).id_mesh3d;
+end
+%--------------------------------------------------------------------------
 if ~isempty(design3d) && ~isempty(thing)
-    id_mesh3d = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_mesh3d;
     id_dom3d  = c3dobj.(design3d).(id_design3d).(thing).(id_thing).id_dom3d;
+    % ---
+    if strcmpi(thing,'coil')
+        additional = c3dobj.(design3d).(id_design3d).(thing).(id_thing);
+        additional.type = 'coil';
+    end
 end
 %--------------------------------------------------------------------------
 if isempty(id_mesh2d) && isfield(c3dobj,'mesh2d')
@@ -110,11 +124,13 @@ if ~iscell(of_dom3d)
 end
 %--------------------------------------------------------------------------
 % --- Output
+meshobj.for3d     = for3d;
+% ---
 meshobj.id_mesh3d = id_mesh3d;
 meshobj.id_dom3d  = id_dom3d;
 meshobj.of_dom3d  = of_dom3d;
 % ---
 meshobj.id_mesh2d = id_mesh2d;
 meshobj.id_dom2d  = id_dom2d;
-
-
+% ---
+meshobj.additional = additional;

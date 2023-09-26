@@ -21,7 +21,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 
@@ -52,7 +52,7 @@ if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
 end
 %--------------------------------------------------------------------------
 tic;
-fprintf(['Making c3d_hexamesh #' id_mesh3d]);
+fprintf(['Make c3d_hexamesh #' id_mesh3d]);
 
 %--------------------------------------------------------------------------
 divlay   = [];
@@ -123,6 +123,9 @@ c3dobj.mesh3d.(id_mesh3d).elem = elem;
 c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
+%--------------------------------------------------------------------------
+celem = mean(reshape(node(:,elem(1:8,:)),3,8,nb_elem),2);
+c3dobj.mesh3d.(id_mesh3d).cnode = squeeze(celem);
 %--------------------------------------------------------------------------
 c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);

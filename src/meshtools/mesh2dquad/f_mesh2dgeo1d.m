@@ -21,7 +21,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 % -------------------------------------------------------------------------
@@ -42,7 +42,7 @@ end
 % -------------------------------------------------------------------------
 
 tic;
-fprintf(['Making mesh2d #' id_mesh2d ' from mesh1d with : \n']);
+fprintf(['Make mesh2d #' id_mesh2d ' from mesh1d with : \n']);
 fprintf(['id_x #' strjoin(id_x,', #') '\n']);
 fprintf(['id_y #' strjoin(id_y,', #')])
 

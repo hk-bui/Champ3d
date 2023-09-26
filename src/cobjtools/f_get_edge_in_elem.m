@@ -1,4 +1,4 @@
-function [edge_in_elem, ori_edge_in_elem] = f_get_edge_in_elem(c3dobj,varargin)
+function [edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = f_get_edge_in_elem(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -18,7 +18,7 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
@@ -36,10 +36,12 @@ if f_isempty(of_dom3d)
     elem = mesh3d.elem;
     defined_on = 'elem';
     %----------------------------------------------------------------------
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
+    %----------------------------------------------------------------------
     if ~isfield(mesh3d,'edge')
-        edge_list = f_edge(elem,'defined_on',defined_on);
+        edge_list = f_edge(elem,'elem_type',elem_type);
     elseif isempty(mesh3d.edge)
-        edge_list = f_edge(elem,'defined_on',defined_on);
+        edge_list = f_edge(elem,'elem_type',elem_type);
     else
         edge_list = mesh3d.edge;
     end
@@ -56,7 +58,7 @@ else
         elem = [elem mesh3d.elem(:,mesh3d.dom3d.(of_dom3d{i}).id_elem)];
     end
     %----------------------------------------------------------------------
-    elem_type = f_elemtype(mesh3d.elem,'defined_on',defined_on);
+    elem_type = f_elemtype(elem,'defined_on',defined_on);
     %----------------------------------------------------------------------
     edge_list = f_edge(elem,'elem_type',elem_type);
     %----------------------------------------------------------------------
@@ -64,7 +66,7 @@ end
 %--------------------------------------------------------------------------
 elem_type = f_elemtype(elem,'defined_on',defined_on);
 %--------------------------------------------------------------------------
-[edge_in_elem, ori_edge_in_elem] = ...
+[edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = ...
     f_edgeinelem(elem,edge_list,'elem_type',elem_type,'get',get);
 %--------------------------------------------------------------------------
 % --- Outputs

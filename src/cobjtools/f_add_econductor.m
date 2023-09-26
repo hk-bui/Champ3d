@@ -7,11 +7,10 @@ function c3dobj = f_add_econductor(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_econductor','id_mesh3d','id_dom3d','sigma'};
+arglist = {'id_emdesign3d','id_econductor','id_dom3d','sigma'};
 
 % --- default input value
 id_emdesign3d = [];
-id_mesh3d     = [];
 id_dom3d      = [];
 sigma         = 0;
 id_econductor = [];
@@ -26,35 +25,28 @@ for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': Check function arguments : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
-
 if isempty(id_emdesign3d)
     id_emdesign3d = fieldnames(c3dobj.emdesign3d);
     id_emdesign3d = id_emdesign3d{1};
 end
-
-if isempty(id_mesh3d)
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-    id_mesh3d = id_mesh3d{1};
-end
-
+%--------------------------------------------------------------------------
 if isempty(id_econductor)
     error([mfilename ': id_econductor must be defined !'])
 end
-
+%--------------------------------------------------------------------------
 if isempty(id_dom3d)
     error([mfilename ': id_dom3d must be given !'])
 end
-
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_mesh3d = id_mesh3d;
+c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).sigma = sigma;
 % --- info message
-fprintf(['Add econ #' id_econductor ' to emdesign3d #' id_emdesign3d ' in mesh3d #' id_mesh3d '\n']);
+fprintf(['Add econ #' id_econductor ' to emdesign3d #' id_emdesign3d '\n']);
 
 
