@@ -25,13 +25,11 @@ function parameter = f_make_parameter(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'f','depend_on','from','id_cobj'};
+arglist = {'f','depend_on'};
 
 % --- default input value
 f = [];
 depend_on = [];
-from = [];
-id_cobj = [];
 
 % --- valid depend_on
 valid_depend_on = {'cnode','b','h','temp','j'};
@@ -59,18 +57,8 @@ switch ptype
     case 'number'
         f = str2func(['@()' num2str(f)]);
     case 'function'
-        %--------------------------------------------------------------------------
-        if isempty(from)
-            error([mfilename ': #from what ?!']);
-        end
         %------------------------------------------------------------------
         depend_on = f_to_scellargin(depend_on);
-        %--------------------------------------------------------------------------
-        for ido = 1:length(depend_on)
-            if ~any(strcmpi(depend_on{ido},valid_depend_on))
-                error([mfilename ' : #depend_on is not valid. Valid #depend_on are ' strjoin(valid_depend_on,', ') ' !']);
-            end
-        end
         %------------------------------------------------------------------
         if nargin(f)
             if nargin(f) ~= length(depend_on)
@@ -78,34 +66,10 @@ switch ptype
             end
         end
         %------------------------------------------------------------------
-        from = f_to_scellargin(from);
-        %------------------------------------------------------------------
-        %if isempty(id_design3d)
-        %    for i = 1:length(from)
-        %        if any(strcmpi(from{i},{'emdesign3d','thdesign3d'}))
-        %            iddes3d = fieldnames(c3dobj.(from{i}));
-        %            id_design3d{i} = iddes3d{1};
-        %        end
-        %    end
-        %else
-        %    id_design3d = f_to_scellargin(id_design3d);
-        %end
-        %------------------------------------------------------------------
-        id_cobj = f_to_scellargin(id_cobj);
-        %------------------------------------------------------------------
-        while ((length(depend_on) ~= length(from)) || ...
-               (length(depend_on) ~= length(id_cobj)) || ...
-               (length(from) ~= length(id_cobj)))
-            [depend_on,from] = f_pairing_scellargin(depend_on,from);
-            [id_cobj,from] = f_pairing_scellargin(id_cobj,from);
-            [id_cobj,depend_on] = f_pairing_scellargin(id_cobj,depend_on);
-        end
 end
 %--------------------------------------------------------------------------
 % --- Output
 parameter.f = f;
-parameter.from = from;
-parameter.id_cobj = id_cobj;
-parameter.field = depend_on;
+parameter.depend_on = depend_on;
 
 
