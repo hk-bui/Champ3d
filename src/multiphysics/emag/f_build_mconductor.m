@@ -44,34 +44,46 @@ if any(strcmpi(id_mconductor,{'_all'}))
 end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_mconductor)
-    %----------------------------------------------------------------------
-    em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
-    %----------------------------------------------------------------------
-    fprintf(['Build mcon ' id_mconductor{iec} ...
-             ' in emdesign3d #' id_emdesign3d ...
-             ' for ' em_model]);
-    switch em_model
-        case {'aphijw','aphits'}
-            tic;
-            %--------------------------------------------------------------
-            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec});
-            %--------------------------------------------------------------
-            coef_name  = 'mu_r';
-            coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
-                                                  'coefficient',coef_name);
-            %--------------------------------------------------------------
-            mu0 = 4 * pi * 1e-7;
-            nu0nur = f_invtensor(mu0 .* coef_array);
-            %--------------------------------------------------------------
-            nuwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
-                                    'coefficient',nu0nur);
-            %--------------------------------------------------------------
-            % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).(em_model).nuwfwf = nuwfwf;
-            % --- Log message
-            fprintf(' --- in %.2f s \n',toc);
-        case {'tomejw','tomets'}
-            % TODO
+    to_be_rebuilt = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).to_be_rebuilt;
+    if to_be_rebuilt
+        %----------------------------------------------------------------------
+        em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
+        %----------------------------------------------------------------------
+        fprintf(['Build mcon ' id_mconductor{iec} ...
+                 ' in emdesign3d #' id_emdesign3d ...
+                 ' for ' em_model]);
+        switch em_model
+            case {'aphijw','aphits'}
+                tic;
+                %--------------------------------------------------------------
+                phydomobj = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec});
+                %--------------------------------------------------------------
+                coef_name  = 'mu_r';
+                coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                                      'coefficient',coef_name);
+                %--------------------------------------------------------------
+                mu0 = 4 * pi * 1e-7;
+                nu0nur = f_invtensor(mu0 .* coef_array);
+                %--------------------------------------------------------------
+                nuwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
+                                        'coefficient',nu0nur);
+                %--------------------------------------------------------------
+                % --- Output
+                c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).(em_model).nuwfwf = nuwfwf;
+                %----------------------------------------------------------
+                coeftype = f_coeftype(phydomobj.(coef_name));
+                switch coeftype
+                    case {'function_ltensor_array','function_iso_array'}
+                        c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).to_be_rebuilt = 1;
+                    otherwise
+                        c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor{iec}).to_be_rebuilt = 0;
+                end
+                %----------------------------------------------------------
+                % --- Log message
+                fprintf(' --- in %.2f s \n',toc);
+            case {'tomejw','tomets'}
+                % TODO
+        end
     end
 end
 

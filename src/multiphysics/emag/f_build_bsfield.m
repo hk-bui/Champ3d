@@ -44,45 +44,42 @@ if any(strcmpi(id_bsfield,{'_all'}))
 end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_bsfield)
-    %----------------------------------------------------------------------
-    em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
-    %----------------------------------------------------------------------
-    fprintf(['Build bsfield ' id_bsfield{iec} ...
-             ' in emdesign3d #' id_emdesign3d ...
-             ' for ' em_model]);
-    switch em_model
-        case {'aphijw'}
-            tic;
-            %--------------------------------------------------------------
-            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec});
-            %--------------------------------------------------------------
-            coef_name  = 'mu_r';
-            %--------------------------------------------------------------
-            murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
-                                     'coefficient',coef_name);
-            %--------------------------------------------------------------
-            % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).aphijw.murwfwf = murwfwf;
-            % --- Log message
-            fprintf(' --- in %.2f s \n',toc);
-        case {'aphits'}
-            tic;
-            %--------------------------------------------------------------
-            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec});
-            %--------------------------------------------------------------
-            coef_name  = 'mu_r';
-            %--------------------------------------------------------------
-            murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
-                                     'coefficient',coef_name);
-            %--------------------------------------------------------------
-            % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).aphits.murwfwf = murwfwf;
-            % --- Log message
-            fprintf(' --- in %.2f s \n',toc);
-        case {'tomejw'}
-            % TODO
-        case {'tomets'}
-            % TODO
+    to_be_rebuilt = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).to_be_rebuilt;
+    if to_be_rebuilt
+        %----------------------------------------------------------------------
+        em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
+        %----------------------------------------------------------------------
+        fprintf(['Build bsfield ' id_bsfield{iec} ...
+                 ' in emdesign3d #' id_emdesign3d ...
+                 ' for ' em_model]);
+        switch em_model
+            case {'aphijw','aphits'}
+                tic;
+                %--------------------------------------------------------------
+                phydomobj = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec});
+                %--------------------------------------------------------------
+                coef_name  = 'mu_r';
+                %--------------------------------------------------------------
+                murwfwf = f_cwfwf(c3dobj,'phydomobj',phydomobj,...
+                                         'coefficient',coef_name);
+                %--------------------------------------------------------------
+                % --- Output
+                c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).aphijw.murwfwf = murwfwf;
+                %----------------------------------------------------------
+                coeftype = f_coeftype(phydomobj.(coef_name));
+                switch coeftype
+                    case {'function_ltensor_array','function_iso_array'}
+                        c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).to_be_rebuilt = 1;
+                    otherwise
+                        c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).to_be_rebuilt = 0;
+                end
+                %----------------------------------------------------------
+                % --- Log message
+                fprintf(' --- in %.2f s \n',toc);
+                
+            case {'tomejw','tomets'}
+                % TODO
+        end
     end
 end
 

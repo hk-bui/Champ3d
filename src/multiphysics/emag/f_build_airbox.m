@@ -52,52 +52,59 @@ end
 %--------------------------------------------------------------------------
 id_airbox = f_to_scellargin(id_airbox);
 id_airbox = id_airbox{1}; % cannot treat two airbox
-%----------------------------------------------------------------------
-em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
-%----------------------------------------------------------------------
-fprintf(['Build airbox ' id_airbox ...
-         ' in emdesign3d #' id_emdesign3d ...
-         ' for ' em_model]);
-switch em_model
-    case {'aphijw','aphits'}
-        tic;
-        %------------------------------------------------------------------
-        id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-        %------------------------------------------------------------------
-        phydomobj = c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox);
-        %------------------------------------------------------------------
-        id_dom3d  = phydomobj.id_dom3d;
-        defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on;
-        if any(strcmpi(defined_on,'elem'))
-            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-        elseif any(strcmpi(defined_on,'face'))
-            return;
+%--------------------------------------------------------------------------
+to_be_rebuilt = c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).to_be_rebuilt;
+if to_be_rebuilt
+    %----------------------------------------------------------------------
+    em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
+    %----------------------------------------------------------------------
+    fprintf(['Build airbox ' id_airbox ...
+             ' in emdesign3d #' id_emdesign3d ...
+             ' for ' em_model]);
+    switch em_model
+        case {'aphijw','aphits'}
+            tic;
+            %--------------------------------------------------------------
+            id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+            %--------------------------------------------------------------
+            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox);
+            %--------------------------------------------------------------
+            id_dom3d  = phydomobj.id_dom3d;
+            defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on;
+            if any(strcmpi(defined_on,'elem'))
+                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+            elseif any(strcmpi(defined_on,'face'))
+                return;
+                % TODO
+                % id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
+            end
+            %--------------------------------------------------------------
+            edge_list = c3dobj.mesh3d.(id_mesh3d).edge;
+            %--------------------------------------------------------------
+            bound_face = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d);
+            %--------------------------------------------------------------
+            %id_edge_in_bound_face = f_edgeinelem(bound_face,edge_list,'defined_on','face');
+            id_edge_in_bound_face = f_edgeinface(bound_face,edge_list);
+            id_edge_in_bound_face = unique(id_edge_in_bound_face);
+            %--------------------------------------------------------------
+            elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+            id_edge_in_elem = f_edgeinelem(elem,edge_list);
+            id_edge_in_elem = unique(id_edge_in_elem);
+            %--------------------------------------------------------------
+            id_inner_edge = setdiff(id_edge_in_elem,id_edge_in_bound_face);
+            id_bound_edge = id_edge_in_bound_face;
+            %--------------------------------------------------------------
+            % --- Output
+            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_elem = id_elem;
+            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_inner_edge = id_inner_edge;
+            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_bound_edge = id_bound_edge;
+            %--------------------------------------------------------------
+            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).to_be_rebuilt = 0;
+            %--------------------------------------------------------------
+            % --- Log message
+            fprintf(' --- in %.2f s \n',toc);
+        case {'tomejw','tomets'}
             % TODO
-            % id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
-        end
-        %------------------------------------------------------------------
-        edge_list = c3dobj.mesh3d.(id_mesh3d).edge;
-        %------------------------------------------------------------------
-        bound_face = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d);
-        %------------------------------------------------------------------
-        %id_edge_in_bound_face = f_edgeinelem(bound_face,edge_list,'defined_on','face');
-        id_edge_in_bound_face = f_edgeinface(bound_face,edge_list);
-        id_edge_in_bound_face = unique(id_edge_in_bound_face);
-        %------------------------------------------------------------------
-        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
-        id_edge_in_elem = f_edgeinelem(elem,edge_list);
-        id_edge_in_elem = unique(id_edge_in_elem);
-        %------------------------------------------------------------------
-        id_inner_edge = setdiff(id_edge_in_elem,id_edge_in_bound_face);
-        id_bound_edge = id_edge_in_bound_face;
-        %------------------------------------------------------------------
-        % --- Output
-        c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_elem = id_elem;
-        c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_inner_edge = id_inner_edge;
-        c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_bound_edge = id_bound_edge;
-        % --- Log message
-        fprintf(' --- in %.2f s \n',toc);
-    case {'tomejw','tomets'}
-        % TODO
+    end
 end
 %----------------------------------------------------------------------

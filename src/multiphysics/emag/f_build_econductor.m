@@ -44,31 +44,43 @@ if any(strcmpi(id_econductor,{'_all'}))
 end
 %--------------------------------------------------------------------------
 for iec = 1:length(id_econductor)
-    %----------------------------------------------------------------------
-    em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
-    %----------------------------------------------------------------------
-    fprintf(['Build econ ' id_econductor{iec} ...
-             ' in emdesign3d #' id_emdesign3d ...
-             ' for ' em_model]);
-    switch em_model
-        case {'aphijw','aphits'}
-            tic;
-            %--------------------------------------------------------------
-            phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec});
-            %--------------------------------------------------------------
-            coef_name  = 'sigma';
-            coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
-                                                  'coefficient',coef_name);
-            %--------------------------------------------------------------
-            sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
-                                     'coefficient',coef_array);
-            %--------------------------------------------------------------
-            % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).(em_model).sigwewe = sigwewe;
-            % --- Log message
-            fprintf(' --- in %.2f s \n',toc);
-        case {'tomejw','tomets'}
-            % TODO
+    to_be_rebuilt = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).to_be_rebuilt;
+    if to_be_rebuilt
+        %----------------------------------------------------------------------
+        em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
+        %----------------------------------------------------------------------
+        fprintf(['Build econ ' id_econductor{iec} ...
+                 ' in emdesign3d #' id_emdesign3d ...
+                 ' for ' em_model]);
+        switch em_model
+            case {'aphijw','aphits'}
+                tic;
+                %----------------------------------------------------------
+                phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec});
+                %----------------------------------------------------------
+                coef_name  = 'sigma';
+                coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                                      'coefficient',coef_name);
+                %----------------------------------------------------------
+                sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
+                                         'coefficient',coef_array);
+                %----------------------------------------------------------
+                % --- Output
+                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).(em_model).sigwewe = sigwewe;
+                %----------------------------------------------------------
+                coeftype = f_coeftype(phydomobj.(coef_name));
+                switch coeftype
+                    case {'function_ltensor_array','function_iso_array'}
+                        c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).to_be_rebuilt = 1;
+                    otherwise
+                        c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).to_be_rebuilt = 0;
+                end
+                %----------------------------------------------------------
+                % --- Log message
+                fprintf(' --- in %.2f s \n',toc);
+            case {'tomejw','tomets'}
+                % TODO
+        end
     end
 end
 
