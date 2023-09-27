@@ -169,6 +169,8 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).nb_turn   = nb_turn;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_o = field_vector_o;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_v = field_vector_v;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_rounding = field_vector_rounding;
+% --- status
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add open-jscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
 

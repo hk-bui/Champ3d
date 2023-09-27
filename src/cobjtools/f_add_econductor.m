@@ -46,6 +46,8 @@ end
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).sigma = sigma;
+% --- status
+c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add econ #' id_econductor ' to emdesign3d #' id_emdesign3d '\n']);
 

@@ -159,6 +159,8 @@ c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'vs';
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).j_coil    = j_coil;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).i_coil    = i_coil;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_coil    = v_coil;
+% --- status
+c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add open-vscoil #' id_coil ' to emdesign3d #' id_emdesign3d '\n']);
 

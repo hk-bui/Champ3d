@@ -50,6 +50,8 @@ c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).mur      = mur;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_value = br_value;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).br_ori   = br_ori;
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
+% --- status
+c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add pmagnet #' id_pmagnet ' to emdesign3d #' id_emdesign3d '\n']);
 
