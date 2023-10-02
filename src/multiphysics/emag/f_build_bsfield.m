@@ -64,7 +64,7 @@ for iec = 1:length(id_bsfield)
                                          'coefficient',coef_name);
                 %--------------------------------------------------------------
                 % --- Output
-                c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).aphijw.murwfwf = murwfwf;
+                c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield{iec}).murwfwf = murwfwf;
                 %----------------------------------------------------------
                 coeftype = f_coeftype(phydomobj.(coef_name));
                 switch coeftype

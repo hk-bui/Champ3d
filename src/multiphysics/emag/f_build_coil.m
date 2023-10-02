@@ -61,7 +61,7 @@ for iec = 1:length(id_coil)
                                      'coefficient',coef_array);
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil{iec}).(em_model).sigwewe = sigwewe;
+            c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil{iec}).sigwewe = sigwewe;
             % --- Log message
             fprintf(' --- in %.2f s \n',toc);
         case {'tomejw','tomets'}

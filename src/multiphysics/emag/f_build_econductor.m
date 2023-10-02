@@ -66,7 +66,7 @@ for iec = 1:length(id_econductor)
                                          'coefficient',coef_array);
                 %----------------------------------------------------------
                 % --- Output
-                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).(em_model).sigwewe = sigwewe;
+                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor{iec}).sigwewe = sigwewe;
                 %----------------------------------------------------------
                 coeftype = f_coeftype(phydomobj.(coef_name));
                 switch coeftype

@@ -95,9 +95,9 @@ if to_be_rebuilt
             id_bound_edge = id_edge_in_bound_face;
             %--------------------------------------------------------------
             % --- Output
-            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_elem = id_elem;
-            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_inner_edge = id_inner_edge;
-            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).(em_model).id_bound_edge = id_bound_edge;
+            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_elem = id_elem;
+            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_inner_edge = id_inner_edge;
+            c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_bound_edge = id_bound_edge;
             %--------------------------------------------------------------
             c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).to_be_rebuilt = 0;
             %--------------------------------------------------------------

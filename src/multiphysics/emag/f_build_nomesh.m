@@ -82,8 +82,8 @@ for iec = 1:length(id_nomesh)
                 id_inner_edge = setdiff(id_edge_in_elem,id_edge_in_bound_face);
                 %----------------------------------------------------------
                 % --- Output
-                c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).(em_model).id_elem = id_elem;
-                c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).(em_model).id_inner_edge = id_inner_edge;
+                c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).id_elem = id_elem;
+                c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).id_inner_edge = id_inner_edge;
                 %----------------------------------------------------------
                 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh{iec}).to_be_rebuilt = 0;
                 %----------------------------------------------------------
