@@ -1,5 +1,5 @@
-function parameter = f_make_coef(varargin)
-% Allow separated declaration of parameters with different dependency.
+function coef = f_make_coef(varargin)
+% Allow separated declaration of coefficient with different dependency.
 % 'f' : dependency function
 %     + if a constant -> chose 'f' = value, ex. 'f' = 5
 %     + give function handle for 'f'
@@ -9,14 +9,6 @@ function parameter = f_make_coef(varargin)
 %     + 'node_temp' : nodal temperature
 %     + 'b' : induction (flux density)
 %     + 'h' : magnetic field strength
-% 'from' : physical problem
-%     + 'heat'
-%     + 'aphi_jw'
-%     + 'aphi_t'
-%     + 'tome_jw'
-%     + 'tome_t'
-%
-% murPlate   = f_make_parameter('type','bh_nonlinear_curve','f',@(B) B,'depend_on','b','from','aphi_jw');
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
@@ -30,6 +22,7 @@ arglist = {'f','depend_on','coef_type'};
 % --- default input value
 f = [];
 depend_on = [];
+coef_type = [];
 
 % --- valid depend_on
 valid_depend_on = {'cnode','b','h','temp','j'};
@@ -69,7 +62,8 @@ switch ptype
 end
 %--------------------------------------------------------------------------
 % --- Output
-parameter.f = f;
-parameter.depend_on = depend_on;
+coef.f = f;
+coef.depend_on = depend_on;
+coef.coef_type = coef_type;
 
 
