@@ -17,7 +17,7 @@ function coef = f_make_coef(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'f','depend_on','coef_type'};
+arglist = {'f','depend_on','coef_type','input_type'};
 
 % --- default input value
 f = [];
