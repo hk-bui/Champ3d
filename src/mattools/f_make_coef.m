@@ -17,15 +17,26 @@ function coef = f_make_coef(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'f','depend_on','coef_type','input_type'};
+arglist = {'f','depend_on','coef_size','coef_type','input_size'};
 
 % --- default input value
 f = [];
 depend_on = [];
+coef_size = [];
 coef_type = [];
+input_size = [];
 
 % --- valid depend_on
 valid_depend_on = {'cnode','b','h','temp','j'};
+% --- valid coef_size
+valid_coef_type = { '1 x 1', '1', 'scalar', ...
+                    '3 x 1', '1 x 3', 'vector', ...
+                    '1 x nb_elem', 'array_of_scalar', ...
+                    '3 x nb_elem', 'array_of_vector', ...
+                    '3 x 3', 'gtensor', ...
+                    'nb_elem x 3 x 3', 'array_of_gtensor', ...
+                    '1 x ltensor', 'ltensor', ...
+                    'nb_elem x ltensor', 'array_of_ltensor'};
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -59,11 +70,16 @@ switch ptype
             end
         end
         %------------------------------------------------------------------
+        if isempty(coef_type)
+            error([mfilename ': #coef_type must be given !']);
+        end
 end
 %--------------------------------------------------------------------------
 % --- Output
 coef.f = f;
-coef.depend_on = depend_on;
-coef.coef_type = coef_type;
+coef.depend_on  = depend_on;
+coef.coef_size  = coef_size;
+coef.coef_type  = coef_type;
+coef.input_size = input_size;
 
 

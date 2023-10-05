@@ -24,5 +24,5 @@ elseif isa(param,'struct')
 else
     fprintf('param = \n');
     disp(param);
-    error([mfilename ': the parameter is not valid ! Use f_make_parameter !']);
+    error([mfilename ': the parameter is not valid ! Use f_make_coef !']);
 end
