@@ -22,8 +22,9 @@ arglist = {'f','depend_on','coef_size','coef_type','input_size'};
 % --- default input value
 f = [];
 depend_on = [];
-coef_size = [];
 coef_type = [];
+% -
+coef_size = [];
 input_size = [];
 
 % --- valid depend_on
@@ -56,6 +57,15 @@ else
         ptype = 'function';
     end
 end
+
+%------------------------------------------------------------------
+if isempty(coef_type)
+    error([mfilename ': #coef_type must be given !']);
+elseif ~isa(aa,'char')
+    error([mfilename ': #coef_type must be given as char with single quote !']);
+elseif ~any(strcmpi(strrep(coef_type,' ',''),strrep(valid_coef_type,' ','')))
+    error([mfilename ': #coef_type must be one of these type : ' strjoin(valid_coef_type,', ') ' !']);
+end
 %--------------------------------------------------------------------------
 switch ptype
     case 'number'
@@ -69,17 +79,14 @@ switch ptype
                 error([mfilename ': Check number of f arguments !']);
             end
         end
-        %------------------------------------------------------------------
-        if isempty(coef_type)
-            error([mfilename ': #coef_type must be given !']);
-        end
 end
 %--------------------------------------------------------------------------
 % --- Output
 coef.f = f;
 coef.depend_on  = depend_on;
-coef.coef_size  = coef_size;
 coef.coef_type  = coef_type;
+% -
+coef.coef_size  = coef_size;
 coef.input_size = input_size;
 
 
