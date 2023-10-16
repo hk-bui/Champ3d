@@ -111,7 +111,12 @@ for k = 1:nb_layer	% k : current layer
     % go to the next layer
     ie0 = ie0 + nbElem2D;
 end
-
+%--------------------------------------------------------------------------
+celem = mean(reshape(node(:,elem(1:8,:)),3,8,nb_elem),2);
+%--------------------------------------------------------------------------
+face = f_face(elem,'elem_type','hexa');
+nb_face = size(face,2);
+cface = mean(reshape(node(:,face(1:4,:)),3,4,nb_face),2);
 %--------------------------------------------------------------------------
 % --- Output
 c3dobj.mesh3d.(id_mesh3d).mesher = 'c3d_hexamesh';
@@ -123,13 +128,11 @@ c3dobj.mesh3d.(id_mesh3d).elem = elem;
 c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
-%--------------------------------------------------------------------------
-cnode = mean(reshape(node(:,elem(1:8,:)),3,8,nb_elem),2);
-c3dobj.mesh3d.(id_mesh3d).cnode = squeeze(cnode);
+c3dobj.mesh3d.(id_mesh3d).celem = squeeze(celem);
+c3dobj.mesh3d.(id_mesh3d).face  = face;
+c3dobj.mesh3d.(id_mesh3d).cface = squeeze(cface);
 %--------------------------------------------------------------------------
 c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
-                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
-c3dobj.mesh3d.(id_mesh3d).face = f_face(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
 %--------------------------------------------------------------------------
 % --- Log message
