@@ -63,7 +63,7 @@ end
 
 %------------------------------------------------------------------
 if isempty(coef_type)
-    error([mfilename ': #coef_type must be given !']);
+    %error([mfilename ': #coef_type must be given !']);
 elseif ~isa(aa,'char')
     error([mfilename ': #coef_type must be given as char with single quote !']);
 elseif ~any(strcmpi(strrep(coef_type,' ',''),strrep(valid_coef_type,' ','')))

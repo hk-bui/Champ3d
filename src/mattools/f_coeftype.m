@@ -31,9 +31,9 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-no_nb_elem_info = 1;
+no_nb_elem_info = 0;
 if isempty(id_elem) && isempty(nb_elem)
-    no_nb_elem_info = 0;
+    no_nb_elem_info = 1;
 elseif ~isempty(id_elem)
     nb_elem = length(id_elem);
 end
