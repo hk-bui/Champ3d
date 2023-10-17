@@ -148,6 +148,8 @@ c3dobj.mesh3d.(id_mesh3d).origin_coordinates = origin_coordinates;
 c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
 %--------------------------------------------------------------------------
+c3dobj.mesh3d.(id_mesh3d) = f_intkit3d(c3dobj.mesh3d.(id_mesh3d));
+%--------------------------------------------------------------------------
 % --- Log message
 fprintf(' --- in %.2f s \n',toc);
 %--------------------------------------------------------------------------
