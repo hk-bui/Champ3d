@@ -9,6 +9,7 @@ function c3dobj = f_add_mesh2d(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y',...
+           'centering', 'origin_coordinates', ...
            'mesh_file'};
 
 % --- default input value
@@ -18,6 +19,8 @@ id_mesh1d = [];
 flog = 1.05; % log factor when making log mesh
 id_x = [];
 id_y = [];
+centering = 0;
+origin_coordinates = [0, 0];
 mesh_file = [];
 
 % --- check and update input

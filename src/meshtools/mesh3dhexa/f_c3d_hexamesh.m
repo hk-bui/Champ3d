@@ -8,13 +8,16 @@ function c3dobj = f_c3d_hexamesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh2d','id_mesh1d','id_layer','id_mesh3d','mesher'};
+arglist = {'id_mesh2d','id_mesh1d','id_layer','id_mesh3d','mesher', ...
+           'centering', 'origin_coordinates'};
 
 % --- default input value
 id_mesh3d = [];
 id_mesh2d = [];
 id_mesh1d = [];
 id_layer  = [];
+centering = 0;
+origin_coordinates = [0, 0];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -88,6 +91,15 @@ for i = 1:nb_layer
 end
 
 %--------------------------------------------------------------------------
+if f_istrue(centering)
+    cx = mean(node(1,:));
+    cy = mean(node(2,:));
+    cz = mean(node(3,:));
+    node(1,:) = node(1,:) - cx;
+    node(2,:) = node(2,:) - cy;
+    node(3,:) = node(3,:) - cz;
+end
+%--------------------------------------------------------------------------
 % build volume elements (elem) in 3D
 nbElem2D = c3dobj.mesh2d.(id_mesh2d).nb_elem;
 nb_elem = nbElem2D * nb_layer;
@@ -131,6 +143,7 @@ c3dobj.mesh3d.(id_mesh3d).elem_type = 'hexa';
 c3dobj.mesh3d.(id_mesh3d).celem = squeeze(celem);
 c3dobj.mesh3d.(id_mesh3d).face  = face;
 c3dobj.mesh3d.(id_mesh3d).cface = squeeze(cface);
+c3dobj.mesh3d.(id_mesh3d).origin_coordinates = origin_coordinates;
 %--------------------------------------------------------------------------
 c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);

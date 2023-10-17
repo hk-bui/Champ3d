@@ -7,7 +7,8 @@ function c3dobj = f_mesh2dgeo1d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y'};
+arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y',...
+           'centering','origin_coordinates'};
 
 % --- default input value
 id_mesh2d = [];
@@ -15,6 +16,8 @@ id_mesh1d = [];
 flog = 1.05; % log factor when making log mesh
 id_x = [];
 id_y = [];
+centering = [];
+origin_coordinates = [0, 0];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -24,6 +27,7 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
+
 % -------------------------------------------------------------------------
 if isempty(id_mesh1d)
     id_mesh1d = fieldnames(c3dobj.mesh1d);
@@ -99,8 +103,10 @@ for ik = 1:size(y1,1)
 end
 
 %----- centering
-% x2 = x2 - (max(x2) - min(x2))/2;
-% y2 = y2 - (max(y2) - min(y2))/2;
+if f_istrue(centering)
+    x2 = x2 - mean(x2);
+    y2 = y2 - mean(y2);
+end
 
 %-----
 node = [x2; y2];
@@ -137,6 +143,7 @@ c3dobj.mesh2d.(id_mesh2d).elem = elem;
 c3dobj.mesh2d.(id_mesh2d).nb_elem = nb_elem;
 c3dobj.mesh2d.(id_mesh2d).elem_code = elem_code;
 c3dobj.mesh2d.(id_mesh2d).elem_type = 'quad';
+c3dobj.mesh2d.(id_mesh2d).origin_coordinates = origin_coordinates;
 % ---
 % c3dobj.mesh2d.(id_mesh2d).cnode(1,:) = mean(reshape(node(1,elem(1:4,:)),4,nb_elem));
 % c3dobj.mesh2d.(id_mesh2d).cnode(2,:) = mean(reshape(node(2,elem(1:4,:)),4,nb_elem));
