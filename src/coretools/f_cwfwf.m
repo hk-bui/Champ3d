@@ -68,8 +68,8 @@ Weigh = con.Weigh;
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 for iG = 1:nbG
-    Wf{iG} = c3dobj.mesh3d.(id_mesh3d).Wf{iG}(id_elem,:,:);
-    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
+    Wf{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.Wf{iG}(id_elem,:,:);
+    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.detJ{iG}(id_elem,1);
 end
 %--------------------------------------------------------------------------
 coefwfwf = zeros(nb_elem,nbFa_inEl,nbFa_inEl);

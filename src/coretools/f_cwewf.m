@@ -69,9 +69,9 @@ nbEd_inEl = con.nbEd_inEl;
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 for iG = 1:nbG
-    We{iG} = c3dobj.mesh3d.(id_mesh3d).We{iG}(id_elem,:,:);
-    Wf{iG} = c3dobj.mesh3d.(id_mesh3d).Wf{iG}(id_elem,:,:);
-    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
+    We{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.We{iG}(id_elem,:,:);
+    Wf{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.Wf{iG}(id_elem,:,:);
+    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.detJ{iG}(id_elem,1);
 end
 %--------------------------------------------------------------------------
 coefwewf = zeros(nb_elem,nbEd_inEl,nbFa_inEl);

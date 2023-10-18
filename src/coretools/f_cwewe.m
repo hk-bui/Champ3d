@@ -60,12 +60,6 @@ end
 %--------------------------------------------------------------------------
 nb_elem = length(id_elem);
 %--------------------------------------------------------------------------
-
-
-
-
-
-%--------------------------------------------------------------------------
 if isempty(coefficient)
     coef_array = 1;
     coef_array_type = 'iso_array';
@@ -85,8 +79,8 @@ Weigh = con.Weigh;
 nbEd_inEl = con.nbEd_inEl;
 %--------------------------------------------------------------------------
 for iG = 1:nbG
-    We{iG} = c3dobj.mesh3d.(id_mesh3d).We{iG}(id_elem,:,:);
-    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
+    We{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.We{iG}(id_elem,:,:);
+    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.detJ{iG}(id_elem,1);
 end
 %--------------------------------------------------------------------------
 coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
