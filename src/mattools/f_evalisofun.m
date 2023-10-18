@@ -63,13 +63,34 @@ for ial = 1:nb_fargin
     argu{ial} = eval([alist{ial} '(:,id_elem);']);
 end
 %--------------------------------------------------------------------------
-param = f_foreach(iso_function.f,'argument_array',argu,'varargin_list',varargin_list);
+if any(strcmpi(iso_function.coef_type,{'array'}))
+    f = iso_function.f;
+    if nb_fargin == 0
+        param = f(varargin_list{:});
+    elseif nb_fargin == 1
+        param = f(argu{1},varargin_list{:});
+    elseif nb_fargin == 2
+        param = f(argu{1},argu{2},varargin_list{:});
+    elseif nb_fargin == 3
+        param = f(argu{1},argu{2},argu{3},varargin_list{:});
+    elseif nb_fargin == 4
+        param = f(argu{1},argu{2},argu{3},argu{4},varargin_list{:});
+    elseif nb_fargin == 5
+        param = f(argu{1},argu{2},argu{3},argu{4},argu{5},varargin_list{:});
+    elseif nb_fargin == 6
+        param = f(argu{1},argu{2},argu{3},argu{4},argu{5},argu{6},varargin_list{:});
+    end
+else
+    param = f_foreach(iso_function.f,'argument_array',argu,'varargin_list',varargin_list);
+end
 %--------------------------------------------------------------------------
 param(isnan(param)) = 0;
 %--------------------------------------------------------------------------
 % --- Output
 if size(param,1) == 1 && size(param,2) ~= nb_elem
     iso_array = repmat(param,nb_elem,1);
+elseif size(param,1) ~= nb_elem && size(param,2) == nb_elem
+    iso_array = param.';
 else
     iso_array = param;
 end
