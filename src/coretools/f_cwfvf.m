@@ -76,7 +76,9 @@ end
 coefwfvf = zeros(nb_elem,nbFa_inEl);
 %--------------------------------------------------------------------------
 if isempty(vector_field)
-    return;
+    vfx = 1;
+    vfy = 1;
+    vfz = 1;
 else
     vfx = vector_field(:,1);
     vfy = vector_field(:,2);
