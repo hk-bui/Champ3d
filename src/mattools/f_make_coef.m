@@ -130,8 +130,13 @@ if ~isempty(varargin_list)
     end
 end
 % ---
+depon = {};
+if ~isempty(depend_on)
+    depon = depend_on;
+end
+% ---
 fprintf(['Make coef with f:' char(f) ...
-         ', depend_on:' strjoin(depend_on,' ') ...
+         ', depend_on:' strjoin(depon,' ') ...
          ', varargin_list:' strjoin(vl,' ') ...
          ', coef_type:' coef_type '\n']);
 

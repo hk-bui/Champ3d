@@ -85,39 +85,40 @@ for i = 1:nb_fargin
     eval(['a{i} = argument_array{i}' arg_pattern{i} ';']);
 end
 %--------------------------------------------------------------------------
-if isempty(varargin_list)
-    if nb_fargin == 0
-        vtest = f();
-    elseif nb_fargin == 1
-        vtest = f(a{1});
-    elseif nb_fargin == 2
-        vtest = f(a{1},a{2});
-    elseif nb_fargin == 3
-        vtest = f(a{1},a{2},a{3});
-    elseif nb_fargin == 4
-        vtest = f(a{1},a{2},a{3},a{4});
-    elseif nb_fargin == 5
-        vtest = f(a{1},a{2},a{3},a{4},a{5});
-    elseif nb_fargin == 6
-        vtest = f(a{1},a{2},a{3},a{4},a{5},a{6});
-    end
-else
-    if nb_fargin == 0
-        vtest = f(varargin_list{:});
-    elseif nb_fargin == 1
-        vtest = f(a{1},varargin_list{:});
-    elseif nb_fargin == 2
-        vtest = f(a{1},a{2},varargin_list{:});
-    elseif nb_fargin == 3
-        vtest = f(a{1},a{2},a{3},varargin_list{:});
-    elseif nb_fargin == 4
-        vtest = f(a{1},a{2},a{3},a{4},varargin_list{:});
-    elseif nb_fargin == 5
-        vtest = f(a{1},a{2},a{3},a{4},a{5},varargin_list{:});
-    elseif nb_fargin == 6
-        vtest = f(a{1},a{2},a{3},a{4},a{5},a{6},varargin_list{:});
-    end
-end
+vtest = f_feval(f,'argument_array',a,'varargin_list',varargin_list);
+% if isempty(varargin_list)
+%     if nb_fargin == 0
+%         vtest = f();
+%     elseif nb_fargin == 1
+%         vtest = f(a{1});
+%     elseif nb_fargin == 2
+%         vtest = f(a{1},a{2});
+%     elseif nb_fargin == 3
+%         vtest = f(a{1},a{2},a{3});
+%     elseif nb_fargin == 4
+%         vtest = f(a{1},a{2},a{3},a{4});
+%     elseif nb_fargin == 5
+%         vtest = f(a{1},a{2},a{3},a{4},a{5});
+%     elseif nb_fargin == 6
+%         vtest = f(a{1},a{2},a{3},a{4},a{5},a{6});
+%     end
+% else
+%     if nb_fargin == 0
+%         vtest = f(varargin_list{:});
+%     elseif nb_fargin == 1
+%         vtest = f(a{1},varargin_list{:});
+%     elseif nb_fargin == 2
+%         vtest = f(a{1},a{2},varargin_list{:});
+%     elseif nb_fargin == 3
+%         vtest = f(a{1},a{2},a{3},varargin_list{:});
+%     elseif nb_fargin == 4
+%         vtest = f(a{1},a{2},a{3},a{4},varargin_list{:});
+%     elseif nb_fargin == 5
+%         vtest = f(a{1},a{2},a{3},a{4},a{5},varargin_list{:});
+%     elseif nb_fargin == 6
+%         vtest = f(a{1},a{2},a{3},a{4},a{5},a{6},varargin_list{:});
+%     end
+% end
 %--------------------------------------------------------------------------
 sizev = size(vtest);
 vout  = zeros([nb_elem sizev]);
