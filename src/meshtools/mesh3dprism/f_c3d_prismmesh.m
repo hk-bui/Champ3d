@@ -7,13 +7,15 @@ function c3dobj = f_c3d_prismmesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh2d','id_layer','id_mesh3d','mesher'};
+arglist = {'id_mesh2d','id_layer','id_mesh3d','mesher', ...
+           'centering', 'origin_coordinates'};
 
 % --- default input value
 id_mesh3d = [];
 id_mesh2d = [];
 id_mesh1d = [];
 id_layer  = [];
+centering = 0;
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -85,6 +87,15 @@ for i = 1:nb_layer
 end
 
 %--------------------------------------------------------------------------
+if f_istrue(centering)
+    cx = mean(node(1,:));
+    cy = mean(node(2,:));
+    cz = mean(node(3,:));
+    node(1,:) = node(1,:) - cx;
+    node(2,:) = node(2,:) - cy;
+    node(3,:) = node(3,:) - cz;
+end
+%--------------------------------------------------------------------------
 % build volume elements (elem) in 3D
 nbElem2D = c3dobj.mesh2d.(id_mesh2d).nb_elem;
 nb_elem = nbElem2D * nb_layer;
@@ -107,7 +118,16 @@ for k = 1:nb_layer	% k : current layer
     % go to the next layer
     ie0 = ie0 + nbElem2D;
 end
-
+%--------------------------------------------------------------------------
+celem = mean(reshape(node(:,elem(1:6,:)),3,6,nb_elem),2);
+%--------------------------------------------------------------------------
+face = f_face(elem,'elem_type','prism');
+nb_face = size(face,2);
+cface   = zeros(3,nb_face);
+id_tria = find(face(4,:) == 0);
+id_quad = setdiff(1:nb_face,id_tria);
+cface(:,id_tria) = mean(reshape(node(:,face(1:3,id_tria)),3,3,length(id_tria)),2);
+cface(:,id_quad) = mean(reshape(node(:,face(1:4,id_quad)),3,4,length(id_quad)),2);
 %--------------------------------------------------------------------------
 % --- Output
 c3dobj.mesh3d.(id_mesh3d).mesher = 'c3d_prismmesh';
@@ -119,13 +139,11 @@ c3dobj.mesh3d.(id_mesh3d).elem = elem;
 c3dobj.mesh3d.(id_mesh3d).nb_elem = nb_elem;
 c3dobj.mesh3d.(id_mesh3d).elem_code = elem_code;
 c3dobj.mesh3d.(id_mesh3d).elem_type = 'prism';
-%--------------------------------------------------------------------------
-cnode = mean(reshape(node(:,elem(1:6,:)),3,6,nb_elem),2);
-c3dobj.mesh3d.(id_mesh3d).cnode = squeeze(cnode);
+c3dobj.mesh3d.(id_mesh3d).celem = squeeze(celem);
+c3dobj.mesh3d.(id_mesh3d).face = face;
+c3dobj.mesh3d.(id_mesh3d).cface = squeeze(cface);
 %--------------------------------------------------------------------------
 c3dobj.mesh3d.(id_mesh3d).edge = f_edge(c3dobj.mesh3d.(id_mesh3d).elem, ...
-                            'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
-c3dobj.mesh3d.(id_mesh3d).face = f_face(c3dobj.mesh3d.(id_mesh3d).elem, ...
                             'elem_type',c3dobj.mesh3d.(id_mesh3d).elem_type);
 %--------------------------------------------------------------------------
 % --- Log message

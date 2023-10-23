@@ -1,10 +1,16 @@
-function c3dobj = f_build_pmagnet(c3dobj,varargin)
-% F_BUILD_PMAGNET returns the em matrix system related to permanent magnet.
+function VM = f_magnitude(V,varargin)
+% F_NORM returns the norm of vectors in an array of column vectors.
 %--------------------------------------------------------------------------
-% c3dobj = f_build_pmagnet(c3dobj,option);
+% VM = F_NORM(V);
 %--------------------------------------------------------------------------
 % CHAMP3D PROJECT
 % Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
 % Huu-Kien.Bui@univ-nantes.fr
 % Copyright (c) 2022 H-K. Bui, All Rights Reserved.
 %--------------------------------------------------------------------------
+
+
+VM = sqrt(sum(V.^2));
+if ~isreal(V)
+    VM = abs(VM);
+end

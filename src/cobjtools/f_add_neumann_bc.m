@@ -59,6 +59,8 @@ c3dobj.(design3d).(id_design3d).bc.(id_bc).id_dom3d = id_dom3d;
 c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_type = 'neumann';
 c3dobj.(design3d).(id_design3d).bc.(id_bc).defined_on = defined_on;
 c3dobj.(design3d).(id_design3d).bc.(id_bc).bc_value = bc_coef;
+% --- status
+c3dobj.(design3d).(id_design3d).bc.(id_bc).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add neumann boundary condition #' id_bc ' to ' design3d ' #' id_design3d '\n']);
 

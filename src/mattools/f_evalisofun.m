@@ -44,40 +44,38 @@ if ~any(strcmpi(paramtype,{'c3d_parameter_function'}))
     return
 end
 %--------------------------------------------------------------------------
-nb_fargin = nargin(iso_function.f);
+nb_fargin = f_nargin(iso_function.f);
 %--------------------------------------------------------------------------
 alist = {};
 for ial = 1:nb_fargin
-    %alist{ial} = ['c3dobj' ...
-    %              '.' iso_function.from{ial} ...
-    %              '.' iso_function.id_cobj{ial} ...
-    %              '.' iso_function.field{ial}];
-    alist{ial} = iso_function.depend_on{ial};
+    depon = iso_function.depend_on{ial};
+    if isempty(depon)
+        alist{ial} = depon;
+    else
+        alist{ial} = f_cargpath(c3dobj,'phydomobj',phydomobj,'arg_name',depon);
+    end
 end
 %--------------------------------------------------------------------------
+varargin_list = iso_function.varargin_list;
+%--------------------------------------------------------------------------
+argu = {};
 for ial = 1:nb_fargin
     argu{ial} = eval([alist{ial} '(:,id_elem);']);
 end
 %--------------------------------------------------------------------------
-if nb_fargin == 0
-    param = feval(iso_function.f);
-elseif nb_fargin == 1
-    param = feval(iso_function.f,argu{1});
-elseif nb_fargin == 2
-    param = feval(iso_function.f,argu{1},argu{2});
-elseif nb_fargin == 3
-    param = feval(iso_function.f,argu{1},argu{2},argu{3});
-elseif nb_fargin == 4
-    param = feval(iso_function.f,argu{1},argu{2},argu{3},argu{4});
-elseif nb_fargin == 5
-    param = feval(iso_function.f,argu{1},argu{2},argu{3},argu{4},argu{5});
-elseif nb_fargin == 6
-    param = feval(iso_function.f,argu{1},argu{2},argu{3},argu{4},argu{5},argu{6});
+if any(strcmpi(iso_function.coef_type,{'array'}))
+    param = f_feval(iso_function.f,'argument_array',argu,'varargin_list',varargin_list);
+else
+    param = f_foreach(iso_function.f,'argument_array',argu,'varargin_list',varargin_list);
 end
+%--------------------------------------------------------------------------
+param(isnan(param)) = 0;
 %--------------------------------------------------------------------------
 % --- Output
 if size(param,1) == 1 && size(param,2) ~= nb_elem
     iso_array = repmat(param,nb_elem,1);
+elseif size(param,1) ~= nb_elem && size(param,2) == nb_elem
+    iso_array = param.';
 else
     iso_array = param;
 end

@@ -66,17 +66,17 @@ We = f_we(mesh3d,U,V,W,'wn',Wn,'gradf',gradF,'jinv',Jinv);
 Wf = f_wf(mesh3d,U,V,W,'wn',Wn,'gradf',gradF,'jinv',Jinv);
 %--------------------------------------------------------------------------
 % --- Outputs
-mesh3d.cdetJ = cdetJ;
-mesh3d.cJinv = cJinv;
-mesh3d.cWn = cWn;
-mesh3d.cgradWn = cgradWn;
-mesh3d.cWe = cWe;
-mesh3d.cWf = cWf;
+mesh3d.intkit.cdetJ = cdetJ;
+mesh3d.intkit.cJinv = cJinv;
+mesh3d.intkit.cWn = cWn;
+mesh3d.intkit.cgradWn = cgradWn;
+mesh3d.intkit.cWe = cWe;
+mesh3d.intkit.cWf = cWf;
 % ---
-mesh3d.detJ = detJ;
-mesh3d.Jinv = Jinv;
-mesh3d.Wn = Wn;
-mesh3d.gradWn = gradWn;
-mesh3d.We = We;
-mesh3d.Wf = Wf;
+mesh3d.intkit.detJ = detJ;
+mesh3d.intkit.Jinv = Jinv;
+mesh3d.intkit.Wn = Wn;
+mesh3d.intkit.gradWn = gradWn;
+mesh3d.intkit.We = We;
+mesh3d.intkit.Wf = Wf;
 

@@ -52,6 +52,8 @@ c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).defined_on = defined_on;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).sigma = sigma;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).mur = mur;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).cparam = cparam;
+% --- status
+c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add surface impedance bc #' id_bc ' to emdesign3d #' id_emdesign3d '\n']);
 

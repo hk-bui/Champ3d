@@ -55,6 +55,8 @@ c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).id_thdesign3d = id_
 c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).id_dom3d = id_dom3d;
 c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).flambda = flambda;
 c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).lambda = lambda;
+% --- status
+c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add tcon #' id_tconductor ' to thdesign3d #' id_thdesign3d '\n']);
 

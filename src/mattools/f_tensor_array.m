@@ -1,4 +1,4 @@
-function [coef_array, coef_array_type] = f_coef_array(coef,varargin)
+function [tensor_array, tensor_array_type] = f_tensor_array(coef,varargin)
 % F_COEF_ARRAY
 % coef_array will be of size :
 %   o nb_elem x 1
@@ -13,8 +13,8 @@ function [coef_array, coef_array_type] = f_coef_array(coef,varargin)
 
 %--------------------------------------------------------------------------
 if isempty(coef)
-    coef_array = [];
-    coef_array_type = [];
+    tensor_array = [];
+    tensor_array_type = [];
     return
 end
 %--------------------------------------------------------------------------
@@ -54,13 +54,13 @@ end
 %--------------------------------------------------------------------------
 switch tensor_type
     case {'a_1x1_tensor','a_scalar','a_1x1_tensor_array','a_scalar_array'}
-        coef_array = f_tocolv(coef);
-        coef_array_type = 'iso_array';
+        tensor_array = f_tocolv(coef);
+        tensor_array_type = 'iso_array';
     case {'a_2x2_tensor','a_3x3_tensor'}
-        coef_array(1,:,:) = coef;
-        coef_array_type = 'tensor_array';
+        tensor_array(1,:,:) = coef;
+        tensor_array_type = 'tensor_array';
     case {'a_2x2_tensor_array','a_3x3_tensor_array'}
-        coef_array = coef;
-        coef_array_type = 'tensor_array';
+        tensor_array = coef;
+        tensor_array_type = 'tensor_array';
 end
 %--------------------------------------------------------------------------

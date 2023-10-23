@@ -10,11 +10,14 @@ function c3dobj = f_femm_loadmeshfile(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'build_from','id_mesh2d','mesh_file'};
+arglist = {'build_from','id_mesh2d','mesh_file', ...
+           'centering','origin_coordinates'};
 
 % --- default input value
 id_mesh2d = [];
 mesh_file = [];
+centering = [];
+origin_coordinates = [0, 0];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -56,6 +59,11 @@ elem_code = str2double(fileDA{1,4}(iElem +1 : iElem +nb_elem ,1)) + 1 ;
 %----- check and correct mesh
 [node,elem] = f_reorg2d(node,elem);
 
+%----- centering
+if f_istrue(centering)
+    node(1,:) = node(1,:) - mean(node(1,:));
+    node(2,:) = node(2,:) - mean(node(2,:));
+end
 %--------------------------------------------------------------------------
 % --- Output
 c3dobj.mesh2d.(id_mesh2d).mesher = 'triangle_femm';
@@ -66,6 +74,7 @@ c3dobj.mesh2d.(id_mesh2d).nb_elem = nb_elem;
 c3dobj.mesh2d.(id_mesh2d).elem_code = elem_code;
 c3dobj.mesh2d.(id_mesh2d).elem_type = 'tri';
 c3dobj.mesh2d.(id_mesh2d).data = data;
+c3dobj.mesh2d.(id_mesh2d).origin_coordinates = origin_coordinates;
 % --- Log message
 fprintf(' --- in %.2f s \n',toc);
 

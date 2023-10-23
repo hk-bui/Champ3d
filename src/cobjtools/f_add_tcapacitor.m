@@ -56,6 +56,8 @@ c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).fcp = fcp;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rho = rho;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).cp = cp;
 c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).rhocp = rhocp;
+% --- status
+c3dobj.thdesign3d.(id_thdesign3d).tcapacitor.(id_tcapacitor).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add tcon #' id_tcapacitor ' to thdesign3d #' id_thdesign3d '\n']);
 

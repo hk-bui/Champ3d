@@ -38,7 +38,7 @@ if isempty(id_airbox)
     error([mfilename ': id_airbox must be defined !'])
 end
 if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be given !'])
+    id_dom3d = 'all_domain';
 end
 %--------------------------------------------------------------------------
 % --- Output
@@ -46,5 +46,7 @@ c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_emdesign3d = id_emdesign
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).mu_r = 1;
 c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).a_value = a_value;
+% --- status
+c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).to_be_rebuilt = 1;
 % --- info message
 fprintf(['Add airbox #' id_airbox ' to emdesign3d #' id_emdesign3d '\n']);

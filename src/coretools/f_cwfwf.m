@@ -49,11 +49,11 @@ id_dom3d  = phydomobj.id_dom3d;
 id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 nb_elem   = length(id_elem);
 %--------------------------------------------------------------------------
-[coef_array, coef_array_type] = f_coef_array(coefficient);
-%--------------------------------------------------------------------------
 if isempty(coefficient)
     coef_array = 1;
     coef_array_type = 'iso_array';
+else
+    [coef_array, coef_array_type] = f_tensor_array(coefficient);
 end
 %--------------------------------------------------------------------------
 if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
@@ -68,8 +68,8 @@ Weigh = con.Weigh;
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
 for iG = 1:nbG
-    Wf{iG} = c3dobj.mesh3d.(id_mesh3d).Wf{iG}(id_elem,:,:);
-    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).detJ{iG}(id_elem,1);
+    Wf{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.Wf{iG}(id_elem,:,:);
+    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.detJ{iG}(id_elem,1);
 end
 %--------------------------------------------------------------------------
 coefwfwf = zeros(nb_elem,nbFa_inEl,nbFa_inEl);

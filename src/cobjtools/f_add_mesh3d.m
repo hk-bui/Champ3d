@@ -8,7 +8,8 @@ function c3dobj = f_add_mesh3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','mesher','id_mesh2d','id_mesh1d','id_layer'};
+arglist = {'id_mesh3d','mesher','id_mesh2d','id_mesh1d','id_layer', ...
+           'centering', 'origin_coordinates'};
 
 % --- default input value
 mesher    = []; % 'c3d_hexamesh', 'c3d_prismmesh', 'gmsh', 'datfile'
@@ -16,6 +17,8 @@ id_mesh3d = [];
 id_mesh2d = [];
 id_mesh1d = [];
 id_layer  = [];
+centering = 0;
+origin_coordinates = [0, 0];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -50,9 +53,13 @@ switch mesher
     case {'c3d_mixedmesh','c3d_mixedhexaprismmesh','c3d_mixedhexaprism'}
         % TODO
 end
-
-
-
+%--------------------------------------------------------------------------
+c3dobj.mesh3d.(id_mesh3d).origin_coordinates = origin_coordinates;
+c3dobj.mesh3d.(id_mesh3d).dom3d.all_domain.defined_on = 'elem';
+c3dobj.mesh3d.(id_mesh3d).dom3d.all_domain.id_elem = 1:c3dobj.mesh3d.(id_mesh3d).nb_elem;
+c3dobj.mesh3d.(id_mesh3d).dom3d.all_domain.elem_code = unique(c3dobj.mesh3d.(id_mesh3d).elem_code);
+% --- status
+c3dobj.mesh3d.(id_mesh3d).to_be_rebuilt = 1;
 
 
 

@@ -17,12 +17,15 @@ if isa(param,'numeric')
 elseif isa(param,'struct') 
     % ---------------------------------------------------------------------
     if isfield(param,'f')
-        if isa(param.f,'function_handle') && all(isfield(param,{'depend_on'}))
-            paramtype = 'c3d_parameter_function';
+        if isa(param.f,'function_handle')
+            paramtype = 'function';
+            if isfield(param,{'depend_on'})
+                paramtype = 'c3d_parameter_function';
+            end
         end
     end
 else
     fprintf('param = \n');
     disp(param);
-    error([mfilename ': the parameter is not valid ! Use f_make_parameter !']);
+    error([mfilename ': the parameter is not valid ! Use f_make_coef !']);
 end
