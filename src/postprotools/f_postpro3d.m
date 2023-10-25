@@ -8,10 +8,13 @@ function Y = f_postpro3d(mesh,X,field_type,varargin)
 % Y = F_POSTPRO3D(mesh,X,'W3','id_elem',id_elem);
 
 %--------------------------------------------------------------------------
-% CHAMP3D PROJECT
-% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% This code is written by: H-K. Bui, 2023
+% as a contribution to champ3d code.
+%--------------------------------------------------------------------------
+% champ3d is copyright (c) 2023 H-K. Bui.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
 % Huu-Kien.Bui@univ-nantes.fr
-% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+% IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 datin = [];

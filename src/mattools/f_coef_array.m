@@ -5,10 +5,13 @@ function [coef_array, coef_array_type] = f_coef_array(coef,varargin)
 %   o nb_elem x 2 x 2
 %   o nb_elem x 3 x 3
 %--------------------------------------------------------------------------
-% CHAMP3D PROJECT
-% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% This code is written by: H-K. Bui, 2023
+% as a contribution to champ3d code.
+%--------------------------------------------------------------------------
+% champ3d is copyright (c) 2023 H-K. Bui.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
 % Huu-Kien.Bui@univ-nantes.fr
-% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+% IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 %--------------------------------------------------------------------------

@@ -1,10 +1,13 @@
 function c3dobj = f_add_mesh2d(c3dobj,varargin)
 % F_ADD_MESH2D ...
 %--------------------------------------------------------------------------
-% CHAMP3D PROJECT
-% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% This code is written by: H-K. Bui, 2023
+% as a contribution to champ3d code.
+%--------------------------------------------------------------------------
+% champ3d is copyright (c) 2023 H-K. Bui.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
 % Huu-Kien.Bui@univ-nantes.fr
-% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+% IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)

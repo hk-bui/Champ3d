@@ -2,10 +2,13 @@ function dom2d = f_refine2d(dom2d,varargin)
 % F_REFINE2D return dom2D with refined mesh in specified regions.
 % dom2D.mesh = f_REFINE2D(dom2D.mesh,'dom2refine',[2 5]);
 %--------------------------------------------------------------------------
-% CHAMP3D PROJECT
-% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% This code is written by: H-K. Bui, 2023
+% as a contribution to champ3d code.
+%--------------------------------------------------------------------------
+% champ3d is copyright (c) 2023 H-K. Bui.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
 % Huu-Kien.Bui@univ-nantes.fr
-% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+% IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 tic

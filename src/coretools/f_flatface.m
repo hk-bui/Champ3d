@@ -16,10 +16,13 @@ function [flatnode,flatface] = f_flatface(node,face)
 %  --> flatnode(1,i,j) = local x of node i of face j
 %      flatnode(2,i,j) = local y of node i of face j
 %--------------------------------------------------------------------------
-% CHAMP3D PROJECT
-% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
+% This code is written by: H-K. Bui, 2023
+% as a contribution to champ3d code.
+%--------------------------------------------------------------------------
+% champ3d is copyright (c) 2023 H-K. Bui.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
 % Huu-Kien.Bui@univ-nantes.fr
-% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+% IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 if any(face(end,:) == 0)
