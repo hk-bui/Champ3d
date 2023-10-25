@@ -16,12 +16,14 @@ function CoefWesWes = f_cweswes(mesh,varargin)
 % EXAMPLE
 % CoefWesWes = F_CWESWES(mesh,'id_face',id_face,'coef',coef)
 %--------------------------------------------------------------------------
-% CHAMP3D PROJECT
-% Author : Huu-Kien Bui, IREENA Lab - UR 4642, Nantes Universite'
-% Huu-Kien.Bui@univ-nantes.fr
-% Copyright (c) 2022 H-K. Bui, All Rights Reserved.
+% This code is written by: H-K. Bui, 2023
+% as a contribution to champ3d code.
 %--------------------------------------------------------------------------
-% See also 
+% champ3d is copyright (c) 2023 H-K. Bui.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
+% Huu-Kien.Bui@univ-nantes.fr
+% IREENA Lab - UR 4642, Nantes Universite'
+%--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'mesh','coef','id_face'};
