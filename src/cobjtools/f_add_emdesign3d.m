@@ -65,7 +65,7 @@ if ~isempty(from)
     id_emdesign__ = fieldnames(c3dobj.emdesign3d);
     for i = 1:length(from__)
         if ~any(strcmpi(from__{i},id_emdesign__))
-            error([mfilename ': #id_emdesign3d ' from__{i} ' is not valid. Chose : ' strjoin(id_emdesign__,', ') ' !']);
+            error([mfilename ': from #' from__{i} ' is not valid. Chose : ' strjoin(id_emdesign__,', ') ' !']);
         end
     end
 end
@@ -117,11 +117,11 @@ c3dobj.emdesign3d.(id_emdesign3d).fields.omes  = [];
 %--------------------------------------------------------------------------
 % --- Log message
 if iscell(id_mesh3d)
-    fprintf(['Add emdesign3d #' id_emdesign3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
+    fprintf(['Add emdesign3d [\b#' id_emdesign3d ']\b with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
 elseif ischar(id_mesh3d)
-    fprintf(['Add emdesign3d #' id_emdesign3d ' with mesh3d #' id_mesh3d '\n']);
+    fprintf(['Add emdesign3d [\b#' id_emdesign3d ']\b with mesh3d #' id_mesh3d '\n']);
 else
-    fprintf(['Add emdesign3d #' id_emdesign3d '\n']);
+    fprintf(['Add emdesign3d [\b#' id_emdesign3d ']\b\n']);
 end
 
 
