@@ -10,9 +10,27 @@ function f_fprintf(varargin)
 %--------------------------------------------------------------------------
 
 len = length(varargin);
-str = {};
-for i = 1:len
-    s = varargin{i};
+if mod(len,2) ~= 0
+    error([mfilename ': give arguments in pairs (format1,string1,...). \n']);
+end
+
+%--------------------------------------------------------------------------
+form = {};
+str  = {};
+for i = 1:len/2
+    %----------------------------------------------------------------------
+    f = varargin{2*i - 1};
+    if isnumeric(f)
+        if numel(f) == 1
+            if any(f,[0 1 2])
+                form{i} = f;
+            end
+        end
+    else
+        form{i} = 0;
+    end
+    %----------------------------------------------------------------------
+    s = varargin{2*i};
     if isnumeric(s)
         if numel(s) == 1
             str{i} = num2str(s);
@@ -26,7 +44,9 @@ for i = 1:len
     end
 end
 %--------------------------------------------------------------------------
-
+for i = 1:len/2
+    
+end
 
 
 
