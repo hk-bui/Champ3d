@@ -117,11 +117,11 @@ c3dobj.emdesign3d.(id_emdesign3d).fields.omes  = [];
 %--------------------------------------------------------------------------
 % --- Log message
 if iscell(id_mesh3d)
-    fprintf(['Add emdesign3d [\b#' id_emdesign3d ']\b with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
+    fprintf(['Add emdesign3d ' id_emdesign3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
 elseif ischar(id_mesh3d)
-    fprintf(['Add emdesign3d [\b#' id_emdesign3d ']\b with mesh3d #' id_mesh3d '\n']);
+    fprintf(['Add emdesign3d ' id_emdesign3d ' with mesh3d #' id_mesh3d '\n']);
 else
-    fprintf(['Add emdesign3d [\b#' id_emdesign3d ']\b\n']);
+    fprintf(['Add emdesign3d ' id_emdesign3d '\n']);
 end
 
 
