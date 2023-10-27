@@ -184,14 +184,15 @@ else
     box on;
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
 end
-
-
-
-
-
-
-
-
-
-
-
+%--------------------------------------------------------------------------
+texpos = get(gca, 'OuterPosition');
+hold on;
+text(texpos(1)+1,texpos(2)-0.1, ...
+     '$\overrightarrow{champ}_{3d}$', ...
+     'FontSize',10, ...
+     'FontWeight','normal',...
+     'Color','magenta', ...
+     'Interpreter','latex',...
+     'Units','normalized', ...
+     'VerticalAlignment', 'baseline', ...
+     'HorizontalAlignment', 'right');
