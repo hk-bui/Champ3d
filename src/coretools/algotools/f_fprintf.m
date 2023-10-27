@@ -1,4 +1,10 @@
 function f_fprintf(varargin)
+% F_FPRINTF
+% (format1,'str1',...)
+% format :
+% + 0 : black
+% + 1 : red
+% + 2 : orange/yellow
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -22,7 +28,7 @@ for i = 1:len/2
     f = varargin{2*i - 1};
     if isnumeric(f)
         if numel(f) == 1
-            if any(f,[0 1 2])
+            if any(f == [0 1 2])
                 form{i} = f;
             end
         end
@@ -45,7 +51,18 @@ for i = 1:len/2
 end
 %--------------------------------------------------------------------------
 for i = 1:len/2
-    
+    f = form{i};
+    s = str{i};
+    switch f
+        case 0
+            fprintf([' ' s ' ']);
+        case 1
+            fprintf(2,[' ' s ' ']);
+        case 2
+            fprintf(['[\b ' s ' ]\b']);
+        otherwise
+            fprintf([' ' s ' ']);
+    end
 end
 
 
