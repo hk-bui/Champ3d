@@ -31,9 +31,19 @@ _Code for Computational Physics in Electrical Engineering_
   
   - [ ] Radiation
 
+### Numerical methods
+
++ [x] FEM
+  
+  - [x] 2D on quadrilateral and triangle mesh
+  
+  - [x] 3D on hexahedral, prismatic and tetrahedral mesh
+
+- [ ] FEM/BEM
+
 ### Dependency
 
-+ Standard MATLAB with no additional toolbox.
++ Standard MATLAB without needs of additional toolboxes.
 
 ### Optional dependency
 
