@@ -43,8 +43,7 @@ nb_elem   = length(id_elem);
 paramtype = f_paramtype(iso_function);
 %--------------------------------------------------------------------------
 if ~any(strcmpi(paramtype,{'c3d_parameter_function'}))
-    fprintf([mfilename ' : this iso_function is not supported. Use f_make_parameter ! \n']);
-    return
+    error([mfilename ' : this iso_function is not supported. Use f_make_parameter ! \n']);
 end
 %--------------------------------------------------------------------------
 nb_fargin = f_nargin(iso_function.f);
