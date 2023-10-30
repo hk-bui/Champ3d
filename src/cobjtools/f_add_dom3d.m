@@ -10,7 +10,9 @@ function c3dobj = f_add_dom3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = f_arglist('add_dom3d');
+arglist = {'id_mesh3d','id_dom3d','id_dom2d','id_layer','elem_code', ...
+           'defined_on','of_dom3d','dom3d_equation'...
+           'get','n_direction','n_component'};
 
 % --- default input value
 id_mesh3d = [];
