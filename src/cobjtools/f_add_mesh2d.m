@@ -47,21 +47,19 @@ if isempty(id_mesh2d)
     error([mfilename ' : #id_mesh2d must be given !']);
 end
 %--------------------------------------------------------------------------
+
 if strcmpi(build_from,'mesh1d')
     %----------------------------------------------------------------------
     % --- Output
     c3dobj = f_mesh2dgeo1d(c3dobj,varargin{:});
-    % --- Log message
-    f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
-
 elseif strcmpi(build_from,'femm')
     c3dobj = f_femm_loadmeshfile(c3dobj,varargin{:});
-    % --- Log message
-    f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
-    
 elseif strcmpi(build_from,'geoquad')
     % TODO
 end
+%--------------------------------------------------------------------------
+% --- Log message
+    f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
 
 
 

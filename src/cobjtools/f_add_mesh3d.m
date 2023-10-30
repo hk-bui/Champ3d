@@ -39,10 +39,6 @@ if isempty(id_mesh3d)
     error([mfilename ' : #id_mesh3d must be given !']);
 end
 %--------------------------------------------------------------------------
-f_fprintf(0,'Add #mesh3d',...
-          1,id_mesh3d,...
-          0,'\n');
-%--------------------------------------------------------------------------
 switch mesher
     case 'c3d_hexamesh'
         c3dobj = f_c3d_hexamesh(c3dobj,varargin{:});
@@ -60,7 +56,10 @@ c3dobj.mesh3d.(id_mesh3d).dom3d.all_domain.id_elem = 1:c3dobj.mesh3d.(id_mesh3d)
 c3dobj.mesh3d.(id_mesh3d).dom3d.all_domain.elem_code = unique(c3dobj.mesh3d.(id_mesh3d).elem_code);
 % --- status
 c3dobj.mesh3d.(id_mesh3d).to_be_rebuilt = 1;
-
+%--------------------------------------------------------------------------
+f_fprintf(0,'Add #mesh3d',...
+          1,id_mesh3d,...
+          0,'\n');
 
 
 

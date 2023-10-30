@@ -49,7 +49,7 @@ end
 % -------------------------------------------------------------------------
 
 tic;
-f_fprintf(0, 'Make mesh2d #', 1, id_mesh2d, 0,' from mesh1d with : \n');
+f_fprintf(0, 'Make #mesh2d', 1, id_mesh2d, 0,' from mesh1d with : \n');
 f_fprintf(0, '#id_x :', 1, strjoin(id_x,', '), 0, '\n');
 f_fprintf(0, '#id_y :', 1, strjoin(id_y,', '), 0, '\n');
 
