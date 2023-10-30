@@ -12,7 +12,7 @@ function dom2d = f_refine2d(dom2d,varargin)
 %--------------------------------------------------------------------------
 
 tic
-fprintf('Refining 2D mesh ... ');
+f_fprintf(0,'Refine 2D mesh \n');
 
 datin = [];
 
@@ -84,6 +84,8 @@ if isfield(datin,'dom2refine')
     end
 end
 
-fprintf('%.4f s \n',toc);
+f_fprintf(0,'in',...
+          1, toc, ...
+          0,'s \n');
 
 end
