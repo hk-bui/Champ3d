@@ -48,6 +48,11 @@ if isempty(id_y)
 end
 % -------------------------------------------------------------------------
 
+id_x = f_to_scellargin(id_x);
+id_y = f_to_scellargin(id_y);
+
+% -------------------------------------------------------------------------
+
 tic;
 f_fprintf(0, 'Make #mesh2d', 1, id_mesh2d, 0,' from mesh1d with : \n');
 f_fprintf(0, '#id_x :', 1, strjoin(id_x,', '), 0, '\n');

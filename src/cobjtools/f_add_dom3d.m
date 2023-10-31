@@ -51,6 +51,7 @@ c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
 mesher = c3dobj.mesh3d.(id_mesh3d).mesher;
 switch defined_on
     case {'elem','el'}
+        tic;
         %------------------------------------------------------------------
         if any(strcmpi(mesher,{'c3d_hexamesh','c3d_prismmesh'}))
             f_fprintf(0,'Add #dom3d',1,id_dom3d,0,'in #mesh3d',1,id_mesh3d);
