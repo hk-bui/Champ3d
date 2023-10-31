@@ -46,6 +46,9 @@ else
     elem_type = f_elemtype(mesh3d.elem,'defined_on','elem');
 end
 %--------------------------------------------------------------------------
+tic
+f_fprintf(0,'Make #meshds');
+%--------------------------------------------------------------------------
 con = f_connexion(elem_type);
 U   = con.U;
 V   = con.V;
@@ -82,4 +85,8 @@ mesh3d.intkit.Wn = Wn;
 mesh3d.intkit.gradWn = gradWn;
 mesh3d.intkit.We = We;
 mesh3d.intkit.Wf = Wf;
-
+%--------------------------------------------------------------------------
+%--- Log message
+f_fprintf(0,'--- in',...
+          1,toc, ...
+          0,'s \n');
