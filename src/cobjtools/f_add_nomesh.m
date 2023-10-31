@@ -46,5 +46,5 @@ c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).id_dom3d = id_dom3d;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_nomesh).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add nomesh #' id_nomesh ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #nomesh',1,id_nomesh,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
 

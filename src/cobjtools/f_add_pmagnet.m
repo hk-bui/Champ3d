@@ -56,7 +56,7 @@ c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).pmagnet.(id_pmagnet).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add pmagnet #' id_pmagnet ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #pmagnet',1,id_pmagnet,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
 
 
 

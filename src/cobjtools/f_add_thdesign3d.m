@@ -49,11 +49,11 @@ c3dobj.thdesign3d.(id_thdesign3d).fields.temps = [];
 %--------------------------------------------------------------------------
 % --- Log message
 if iscell(id_mesh3d)
-    fprintf(['Add thdesign3d #' id_thdesign3d ' with mesh3d #' strjoin(id_mesh3d,', #') '\n']);
+    f_fprintf(0,'Add #thdesign3d',1,id_thdesign3d,0,'with #mesh3d',1,id_mesh3d,0,'\n');
 elseif ischar(id_mesh3d)
-    fprintf(['Add thdesign3d #' id_thdesign3d ' with mesh3d #' id_mesh3d '\n']);
+    f_fprintf(0,'Add #thdesign3d',1,id_thdesign3d,0,'with #mesh3d',1,id_mesh3d,0,'\n');
 else
-    fprintf(['Add thdesign3d #' id_thdesign3d '\n']);
+    f_fprintf(0,'Add #thdesign3d',1,id_thdesign3d,0,'\n');
 end
 
 

@@ -52,7 +52,7 @@ c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).mu_r = mu_r;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_mconductor).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add mcon #' id_mconductor ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #mcon',1,id_mconductor,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
 
 
 

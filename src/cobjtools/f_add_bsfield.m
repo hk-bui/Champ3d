@@ -57,7 +57,7 @@ c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs       = bs;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add bsfield #' id_bsfield ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #bsfield',1,id_bsfield,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
 
 
 

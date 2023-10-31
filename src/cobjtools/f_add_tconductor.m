@@ -61,7 +61,7 @@ c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).lambda = lambda;
 % --- status
 c3dobj.thdesign3d.(id_thdesign3d).tconductor.(id_tconductor).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add tcon #' id_tconductor ' to thdesign3d #' id_thdesign3d '\n']);
+f_fprintf(0,'Add #tcon',1,id_tconductor,0,'to #thdesign3d',1,id_thdesign3d,0,'\n');
 
 
 

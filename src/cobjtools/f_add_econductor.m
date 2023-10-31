@@ -52,6 +52,6 @@ c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).sigma = sigma;
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_econductor).to_be_rebuilt = 1;
 % --- info message
-fprintf(['Add econ #' id_econductor ' to emdesign3d #' id_emdesign3d '\n']);
+f_fprintf(0,'Add #econ',1,id_econductor,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
 
 

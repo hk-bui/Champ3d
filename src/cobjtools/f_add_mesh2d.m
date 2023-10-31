@@ -59,7 +59,7 @@ elseif strcmpi(build_from,'geoquad')
 end
 %--------------------------------------------------------------------------
 % --- Log message
-    f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
+f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');
 
 
 
