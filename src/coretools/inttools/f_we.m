@@ -45,7 +45,7 @@ if isfield(mesh3d,'ori_edge_in_elem')
     ori_edge_in_elem = mesh3d.ori_edge_in_elem;
 else
     [~, ori_edge_in_elem, ~] = ...
-        f_edgeinelem(elem,[],'elem_type',elem_type,'get','ori');
+        f_edgeinelem(elem,[],'elem_type',elem_type);
 end
 %--------------------------------------------------------------------------
 if (numel(U) ~= numel(V)) || (numel(U) ~= numel(W))
