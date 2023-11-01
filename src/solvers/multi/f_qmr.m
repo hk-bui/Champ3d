@@ -16,27 +16,25 @@ function [solution,flag,relres,niter,resvec] = f_qmr(S,F,varargin)
 if nargin > 2
     sol_option = varargin{1};
 else
-    sol_option.tolerance = 1e-7;
-    sol_option.nb_iter = 1e4;
+    sol_option.tolerance = 1e-6;
+    sol_option.nb_iter = 3e4;
 end
 
 if ~isfield(sol_option,'tolerance')
-    sol_option.tolerance = 1e-7;
+    sol_option.tolerance = 1e-6;
 end
 if ~isfield(sol_option,'nb_iter')
-    sol_option.nb_iter = 1e4;
+    sol_option.nb_iter = 3e4;
 end
 
-fprintf('Solving system ... ');
+f_fprintf(0,'Solve system with',1,mfilename,0,'\n');
 tic
 % ---
 precon = sqrt(diag(diag(S)));
 [solution,flag,relres,niter,resvec] = qmr(S,F,sol_option.tolerance,sol_option.nb_iter,precon.',precon);
 % ---
-% precon = ichol(S, struct('type','ict','droptol',1e-2));
-% [solution,flag,relres,niter,resvec] = pcg(S,F,sol_option.tolerance,sol_option.nb_iter,precon,precon.');
-% ---
-fprintf('%.4f s \n',toc);
+f_fprintf(0,'--- in',1,toc,0,'s \n');
+f_fprintf(0,'------ niter',1,niter,0,'relres',1,relres,0,'\n');
 
 
 

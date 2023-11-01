@@ -1,8 +1,4 @@
-function coefwewe = f_cwewe(c3dobj,varargin)
-% F_CWEWE computes the mass matrix int_v(coef x We x We x dv)
-%--------------------------------------------------------------------------
-% OUTPUT
-% coefwewe : nb_elem x nbEd_inEl x nbEd_inEl
+function field_wf = f_field_wf(gvalue,mesh,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -14,20 +10,16 @@ function coefwewe = f_cwewe(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_design3d','dom_type','id_dom',...
-           'phydomobj','coefficient',...
-           'id_mesh3d','id_dom3d','id_elem'};
+arglist = {'id_elem','coefficient','options'};
 
 % --- default input value
-design3d = [];
-id_design3d = [];
-dom_type  = [];
-id_dom    = [];
-phydomobj = [];
-coefficient = [];
-id_mesh3d = [];
-id_dom3d = [];
 id_elem = [];
+coefficient = [];
+options = 'on_center'; % 'on_center', 'on_gauss_points'
+
+% --- default output value
+field_wf = [];
+
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -37,31 +29,10 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_mesh3d)
-    if isempty(phydomobj)
-        if ~isempty(design3d) && ~isempty(id_design3d) && ~isempty(dom_type) && ~isempty(id_dom)
-            phydomobj = c3dobj.(design3d).(id_design3d).(dom_type).(id_dom);
-        end
-    end
-    %--------------------------------------------------------------------------
-    if isfield(phydomobj,'id_emdesign3d')
-        id_mesh3d = c3dobj.emdesign3d.(phydomobj.id_emdesign3d).id_mesh3d;
-    elseif isfield(phydomobj,'id_thdesign3d')
-        id_mesh3d = c3dobj.thdesign3d.(phydomobj.id_thdesign3d).id_mesh3d;
-    end
-end
-%--------------------------------------------------------------------------
-if isempty(id_dom3d)
-    if isfield(phydomobj,'id_dom3d')
-        id_dom3d = phydomobj.id_dom3d;
-    end
-end
-%--------------------------------------------------------------------------
+nb_elem = size(mesh.elem,2);
 if isempty(id_elem)
-    id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+    id_elem = 1:nb_elem;
 end
-%--------------------------------------------------------------------------
-nb_elem = length(id_elem);
 %--------------------------------------------------------------------------
 if isempty(coefficient)
     coef_array = 1;
@@ -70,27 +41,51 @@ else
     [coef_array, coef_array_type] = f_tensor_array(coefficient);
 end
 %--------------------------------------------------------------------------
-if isfield(c3dobj.mesh3d.(id_mesh3d),'elem_type')
-    elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
+if any(strcmpi(coef_array_type,{'iso_array'}))
+    coef_array = f_tocolv(coef_array);
 else
-    elem_type = f_elemtype(c3dobj.mesh3d.(id_mesh3d).elem,'defined_on','elem');
+    error([mfilename ': #coefficient ' coefficient ' must be scalar !']);
+end
+%--------------------------------------------------------------------------
+if isfield(mesh,'elem_type')
+    elem_type = mesh.elem_type;
+else
+    elem_type = f_elemtype(mesh.elem,'defined_on','elem');
 end
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
 nbG = con.nbG;
-Weigh = con.Weigh;
-nbEd_inEl = con.nbEd_inEl;
+nbNo_inEl = con.nbNo_inEl;
 %--------------------------------------------------------------------------
-We = cell(1,nbG);
-detJ = cell(1,nbG);
-for iG = 1:nbG
-    We{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.We{iG}(id_elem,:,:);
-    detJ{iG} = c3dobj.mesh3d.(id_mesh3d).intkit.detJ{iG}(id_elem,1);
+if any(strcmpi(options,{'on_center'}))
+    Wn = mesh.intkit.cWn{1}(id_elem,:);
+    fi = zeros(length(id_elem),1);
+    for i = 1:nbNo_inEl
+        wni = Wn(:,i);
+        fi = fi + coef_array .* wni .* gvalue;
+    end
+    % ---
+    field_wf = sparse(id_elem,1,fi,nb_elem,1);
+    % ---
+elseif any(strcmpi(options,{'on_gauss_points'}))
+    Wn = cell(1,8);
+    for iG = 1:nbG
+        Wn{iG} = mesh.intkit.Wn{iG}(id_elem,:);
+    end
+    fi = zeros(length(id_elem),nbG);
+    for iG = 1:nbG
+        for i = 1:nbNo_inEl
+            wni = Wn{iG}(:,i);
+            fi(:,iG) = fi(:,iG) + coef_array .* wni .* gvalue;
+        end
+    end
+    % ---
+    field_wf = sparse(id_elem,1:nbG,fi,nb_elem,nbG);
 end
 %--------------------------------------------------------------------------
-coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
-%--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'iso_array'}))
+    
+    
     %----------------------------------------------------------------------
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});

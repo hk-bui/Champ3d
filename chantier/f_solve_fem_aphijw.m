@@ -309,14 +309,12 @@ for iec = 1:length(id_bsfield__)
     rotrot = rotrot(id_edge_unknown,id_edge_unknown);
     %----------------------------------------------------------------------
     a = zeros(nb_edge,1);
-    a(id_edge_unknown) = f_qmr(rotrot,rotb); %rotrot\rotb;
+    a(id_edge_unknown) = f_qmr(rotrot,rotb);
     %----------------------------------------------------------------------
     a_bsfield = a_bsfield + a;
 end
 
-
-
-
+mflux = c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
 
 
 
