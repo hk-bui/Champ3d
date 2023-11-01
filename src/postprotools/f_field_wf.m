@@ -41,12 +41,6 @@ else
     [coef_array, coef_array_type] = f_tensor_array(coefficient);
 end
 %--------------------------------------------------------------------------
-if any(strcmpi(coef_array_type,{'iso_array'}))
-    coef_array = f_tocolv(coef_array);
-else
-    error([mfilename ': #coefficient ' coefficient ' must be scalar !']);
-end
-%--------------------------------------------------------------------------
 if isfield(mesh,'elem_type')
     elem_type = mesh.elem_type;
 else
@@ -58,7 +52,7 @@ nbG = con.nbG;
 nbNo_inEl = con.nbNo_inEl;
 %--------------------------------------------------------------------------
 if any(strcmpi(options,{'on_center'}))
-    Wn = mesh.intkit.cWn{1}(id_elem,:);
+    Wf = mesh.intkit.cWf{1}(id_elem,:);
     fi = zeros(length(id_elem),1);
     for i = 1:nbNo_inEl
         wni = Wn(:,i);
@@ -68,19 +62,7 @@ if any(strcmpi(options,{'on_center'}))
     field_wf = sparse(id_elem,1,fi,nb_elem,1);
     % ---
 elseif any(strcmpi(options,{'on_gauss_points'}))
-    Wn = cell(1,8);
-    for iG = 1:nbG
-        Wn{iG} = mesh.intkit.Wn{iG}(id_elem,:);
-    end
-    fi = zeros(length(id_elem),nbG);
-    for iG = 1:nbG
-        for i = 1:nbNo_inEl
-            wni = Wn{iG}(:,i);
-            fi(:,iG) = fi(:,iG) + coef_array .* wni .* gvalue;
-        end
-    end
-    % ---
-    field_wf = sparse(id_elem,1:nbG,fi,nb_elem,nbG);
+    % TODO
 end
 %--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'iso_array'}))

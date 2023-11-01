@@ -41,9 +41,7 @@ else
     [coef_array, coef_array_type] = f_tensor_array(coefficient);
 end
 %--------------------------------------------------------------------------
-if any(strcmpi(coef_array_type,{'iso_array'}))
-    coef_array = f_tocolv(coef_array);
-else
+if ~any(strcmpi(coef_array_type,{'iso_array'}))
     error([mfilename ': #coefficient ' coefficient ' must be scalar !']);
 end
 %--------------------------------------------------------------------------
