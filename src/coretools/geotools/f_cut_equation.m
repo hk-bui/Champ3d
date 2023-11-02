@@ -32,6 +32,7 @@ original = cut_equation;
 %--------------------------------------------------------------------------
 cut_equation(isspace(cut_equation)) = [];
 cut_equation = strrep(cut_equation,'&&','&');
+cut_equation = strrep(cut_equation,'||','|');
 cut_equation = strrep(cut_equation,'max(x)','max(max(x))');
 cut_equation = strrep(cut_equation,'max(y)','max(max(y))');
 cut_equation = strrep(cut_equation,'max(z)','max(max(z))');

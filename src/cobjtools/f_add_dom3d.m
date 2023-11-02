@@ -24,7 +24,7 @@ defined_on = 'elem'; % 'face', 'interface', 'bound_face', 'edge', 'bound_edge'
 dom3d_equation = [];
 of_dom3d = [];
 get = [];
-n_direction = 'outward';
+n_direction = []; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i', 'automatic' = 'natural' = 'auto'
 n_component = []; % 1, 2 or 3
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -40,7 +40,7 @@ if isempty(id_mesh3d)
     id_mesh3d = fieldnames(c3dobj.mesh3d);
     id_mesh3d = id_mesh3d{1};
 end
-
+% ---
 if isempty(id_dom3d)
     error([mfilename ' : #id_dom3d must be given !']);
 end
@@ -93,6 +93,10 @@ switch defined_on
         end
     case {'bound_face','boundface'}
         %------------------------------------------------------------------
+        if isempty(of_dom3d)
+            of_dom3d = 'all_domain';
+        end
+        %------------------------------------------------------------------
         if ~isfield(c3dobj.mesh3d.(id_mesh3d).dom3d, of_dom3d)
             error([mfilename ' : no dom3d #' of_dom3d ' exists !']);
         else
@@ -105,13 +109,23 @@ switch defined_on
                     domlist = [domlist '#' of_dom3d{i}{j} ' '];
                 end
             end
-            [bound_face, lid_bound_face, info] = ...
+            [bound_face, ~ , info] = ...
                 f_get_bound_face(c3dobj,'id_mesh3d',id_mesh3d,'of_dom3d',of_dom3d,...
                      'get',get,'n_direction',n_direction,'n_component',n_component);
+            % ---
+            if ~isempty(dom3d_equation)
+                lid_face = 1:size(bound_face,2);
+                id_ = ...
+                    f_find_elem3d(c3dobj.mesh3d.(id_mesh3d).node,...
+                     bound_face,...
+                    'dom3d_equation', dom3d_equation);
+                lid_face = lid_face(id_);
+                bound_face = bound_face(:,lid_face);
+            end
             %--------------------------------------------------------------
             % output
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).of_dom3d = of_dom3d;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).lid_face = lid_bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = ...
                 f_findvecnd(bound_face, ...

@@ -24,8 +24,8 @@ arglist = {'id_mesh2d','id_dom2d',...
 
 % --- default input value
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition'
-n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
-                         %  otherwise : 'automatic' = 'natural' = 'auto'
+n_direction = 'auto'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
+                      %  otherwise : 'automatic' = 'natural' = 'auto'
 n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -45,6 +45,10 @@ if isempty(id_mesh3d)
     error([mfilename ': no mesh3d found !']);
 else
     mesh3d = c3dobj.mesh3d.(id_mesh3d);
+end
+%--------------------------------------------------------------------------
+if isempty(n_direction)
+    n_direction = 'auto';
 end
 %--------------------------------------------------------------------------
 node = mesh3d.node;

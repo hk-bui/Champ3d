@@ -143,6 +143,17 @@ c3dobj = f_add_dom3d(c3dobj,'defined_on','bound_face',...
                       'of_dom3d','plate_1', ...
                       'id_dom3d','plate_1_surface');
 
+c3dobj = f_add_dom3d(c3dobj,'defined_on','bound_face',...
+                      'dom3d_equation','z >= max(z) - 1e-9',...
+                      'id_dom3d','top_bound');
+
+c3dobj = f_add_dom3d(c3dobj,'defined_on','bound_face',...
+                      'dom3d_equation','z <= min(z) + 1e-9',...
+                      'id_dom3d','bottom_bound');
+
+c3dobj = f_add_dom3d(c3dobj,'defined_on','bound_face',...
+                      'dom3d_equation','z > min(z) + 1e-9 || z < max(z) - 1e-9',...
+                      'id_dom3d','around_bound');
 %% View 3d mesh
 figure
 f_view_c3dobj(c3dobj,'id_dom3d','plate_1','face_color',f_color(1),'alpha_value',0.5);  hold on
@@ -151,12 +162,16 @@ f_view_c3dobj(c3dobj,'id_dom3d','plate_3','face_color',f_color(3),'alpha_value',
 f_view_c3dobj(c3dobj,'id_dom3d','plate_4','face_color',f_color(4),'alpha_value',0.5);  hold on
 f_view_c3dobj(c3dobj,'face_color','none','alpha_value',0.5);
 
+figure
+f_view_c3dobj(c3dobj,'face_color','none','alpha_value',0.5);
+f_view_c3dobj(c3dobj,'id_dom3d','top_bound','face_color',f_color(1),'alpha_value',0.5);  hold on
+f_view_c3dobj(c3dobj,'id_dom3d','bottom_bound','face_color',f_color(2),'alpha_value',0.5);  hold on
+f_view_c3dobj(c3dobj,'id_dom3d','around_bound','face_color',f_color(3),'alpha_value',0.5);  hold on
 %% build emdesign3d em_multicubes
 c3dobj = f_add_emdesign3d(c3dobj,'id_emdesign3d','em_multicubes',...
                                  'id_mesh3d','my_mesh3d',...
                                  'em_model','fem_aphijw',...
                                  'frequency',fr);
-
 % ---
 c3dobj = f_add_econductor(c3dobj,'id_econductor','plate_1',...
                                  'id_dom3d','plate_1',...
@@ -196,6 +211,10 @@ c3dobj = f_add_bsfield(c3dobj,'id_bsfield','bsfield','bs',Bs);
 
 % ---
 c3dobj = f_add_airbox(c3dobj,'id_airbox','big_airbox','a_value',0);
+
+% ---
+c3dobj = f_add_embc(c3dobj,'id_bc','imp_bs','id_dom3d',{'top_bound','bottom_bound'}, ...
+                    'bc_type','bsfield','bc_value',1);
 
 %% Solve emdesign3d
 

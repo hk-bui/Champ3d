@@ -15,8 +15,8 @@ arglist = {'elem_type','get','n_direction','n_component'};
 % --- default input value
 elem_type = [];
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition',
-n_direction = 'outward'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
-                         %  otherwise : 'automatic' = 'natural' = 'auto'
+n_direction = 'auto'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
+                     %  otherwise : 'automatic' = 'natural' = 'auto'
 n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input
@@ -30,6 +30,10 @@ end
 %--------------------------------------------------------------------------
 if isempty(elem_type)
     error([mfilename ' : #elem_type must be given !']);
+end
+%--------------------------------------------------------------------------
+if isempty(n_direction)
+    n_direction = 'auto';
 end
 %------------------------------------------------------------------------
 face = f_face(elem,'elem_type',elem_type);
@@ -57,9 +61,11 @@ end
 dom_right_of_face = zeros(1,nb_face);
 dom_right_of_face(elem_right_of_face > 0) = 1 ;%elem_code(elem_right_of_face(elem_right_of_face > 0));
 %--------------------------------------------------------------------------
-% --- bound with outward normal
+% --- id bound
 ibO = find(dom_left_of_face  == 1 & dom_right_of_face == 0);
 ibI = find(dom_right_of_face == 1 & dom_left_of_face  == 0);
+ibO = unique(ibO);
+ibI = unique(ibI);
 %--------------------------------------------------------------------------
 switch n_direction
     case {'o','out','outward'}

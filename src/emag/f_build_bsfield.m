@@ -73,6 +73,7 @@ for iec = 1:length(id_bsfield)
                 elseif isfield(phydomobj,'id_thdesign3d')
                     id_mesh3d = c3dobj.thdesign3d.(phydomobj.id_thdesign3d).id_mesh3d;
                 end
+                %----------------------------------------------------------
                 id_dom3d  = phydomobj.id_dom3d;
                 id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
                 node = c3dobj.mesh3d.(id_mesh3d).celem(:,id_elem);

@@ -48,23 +48,49 @@ for iec = 1:length(id_econductor)
     id_phydom = id_econductor{iec};
     to_be_rebuilt = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).to_be_rebuilt;
     if to_be_rebuilt
-        %----------------------------------------------------------------------
+        %------------------------------------------------------------------
         em_model = c3dobj.emdesign3d.(id_emdesign3d).em_model;
-        %----------------------------------------------------------------------
+        %------------------------------------------------------------------
         f_fprintf(0,'Build #econ',1,id_phydom, ...
                   0,'in #emdesign3d',1,id_emdesign3d, ...
                   0,'for',1,em_model,0,'\n');
+        %------------------------------------------------------------------
+        tic;
+        %------------------------------------------------------------------
+        id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+        %------------------------------------------------------------------
+        phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom);
+        %------------------------------------------------------------------
+        id_dom3d = phydomobj.id_dom3d;
+        id_dom3d = f_to_scellargin(id_dom3d);
+        % ---
+        id_elem = [];
+        id_face = [];
+        id_edge = [];
+        for i = 1:length(id_dom3d)
+            defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).defined_on;
+            if f_strcmpi(defined_on,'elem')
+                id_elem = [id_elem ...
+                    c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_elem];
+            elseif f_strcmpi(defined_on,'face')
+                id_face = [id_face ...
+                    c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_face];
+            elseif f_strcmpi(defined_on,'edge')
+                id_edge = [id_edge ...
+                    c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_edge];
+            end
+        end
+        %------------------------------------------------------------------
+        % --- Output
+        c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_elem = id_elem;
+        c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_face = id_face;
+        c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_edge = id_edge;
+        %------------------------------------------------------------------
+        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+        %------------------------------------------------------------------
         switch em_model
             case {'fem_aphijw','fem_aphits'}
-                tic;
                 %----------------------------------------------------------
-                id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-                %----------------------------------------------------------
-                phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom);
-                %----------------------------------------------------------
-                id_dom3d  = phydomobj.id_dom3d;
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-                elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
                 id_node_phi = f_uniquenode(elem);
                 %----------------------------------------------------------
                 coef_name  = 'sigma';

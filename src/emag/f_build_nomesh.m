@@ -53,34 +53,50 @@ for iec = 1:length(id_nomesh)
         f_fprintf(0,'Build #nomesh',1,id_phydom, ...
                   0,'in #emdesign3d',1,id_emdesign3d, ...
                   0,'for',1,em_model,0,'\n');
+        tic;
+        %------------------------------------------------------------------
+        id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+        %------------------------------------------------------------------
+        phydomobj = c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom);
+        %------------------------------------------------------------------
+        id_dom3d = phydomobj.id_dom3d;
+        id_dom3d = f_to_scellargin(id_dom3d);
+        % ---
+        id_elem = [];
+        id_face = [];
+        id_edge = [];
+        for i = 1:length(id_dom3d)
+            defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).defined_on;
+            if f_strcmpi(defined_on,'elem')
+                id_elem = [id_elem ...
+                    c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_elem];
+                bfa = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d{i});
+                bound_face = [bound_face, bfa];
+            elseif f_strcmpi(defined_on,'face')
+                id_face = [id_face ...
+                    c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_face];
+            elseif f_strcmpi(defined_on,'edge')
+                id_edge = [id_edge ...
+                    c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_edge];
+            end
+        end
+        %------------------------------------------------------------------
+        edge_list = c3dobj.mesh3d.(id_mesh3d).edge;
+        %------------------------------------------------------------------
+        % --- Output
+        c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_elem = id_elem;
+        c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_face = id_face;
+        c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_edge = id_edge;
+        %------------------------------------------------------------------
+        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+        %------------------------------------------------------------------
         switch em_model
             case {'fem_aphijw','fem_aphits'}
-                tic;
-                %----------------------------------------------------------
-                id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-                %----------------------------------------------------------
-                phydomobj = c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom);
-                %----------------------------------------------------------
-                id_dom3d  = phydomobj.id_dom3d;
-                defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on;
-                if any(strcmpi(defined_on,'elem'))
-                    id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-                elseif any(strcmpi(defined_on,'face'))
-                    return;
-                    % TODO
-                    % id_face = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
-                end
-                %----------------------------------------------------------
-                edge_list = c3dobj.mesh3d.(id_mesh3d).edge;
-                %----------------------------------------------------------
-                bound_face = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d);
                 id_bound_node = f_uniquenode(bound_face);
                 %----------------------------------------------------------
-                %id_edge_in_bound_face = f_edgeinelem(bound_face,edge_list,'defined_on','face');
                 id_edge_in_bound_face = f_edgeinface(bound_face,edge_list);
                 id_edge_in_bound_face = unique(id_edge_in_bound_face);
                 %----------------------------------------------------------
-                elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
                 id_node_in_elem = f_uniquenode(elem);
                 id_edge_in_elem = f_edgeinelem(elem,edge_list);
                 id_edge_in_elem = unique(id_edge_in_elem);
