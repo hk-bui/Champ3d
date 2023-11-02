@@ -58,17 +58,25 @@ for iec = 1:length(id_econductor)
             case {'fem_aphijw','fem_aphits'}
                 tic;
                 %----------------------------------------------------------
+                id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+                %----------------------------------------------------------
                 phydomobj = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom);
+                %----------------------------------------------------------
+                id_dom3d  = phydomobj.id_dom3d;
+                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+                elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+                id_node_phi = f_uniquenode(elem);
                 %----------------------------------------------------------
                 coef_name  = 'sigma';
                 coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
                                                       'coefficient',coef_name);
                 %----------------------------------------------------------
-                sigwewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
+                sigmawewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
                                          'coefficient',coef_array);
                 %----------------------------------------------------------
                 % --- Output
-                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).sigwewe = sigwewe;
+                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).sigmawewe = sigmawewe;
+                c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_node_phi = id_node_phi;
                 %----------------------------------------------------------
                 coeftype = f_coeftype(phydomobj.(coef_name));
                 switch coeftype

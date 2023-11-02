@@ -74,20 +74,27 @@ for iec = 1:length(id_nomesh)
                 edge_list = c3dobj.mesh3d.(id_mesh3d).edge;
                 %----------------------------------------------------------
                 bound_face = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d);
+                id_bound_node = f_uniquenode(bound_face);
                 %----------------------------------------------------------
                 %id_edge_in_bound_face = f_edgeinelem(bound_face,edge_list,'defined_on','face');
                 id_edge_in_bound_face = f_edgeinface(bound_face,edge_list);
                 id_edge_in_bound_face = unique(id_edge_in_bound_face);
                 %----------------------------------------------------------
                 elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+                id_node_in_elem = f_uniquenode(elem);
                 id_edge_in_elem = f_edgeinelem(elem,edge_list);
                 id_edge_in_elem = unique(id_edge_in_elem);
                 %----------------------------------------------------------
+                id_inner_node = setdiff(id_node_in_elem,id_bound_node);
                 id_inner_edge = setdiff(id_edge_in_elem,id_edge_in_bound_face);
+                id_bound_edge = id_edge_in_bound_face;
                 %----------------------------------------------------------
                 % --- Output
                 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_elem = id_elem;
+                c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_inner_node = id_inner_node;
+                c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_bound_node = id_bound_node;
                 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_inner_edge = id_inner_edge;
+                c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_bound_edge = id_bound_edge;
                 %----------------------------------------------------------
                 c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).to_be_rebuilt = 0;
                 %----------------------------------------------------------

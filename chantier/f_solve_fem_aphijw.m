@@ -102,6 +102,7 @@ nb_node = size(c3dobj.mesh3d.(id_mesh3d).node,2);
 %--------------------------------------------------------------------------
 % Do this first
 c3dobj.emdesign3d.(id_emdesign3d).matrix.id_edge_a = 1:nb_edge;
+id_edge_a = c3dobj.emdesign3d.(id_emdesign3d).matrix.id_edge_a;
 %--------------------------------------------------------------------------
 % Then build nomesh
 c3dobj = f_build_nomesh(c3dobj,'id_emdesign3d',id_emdesign3d);
@@ -166,7 +167,6 @@ id_edge_in_elem = c3dobj.mesh3d.(id_mesh3d).id_edge_in_elem;
 id_face_in_elem = c3dobj.mesh3d.(id_mesh3d).id_face_in_elem;
 %--------------------------------------------------------------------------
 % --- wfwf
-%--------------------------------------------------------------------------
 no_wfwf = 0;
 if ~isfield(c3dobj.emdesign3d.(id_emdesign3d),'matrix')
     no_wfwf = 1;
@@ -201,38 +201,83 @@ end
 % ---
 c3dobj.emdesign3d.(id_emdesign3d).matrix.wfwf = wfwf;
 %--------------------------------------------------------------------------
+% --- nomesh
+id_elem_nomesh = [];
+id_inner_edge_nomesh = [];
+id_inner_node_nomesh = [];
+for iec = 1:length(id_nomesh__)
+    %----------------------------------------------------------------------
+    id_phydom = id_nomesh__{iec};
+    %----------------------------------------------------------------------
+    f_fprintf(0,'--- #nomesh',1,id_phydom,0,'\n');
+    %----------------------------------------------------------------------
+    id_dom3d  = c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_dom3d;
+    id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+    id_inner_edge = c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_inner_edge;
+    id_inner_node = c3dobj.emdesign3d.(id_emdesign3d).nomesh.(id_phydom).id_inner_node;
+    %----------------------------------------------------------------------
+    id_elem_nomesh = [id_elem_nomesh id_elem];
+    id_inner_edge_nomesh = [id_inner_edge_nomesh id_inner_edge];
+    id_inner_node_nomesh = [id_inner_node_nomesh id_inner_node];
+end
+id_elem_nomesh = unique(id_elem_nomesh);
+id_inner_edge_nomesh = unique(id_inner_edge_nomesh);
+id_inner_node_nomesh = unique(id_inner_node_nomesh);
+%--------------------------------------------------------------------------
+% --- airbox
+id_phydom = id_airbox__{1};
+f_fprintf(0,'--- #airbox',1,id_phydom,0,'\n');
+id_dom3d  = c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_phydom).id_dom3d;
+id_elem_airbox = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+id_inner_edge_airbox = c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_phydom).id_inner_edge;
+%--------------------------------------------------------------------------
 % --- econductor
-sigwewe = sparse(nb_edge,nb_edge);
+sigmawewe = sparse(nb_edge,nb_edge);
+id_node_phi = [];
 % ---
 for iec = 1:length(id_econductor__)
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     id_phydom = id_econductor__{iec};
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     f_fprintf(0,'--- #econ',1,id_phydom,0,'\n');
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     id_dom3d  = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_dom3d;
     id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-    lmatrix   = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).sigwewe;
+    lmatrix   = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).sigmawewe;
+    %----------------------------------------------------------------------
+    [~,id_] = intersect(id_elem,id_elem_nomesh);
+    id_elem(id_) = [];
+    lmatrix(id_,:,:) = [];
+    %----------------------------------------------------------------------
     for i = 1:nbEd_inEl
         for j = i+1 : nbEd_inEl
-            sigwewe = sigwewe + ...
+            sigmawewe = sigmawewe + ...
                 sparse(id_edge_in_elem(i,id_elem),id_edge_in_elem(j,id_elem),...
                        lmatrix(:,i,j),nb_edge,nb_edge);
         end
     end
+    %----------------------------------------------------------------------
+    id_node_phi = [id_node_phi ...
+        c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_node_phi];
+    %----------------------------------------------------------------------
 end
 % ---
-sigwewe = sigwewe + sigwewe.';
+sigmawewe = sigmawewe + sigmawewe.';
 % ---
 for iec = 1:length(id_econductor__)
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     id_phydom = id_econductor__{iec};
-    %--------------------------------------------------------------------------
-    id_dom3d  = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_dom3d;
-    id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-    lmatrix   = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).sigwewe;
+    %----------------------------------------------------------------------
+    id_dom3d = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).id_dom3d;
+    id_elem  = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+    lmatrix  = c3dobj.emdesign3d.(id_emdesign3d).econductor.(id_phydom).sigmawewe;
+    %----------------------------------------------------------------------
+    [~,id_] = intersect(id_elem,id_elem_nomesh);
+    id_elem(id_) = [];
+    lmatrix(id_,:,:) = [];
+    %----------------------------------------------------------------------
     for i = 1:nbEd_inEl
-        sigwewe = sigwewe + ...
+        sigmawewe = sigmawewe + ...
             sparse(id_edge_in_elem(i,id_elem),id_edge_in_elem(i,id_elem),...
                    lmatrix(:,i,i),nb_edge,nb_edge);
     end
@@ -241,15 +286,21 @@ end
 % --- mconductor
 nu0nurwfwf = sparse(nb_face,nb_face);
 % ---
+id_elem_mcon = [];
 for iec = 1:length(id_mconductor__)
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     id_phydom = id_mconductor__{iec};
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     f_fprintf(0,'--- #mcon',1,id_phydom,0,'\n');
-    %--------------------------------------------------------------------------
-    id_dom3d  = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).id_dom3d;
-    id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-    lmatrix   = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).nu0nurwfwf;
+    %----------------------------------------------------------------------
+    id_dom3d = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).id_dom3d;
+    id_elem  = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+    lmatrix  = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).nu0nurwfwf;
+    %----------------------------------------------------------------------
+    [~,id_] = intersect(id_elem,id_elem_nomesh);
+    id_elem(id_) = [];
+    lmatrix(id_,:,:) = [];
+    %----------------------------------------------------------------------
     for i = 1:nbFa_inEl
         for j = i+1 : nbFa_inEl
             nu0nurwfwf = nu0nurwfwf + ...
@@ -257,17 +308,25 @@ for iec = 1:length(id_mconductor__)
                        lmatrix(:,i,j),nb_face,nb_face);
         end
     end
+    %----------------------------------------------------------------------
+    id_elem_mcon = [id_elem_mcon id_elem];
+    %----------------------------------------------------------------------
 end
 % ---
 nu0nurwfwf = nu0nurwfwf + nu0nurwfwf.';
 % ---
 for iec = 1:length(id_mconductor__)
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     id_phydom = id_mconductor__{iec};
-    %--------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     id_dom3d  = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).id_dom3d;
     id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
     lmatrix   = c3dobj.emdesign3d.(id_emdesign3d).mconductor.(id_phydom).nu0nurwfwf;
+    %----------------------------------------------------------------------
+    [~,id_] = intersect(id_elem,id_elem_nomesh);
+    id_elem(id_) = [];
+    lmatrix(id_,:,:) = [];
+    %----------------------------------------------------------------------
     for i = 1:nbFa_inEl
         nu0nurwfwf = nu0nurwfwf + ...
             sparse(id_face_in_elem(i,id_elem),id_face_in_elem(i,id_elem),...
@@ -303,32 +362,77 @@ for iec = 1:length(id_bsfield__)
         c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_phydom).id_airbox = id_airbox__{1};
     end
     id_airbox = c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_phydom).id_airbox;
-    id_edge_unknown = c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_inner_edge;
+    id_edge_a_unknown = c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_inner_edge;
     %----------------------------------------------------------------------
-    rotb = rotb(id_edge_unknown,1);
-    rotrot = rotrot(id_edge_unknown,id_edge_unknown);
+    rotb = rotb(id_edge_a_unknown,1);
+    rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
     %----------------------------------------------------------------------
     a = zeros(nb_edge,1);
-    a(id_edge_unknown) = f_qmr(rotrot,rotb);
+    a(id_edge_a_unknown) = f_qmr(rotrot,rotb);
     %----------------------------------------------------------------------
     a_bsfield = a_bsfield + a;
 end
-
+%--------------------------------------------------------------------------
 mflux = c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
-
 bs = f_field_wf(mflux,c3dobj.mesh3d.(id_mesh3d));
-
 node = c3dobj.mesh3d.(id_mesh3d).celem;
 vf = bs;
 figure
-f_quiver(node,full(vf));
+f_quiver(node,vf);
+%--------------------------------------------------------------------------
+%
+%               MATRIX SYSTEM
+%
+%--------------------------------------------------------------------------
+id_edge_a_unknown = setdiff(id_inner_edge_airbox,id_inner_edge_nomesh);
+id_node_phi_unknown = setdiff(id_node_phi,id_inner_node_nomesh);
+% --- LSH
+% --- nu0nurwfwf
+id_elem_air = setdiff(id_elem_airbox,id_elem_mcon);
+id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
+mu0 = 4 * pi * 1e-7;
+nu0wfwf = (1/mu0) .* c3dobj.emdesign3d.(id_emdesign3d).matrix.wfwf;
+nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + nu0wfwf(id_face_in_elem_air,id_face_in_elem_air);
+% ---
+freq = c3dobj.emdesign3d.(id_emdesign3d).frequency;
+omeg = 1j*2*pi*freq;
+S11  = c3dobj.mesh3d.(id_mesh3d).rot.' * nu0nurwfwf * c3dobj.mesh3d.(id_mesh3d).rot;
+S11  = S11 + omeg .* sigmawewe;
+S12  = omeg .* sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad;
+S22  = omeg .* c3dobj.mesh3d.(id_mesh3d).grad.' * sigmawewe * c3dobj.mesh3d.(id_mesh3d).grad;
+% --- dirichlet remove
+S11 = S11(id_edge_a_unknown,id_edge_a_unknown);
+S12 = S12(id_edge_a_unknown,:);
+S12 = S12(:,id_node_phi);
+S22 = S22(id_node_phi,id_node_phi);
+% ---
+LHS = S11;              clear S11;
+LHS = [LHS  S12];
+LHS = [LHS; S12.' S22]; clear S12 S22;
+%--------------------------------------------------------------------------
+% --- RHS
+bsfieldRHS = c3dobj.mesh3d.(id_mesh3d).rot.' * nu0wfwf * c3dobj.mesh3d.(id_mesh3d).rot * a_bsfield;
+RHS = bsfieldRHS;
+RHS = RHS(id_edge_a_unknown,1);
+RHS = [RHS; zeros(length(id_node_phi),1)];
+
+%--------------------------------------------------------------------------
+a = zeros(nb_edge,1);
+phi = zeros(nb_node,1);
+sol = f_qmr(LHS,RHS);
+[a(id_edge_a_unknown), phi(id_node_phi_unknown)] = f_qmr(LHS,RHS);
+
+
+
+
+
 
 
 
 %--------------------------------------------------------------------------
 %--- Test symmetric
-if issymmetric(sigwewe)
-    f_fprintf(0,'sigwewe is symmetric \n');
+if issymmetric(sigmawewe)
+    f_fprintf(0,'sigmawewe is symmetric \n');
 end
 if issymmetric(nu0nurwfwf)
     f_fprintf(0,'nu0nurwfwf is symmetric \n');

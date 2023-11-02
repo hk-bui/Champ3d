@@ -5,7 +5,7 @@ clc
 x_plate   = 10e-3;
 y_plate   = 10e-3;
 h_plate   = 10e-3;
-nb_plates = 5;
+nb_plates = 6;
 agap      = 2e-3;
 x_airbox  = x_plate * 2;
 y_airbox  = x_plate * 2;
@@ -51,7 +51,7 @@ y_data  = [-w -w +w +w -w -w +w +w].';
 z_data  = [-w -w -w -w +w +w +w +w].';
 bx_data = [ 0  0  0  0  0  0  0  0].';
 by_data = [ 0  0  0  0  0  0  0  0].';
-bz_data = [-1 -1 -1 -1 +1 +1 +1 +1].';
+bz_data = [+0 +0 +0 +0 +1 +1 +1 +1].';
 % force outside point to 0
 fbx = scatteredInterpolant(x_data, y_data, z_data, bx_data, 'linear', 'none');
 fby = scatteredInterpolant(x_data, y_data, z_data, by_data, 'linear', 'none');
@@ -70,7 +70,7 @@ fbz = scatteredInterpolant(x_data, y_data, z_data, bz_data, 'linear', 'none');
              
 Bs = f_make_coef('f',@f_bs3,'depend_on','celem',...
                  'varargin_list',...
-                 {'fbx',fbx,'fby',fby,'fbz',fbz,'move_step',[0 0 10e-3]}, ...
+                 {'fbx',fbx,'fby',fby,'fbz',fbz,'move_step',[0 0 0]}, ...
                  'coef_type','array');
 
 % ---
@@ -79,7 +79,7 @@ br_value = 1;
 
 
 %% build 1D mesh
-msize  = 6;
+msize  = 3;
 c3dobj = [];
 % ---
 c3dobj = f_add_x(c3dobj,'id_x','xair_l','d',x_airbox,'dnum',msize,'dtype','log-');
@@ -184,6 +184,12 @@ c3dobj = f_add_mconductor(c3dobj,'id_mconductor','plate_4', ...
                                  'id_dom3d','plate_4',...
                                  'mu_r',mur_4);
 % ---
+c3dobj = f_add_econductor(c3dobj,'id_econductor','plate_5',...
+                                 'id_dom3d','plate_5',...
+                                 'sigma',1);
+c3dobj = f_add_mconductor(c3dobj,'id_mconductor','plate_5', ...
+                                 'id_dom3d','plate_5',...
+                                 'mu_r',1);
 c3dobj = f_add_nomesh(c3dobj,'id_nomesh','nomesh','id_dom3d','plate_5');
 % ---
 c3dobj = f_add_bsfield(c3dobj,'id_bsfield','bsfield','bs',Bs);

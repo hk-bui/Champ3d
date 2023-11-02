@@ -68,6 +68,18 @@ for iec = 1:length(id_bsfield)
                                                     'coefficient',coef_name);
                 wfbs = f_cwfvf(c3dobj,'phydomobj',phydomobj,'vector_field',bs_array);
                 %----------------------------------------------------------
+                if isfield(phydomobj,'id_emdesign3d')
+                    id_mesh3d = c3dobj.emdesign3d.(phydomobj.id_emdesign3d).id_mesh3d;
+                elseif isfield(phydomobj,'id_thdesign3d')
+                    id_mesh3d = c3dobj.thdesign3d.(phydomobj.id_thdesign3d).id_mesh3d;
+                end
+                id_dom3d  = phydomobj.id_dom3d;
+                id_elem   = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+                node = c3dobj.mesh3d.(id_mesh3d).celem(:,id_elem);
+                vf = bs_array;
+                figure
+                f_quiver(node,vf.');
+                %----------------------------------------------------------
                 % --- Output
                 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_phydom).bs_array = bs_array;
                 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_phydom).wfbs     = wfbs;

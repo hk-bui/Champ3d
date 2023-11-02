@@ -27,6 +27,7 @@ elem = elem(1:nb_vertices,:);
 %--------------------------------------------------------------------------
 allNodeID = reshape(elem,1,numel(elem));
 IDNode = unique(allNodeID);
+IDNode(IDNode == 0) = [];
 
 
 
