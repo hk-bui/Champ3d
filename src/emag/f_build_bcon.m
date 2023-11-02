@@ -61,6 +61,8 @@ for iec = 1:length(id_bc)
         %------------------------------------------------------------------
         phydomobj = c3dobj.emdesign3d.(id_emdesign3d).bc.(id_phydom);
         %------------------------------------------------------------------
+        bc_type = phydomobj.bc_type;
+        %------------------------------------------------------------------
         id_dom3d = phydomobj.id_dom3d;
         id_dom3d = f_to_scellargin(id_dom3d);
         % ---
@@ -86,32 +88,19 @@ for iec = 1:length(id_bc)
         c3dobj.emdesign3d.(id_emdesign3d).bc.(id_phydom).id_face = id_face;
         c3dobj.emdesign3d.(id_emdesign3d).bc.(id_phydom).id_edge = id_edge;
         %------------------------------------------------------------------
-        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
-        %------------------------------------------------------------------
         switch em_model
             case {'fem_aphijw','fem_aphits'}
                 %----------------------------------------------------------
-                id_node_phi = f_uniquenode(elem);
-                %----------------------------------------------------------
-                coef_name  = 'sigma';
-                coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
-                                                      'coefficient',coef_name);
-                %----------------------------------------------------------
-                sigmawewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
-                                         'coefficient',coef_array);
-                %----------------------------------------------------------
-                % --- Output
-                c3dobj.emdesign3d.(id_emdesign3d).bc.(id_phydom).sigmawewe = sigmawewe;
-                c3dobj.emdesign3d.(id_emdesign3d).bc.(id_phydom).id_node_phi = id_node_phi;
-                %----------------------------------------------------------
-                coeftype = f_coeftype(phydomobj.(coef_name));
-                switch coeftype
-                    case {'function_ltensor_array','function_iso_array'}
-                        c3dobj.emdesign3d.(id_emdesign3d).bc.(id_phydom).to_be_rebuilt = 1;
-                    otherwise
-                        c3dobj.emdesign3d.(id_emdesign3d).bc.(id_phydom).to_be_rebuilt = 0;
+                if f_strcmpi(bc_type,{'fixed'})
+
                 end
-                %----------------------------------------------------------
+                if f_strcmpi(bc_type,{'bsfield'})
+                    %----------------------------------------------------------
+                    coef_name  = 'bc_value';
+                    coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
+                                                          'coefficient',coef_name);
+                    
+                end
             case {'fem_tomejw','fem_tomets'}
                 % TODO
         end
