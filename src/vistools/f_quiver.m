@@ -15,13 +15,15 @@ function f_quiver(node,vector,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'vtype','afactor','sfactor','id_node'};
+arglist = {'vtype','afactor','sfactor','id_node','component','vsize'};
 
 % --- default input value
 vtype = 'proportional'; % 'proportional', 'equal'
 afactor = 5;
 sfactor = 1;
 id_node = [];
+component = [];
+vsize = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -53,7 +55,7 @@ if dim < 3
     vector(3,:) = 0;
 end
 %----- component
-if exist('component','var')
+if ~isempty(component)
     switch component
         case {1,'x'}
             vector(2,:) = 0;
@@ -66,7 +68,7 @@ if exist('component','var')
             vector(2,:) = 0;
     end
 end
-
+%--------------------------------------------------------------------------
 if strcmpi(vtype,'equal')
     %----- try to scale
     dmax = max(node(1,:)) - min(node(1,:));
@@ -74,7 +76,7 @@ if strcmpi(vtype,'equal')
         dmax = max(dmax, max(node(i,:)) - min(node(i,:)));
     end
     %----- size of arrows
-    if ~exist('vsize','var')
+    if isempty(vsize)
         vsize = sfactor * dmax / nbNode^(1/(dim));
     end
     %----- direction and lenght
