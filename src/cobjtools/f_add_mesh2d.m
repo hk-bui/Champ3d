@@ -47,7 +47,6 @@ if isempty(id_mesh2d)
     error([mfilename ' : #id_mesh2d must be given !']);
 end
 %--------------------------------------------------------------------------
-
 if strcmpi(build_from,'mesh1d')
     %----------------------------------------------------------------------
     % --- Output
@@ -57,6 +56,13 @@ elseif strcmpi(build_from,'femm')
 elseif strcmpi(build_from,'geoquad')
     % TODO
 end
+%--------------------------------------------------------------------------
+c3dobj.mesh2d.(id_mesh2d).origin_coordinates = origin_coordinates;
+c3dobj.mesh2d.(id_mesh2d).dom2d.all_domain.defined_on = {'2d','elem'};
+c3dobj.mesh2d.(id_mesh2d).dom2d.all_domain.id_elem = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
+c3dobj.mesh2d.(id_mesh2d).dom2d.all_domain.elem_code = unique(c3dobj.mesh2d.(id_mesh2d).elem_code);
+% --- status
+c3dobj.mesh2d.(id_mesh2d).to_be_rebuilt = 1;
 %--------------------------------------------------------------------------
 % --- Log message
 f_fprintf(0,'Add #mesh2d',1,id_mesh2d,0,'\n');

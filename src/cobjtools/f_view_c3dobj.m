@@ -58,7 +58,7 @@ for3d     = meshobj.for3d;
 additional= meshobj.additional;
 %--------------------------------------------------------------------------
 elem_type = [];
-defined_on = 'elem';
+defined_on = [];
 if ~for3d
     %----------------------------------------------------------------------
     if isempty(id_dom2d)
@@ -82,15 +82,19 @@ else
         if any(f_strcmpi(defined_on,'elem'))
             id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
             elem    = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+            defined_on = 'elem';
         elseif any(f_strcmpi(defined_on,'face'))
             id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
             elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face;
+            defined_on = 'face';
         elseif any(f_strcmpi(defined_on,'edge'))
             id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_edge;
             elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).edge;
+            defined_on = 'edge';
         elseif any(f_strcmpi(defined_on,'node'))
             id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_node;
             elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).node;
+            defined_on = 'node';
         end
     else
         elem = c3dobj.mesh3d.(id_mesh3d).elem;
