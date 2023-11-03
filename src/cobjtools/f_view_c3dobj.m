@@ -78,20 +78,19 @@ else
     %----------------------------------------------------------------------
     if ~isempty(id_dom3d)
         disptext = id_dom3d;
-        defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on{1};
-        switch defined_on
-            case {'elem'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
-                elem    = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
-            case {'face'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
-                elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face;
-            case {'edge'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_edge;
-                elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).edge;
-            case {'node'}
-                id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_node;
-                elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).node;
+        defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on;
+        if any(f_strcmpi(defined_on,'elem'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
+            elem    = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+        elseif any(f_strcmpi(defined_on,'face'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face;
+            elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face;
+        elseif any(f_strcmpi(defined_on,'edge'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_edge;
+            elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).edge;
+        elseif any(f_strcmpi(defined_on,'node'))
+            id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_node;
+            elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).node;
         end
     else
         elem = c3dobj.mesh3d.(id_mesh3d).elem;

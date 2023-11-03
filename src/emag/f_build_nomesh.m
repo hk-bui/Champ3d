@@ -68,15 +68,15 @@ for iec = 1:length(id_nomesh)
         bound_face = [];
         for i = 1:length(id_dom3d)
             defined_on = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).defined_on;
-            if f_strcmpi(defined_on,'elem')
+            if any(f_strcmpi(defined_on,'elem'))
                 id_elem = [id_elem ...
                     c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_elem];
                 bfa = f_get_bound_face(c3dobj,'of_dom3d',id_dom3d{i});
                 bound_face = [bound_face, bfa];
-            elseif f_strcmpi(defined_on,'face')
+            elseif any(f_strcmpi(defined_on,'face'))
                 id_face = [id_face ...
                     c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_face];
-            elseif f_strcmpi(defined_on,'edge')
+            elseif any(f_strcmpi(defined_on,'edge'))
                 id_edge = [id_edge ...
                     c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_edge];
             end

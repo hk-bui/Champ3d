@@ -1,38 +1,49 @@
-function c3dobj = f_build_bc(c3dobj,varargin)
-%--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2023
-% as a contribution to champ3d code.
-%--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
-% Huu-Kien.Bui@univ-nantes.fr
-% IREENA Lab - UR 4642, Nantes Universite'
-%--------------------------------------------------------------------------
+% function c3dobj = f_build_bc(c3dobj,varargin)
+% %--------------------------------------------------------------------------
+% % This code is written by: H-K. Bui, 2023
+% % as a contribution to champ3d code.
+% %--------------------------------------------------------------------------
+% % champ3d is copyright (c) 2023 H-K. Bui.
+% % See LICENSE and CREDITS files in champ3d root directory for more information.
+% % Huu-Kien.Bui@univ-nantes.fr
+% % IREENA Lab - UR 4642, Nantes Universite'
+% %--------------------------------------------------------------------------
+% 
+% 
+% % --- valid argument list (to be updated each time modifying function)
+% arglist = {'id_emdesign3d','id_bc'};
+% 
+% % --- default input value
+% id_emdesign3d = [];
+% id_bc = '_all';
+% 
+% % --- check and update input
+% for i = 1:length(varargin)/2
+%     if any(strcmpi(arglist,varargin{2*i-1}))
+%         eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+%     else
+%         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+%     end
+% end
+% %--------------------------------------------------------------------------
+% if isempty(id_emdesign3d)
+%     error([mfilename ': #id_emdesign3d must be given']); 
+% end
+% %--------------------------------------------------------------------------
+% if iscell(id_emdesign3d)
+%     id_emdesign3d = id_emdesign3d{1};
+% end
 
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_bc'};
 
-% --- default input value
-id_emdesign3d = [];
-id_bc = '_all';
+id_emdesign3d = 'em_multicubes';
+id_bc = 'imp_bs';
 
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
-end
-%--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    error([mfilename ': #id_emdesign3d must be given']); 
-end
-%--------------------------------------------------------------------------
-if iscell(id_emdesign3d)
-    id_emdesign3d = id_emdesign3d{1};
-end
+
+
+
+
+
 %--------------------------------------------------------------------------
 id_bc = f_to_scellargin(id_bc);
 %--------------------------------------------------------------------------

@@ -422,11 +422,18 @@ phi = zeros(nb_node,1);
 sol = f_qmr(LHS,RHS);
 [a(id_edge_a_unknown), phi(id_node_phi_unknown)] = f_qmr(LHS,RHS);
 
+a(id_edge_a_unknown)     = sol(1:length(id_edge_a_unknown));
+phi(id_node_phi_unknown) = sol(length(id_edge_a_unknown)+1:end);
 
-
-
-
-
+mflux = c3dobj.mesh3d.(id_mesh3d).rot * a;
+bs = f_field_wf(mflux,c3dobj.mesh3d.(id_mesh3d));
+node = c3dobj.mesh3d.(id_mesh3d).celem;
+vf = bs;
+figure
+subplot(121)
+f_quiver(node,real(vf));
+subplot(122)
+f_quiver(node,imag(vf));
 
 
 %--------------------------------------------------------------------------

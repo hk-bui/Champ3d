@@ -46,7 +46,7 @@ if isempty(id_dom3d)
 end
 %--------------------------------------------------------------------------
 % output 1
-c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = defined_on;
+%c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'3d'};
 %--------------------------------------------------------------------------
 mesher = c3dobj.mesh3d.(id_mesh3d).mesher;
 switch defined_on
@@ -80,7 +80,7 @@ switch defined_on
         end
         %------------------------------------------------------------------
         % output
-        c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'elem',defined_on};
+        c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'3d','elem',defined_on};
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem = id_elem;
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).elem_code = elem_code;
         c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).dom3d_equation = dom3d_equation;
@@ -125,7 +125,7 @@ switch defined_on
             %--------------------------------------------------------------
             % output
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).of_dom3d = of_dom3d;
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'3d','face',defined_on};
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = bound_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = ...
                 f_findvecnd(bound_face, ...
@@ -151,7 +151,7 @@ switch defined_on
                      'get',get,'n_direction',n_direction,'n_component',n_component);
             %--------------------------------------------------------------
             % output
-            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'face',defined_on};
+            c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).defined_on = {'3d','face',defined_on};
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).lid_face = lid_inter_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).face = inter_face;
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_face = ...

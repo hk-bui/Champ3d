@@ -25,7 +25,7 @@ for i = 1:length(varargin)/2
 end
 %--------------------------------------------------------------------------
 nbnoinel = size(elem, 1);
-if any(strcmpi(defined_on,{'elem'}))
+if any(f_strcmpi(defined_on,{'elem'}))
     switch nbnoinel
         case 4
             elem_type = 'tet';
@@ -34,7 +34,7 @@ if any(strcmpi(defined_on,{'elem'}))
         case 8
             elem_type = 'hex';
     end
-elseif any(strcmpi(defined_on,{'face'}))
+elseif any(f_strcmpi(defined_on,{'face'}))
     switch nbnoinel
         case 3
             elem_type = 'tri';
