@@ -28,19 +28,19 @@ function chavec = f_chavec(node,elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'node','elem','edge','face'};
+arglist = {'defined_on'};
 
 % --- default input value
 if size(elem,1) == 2
-    elem_type = 'edge';
+    defined_on = 'edge';
 elseif size(elem,1) > 2
-    elem_type = 'face';
+    defined_on = 'face';
 end
 
 % --- check and update input
-if nargin > 2
-    if any(strcmpi(arglist,varargin{1}))
-        elem_type = varargin{1};
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
@@ -50,7 +50,7 @@ end
 dim = size(node,1);
 chavec = zeros(dim,size(elem,2));
 
-switch elem_type
+switch defined_on
     case 'edge'
         chavec = node(:,elem(2,:)) - node(:,elem(1,:));
         chavec = f_normalize(chavec);

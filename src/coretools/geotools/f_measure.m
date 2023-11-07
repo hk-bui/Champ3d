@@ -1,4 +1,4 @@
-function meas = f_measure(node,element,varargin)
+function meas = f_measure(node,elem,varargin)
 % F_MEASURE returns the measure (length, area, volume)
 %           of lines, surfaces and volumes.
 %--------------------------------------------------------------------------
@@ -16,29 +16,33 @@ function meas = f_measure(node,element,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'node','edge','face','elem'};
+arglist = {'defined_on'};
+
+% --- default input value
+defined_on = [];
 
 % --- check and update input
-if nargin > 2
-    if any(strcmpi(arglist,varargin{1}))
-        datin.element_type = varargin{1};
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
-else
-    error([mfilename ' : specify the element type: #edge, #face, #elem)']);
 end
 
 %--------------------------------------------------------------------------
-
-nbElem = size(element,2);
+if isempty(defined_on)
+    error([mfilename ': #defined_on must be given !']);
+end
+%--------------------------------------------------------------------------
+nbElem = size(elem,2);
 meas = zeros(1,nbElem);
-switch lower(datin.element_type)
+switch defined_on
     case 'edge'
-        vec = node(:,element(2,:)) - node(:,element(1,:));
+        vec = node(:,elem(2,:)) - node(:,elem(1,:));
         meas = f_norm(vec);
     case 'face'
-        [filterface,id_face] = f_filterface(element);
+        [filterface,id_face] = f_filterface(elem);
         for i = 1:length(filterface)
             nbVert = size(filterface{i},1);
             for j = 1:(nbVert-2)
