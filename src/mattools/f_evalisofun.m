@@ -29,8 +29,20 @@ for i = 1:length(varargin)/2
 end
 %--------------------------------------------------------------------------
 phydomobj = f_get_id(c3dobj,phydomobj);
-id_elem   = phydomobj.id_elem;
-nb_elem   = length(id_elem);
+defined_on = phydomobj.defined_on;
+if any(f_strcmpi(defined_on,'elem'))
+    id_elem = phydomobj.id_elem;
+    nb_elem = length(id_elem);
+elseif any(f_strcmpi(defined_on,'face'))
+    id_elem = phydomobj.id_face;
+    nb_elem = length(id_elem);
+elseif any(f_strcmpi(defined_on,'edge'))
+    id_elem = phydomobj.id_edge;
+    nb_elem = length(id_elem);
+elseif any(f_strcmpi(defined_on,'node'))
+    id_elem = phydomobj.id_node;
+    nb_elem = length(id_elem);
+end
 %--------------------------------------------------------------------------
 paramtype = f_paramtype(iso_function);
 %--------------------------------------------------------------------------

@@ -42,14 +42,20 @@ if issparse(vector)
     vector = full(vector);
 end
 %--------------------------------------------------------------------------
-if size(node,2) ~= size(vector,2)
+[dim, nbNode] = size(node);
+%--------------------------------------------------------------------------
+if size(vector,1) ~= dim
     vector = vector.';
-    if size(node,2) ~= size(vector,2)
-        error([mfilename ' : check node and vector size !'])
-    end
+end
+%---
+if size(vector,2) == 1
+    vector = repmat(vector,1,nbNode);
+end
+%---
+if size(vector,2) ~= nbNode
+    error([mfilename ' : check node and vector size !'])
 end
 %--------------------------------------------------------------------------
-[dim, nbNode] = size(node);
 if dim < 3
     node(3,:) = 0;
     vector(3,:) = 0;

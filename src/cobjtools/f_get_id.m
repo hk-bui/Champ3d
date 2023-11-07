@@ -51,19 +51,24 @@ for i = 1:length(id_dom3d)
     if any(f_strcmpi(defined_on,'elem'))
         id_elem = [id_elem ...
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_elem];
+        defined_on = 'elem';
     elseif any(f_strcmpi(defined_on,'face'))
         id_face = [id_face ...
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_face];
+        defined_on = 'face';
     elseif any(f_strcmpi(defined_on,'edge'))
         id_edge = [id_edge ...
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_edge];
+        defined_on = 'edge';
     elseif any(f_strcmpi(defined_on,'node'))
         id_node = [id_node ...
             c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d{i}).id_node];
+        defined_on = 'node';
     end
 end
 %--------------------------------------------------------------------------
 % --- Output
+phydomobj.defined_on = defined_on;
 phydomobj.id_elem = id_elem;
 phydomobj.id_face = id_face;
 phydomobj.id_edge = id_edge;

@@ -10,13 +10,14 @@ function c3dobj = f_add_embc(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_bc','id_dom3d','bc_type','bc_value'};
+arglist = {'id_emdesign3d','id_bc','id_dom3d','bc_type','bc_value','bs'};
 
 % --- default input value
 id_emdesign3d = [];
 id_dom3d      = [];
 bc_type       = []; % 'fixed', 'bsfield', 'neumann'
-bc_value      = 0 ; %
+bc_value      = 0 ; % for 'fixed'
+bs            = []; % for 'bsfield'
 id_bc = [];
 
 %--------------------------------------------------------------------------
@@ -55,6 +56,7 @@ c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_dom3d = id_dom3d;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bc_type  = bc_type;
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bc_value = bc_value;
+c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bs       = bs;        % for 'bsfield'
 % --- status
 c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).to_be_rebuilt = 1;
 % --- info message

@@ -11,15 +11,13 @@ function c3dobj = f_add_bsfield(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'id_emdesign3d','id_bsfield','id_dom3d',...
-           'bs_value','bs_dir','bs',...
+           'bs',...
            'id_airbox'};
 
 % --- default input value
 id_emdesign3d = [];
 id_dom3d      = [];
-bs_value      = 0;
-bs_dir        = [];
-bs            = [];
+bs            = []; % vector, vector array or parameter with f_make_coef
 id_bsfield    = [];
 id_airbox     = [];
 %--------------------------------------------------------------------------
@@ -56,8 +54,6 @@ end
 % --- Output
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_emdesign3d = id_emdesign3d;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_dom3d  = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_value  = bs_value;
-c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs_dir    = bs_dir;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).bs        = bs;
 c3dobj.emdesign3d.(id_emdesign3d).bsfield.(id_bsfield).id_airbox = id_airbox;
 % --- status
