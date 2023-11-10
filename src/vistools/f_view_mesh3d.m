@@ -41,35 +41,48 @@ if any(f_strcmpi(defined_on,{'elem'}))
     id_face = 1:size(face,2);
     % ---
     % 1/ triangle
-    ind_tria = find(face(end, id_face) == 0);
-    if ~isempty(ind_tria)
-        triface  = face(1:3,id_face(ind_tria));
+    itria = find(face(end, id_face) == 0);
+    if ~isempty(itria)
+        triface  = face(1:3,id_face(itria));
         f_view_face(node, triface, transarg{:}); hold on
     end
     % ---
     % 2/ quad
-    ind_quad = find(face(end, id_face) ~= 0);
-    if ~isempty(ind_quad)
-        quadface = face(1:4,id_face(ind_quad));
+    iquad = find(face(end, id_face) ~= 0);
+    if ~isempty(iquad)
+        quadface = face(1:4,id_face(iquad));
         f_view_face(node, quadface, transarg{:}); hold on
     end
     view(3);
-elseif any(f_strcmpi(defined_on,{'face'}))
-    id_face = 1:size(elem, 2);
+    %----------------------------------------------------------------------
+elseif any(f_strcmpi(defined_on,{'face'}))    
+    %----------------------------------------------------------------------
+    maxnbNo_inEl = size(elem,1);
+    nb_elem = size(elem,2);
+    %----------------------------------------------------------------------
+    itria = [];
+    iquad = [];
+    if maxnbNo_inEl == 3
+        itria = 1:nb_elem;
+        iquad = [];
+    elseif maxnbNo_inEl == 4
+        itria = find(elem(4,:) == 0);
+        iquad = setdiff(1:nb_elem,itria);
+    end
+    %----------------------------------------------------------------------
     % 1/ triangle
-    ind_tria = find(elem(end, :) == 0);
-    if ~isempty(ind_tria)
-        triface  = elem(1:3,ind_tria);
+    if ~isempty(itria)
+        triface  = elem(1:3,itria);
         f_view_face(node, triface, transarg{:}); hold on
     end
     % ---
     % 2/ quad
-    ind_quad = setdiff(id_face, ind_tria);
-    if ~isempty(ind_quad)
-        quadface  = elem(1:4,ind_quad);
+    if ~isempty(iquad)
+        quadface  = elem(1:4,iquad);
         f_view_face(node, quadface, transarg{:}); hold off
     end
     view(3);
+    %----------------------------------------------------------------------
 elseif any(f_strcmpi(defined_on,{'edge'}))
     % --- TODO
 elseif any(f_strcmpi(defined_on,{'node'}))
@@ -96,9 +109,9 @@ if any(f_strcmpi(options,{'show_id_node'}))
     end
     % ---
     hold on;
-    if size(node) == 2
+    if size(node,1) == 2
         text(x,y,showtext,'FontSize',10,'Color','blue');
-    elseif size(node) > 2
+    elseif size(node,1) > 2
         z = node(3,id_node);
         text(x,y,z,showtext,'FontSize',10,'Color','blue');
     end

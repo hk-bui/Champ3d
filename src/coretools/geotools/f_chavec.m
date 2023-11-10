@@ -45,16 +45,19 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
-
 %--------------------------------------------------------------------------
-dim = size(node,1);
-chavec = zeros(dim,size(elem,2));
-
 switch defined_on
     case 'edge'
         chavec = node(:,elem(2,:)) - node(:,elem(1,:));
         chavec = f_normalize(chavec);
     case 'face'
+        [dim,lnode] = size(node);
+        if dim == 2
+            node = [node; zeros(1,lnode)];
+        elseif dim > 3
+            chavec = [];
+            return
+        end
         V1 = node(:,elem(2,:)) - node(:,elem(1,:));
         V2 = node(:,elem(3,:)) - node(:,elem(1,:));
         chavec = cross(V1,V2);

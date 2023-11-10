@@ -68,9 +68,10 @@ nbFa_inEl = con.nbFa_inEl;
 nbEd_inFa = con.nbEd_inFa;
 nbNo_inEd = con.nbNo_inEd;
 siNo_inEd = con.siNo_inEd;
+nbEd_inEl = con.nbEd_inEl;
 %--------------------------------------------------------------------------
 %----- barrycenter
-if any(strcmpi(get,{'_all', 'celem','center'}))
+if any(f_strcmpi(get,{'_all', 'celem','center'}))
     if ~isfield(mesh,'celem')
         dim = size(node,1);
         mesh.celem = mean(reshape(node(:,elem(1:nbNo_inEl,:)),dim,nbNo_inEl,nb_elem),2);
@@ -78,7 +79,7 @@ if any(strcmpi(get,{'_all', 'celem','center'}))
 end
 %--------------------------------------------------------------------------
 %----- edges
-if any(strcmpi(get,{'_all','edge','id_edge_in_elem'}))
+if any(f_strcmpi(get,{'_all','edge','id_edge_in_elem'}))
     if ~isfield(mesh,'edge')
         mesh.edge = f_edge(elem,'elem_type',elem_type);
     end
@@ -93,7 +94,7 @@ if any(strcmpi(get,{'_all','edge','id_edge_in_elem'}))
 end
 %--------------------------------------------------------------------------
 %----- faces
-if any(strcmpi(get,{'_all','face','id_face_in_elem','sign_face_in_elem'}))
+if any(f_strcmpi(get,{'_all','face','id_face_in_elem','sign_face_in_elem'}))
     if ~isfield(mesh,'face')
         mesh.face = f_face(elem,'elem_type',elem_type);
     end
@@ -109,7 +110,7 @@ if any(strcmpi(get,{'_all','face','id_face_in_elem','sign_face_in_elem'}))
 end
 %--------------------------------------------------------------------------
 %----- Discrete Div
-if any(strcmpi(get,{'_all','D', 'Div'}))
+if any(f_strcmpi(get,{'_all','D', 'Div'}))
     % ---
     if ~all(isfield(mesh,{'face'}))
         mesh.face = f_face(elem,'elem_type',elem_type);
@@ -137,49 +138,76 @@ if any(strcmpi(get,{'_all','D', 'Div'}))
 end
 %--------------------------------------------------------------------------
 %----- Discrete Rot
-if any(strcmpi(get,{'_all', 'R', 'Rot', 'Curl'}))
-    % ---
-    if ~all(isfield(mesh,{'edge'}))
-        mesh.edge = f_edge(elem,'elem_type',elem_type);
-    end
-    % ---
-    if ~all(isfield(mesh,{'face'}))
-        mesh.face = f_face(elem,'elem_type',elem_type);
-    end
-    % ---
-    if ~all(isfield(mesh,{'id_edge_in_face','sign_edge_in_face'}))
-        [id_edge_in_face, ori_edge_in_face, sign_edge_in_face] = ...
-            f_edgeinface(mesh.face,mesh.edge);
+if any(f_strcmpi(get,{'_all', 'R', 'Rot', 'Curl'}))
+    if any(f_strcmpi(elem_type,{'tri', 'triangle', 'quad'}))
         % ---
-        mesh.id_edge_in_face   = id_edge_in_face;
-        mesh.ori_edge_in_face  = ori_edge_in_face;
-        mesh.sign_edge_in_face = sign_edge_in_face;
-    end
-    % ---
-    nbEdge = size(mesh.edge, 2);
-    nbFace = size(mesh.face, 2);
-    % ---
-    itria = find(mesh.face(4,:) == 0);
-    iquad = setdiff(1:nbFace,itria);
-    % ---
-    mesh.rot = sparse(nbFace,nbEdge);
-    for k = 1:2 %---- 2 faceType
-        switch k
-            case 1
-                iface = itria;
-            case 2
-                iface = iquad;
+        if ~all(isfield(mesh,{'edge'}))
+            mesh.edge = f_edge(elem,'elem_type',elem_type);
         end
-        for i = 1:nbEd_inFa{k}
+        % ---
+        if ~all(isfield(mesh,{'id_face_in_elem','sign_face_in_elem'}))
+            [id_edge_in_elem, ori_edge_in_elem, sign_edge_in_elem] = ...
+                f_edgeinelem(elem,node,mesh.edge,'elem_type',elem_type);
+            % ---
+            mesh.id_edge_in_elem   = id_edge_in_elem;
+            mesh.ori_edge_in_elem  = ori_edge_in_elem;
+            mesh.sign_edge_in_elem = sign_edge_in_elem;
+        end
+        % ---
+        nbElem = size(mesh.elem, 2);
+        nbEdge = size(mesh.edge, 2);
+        % ---
+        mesh.rot = sparse(nbElem,nbEdge);
+        for i = 1:nbEd_inEl
             mesh.rot = mesh.rot + ...
-                sparse(iface,mesh.id_edge_in_face(i,iface),mesh.sign_edge_in_face(i,iface),nbFace,nbEdge);
+                sparse(1:nbElem,mesh.id_edge_in_elem(i,:),mesh.sign_edge_in_elem(i,:),nbElem,nbEdge);
         end
+        % ---
+        clear id_edge_in_elem ori_edge_in_elem sign_edge_in_elem
+    else
+        % ---
+        if ~all(isfield(mesh,{'edge'}))
+            mesh.edge = f_edge(elem,'elem_type',elem_type);
+        end
+        % ---
+        if ~all(isfield(mesh,{'face'}))
+            mesh.face = f_face(elem,'elem_type',elem_type);
+        end
+        % ---
+        if ~all(isfield(mesh,{'id_edge_in_face','sign_edge_in_face'}))
+            [id_edge_in_face, ori_edge_in_face, sign_edge_in_face] = ...
+                f_edgeinface(mesh.face,mesh.edge);
+            % ---
+            mesh.id_edge_in_face   = id_edge_in_face;
+            mesh.ori_edge_in_face  = ori_edge_in_face;
+            mesh.sign_edge_in_face = sign_edge_in_face;
+        end
+        % ---
+        nbEdge = size(mesh.edge, 2);
+        nbFace = size(mesh.face, 2);
+        % ---
+        itria = find(mesh.face(4,:) == 0);
+        iquad = setdiff(1:nbFace,itria);
+        % ---
+        mesh.rot = sparse(nbFace,nbEdge);
+        for k = 1:2 %---- 2 faceType
+            switch k
+                case 1
+                    iface = itria;
+                case 2
+                    iface = iquad;
+            end
+            for i = 1:nbEd_inFa{k}
+                mesh.rot = mesh.rot + ...
+                    sparse(iface,mesh.id_edge_in_face(i,iface),mesh.sign_edge_in_face(i,iface),nbFace,nbEdge);
+            end
+        end
+        clear id_edge_in_face sign_edge_in_face
     end
-    clear id_edge_in_face sign_edge_in_face
 end
 %--------------------------------------------------------------------------
 %----- Discrete Grad
-if any(strcmpi(get,{'_all', 'G', 'Grad', 'Gradient'}))
+if any(f_strcmpi(get,{'_all', 'G', 'Grad', 'Gradient'}))
     if ~all(isfield(mesh,{'edge'}))
         mesh.edge = f_edge(elem,'elem_type',elem_type);
     end
@@ -194,18 +222,23 @@ if any(strcmpi(get,{'_all', 'G', 'Grad', 'Gradient'}))
 end
 %--------------------------------------------------------------------------
 %----- check
-if isfield(mesh,'div') && isfield(mesh,'rot') 
-    if any(any(mesh.div * mesh.rot))
-        error([mfilename ': error on mesh entry, DivRot is not null !']);
+
+if any(f_strcmpi(elem_type,{'tri', 'triangle', 'quad'}))
+    
+    
+else
+    if isfield(mesh,'div') && isfield(mesh,'rot') 
+        if any(any(mesh.div * mesh.rot))
+            error([mfilename ': error on mesh entry, DivRot is not null !']);
+        end
+    end
+    % ---
+    if isfield(mesh,'rot') && isfield(mesh,'grad') 
+        if any(any(mesh.rot * mesh.grad))
+            error([mfilename ': error on mesh entry, RotGrad is not null !']);
+        end
     end
 end
-
-if isfield(mesh,'rot') && isfield(mesh,'grad') 
-    if any(any(mesh.rot * mesh.grad))
-        error([mfilename ': error on mesh entry, RotGrad is not null !']);
-    end
-end
-
 
 %--------------------------------------------------------------------------
 %--- Log message

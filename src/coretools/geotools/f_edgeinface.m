@@ -27,12 +27,9 @@ end
 maxnbNo_inFa = size(face,1);
 nb_face = size(face,2);
 %--------------------------------------------------------------------------
-ixxxx = [];
 itria = [];
 iquad = [];
-if maxnbNo_inFa == 2
-    
-elseif maxnbNo_inFa == 3
+if maxnbNo_inFa == 3
     itria = 1:nb_face;
     iquad = [];
     maxnbEd_inFa = 3;
