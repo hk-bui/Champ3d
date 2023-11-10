@@ -10,7 +10,8 @@ function f_view_mesh3d(node,elem,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'elem_type','defined_on','face_color','edge_color','alpha_value'};
+arglist = {'elem_type','defined_on','face_color','edge_color','alpha_value',...
+           'options'};
 
 % --- default input value
 elem_type   = '';
@@ -18,6 +19,7 @@ defined_on  = 'elem'; % elem, face, edge, 'node'
 edge_color  = 'k';
 face_color  = 'c';
 alpha_value = 0.9;
+options     = ''; 
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
