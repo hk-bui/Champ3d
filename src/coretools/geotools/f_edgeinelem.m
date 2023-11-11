@@ -47,12 +47,10 @@ ori_edge_in_elem = squeeze(sign(diff(e, 1, 2))); % with unsorted e !
 if any(strcmpi(elem_type,{'tri','quad','triangle'}))
     sign_edge_in_elem = ori_edge_in_elem .* con.siEd_inEl;
 end
-% ---
-e = sort(e, 2);
 %--------------------------------------------------------------------------
 if ~isempty(edge_list)
+    e = sort(e, 2);
     id_edge_in_elem = f_findvecnd(e,edge_list,'position',2);
 end
-
 %--------------------------------------------------------------------------
 end
