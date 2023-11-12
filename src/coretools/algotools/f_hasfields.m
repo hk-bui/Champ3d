@@ -1,16 +1,4 @@
 function has_fields = f_hasfields(struct_in,fieldnames2test,varargin)
-% F_INTKIT3D gives the integral kit.
-%--------------------------------------------------------------------------
-% FIXED INPUT
-% mesh3d : mesh data structure
-%--------------------------------------------------------------------------
-% OPTIONAL INPUT
-%--------------------------------------------------------------------------
-% OUTPUT
-% mesh3d : mesh data structure with kit added
-%--------------------------------------------------------------------------
-% EXAMPLE
-% mesh3d = F_INTKIT3D(mesh3d);
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
