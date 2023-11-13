@@ -47,7 +47,7 @@ if isempty(id_dom3d) && isempty(id_dom2d)
 end
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign.(id_emdesign).econductor.(id_econductor).id_emdesign3d = id_emdesign;
+c3dobj.emdesign.(id_emdesign).econductor.(id_econductor).id_emdesign = id_emdesign;
 c3dobj.emdesign.(id_emdesign).econductor.(id_econductor).id_dom3d = id_dom3d;
 c3dobj.emdesign.(id_emdesign).econductor.(id_econductor).id_dom2d = id_dom2d;
 c3dobj.emdesign.(id_emdesign).econductor.(id_econductor).sigma = sigma;
