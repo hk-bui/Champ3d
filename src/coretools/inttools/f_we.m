@@ -77,27 +77,56 @@ if isempty(gradf)
     end
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbEd_inEl = con.nbEd_inEl;
-EdNo_inEl = con.EdNo_inEl;
-NoFa_ofEd = con.NoFa_ofEd;
-%--------------------------------------------------------------------------
-nb_elem = size(elem,2);
-%--------------------------------------------------------------------------
-We = cell(1,length(u));
-for i = 1:length(u)
-    We{i} = zeros(nb_elem,3,nbEd_inEl);
-end
-%--------------------------------------------------------------------------
-for i = 1:length(u)
-    % ---
-    fwe = zeros(nb_elem,3,nbEd_inEl);
-    for j = 1:nbEd_inEl
-        fwe(:,:,j) = - (wn{i}(:,EdNo_inEl(j,1)).*gradf{i}(:,:,NoFa_ofEd(j,1)) - ...
-                        wn{i}(:,EdNo_inEl(j,2)).*gradf{i}(:,:,NoFa_ofEd(j,2)))...
-                        .*ori_edge_in_elem(j,:).';
+if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
+    dim = 2;
+    con = f_connexion(elem_type);
+    nbEd_inEl = con.nbEd_inEl;
+    EdNo_inEl = con.EdNo_inEl;
+    NoFa_ofEd = con.NoFa_ofEd;
+    %----------------------------------------------------------------------
+    nb_elem = size(elem,2);
+    %----------------------------------------------------------------------
+    We = cell(1,length(u));
+    for i = 1:length(u)
+        We{i} = zeros(nb_elem,dim,nbEd_inEl);
     end
-    % ---
-    We{i} = fwe;
+    %----------------------------------------------------------------------
+    for i = 1:length(u)
+        % ---
+        fwe = zeros(nb_elem,dim,nbEd_inEl);
+        for j = 1:nbEd_inEl
+            fwe(:,:,j) = - (wn{i}(:,EdNo_inEl(j,1)).*gradf{i}(:,:,NoFa_ofEd(j,1)) - ...
+                            wn{i}(:,EdNo_inEl(j,2)).*gradf{i}(:,:,NoFa_ofEd(j,2)))...
+                            .*ori_edge_in_elem(j,:).';
+        end
+        % ---
+        We{i} = fwe;
+    end
+    %----------------------------------------------------------------------
+elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
+    dim = 3;
+    con = f_connexion(elem_type);
+    nbEd_inEl = con.nbEd_inEl;
+    EdNo_inEl = con.EdNo_inEl;
+    NoFa_ofEd = con.NoFa_ofEd;
+    %----------------------------------------------------------------------
+    nb_elem = size(elem,2);
+    %----------------------------------------------------------------------
+    We = cell(1,length(u));
+    for i = 1:length(u)
+        We{i} = zeros(nb_elem,dim,nbEd_inEl);
+    end
+    %----------------------------------------------------------------------
+    for i = 1:length(u)
+        % ---
+        fwe = zeros(nb_elem,dim,nbEd_inEl);
+        for j = 1:nbEd_inEl
+            fwe(:,:,j) = - (wn{i}(:,EdNo_inEl(j,1)).*gradf{i}(:,:,NoFa_ofEd(j,1)) - ...
+                            wn{i}(:,EdNo_inEl(j,2)).*gradf{i}(:,:,NoFa_ofEd(j,2)))...
+                            .*ori_edge_in_elem(j,:).';
+        end
+        % ---
+        We{i} = fwe;
+    end
+    %----------------------------------------------------------------------
 end
-%--------------------------------------------------------------------------

@@ -65,16 +65,30 @@ for i = 1:length(u)
     Wn{i} = zeros(nb_elem,nbNo_inEl);
 end
 %--------------------------------------------------------------------------
-for i = 1:length(u)
-    u_ = u(i).*ones(nb_elem,1);
-    v_ = v(i).*ones(nb_elem,1);
-    w_ = w(i).*ones(nb_elem,1);
-    % ---
-    fwn = zeros(nb_elem,nbNo_inEl);
-    for j = 1:length(fN)
-        fwn(:,j) = fN{j}(u_,v_,w_);
+if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
+    for i = 1:length(u)
+        u_ = u(i).*ones(nb_elem,1);
+        v_ = v(i).*ones(nb_elem,1);
+        % ---
+        fwn = zeros(nb_elem,nbNo_inEl);
+        for j = 1:length(fN)
+            fwn(:,j) = fN{j}(u_,v_);
+        end
+        % ---
+        Wn{i} = fwn;
     end
-    % ---
-    Wn{i} = fwn;
+elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
+    for i = 1:length(u)
+        u_ = u(i).*ones(nb_elem,1);
+        v_ = v(i).*ones(nb_elem,1);
+        w_ = w(i).*ones(nb_elem,1);
+        % ---
+        fwn = zeros(nb_elem,nbNo_inEl);
+        for j = 1:length(fN)
+            fwn(:,j) = fN{j}(u_,v_,w_);
+        end
+        % ---
+        Wn{i} = fwn;
+    end
 end
 %--------------------------------------------------------------------------
