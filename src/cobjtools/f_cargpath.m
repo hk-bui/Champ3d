@@ -31,12 +31,12 @@ if isempty(arg_name)
     error([mfilename ': #arg_name must be given !']);
 end
 %--------------------------------------------------------------------------
-if isfield(phydomobj,'id_emdesign3d')
-    id_emdesign3d = phydomobj.id_emdesign3d;
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
-elseif isfield(phydomobj,'id_thdesign3d')
-    id_thdesign3d = phydomobj.id_thdesign3d;
-    id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;
+if isfield(phydomobj,'id_emdesign')
+    id_emdesign = phydomobj.id_emdesign;
+    id_mesh = c3dobj.emdesign.(id_emdesign).id_mesh3d;
+elseif isfield(phydomobj,'id_thdesign')
+    id_thdesign = phydomobj.id_thdesign;
+    id_mesh = c3dobj.thdesign.(id_thdesign).id_mesh3d;
 end
 %--------------------------------------------------------------------------
 if contains(arg_name,'.')
@@ -44,12 +44,12 @@ if contains(arg_name,'.')
     return
 else
     if any(strcmpi(arg_name,{'celem','cface'}))
-        cargpath = ['c3dobj.mesh3d.' id_mesh3d '.' arg_name];
+        cargpath = ['c3dobj.mesh3d.' id_mesh '.' arg_name];
     elseif any(strcmpi(arg_name,{'bv','jv','hv','pv','av','phiv','tv','omev', ...
                                  'bs','js','hs','ps','as','phis','ts','omes'}))
-        cargpath = ['c3dobj.emdesign3d.' id_emdesign3d '.fields.' arg_name];
+        cargpath = ['c3dobj.emdesign.' id_emdesign '.fields.' arg_name];
     elseif any(strcmpi(arg_name,{'tempv','temps'}))
-        cargpath = ['c3dobj.thdesign3d.' id_thdesign3d '.fields.' arg_name];
+        cargpath = ['c3dobj.thdesign.' id_thdesign '.fields.' arg_name];
     else
         cargpath = arg_name;
     end

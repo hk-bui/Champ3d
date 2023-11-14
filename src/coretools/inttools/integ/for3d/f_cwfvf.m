@@ -14,12 +14,12 @@ function coefwfvf = f_cwfvf(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'design3d','id_design3d','dom_type','id_dom',...
+arglist = {'design_type','id_design','dom_type','id_dom',...
            'phydomobj','coefficient','vector_field'};
 
 % --- default input value
-design3d = [];
-id_design3d = [];
+design_type = [];
+id_design = [];
 dom_type  = [];
 id_dom    = [];
 phydomobj = [];
@@ -36,17 +36,17 @@ for i = 1:length(varargin)/2
 end
 %--------------------------------------------------------------------------
 if isempty(phydomobj)
-    if ~isempty(design3d) && ~isempty(id_design3d) && ~isempty(dom_type) && ~isempty(id_dom)
-        phydomobj = c3dobj.(design3d).(id_design3d).(dom_type).(id_dom);
+    if ~isempty(design_type) && ~isempty(id_design) && ~isempty(dom_type) && ~isempty(id_dom)
+        phydomobj = c3dobj.(design_type).(id_design).(dom_type).(id_dom);
     else
         return;
     end
 end
 %--------------------------------------------------------------------------
-if isfield(phydomobj,'id_emdesign3d')
-    id_mesh3d = c3dobj.emdesign3d.(phydomobj.id_emdesign3d).id_mesh3d;
-elseif isfield(phydomobj,'id_thdesign3d')
-    id_mesh3d = c3dobj.thdesign3d.(phydomobj.id_thdesign3d).id_mesh3d;
+if isfield(phydomobj,'id_emdesign')
+    id_mesh3d = c3dobj.emdesign.(phydomobj.id_emdesign).id_mesh3d;
+elseif isfield(phydomobj,'id_thdesign')
+    id_mesh3d = c3dobj.thdesign.(phydomobj.id_thdesign).id_mesh3d;
 end
 %--------------------------------------------------------------------------
 id_dom3d  = phydomobj.id_dom3d;

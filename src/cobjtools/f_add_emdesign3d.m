@@ -70,22 +70,38 @@ if ~isempty(from)
 end
 %--------------------------------------------------------------------------
 switch em_model
-    case {'fem_aphijw'}
+    case {'3d_fem_aphijw'}
         formulation = 'aphi';
         model_type = 'frequency_domain';
         discretization = 'fem';
-    case {'fem_aphits'}
+    case {'3d_fem_aphits'}
         formulation = 'aphi';
         model_type = 'time_domain';
         discretization = 'fem';
-    case {'fem_tomejw'}
+    case {'3d_fem_tomejw'}
         formulation = 'tome';
         model_type = 'frequency_domain';
         discretization = 'fem';
-    case {'fem_tomets'}
+    case {'3d_fem_tomets'}
         formulation = 'tome';
         model_type = 'time_domain';
         discretization = 'fem';
+    case {'3d_fem_bem_aphijw'}
+        formulation = 'aphi';
+        model_type = 'frequency_domain';
+        discretization = 'fem_bem';
+    case {'3d_fem_bem_aphits'}
+        formulation = 'aphi';
+        model_type = 'time_domain';
+        discretization = 'fem_bem';
+    case {'3d_fem_bem_tomejw'}
+        formulation = 'tome';
+        model_type = 'frequency_domain';
+        discretization = 'fem_bem';
+    case {'3d_fem_bem_tomets'}
+        formulation = 'tome';
+        model_type = 'time_domain';
+        discretization = 'fem_bem';
 end
 %--------------------------------------------------------------------------
 c3dobj.emdesign.(id_emdesign).id_mesh3d      = id_mesh3d;
