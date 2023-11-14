@@ -10,14 +10,16 @@ function c3dobj = f_add_embc(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_bc','id_dom3d','bc_type','bc_value','bs'};
+arglist = {'id_emdesign','id_bc','id_dom3d','id_dom2d',...
+           'bc_type','bc_value','bs'};
 
 % --- default input value
-id_emdesign3d = [];
-id_dom3d      = [];
-bc_type       = []; % 'fixed', 'bsfield', 'neumann'
-bc_value      = 0 ; % for 'fixed'
-bs            = []; % for 'bsfield'
+id_emdesign = [];
+id_dom3d    = [];
+id_dom2d    = [];
+bc_type     = []; % 'fixed', 'bsfield', 'neumann'
+bc_value    = 0 ; % for 'fixed'
+bs          = []; % for 'bsfield'
 id_bc = [];
 
 %--------------------------------------------------------------------------
@@ -34,17 +36,17 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
-    id_emdesign3d = id_emdesign3d{1};
+if isempty(id_emdesign)
+    id_emdesign = fieldnames(c3dobj.emdesign);
+    id_emdesign = id_emdesign{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_bc)
     error([mfilename ': id_bc must be defined !'])
 end
 %--------------------------------------------------------------------------
-if isempty(id_dom3d)
-    error([mfilename ': id_dom3d must be given !'])
+if isempty(id_dom3d) && isempty(id_dom2d)
+    error([mfilename ': id_dom3d/id_dom2d must be given !'])
 end
 %--------------------------------------------------------------------------
 if isempty(bc_type)
@@ -52,12 +54,13 @@ if isempty(bc_type)
 end
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bc_type  = bc_type;
-c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bc_value = bc_value;
-c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).bs       = bs;        % for 'bsfield'
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).id_emdesign = id_emdesign;
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).id_dom3d = id_dom3d;
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).id_dom2d = id_dom2d;
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).bc_type  = bc_type;
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).bc_value = bc_value;
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).bs       = bs;        % for 'bsfield'
 % --- status
-c3dobj.emdesign3d.(id_emdesign3d).bc.(id_bc).to_be_rebuilt = 1;
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).to_be_rebuilt = 1;
 % --- info message
-f_fprintf(0,'Add #bc',1,id_bc,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
+f_fprintf(0,'Add #bc',1,id_bc,0,'to #emdesign',1,id_emdesign,0,'\n');

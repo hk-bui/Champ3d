@@ -1,6 +1,4 @@
 function [coef_array, coef_array_type] = f_callcoefficient(c3dobj,varargin)
-% F_CALLPARAMETER calculates and returns parameter value according to its dependency.
-% p_value : array of values of the parameter computed for each element
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.

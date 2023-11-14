@@ -32,13 +32,13 @@ if isempty(phydomobj)
     error([mfilename ' : #phydomobj must be given !']);
 end
 %--------------------------------------------------------------------------
-if ~all(isfield(phydomobj,{'id_dom3d','id_emdesign3d'}))
-    error([mfilename ' : phydomobj must contains #id_dom3d and #id_emdesign3d!']);
+if ~all(isfield(phydomobj,{'id_dom3d','id_emdesign'}))
+    error([mfilename ' : phydomobj must contains #id_dom3d and #id_emdesign!']);
 end
 %--------------------------------------------------------------------------
-if isfield(phydomobj,'id_emdesign3d')
-    id_emdesign3d = phydomobj.id_emdesign3d;
-    id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+if isfield(phydomobj,'id_emdesign')
+    id_emdesign = phydomobj.id_emdesign;
+    id_mesh3d = c3dobj.emdesign.(id_emdesign).id_mesh3d;
 elseif isfield(phydomobj,'id_thdesign3d')
     id_thdesign3d = phydomobj.id_thdesign3d;
     id_mesh3d = c3dobj.thdesign3d.(id_thdesign3d).id_mesh3d;

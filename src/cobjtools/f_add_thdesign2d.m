@@ -1,4 +1,4 @@
-function c3dobj = f_add_nomesh(c3dobj,varargin)
+function c3dobj = f_add_thdesign2d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -10,15 +10,12 @@ function c3dobj = f_add_nomesh(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign','id_dom3d','id_dom2d','id_nomesh'};
+arglist = {'id_mesh2d','id_thdesign'};
 
 % --- default input value
-id_emdesign = [];
-id_nomesh   = [];
-id_dom3d    = [];
-id_dom2d    = [];
+id_mesh2d = [];
+id_thdesign = [];
 
-%--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -27,26 +24,37 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
+
 %--------------------------------------------------------------------------
-if isempty(id_emdesign)
-    id_emdesign = fieldnames(c3dobj.emdesign);
-    id_emdesign = id_emdesign{1};
+if isempty(id_mesh2d)
+    id_mesh2d = fieldnames(c3dobj.mesh2d);
+    id_mesh2d = id_mesh2d{1};
 end
 %--------------------------------------------------------------------------
-if isempty(id_nomesh)
-    error([mfilename ': id_nomesh must be defined !'])
+if iscell(id_mesh2d)
+    if length(id_mesh2d) > 1
+        error([mfilename ' : only one mesh2d allowed !']);
+    end
 end
 %--------------------------------------------------------------------------
-if isempty(id_dom3d) && isempty(id_dom2d)
-    error([mfilename ': id_dom3d/id_dom2d must be defined !'])
+if isempty(id_thdesign)
+    id_thdesign = 'thdesign_01';
 end
 %--------------------------------------------------------------------------
-% --- Output
-c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).id_emdesign = id_emdesign;
-c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).id_dom3d = id_dom3d;
-c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).id_dom2d = id_dom2d;
-% --- status
-c3dobj.emdesign.(id_emdesign).nomesh.(id_nomesh).to_be_rebuilt = 1;
-% --- info message
-f_fprintf(0,'Add #nomesh',1,id_nomesh,0,'to #emdesign',1,id_emdesign,0,'\n');
+c3dobj.thdesign.(id_thdesign).id_mesh2d = id_mesh2d;
+% ---
+c3dobj.thdesign.(id_thdesign).fields.tempv = [];
+c3dobj.thdesign.(id_thdesign).fields.temps = [];
+%--------------------------------------------------------------------------
+% --- Log message
+if iscell(id_mesh2d)
+    f_fprintf(0,'Add #thdesign',1,id_thdesign,0,'with #mesh2d',1,id_mesh2d,0,'\n');
+elseif ischar(id_mesh2d)
+    f_fprintf(0,'Add #thdesign',1,id_thdesign,0,'with #mesh2d',1,id_mesh2d,0,'\n');
+else
+    f_fprintf(0,'Add #thdesign',1,id_thdesign,0,'\n');
+end
+
+
+
 

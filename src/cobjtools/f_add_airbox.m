@@ -10,13 +10,14 @@ function c3dobj = f_add_airbox(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_airbox','id_dom3d','a_value'};
+arglist = {'id_emdesign','id_airbox','id_dom3d','id_dom2d','a_value'};
 
 % --- default input value
-id_emdesign3d = [];
-id_dom3d      = [];
-a_value       = 0;
-id_airbox     = [];
+id_emdesign = [];
+id_dom3d    = [];
+id_dom2d    = [];
+a_value     = 0;
+id_airbox   = [];
 
 %--------------------------------------------------------------------------
 if nargin <= 1
@@ -32,24 +33,26 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
-    id_emdesign3d = id_emdesign3d{1};
+if isempty(id_emdesign)
+    id_emdesign = fieldnames(c3dobj.emdesign);
+    id_emdesign = id_emdesign{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_airbox)
     error([mfilename ': id_airbox must be defined !'])
 end
-if isempty(id_dom3d)
+if isempty(id_dom3d) && isempty(id_dom2d)
     id_dom3d = 'all_domain';
+    id_dom2d = 'all_domain';
 end
 %--------------------------------------------------------------------------
 % --- Output
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).id_dom3d = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).mu_r = 1;
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).a_value = a_value;
+c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).id_emdesign = id_emdesign;
+c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).id_dom3d = id_dom3d;
+c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).id_dom2d = id_dom2d;
+c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).mu_r = 1;
+c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).a_value = a_value;
 % --- status
-c3dobj.emdesign3d.(id_emdesign3d).airbox.(id_airbox).to_be_rebuilt = 1;
+c3dobj.emdesign.(id_emdesign).airbox.(id_airbox).to_be_rebuilt = 1;
 % --- info message
-f_fprintf(0,'Add #airbox',1,id_airbox,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
+f_fprintf(0,'Add #airbox',1,id_airbox,0,'to #emdesign',1,id_emdesign,0,'\n');

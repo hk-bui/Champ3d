@@ -10,19 +10,19 @@ function c3dobj = f_add_emdesign3d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_mesh3d','id_emdesign3d',...
+arglist = {'id_mesh3d','id_emdesign',...
            'em_model','frequency', 'from'};
 
 % --- default input value
 id_mesh3d = [];
-id_emdesign3d = [];
+id_emdesign = [];
 em_model = 'fem_aphijw'; % fem_aphijw, fem_aphits, fem_tomejw, fem_tomets;
 frequency = 0;
 from = [];
 
 % --- valid em_model
-valid_em_model = {'fem_aphijw', 'fem_aphits', 'fem_tomejw', 'fem_tomets', ...
-                  'fem_bem_aphijw', 'fem_bem_aphits', 'fem_bem_tomejw', 'fem_bem_tomets'};
+valid_em_model = {'3d_fem_aphijw', '3d_fem_aphits', '3d_fem_tomejw', '3d_fem_tomets', ...
+                  '3d_fem_bem_aphijw', '3d_fem_bem_aphits', '3d_fem_bem_tomejw', '3d_fem_bem_tomets'};
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -45,9 +45,8 @@ if iscell(id_mesh3d)
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = 'emdesign3d_01';
-    %error([mfilename ' : #id_emdesign3d must be given !']);
+if isempty(id_emdesign)
+    id_emdesign = 'emdesign3d_01';
 end
 %--------------------------------------------------------------------------
 if ~any(strcmpi(em_model,valid_em_model))
@@ -89,39 +88,39 @@ switch em_model
         discretization = 'fem';
 end
 %--------------------------------------------------------------------------
-c3dobj.emdesign.(id_emdesign3d).id_mesh3d      = id_mesh3d;
-c3dobj.emdesign.(id_emdesign3d).em_model       = em_model;
-c3dobj.emdesign.(id_emdesign3d).formulation    = formulation;
-c3dobj.emdesign.(id_emdesign3d).model_type     = model_type;
-c3dobj.emdesign.(id_emdesign3d).discretization = discretization;
-c3dobj.emdesign.(id_emdesign3d).frequency      = frequency;
-c3dobj.emdesign.(id_emdesign3d).from           = from;
+c3dobj.emdesign.(id_emdesign).id_mesh3d      = id_mesh3d;
+c3dobj.emdesign.(id_emdesign).em_model       = em_model;
+c3dobj.emdesign.(id_emdesign).formulation    = formulation;
+c3dobj.emdesign.(id_emdesign).model_type     = model_type;
+c3dobj.emdesign.(id_emdesign).discretization = discretization;
+c3dobj.emdesign.(id_emdesign).frequency      = frequency;
+c3dobj.emdesign.(id_emdesign).from           = from;
 % ---
-c3dobj.emdesign.(id_emdesign3d).fields.bv    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.jv    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.hv    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.pv    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.av    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.phiv  = [];
-c3dobj.emdesign.(id_emdesign3d).fields.tv    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.omev  = [];
+c3dobj.emdesign.(id_emdesign).fields.bv    = [];
+c3dobj.emdesign.(id_emdesign).fields.jv    = [];
+c3dobj.emdesign.(id_emdesign).fields.hv    = [];
+c3dobj.emdesign.(id_emdesign).fields.pv    = [];
+c3dobj.emdesign.(id_emdesign).fields.av    = [];
+c3dobj.emdesign.(id_emdesign).fields.phiv  = [];
+c3dobj.emdesign.(id_emdesign).fields.tv    = [];
+c3dobj.emdesign.(id_emdesign).fields.omev  = [];
 % ---
-c3dobj.emdesign.(id_emdesign3d).fields.bs    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.js    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.hs    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.ps    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.as    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.phis  = [];
-c3dobj.emdesign.(id_emdesign3d).fields.ts    = [];
-c3dobj.emdesign.(id_emdesign3d).fields.omes  = [];
+c3dobj.emdesign.(id_emdesign).fields.bs    = [];
+c3dobj.emdesign.(id_emdesign).fields.js    = [];
+c3dobj.emdesign.(id_emdesign).fields.hs    = [];
+c3dobj.emdesign.(id_emdesign).fields.ps    = [];
+c3dobj.emdesign.(id_emdesign).fields.as    = [];
+c3dobj.emdesign.(id_emdesign).fields.phis  = [];
+c3dobj.emdesign.(id_emdesign).fields.ts    = [];
+c3dobj.emdesign.(id_emdesign).fields.omes  = [];
 %--------------------------------------------------------------------------
 % --- Log message
 if iscell(id_mesh3d)
-    f_fprintf(0,'Add #emdesign',1,id_emdesign3d,0,'with #mesh3d',1,id_mesh3d,0,'\n');
+    f_fprintf(0,'Add #emdesign',1,id_emdesign,0,'with #mesh3d',1,id_mesh3d,0,'\n');
 elseif ischar(id_mesh3d)
-    f_fprintf(0,'Add #emdesign',1,id_emdesign3d,0,'with #mesh3d',1,id_mesh3d,0,'\n');
+    f_fprintf(0,'Add #emdesign',1,id_emdesign,0,'with #mesh3d',1,id_mesh3d,0,'\n');
 else
-    f_fprintf(0,'Add #emdesign',1,id_emdesign3d,0,'\n');
+    f_fprintf(0,'Add #emdesign',1,id_emdesign,0,'\n');
 end
 
 
