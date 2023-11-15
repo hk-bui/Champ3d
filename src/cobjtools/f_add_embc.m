@@ -11,15 +11,20 @@ function c3dobj = f_add_embc(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'id_emdesign','id_bc','id_dom3d','id_dom2d',...
-           'bc_type','bc_value','bs'};
+           'bc_type','bc_value','bs', ...
+           'sigma','mu_r','r_ht','r_et'};
 
 % --- default input value
 id_emdesign = [];
 id_dom3d    = [];
 id_dom2d    = [];
-bc_type     = []; % 'fixed', 'bsfield', 'neumann'
+bc_type     = []; % 'fixed', 'bsfield', 'neumann', 'sibc'
 bc_value    = 0 ; % for 'fixed'
 bs          = []; % for 'bsfield'
+sigma       = 0 ; % for 'sibc'
+mu_r        = 0 ; % for 'sibc'
+r_ht        = []; % for 'sibc'
+r_et        = []; % for 'sibc'
 id_bc = [];
 
 %--------------------------------------------------------------------------
