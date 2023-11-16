@@ -232,13 +232,13 @@ end
 %--------------------------------------------------------------------------
 %----- check
 if any(f_strcmpi(elem_type,{'tri', 'triangle', 'quad'}))
-    if isfield(mesh,'div') && isfield(mesh,'rot') 
-        if any(any(mesh.div - mesh.rot))
-            if any(any(mesh.div - (- mesh.rot)))
-                error([mfilename ': error on mesh entry, Div and Rot are not equal!']);
-            end
-        end
-    end
+%     if isfield(mesh,'div') && isfield(mesh,'rot') 
+%         if any(any(mesh.div - mesh.rot))
+%             if any(any(mesh.div - (- mesh.rot)))
+%                 error([mfilename ': error on mesh entry, Div and Rot are not equal!']);
+%             end
+%         end
+%     end
     % ---
     if isfield(mesh,'rot') && isfield(mesh,'grad') 
         if any(any(mesh.rot * mesh.grad))

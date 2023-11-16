@@ -65,6 +65,10 @@ c3dobj.emdesign.(id_emdesign).bc.(id_bc).id_dom2d = id_dom2d;
 c3dobj.emdesign.(id_emdesign).bc.(id_bc).bc_type  = bc_type;
 c3dobj.emdesign.(id_emdesign).bc.(id_bc).bc_value = bc_value;
 c3dobj.emdesign.(id_emdesign).bc.(id_bc).bs       = bs;        % for 'bsfield'
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).sigma    = sigma ; % for 'sibc'
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).mu_r     = mu_r ; % for 'sibc'
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).r_ht     = r_ht; % for 'sibc'
+c3dobj.emdesign.(id_emdesign).bc.(id_bc).r_et     = r_et; % for 'sibc'
 % --- status
 c3dobj.emdesign.(id_emdesign).bc.(id_bc).to_be_rebuilt = 1;
 % --- info message
