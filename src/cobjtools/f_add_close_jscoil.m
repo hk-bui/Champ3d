@@ -2,7 +2,7 @@ function c3dobj = f_add_close_jscoil(c3dobj,varargin)
 % F_ADD_COIL ...
 %--------------------------------------------------------------------------
 % FIXED INPUT
-% emdesign3d : actual design
+% emdesign : actual design
 %--------------------------------------------------------------------------
 % OPTIONAL INPUT
 % 'id_dom3d' : ids of 3D domains
@@ -30,10 +30,10 @@ function c3dobj = f_add_close_jscoil(c3dobj,varargin)
 % 'field_vector_rounding' : rounding or not corner and straight edge
 %--------------------------------------------------------------------------
 % OUTPUT
-% emdesign3d with added coil
+% emdesign with added coil
 %--------------------------------------------------------------------------
 % EXAMPLE
-% emdesign3d = f_add_coil(emdesign3d,'id_dom3d','coil',...
+% emdesign = f_add_coil(emdesign,'id_dom3d','coil',...
 %                          'coil_type','stranded',...
 %                          'coil_mode','transmitter',...
 %                          'etrode_type','open',...
@@ -55,7 +55,7 @@ function c3dobj = f_add_close_jscoil(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_emdesign3d','id_coil','id_dom3d','id_elem','etrode_type',...
+arglist = {'id_emdesign','id_coil','id_dom3d','id_elem','etrode_type',...
            'coil_mode','coil_type',...
            'cs_equation','petrode_equation','netrode_equation',...
            'field_vector_o','field_vector_v','nb_turn', ...
@@ -63,7 +63,7 @@ arglist = {'id_emdesign3d','id_coil','id_dom3d','id_elem','etrode_type',...
        
 
 % --- default input value
-id_emdesign3d = [];
+id_emdesign = [];
 id_coil       = [];
 id_dom3d      = [];
 coil_mode     = 'transmitter'; % or 'tx'; 'receiver' or 'rx'
@@ -88,9 +88,9 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if isempty(id_emdesign3d)
-    id_emdesign3d = fieldnames(c3dobj.emdesign3d);
-    id_emdesign3d = id_emdesign3d{1};
+if isempty(id_emdesign)
+    id_emdesign = fieldnames(c3dobj.emdesign);
+    id_emdesign = id_emdesign{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_dom3d)
@@ -107,7 +107,7 @@ if isempty(cs_equation)
     end
 end
 %--------------------------------------------------------------------------
-id_mesh3d = c3dobj.emdesign3d.(id_emdesign3d).id_mesh3d;
+id_mesh3d = c3dobj.emdesign.(id_emdesign).id_mesh3d;
 %--------------------------------------------------------------------------
 id_elem = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).id_elem;
 node = c3dobj.mesh3d.(id_mesh3d).node;
@@ -116,6 +116,9 @@ elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;
 con = f_connexion(elem_type);
 id_node = f_uniquenode(elem,'nb_vertices',con.EdNo_inEl);
 %--------------------------------------------------------------------------
+etrode  = [];
+petrode = [];
+netrode = [];
 if ~isempty(cs_equation)
     if ~iscell(cs_equation)
         cs_equation{1} = cs_equation;
@@ -136,31 +139,41 @@ if ~isempty(cs_equation)
     %------
 end
 %--------------------------------------------------------------------------
+defined_with = [];
+if isempty(field_vector_o) || isempty(field_vector_v)
+    if ~isempty(petrode) && ~isempty(netrode)
+        defined_with = 'etrode';
+    end
+else
+    defined_with = 'field_vector';
+end
+%--------------------------------------------------------------------------
 % --- Output
 % -
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).cs_equation = cs_equation;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).etrode  = etrode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_elem = id_elem;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_node = id_node;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).cs_equation = cs_equation;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).etrode  = etrode;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).id_elem = id_elem;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).id_node = id_node;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).defined_with = defined_with;
 % -
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_emdesign3d = id_emdesign3d;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).id_dom3d  = id_dom3d;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_mode = coil_mode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).coil_type = 'close_jscoil';
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_petrode = v_petrode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).v_netrode = v_netrode;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).stype     = 'js';
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).cs_area   = cs_area;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).j_coil    = j_coil;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).i_coil    = i_coil;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).nb_turn   = nb_turn;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_o = field_vector_o;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_v = field_vector_v;
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).field_vector_rounding = field_vector_rounding;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).petrode = petrode;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).netrode = netrode;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).id_emdesign = id_emdesign;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).id_dom3d  = id_dom3d;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).coil_mode = coil_mode;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).coil_type = 'close_jscoil';
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).v_petrode = v_petrode;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).v_netrode = v_netrode;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).stype     = 'js';
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).cs_area   = cs_area;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).j_coil    = j_coil;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).i_coil    = i_coil;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).nb_turn   = nb_turn;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).field_vector_o = field_vector_o;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).field_vector_v = field_vector_v;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).field_vector_rounding = field_vector_rounding;
 % --- status
-c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).to_be_rebuilt = 1;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).to_be_rebuilt = 1;
 % --- info message
-f_fprintf(0,'Add #close-jscoil',1,id_coil,0,'to #emdesign3d',1,id_emdesign3d,0,'\n');
+f_fprintf(0,'Add #close-jscoil',1,id_coil,0,'to #emdesign',1,id_emdesign,0,'\n');
 

@@ -51,9 +51,13 @@ if isempty(id_mesh1d)
     id_mesh1d = fieldnames(c3dobj.mesh1d);
     id_mesh1d = id_mesh1d{1};
 end
-if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
-    info_message = ['Build with mesh1d #' id_mesh1d ' different from #' c3dobj.mesh2d.(id_mesh2d).id_mesh1d ' of mesh2d'];
-    warning(info_message);
+if isfield(c3dobj.mesh2d.(id_mesh2d),'id_mesh1d')
+    if ~isempty(id_mesh1d) && ~isempty(c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
+        if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
+            info_message = ['Build with mesh1d #' id_mesh1d ' different from #' c3dobj.mesh2d.(id_mesh2d).id_mesh1d ' of mesh2d'];
+            warning(info_message);
+        end
+    end
 end
 %--------------------------------------------------------------------------
 id_layer = f_to_scellargin(id_layer);
