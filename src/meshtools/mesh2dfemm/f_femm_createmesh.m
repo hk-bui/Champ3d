@@ -14,4 +14,30 @@ function z = f_femm_createmesh(varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'smartmesh'};
+
+% --- default input value
+smartmesh = 0;
+
+
+% --- check and update input
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+    end
+end
+% -------------------------------------------------------------------------
+if smartmesh == 0
+    mi_smartmesh(0);
+else
+    mi_smartmesh(1);
+end
+% -------------------------------------------------------------------------
 z = mi_createmesh();
+
+
+
+
