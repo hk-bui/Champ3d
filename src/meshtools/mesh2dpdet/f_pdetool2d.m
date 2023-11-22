@@ -1,8 +1,5 @@
-function shape2d = f_pdetool2d(shape2d,varargin)
+function c3dobj = f_pdetool2d(c3dobj,varargin)
 % F_PDETOOL2D ...
-%--------------------------------------------------------------------------
-% dom2D = f_pdetool2DMatlab(dom2D,'mesh_type','simple')
-% dom2D = f_pdetool2DMatlab(dom2D,'mesh_type','full')
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -12,8 +9,33 @@ function shape2d = f_pdetool2d(shape2d,varargin)
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
-shape2d.mesher = 'pdetool2d';
 
+% --- valid argument list (to be updated each time modifying function)
+arglist = {'id_mesh2d','centering','origin_coordinates',...
+           'shape2d','hgrad','box','init','jiggle','jiggleiter','mesherversion'};
+
+% --- default input value
+id_mesh2d = [];
+shape2d = [];
+hgrad = 1.3;
+hmax = 1;
+box  = 'off';
+init = 'off';
+jiggle = 'mean';
+jiggleiter = 10;
+mesherversion = 'R2013a';
+centering = [];
+origin_coordinates = [0, 0];
+
+% --- check and update input
+for i = 1:length(varargin)/2
+    if any(strcmpi(arglist,varargin{2*i-1}))
+        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+    else
+        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+    end
+end
+%--------------------------------------------------------------------------
 if isfield(shape2d,'geoIn')
     switch shape2d.geoIn.type
         case 'geofromdom'
@@ -24,44 +46,22 @@ if isfield(shape2d,'geoIn')
 else
     error([mfilename ': dom2D geometry input is not defined!']);
 end
-
-%-----
-datin = [];
-if nargin > 1
-    %-----
-    hgrad = 1.3;
-    box  = 'off';
-    init = 'off';
-    jiggle = 'mean';
-    jiggleiter = 10;
-    mesherversion = 'R2013a';
-
-    for i = 1:nargin/2
-        (lower(varargin{2*i-1})) = varargin{2*i};
-    end
-    if isfield(datin,'hmax')
-        [node,eb,elem]=initmesh(dgeo,'Hgrad',hgrad,'Hmax',hmax,'Box',box,...
-                                 'Init',init,'Jiggle',jiggle,...
-                                 'JiggleIter',jiggleiter,'MesherVersion',mesherversion);
-    else
-        [node,eb,elem]=initmesh(dgeo,'Hgrad',hgrad,'Box',box,...
-                                 'Init',init,'Jiggle',jiggle,...
-                                 'JiggleIter',jiggleiter,'MesherVersion',mesherversion);
-    end
-else
-    shape2d.mesh_type = 'simple';
-    [node,eb,elem]=initmesh(dgeo);
-end
-
+%--------------------------------------------------------------------------
+[node,eb,elem]=initmesh(dgeo,'Hgrad',hgrad,'Hmax',hmax,'Box',box,...
+                         'Init',init,'Jiggle',jiggle,...
+                         'JiggleIter',jiggleiter,'MesherVersion',mesherversion);
+%--------------------------------------------------------------------------
 %----- check and correct mesh
 [node,elem]=f_reorg2d(node,elem);
 %--------------------------------------------------------------------------
-shape2d.mesh.dgeo = dgeo;
-shape2d.mesh.node = node;  shape2d.mesh.nbNode = size(shape2d.mesh.node,2);
-shape2d.mesh.elem = elem;  shape2d.mesh.nbElem = size(shape2d.mesh.elem,2);
-shape2d.mesh.eb   = eb; % bound edge defined by initmesh tool
-shape2d.mesh.elem_type = 'tri';
-shape2d.dName  = unique(elem(4,:));
-shape2d.nbDom  = length(shape2d.dName);
+c3dobj.mesh2d.(id_mesh2d).mesher = 'pdetool';
+c3dobj.mesh2d.(id_mesh2d).dgeo = dgeo;
+c3dobj.mesh2d.(id_mesh2d).node = node;
+c3dobj.mesh2d.(id_mesh2d).nb_node = size(node,2);
+c3dobj.mesh2d.(id_mesh2d).elem = elem(1:3,:);
+c3dobj.mesh2d.(id_mesh2d).nb_elem = size(elem,2);
+c3dobj.mesh2d.(id_mesh2d).elem_code = elem(4,:);
+c3dobj.mesh2d.(id_mesh2d).elem_type = 'tri';
+c3dobj.mesh2d.(id_mesh2d).origin_coordinates = origin_coordinates;
 
 end
