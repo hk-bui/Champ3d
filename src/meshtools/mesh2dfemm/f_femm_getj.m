@@ -14,4 +14,5 @@ function j = f_femm_getj(x,y)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-j = mo_getj(x,y);
+j = mo_getj(x,y); % MA/m^2
+j = 1e6 .* j;     %  A/m^2
