@@ -12,7 +12,8 @@ function c3dobj = f_pdetool2d(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'id_mesh2d','centering','origin_coordinates',...
-           'shape2d','hgrad','hmax','box','init','jiggle','jiggleiter','mesherversion'};
+           'shape2d','hgrad','hmax','box','init','jiggle','jiggleiter','mesherversion',...
+           'id_dom2refine'};
 
 % --- default input value
 id_mesh2d = [];
@@ -24,6 +25,7 @@ init = 'off';
 jiggle = 'mean';
 jiggleiter = 10;
 mesherversion = 'R2013a';
+id_dom2refine = [];
 centering = [];
 origin_coordinates = [0, 0];
 
@@ -50,6 +52,16 @@ end
 [node,eb,elem]=initmesh(dgeo,'Hgrad',hgrad,'Hmax',hmax,'Box',box,...
                          'Init',init,'Jiggle',jiggle,...
                          'JiggleIter',jiggleiter,'MesherVersion',mesherversion);
+%--------------------------------------------------------------------------
+all_id_dom = unique(elem(4,:));
+%--------------------------------------------------------------------------
+if ~isempty(id_dom2refine)
+    for i = 1:length(id_dom2refine)
+        if any(all_id_dom == id_dom2refine(i))
+            [node,eb,elem]=refinemesh(dgeo,node,eb,elem,id_dom2refine(i));
+        end
+    end
+end
 %--------------------------------------------------------------------------
 %----- check and correct mesh
 [node,elem]=f_reorg2d(node,elem);
