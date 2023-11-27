@@ -33,7 +33,7 @@ function f_femm_set_block(draw2d,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'draw2d','id_draw2d','method','block_name','in_circuit',...
-           'nb_turns','set_pm_direction','meshsize'};
+           'nb_turns','set_pm_direction','pm_direction','meshsize'};
 
 % --- default input value
 method     = 'center';
@@ -43,7 +43,7 @@ nb_turns   = 0;
 set_pm_direction = 0;
 group = 0;
 meshsize = 0;
-
+pm_direction = 0; % degree
 % --- check and update input
 for i = 1:length(varargin)/2
     if any(strcmpi(arglist,varargin{2*i-1}))
@@ -112,15 +112,14 @@ switch lower(method)
         %------------------------------------------------------------------
 end
 %--------------------------------------------------------------------------
-pm_direction = 0;
 if set_pm_direction == +1
     pm_direction = draw2d(id).c_angle;
-end
-if set_pm_direction == -1
+elseif set_pm_direction == +1/2
+    pm_direction = draw2d(id).c_angle + 90;
+elseif set_pm_direction == -1/2
+    pm_direction = draw2d(id).c_angle - 90;
+elseif set_pm_direction == -1
     pm_direction = draw2d(id).c_angle + 180;
-end
-if set_pm_direction == 0
-    pm_direction = 0;
 end
 %--------------------------------------------------------------------------
 mi_addblocklabel(px,py);
