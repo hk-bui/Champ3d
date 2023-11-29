@@ -120,9 +120,9 @@ etrode  = [];
 petrode = [];
 netrode = [];
 if ~isempty(cs_equation)
-    if ~iscell(cs_equation)
-        cs_equation{1} = cs_equation;
-    end
+    % ---
+    cs_equation = f_to_scellargin(cs_equation);
+    % ---
     geo = f_cutdom(node, elem, 'elem_type', elem_type,...
                    'cut_equation', cs_equation{1});
     geo.id_elem = id_elem(geo.id_elem); % !!!

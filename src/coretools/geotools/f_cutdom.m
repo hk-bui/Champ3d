@@ -126,7 +126,7 @@ else
     elem(nbNo_inEl+1,:) = 1;
     elem(nbNo_inEl+1,iElem) = 2;
     mesh = f_make_mds(node,elem,elem_type);
-
+    
     etrodeNode = [];
     for i = 1:max(con.nbNo_inFa)
         etrodeNode = [etrodeNode mesh.interface(i,:)];
