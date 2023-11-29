@@ -31,21 +31,12 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh2d)
-    error([mfilename ' : #id_mesh2d must be given !']);
+    id_mesh2d = fieldnames(c3dobj.mesh2d);
+    id_mesh2d = id_mesh2d{1};
 end
 %--------------------------------------------------------------------------
 while iscell(id_mesh2d)
     id_mesh2d = id_mesh2d{1};
-end
-%--------------------------------------------------------------------------
-if isempty(id_layer)
-    error([mfilename ' : #id_layer must be given !']);
-end
-%--------------------------------------------------------------------------
-if ~iscell(id_layer)
-    idl = id_layer;
-    id_layer = {};
-    id_layer{1} = idl;
 end
 %--------------------------------------------------------------------------
 if isempty(id_mesh1d)
@@ -53,9 +44,14 @@ if isempty(id_mesh1d)
     id_mesh1d = id_mesh1d{1};
 end
 %--------------------------------------------------------------------------
+if isempty(id_layer)
+    id_layer = fieldnames(c3dobj.mesh1d.(id_mesh1d).layer);
+end
+%--------------------------------------------------------------------------
+id_layer = f_to_scellargin(id_layer);
+%--------------------------------------------------------------------------
 tic;
 f_fprintf(0,'Make #c3d_prismmesh',1,id_mesh3d);
-
 %--------------------------------------------------------------------------
 divlay   = [];
 nb_layer = 0;
