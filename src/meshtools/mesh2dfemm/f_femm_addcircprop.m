@@ -16,21 +16,21 @@ function f_femm_addcircprop(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_circuit','imax','circuit_type'};
+arglist = {'id_circuit','i','circuit_type'};
 
 % --- default input value
 id_circuit = 'circuit';
-imax = 0;
+i = 0;
 circuit_type = 'parallel'; % 'parallel', 'series'
 
 
 %--------------------------------------------------------------------------
 % --- check and update input
-for i = 1:(nargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
+for k = 1:(nargin)/2
+    if any(strcmpi(arglist,varargin{2*k-1}))
+        eval([lower(varargin{2*k-1}) '= varargin{2*i};']);
     else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
+        error([mfilename ': #' varargin{2*k-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
 %--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ switch circuit_type
 end
 
 %--------------------------------------------------------------------------
-mi_addcircprop(id_circuit,imax,circuit_type);
+mi_addcircprop(id_circuit,i,circuit_type);
 %--------------------------------------------------------------------------
 
 
