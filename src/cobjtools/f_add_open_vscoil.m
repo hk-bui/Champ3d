@@ -113,9 +113,7 @@ if ~isempty(petrode_equation)
     %----------------------------------------------------------------------
     petrode = [];
     %----------------------------------------------------------------------
-    if ~iscell(petrode_equation)
-        petrode_equation{1} = petrode_equation;
-    end
+    petrode_equation = f_to_scellargin(petrode_equation);
     %----------------------------------------------------------------------
     for itrod = 1:length(petrode_equation)
         petrode(itrod).id_node = f_find_cutnode3d(node, elem, 'elem_type', elem_type,...
@@ -131,9 +129,7 @@ if ~isempty(netrode_equation)
     %----------------------------------------------------------------------
     netrode = [];
     %----------------------------------------------------------------------
-    if ~iscell(netrode_equation)
-        netrode_equation{1} = netrode_equation;
-    end
+    netrode_equation = f_to_scellargin(netrode_equation);
     %----------------------------------------------------------------------
     for itrod = 1:length(netrode_equation)
         netrode(itrod).id_node = f_find_cutnode3d(node, elem, 'elem_type', elem_type,...
@@ -149,6 +145,8 @@ end
 % -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode_equation = petrode_equation;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode_equation = netrode_equation;
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).defined_with = 'etrode';
+c3dobj.emdesign.(id_emdesign).coil.(id_coil).id_elem = id_elem;
 % -
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).petrode = petrode;
 c3dobj.emdesign3d.(id_emdesign3d).coil.(id_coil).netrode = netrode;

@@ -137,7 +137,7 @@ if ~isempty(cs_equation)
     %id_elem = setdiff(id_elem,geo.id_elem);
     % ---
     cutnode = f_uniquenode(elem(:,lid_elem),'nb_vertices',con.EdNo_inEl);
-    id_node = setdiff(id_node,cutnode);
+    %id_node = setdiff(id_node,cutnode);
     %------
 end
 %--------------------------------------------------------------------------
