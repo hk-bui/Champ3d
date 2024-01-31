@@ -12,7 +12,7 @@ function c3dobj = f_add_pmagnet(c3dobj,varargin)
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'id_emdesign','id_dom3d','id_dom2d','id_pmagnet',...
            'br_value','br_dir',...
-           'br_array','id_bcon'};
+           'br'};
 
 % --- default input value
 id_emdesign = [];
@@ -20,8 +20,8 @@ id_dom3d    = [];
 id_dom2d    = [];
 br_value    = 0;
 br_dir      = [];
-br_array    = [];
-id_bcon     = [];
+br          = [];
+mu_r        = 1;
 id_pmagnet  = [];
 %--------------------------------------------------------------------------
 if nargin <= 1
@@ -55,7 +55,8 @@ c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_dom3d = id_dom3d;
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_dom2d = id_dom2d;
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br_value = br_value;
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br_dir   = br_dir;
-c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).id_bcon  = id_bcon;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).br       = br;
+c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).mu_r     = mu_r;
 % --- status
 c3dobj.emdesign.(id_emdesign).pmagnet.(id_pmagnet).to_be_rebuilt = 1;
 % --- info message

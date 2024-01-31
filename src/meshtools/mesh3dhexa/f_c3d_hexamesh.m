@@ -32,28 +32,29 @@ end
 
 %--------------------------------------------------------------------------
 if isempty(id_mesh2d)
-    error([mfilename ' : #id_mesh2d must be given !']);
-end
-% if isempty(id_mesh2d)
-%     id_mesh2d = fieldnames(c3dobj.mesh2d);
-%     id_mesh2d = id_mesh2d{1};
-% end
-%--------------------------------------------------------------------------
-while iscell(id_mesh2d)
+    id_mesh2d = fieldnames(c3dobj.mesh2d);
     id_mesh2d = id_mesh2d{1};
 end
 %--------------------------------------------------------------------------
-if isempty(id_layer)
-    error([mfilename ' : #id_layer must be given !']);
+while iscell(id_mesh2d)
+    id_mesh2d = id_mesh2d{1};
 end
 %--------------------------------------------------------------------------
 if isempty(id_mesh1d)
     id_mesh1d = fieldnames(c3dobj.mesh1d);
     id_mesh1d = id_mesh1d{1};
 end
-if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
-    info_message = ['Build with mesh1d #' id_mesh1d ' different from #' c3dobj.mesh2d.(id_mesh2d).id_mesh1d ' of mesh2d'];
-    warning(info_message);
+if isfield(c3dobj.mesh2d.(id_mesh2d),'id_mesh1d')
+    if ~isempty(id_mesh1d) && ~isempty(c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
+        if ~strcmpi(id_mesh1d,c3dobj.mesh2d.(id_mesh2d).id_mesh1d)
+            info_message = ['Build with mesh1d #' id_mesh1d ' different from #' c3dobj.mesh2d.(id_mesh2d).id_mesh1d ' of mesh2d'];
+            warning(info_message);
+        end
+    end
+end
+%--------------------------------------------------------------------------
+if isempty(id_layer)
+    id_layer = fieldnames(c3dobj.mesh1d.(id_mesh1d).layer);
 end
 %--------------------------------------------------------------------------
 id_layer = f_to_scellargin(id_layer);

@@ -1,6 +1,6 @@
-function z = f_femm_createmesh(varargin)
+function fvalue = f_femm_get(x,y,varargin)
 %--------------------------------------------------------------------------
-% Call mi_createmesh
+% Call mo_getj
 % FEMM
 % Author : David Meeker
 % Copyright (C) 1998-2015
@@ -15,11 +15,10 @@ function z = f_femm_createmesh(varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'smartmesh'};
+arglist = {'field_name'};
 
 % --- default input value
-smartmesh = 0;
-
+field_name = '';
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -29,14 +28,18 @@ for i = 1:length(varargin)/2
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
 end
-% -------------------------------------------------------------------------
-if smartmesh == 0
-    mi_smartmesh(0);
-else
-    mi_smartmesh(1);
+
+if any(f_strcmpi(field_name,{'j'}))
+    fvalue = mo_getj(x,y); % MA/m^2
+    fvalue = 1e6 .* fvalue;     %  A/m^2
+elseif any(f_strcmpi(field_name,{'b'}))
+    fvalue = mo_getb(x,y); % Tesla
 end
-% -------------------------------------------------------------------------
-z = mi_createmesh();
+
+
+
+
+
 
 
 

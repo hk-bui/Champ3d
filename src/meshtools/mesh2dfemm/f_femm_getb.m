@@ -1,6 +1,6 @@
-function j = f_femm_getj(x,y)
+function b = f_femm_getb(x,y)
 %--------------------------------------------------------------------------
-% Call mo_getj
+% Call mo_getb
 % FEMM
 % Author : David Meeker
 % Copyright (C) 1998-2015
@@ -14,4 +14,4 @@ function j = f_femm_getj(x,y)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-j = mo_getj(x,y);
+b = mo_getb(x,y); % Tesla

@@ -13,7 +13,7 @@ function meshobj = f_get_meshobj(c3dobj,varargin)
 arglist = {'id_mesh2d','id_dom2d',...
            'id_mesh3d','id_dom3d',...
            'of_dom3d',...
-           'id_emdesign3d','id_thdesign3d', ...
+           'id_emdesign','id_thdesign', ...
            'id_econductor','id_mconductor',...
            'id_coil','id_bc','id_nomesh',...
            'id_bsfield','id_pmagnet',...
@@ -30,8 +30,8 @@ id_dom2d   = [];
 id_mesh3d  = [];
 id_dom3d   = [];
 of_dom3d   = [];
-id_emdesign3d  = [];
-id_thdesign3d  = [];
+id_emdesign  = [];
+id_thdesign  = [];
 id_econductor  = [];
 id_mconductor = [];
 id_coil = [];
@@ -56,13 +56,13 @@ end
 %--------------------------------------------------------------------------
 design3d = [];
 id_design3d = [];
-if ~isempty(id_emdesign3d)
-    design3d = 'emdesign3d';
-    id_design3d = id_emdesign3d;
+if ~isempty(id_emdesign)
+    design3d = 'emdesign';
+    id_design3d = id_emdesign;
 end
-if ~isempty(id_thdesign3d)
-    design3d = 'thdesign3d';
-    id_design3d = id_thdesign3d;
+if ~isempty(id_thdesign)
+    design3d = 'thdesign';
+    id_design3d = id_thdesign;
 end
 %--------------------------------------------------------------------------
 thing = [];

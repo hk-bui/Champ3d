@@ -23,7 +23,7 @@ arglist = {'id_draw2d','r','max_anglen','ocenter'};
 
 % --- default input value
 r = [];
-max_anglen = [];
+max_anglen = []; % in degree
 id_draw2d = [];
 ocenter = [0 0];
 
@@ -53,7 +53,8 @@ y2 = r * sind(180) + ocenter(2);
 mi_drawarc(x1,y1,x2,y2,180,max_anglen);
 mi_drawarc(x2,y2,x1,y1,180,max_anglen);
 % -------------------------------------------------------------------------
-eps_r = r * (1 - 1/1e3);
+sfactor = 1/(1-cosd(max_anglen/2)) - 1; % -1 for security
+eps_r = r * (1 - 1/sfactor);
 bottom(1) = eps_r * cosd(-90) + ocenter(1);
 bottom(2) = eps_r * sind(-90) + ocenter(2);
 upper(1)  = eps_r * cosd(+90) + ocenter(1);

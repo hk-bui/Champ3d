@@ -11,20 +11,23 @@ function f_view_c3dobj(c3dobj,varargin)
 
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'face_color','edge_color','alpha_value', 'text_color', 'text_size'...
-           'id_mesh2d','id_dom2d',...
+           'id_mesh2d','id_dom2d','elem_code',...
            'id_mesh3d','id_dom3d',...
-           'id_emdesign3d','id_thdesign3d', ...
+           'id_emdesign','id_thdesign', ...
            'id_econductor','id_mconductor','id_coil','id_bc','id_nomesh',...
            'id_bsfield','id_pmagnet',...
-           'id_tconductor','id_tcapacitor'};
+           'id_tconductor','id_tcapacitor',...
+           'id_elem'};
 
 % --- default input value
+id_elem    = [];
 id_mesh2d  = [];
 id_dom2d   = [];
+elem_code  = [];
 id_mesh3d  = [];
 id_dom3d   = [];
-id_emdesign3d  = [];
-id_thdesign3d  = [];
+id_emdesign  = [];
+id_thdesign  = [];
 id_econductor  = [];
 id_mconductor = [];
 id_coil = [];
@@ -62,9 +65,22 @@ defined_on = [];
 if ~for3d
     %----------------------------------------------------------------------
     if isempty(id_dom2d)
-        id_dom2d = {''};
-        id_elem  = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
-        disptext = {'all-elem'};
+        if isempty(elem_code)
+            id_dom2d = {''};
+            id_elem  = 1:c3dobj.mesh2d.(id_mesh2d).nb_elem;
+            disptext = {'all-elem'};
+        elseif isempty(id_elem)
+            disptext = '';
+            id_elem = [];
+            for i = 1:length(elem_code)
+                id_elem = [id_elem ...
+                    f_torowv(find(c3dobj.mesh2d.(id_mesh2d).elem_code == elem_code(i)))];
+                disptext = [disptext '-' num2str(elem_code(i)) '-'];
+            end
+            id_elem = unique(id_elem);
+        else
+            id_elem = unique(id_elem);
+        end
     else
         id_elem  = c3dobj.mesh2d.(id_mesh2d).dom2d.(id_dom2d).id_elem;
         disptext = id_dom2d;
@@ -96,9 +112,14 @@ else
             elem    = c3dobj.mesh3d.(id_mesh3d).dom3d.(id_dom3d).node;
             defined_on = 'node';
         end
-    else
+    elseif isempty(id_elem)
         elem = c3dobj.mesh3d.(id_mesh3d).elem;
         disptext = 'all';
+        defined_on = 'elem';
+    else
+        id_elem = unique(id_elem);
+        elem = c3dobj.mesh3d.(id_mesh3d).elem(:,id_elem);
+        disptext = '___';
         defined_on = 'elem';
     end
     elem_type = c3dobj.mesh3d.(id_mesh3d).elem_type;

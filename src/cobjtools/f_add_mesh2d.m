@@ -13,10 +13,12 @@ function c3dobj = f_add_mesh2d(c3dobj,varargin)
 % --- valid argument list (to be updated each time modifying function)
 arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y',...
            'centering', 'origin_coordinates', ...
-           'mesh_file'};
+           'mesh_file',...
+           'shape2d','hgrad','hmax','box','init','jiggle','jiggleiter','mesherversion', ...
+           'id_dom2refine'};
 
 % --- default input value
-build_from = 'mesh1d'; % 'mesh1d', 'geoquad', 'femm'
+build_from = 'mesh1d'; % 'mesh1d', 'geoquad', 'femm', 'shape2d'
 id_mesh2d = [];
 id_mesh1d = [];
 flog = 1.05; % log factor when making log mesh
@@ -25,6 +27,15 @@ id_y = [];
 centering = 0;
 origin_coordinates = [0, 0];
 mesh_file = [];
+shape2d = [];
+hgrad = 1.3;
+hmax = 1;
+box  = 'off';
+init = 'off';
+jiggle = 'mean';
+jiggleiter = 10;
+mesherversion = 'R2013a';
+id_dom2refine = [];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -35,8 +46,8 @@ for i = 1:length(varargin)/2
     end
 end
 %--------------------------------------------------------------------------
-if ~any(strcmpi(build_from,{'mesh1d','geoquad','femm'}))
-    error([mfilename ' : #build_from should be #mesh1d, #geoquad or #femm !']);
+if ~any(strcmpi(build_from,{'mesh1d','geoquad','femm','shape2d'}))
+    error([mfilename ' : #build_from should be mesh1d, geoquad, femm or shape2d !']);
 end
 if any(strcmpi(build_from,{'femm'}))
     if isempty(mesh_file)
@@ -50,9 +61,19 @@ end
 if strcmpi(build_from,'mesh1d')
     %----------------------------------------------------------------------
     % --- Output
-    c3dobj = f_mesh2dgeo1d(c3dobj,varargin{:});
+    c3dobj = f_mesh2dgeo1d(c3dobj,'id_mesh2d',id_mesh2d,'id_mesh1d',id_mesh1d,...
+             'flog',flog,'id_x',id_x,'id_y',id_y,...
+             'centering',centering,'origin_coordinates',origin_coordinates);
 elseif strcmpi(build_from,'femm')
-    c3dobj = f_femm_loadmeshfile(c3dobj,varargin{:});
+    c3dobj = f_femm_loadmeshfile(c3dobj,'id_mesh2d',id_mesh2d,...
+             'mesh_file',mesh_file,...
+             'centering',centering,'origin_coordinates',origin_coordinates);
+elseif strcmpi(build_from,'shape2d')
+    c3dobj = f_pdetool2d(c3dobj,'id_mesh2d',id_mesh2d,...
+             'shape2d',shape2d,'hgrad',hgrad,'hmax',hmax,'box',box,'init',init,...
+             'jiggle',jiggle,'jiggleiter',jiggleiter,'mesherversion',mesherversion,...
+             'id_dom2refine',id_dom2refine,...
+             'centering',centering,'origin_coordinates',origin_coordinates);
 elseif strcmpi(build_from,'geoquad')
     % TODO
 end

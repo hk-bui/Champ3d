@@ -54,6 +54,8 @@ if isempty(id_draw2d)
     id_draw2d = ['XXDraw2dNo' num2str(lendr)];
 end
 % -------------------------------------------------------------------------
+sfactor = 1e2;
+% -------------------------------------------------------------------------
 if arc_len <= 180
     % ---------------------------------------------------------------------
     xi1 = ri * cosd(c_angle - arc_len/2) + ocenter(1);
@@ -71,15 +73,15 @@ if arc_len <= 180
     mi_drawline(xi1,yi1,xe1,ye1);
     mi_drawline(xi2,yi2,xe2,ye2);
     % ---------------------------------------------------------------------
-    eps_a = arc_len/2 - arc_len/1e3;
-    eps_r = ri + (ri+re)/1e3;
+    eps_a = arc_len/2 - arc_len/sfactor;
+    eps_r = ri + (ri+re)/sfactor;
     bottomright(1) = eps_r * cosd(c_angle - eps_a) + ocenter(1);
     bottomright(2) = eps_r * sind(c_angle - eps_a) + ocenter(2);
     bottomleft(1)  = eps_r * cosd(c_angle + eps_a) + ocenter(1);
     bottomleft(2)  = eps_r * sind(c_angle + eps_a) + ocenter(2);
     % ---------------------------------------------------------------------
-    eps_a = arc_len/2 - arc_len/1e3;
-    eps_r = re - (ri+re)/1e3;
+    eps_a = arc_len/2 - arc_len/sfactor;
+    eps_r = re - (ri+re)/sfactor;
     upperright(1) = eps_r * cosd(c_angle - eps_a) + ocenter(1);
     upperright(2) = eps_r * sind(c_angle - eps_a) + ocenter(2);
     upperleft(1)  = eps_r * cosd(c_angle + eps_a) + ocenter(1);
@@ -113,24 +115,24 @@ else
     mi_drawline(xi3,yi3,xe3,ye3);
     % ---------------------------------------------------------------------
     ca    = c_angle - arc_len/4;
-    eps_a = arc_len/4 - arc_len/1e3;
+    eps_a = arc_len/4 - arc_len/sfactor;
     % ---
-    eps_r = ri + (ri+re)/1e3;
+    eps_r = ri + (ri+re)/sfactor;
     bottomright(1) = eps_r * cosd(ca - eps_a) + ocenter(1);
     bottomright(2) = eps_r * sind(ca - eps_a) + ocenter(2);
     % ---
-    eps_r = re - (ri+re)/1e3;
+    eps_r = re - (ri+re)/sfactor;
     upperright(1) = eps_r * cosd(ca - eps_a) + ocenter(1);
     upperright(2) = eps_r * sind(ca - eps_a) + ocenter(2);
     % ---------------------------------------------------------------------
     ca    = c_angle + arc_len/4;
-    eps_a = arc_len/4 - arc_len/1e3;
+    eps_a = arc_len/4 - arc_len/sfactor;
     % ---
-    eps_r = ri + (ri+re)/1e3;
+    eps_r = ri + (ri+re)/sfactor;
     bottomleft(1) = eps_r * cosd(ca + eps_a) + ocenter(1);
     bottomleft(2) = eps_r * sind(ca + eps_a) + ocenter(2);
     % ---
-    eps_r = re - (ri+re)/1e3;
+    eps_r = re - (ri+re)/sfactor;
     upperleft(1) = eps_r * cosd(ca + eps_a) + ocenter(1);
     upperleft(2) = eps_r * sind(ca + eps_a) + ocenter(2);
     % ---------------------------------------------------------------------

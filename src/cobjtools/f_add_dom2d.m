@@ -100,11 +100,11 @@ switch c3dobj.mesh2d.(id_mesh2d).mesher
             id_elem = unique(id_elem);
         end
     case 'quadmesh'
-    case 'triangle_femm'
+    case {'triangle_femm','pdetool'}
         id_elem = [];
         for i = 1:length(elem_code)
             id_elem = [id_elem ...
-                find(c3dobj.mesh2d.(id_mesh2d).elem_code == elem_code(i))];
+                f_torowv(find(c3dobj.mesh2d.(id_mesh2d).elem_code == elem_code(i)))];
         end
         id_elem = unique(id_elem);
 end

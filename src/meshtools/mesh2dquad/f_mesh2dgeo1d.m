@@ -10,7 +10,7 @@ function c3dobj = f_mesh2dgeo1d(c3dobj,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'build_from','id_mesh2d','id_mesh1d','flog','id_x','id_y',...
+arglist = {'id_mesh2d','id_mesh1d','flog','id_x','id_y',...
            'centering','origin_coordinates'};
 
 % --- default input value

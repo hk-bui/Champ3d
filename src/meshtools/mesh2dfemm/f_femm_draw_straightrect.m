@@ -67,11 +67,11 @@ mi_drawline(d2(1),d2(2),d3(1),d3(2));
 mi_drawline(d3(1),d3(2),d4(1),d4(2));
 mi_drawline(d4(1),d4(2),d1(1),d1(2));
 % -------------------------------------------------------------------------
-s_factor = 1 - 1e-3;
-bottomright = center - diagvec1*s_factor + ocenter;
-upperright  = center - diagvec2*s_factor + ocenter;
-bottomleft  = center + diagvec1*s_factor + ocenter;
-upperleft   = center + diagvec2*s_factor + ocenter;
+sfactor  = 1e2;
+bottomright = center - diagvec1*(1-1/sfactor) + ocenter;
+upperright  = center - diagvec2*(1-1/sfactor) + ocenter;
+bottomleft  = center + diagvec1*(1-1/sfactor) + ocenter;
+upperleft   = center + diagvec2*(1-1/sfactor) + ocenter;
 % -------------------------------------------------------------------------
 draw2d(lendr).id_draw2d = id_draw2d;
 draw2d(lendr).type = 'straight_rectangle';
