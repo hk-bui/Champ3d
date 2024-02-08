@@ -9,8 +9,6 @@ function named_arguments = f_str2namedarg(str)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-%named_arguments = [string(fieldnames(str)), struct2cell(str)].';
-
 named_arguments = {};
 arg_name = fieldnames(str);
 nb_arg = length(arg_name);
