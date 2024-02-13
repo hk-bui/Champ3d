@@ -28,7 +28,6 @@ classdef SurfaceDom3d < SurfaceDom
                 % ---
                 args.parent_mesh
                 args.gid_face = []
-                args.build_from = []
                 args.condition = []
                 % ---
                 args.defined_on char = []

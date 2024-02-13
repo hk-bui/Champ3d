@@ -9,9 +9,13 @@ function valide_id = f_validid(id2test,all_id)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-id2test = replace(id2test,'...','');
-check_valide = regexp(all_id,[id2test '\w*']);
-
+if endWith(id2test,'...')
+    id2test = replace(id2test,'...','');
+    check_valide = regexp(all_id,[id2test '\w*']);
+else
+    check_valide = strcmpi(id2test,all_id);
+end
+% ---
 valide_id = {};
 k = 0;
 for i = 1:length(check_valide)

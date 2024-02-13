@@ -14,6 +14,7 @@ classdef SurfaceDom < Xhandle
     properties
         parent_mesh
         gid_face
+        defined_on
         condition
     end
 
@@ -29,6 +30,7 @@ classdef SurfaceDom < Xhandle
                 % ---
                 args.parent_mesh = []
                 args.gid_face = []
+                args.defined_on = []
                 args.condition = []
             end
             % ---

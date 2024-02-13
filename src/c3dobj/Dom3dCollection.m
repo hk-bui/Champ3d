@@ -64,17 +64,20 @@ classdef Dom3dCollection < Xhandle
                 obj
                 % ---
                 args.id char
-                args.dom2d_collection Dom2dCollection
-                args.id_dom2d = []
-                args.id_zline = []
-                args.elem_code = []
-                args.id_face = []
+                % ---
+                args.parent_mesh
+                args.gid_face = []
+                args.condition = []
+                % ---
+                args.defined_on char = []
+                args.dom3d_collection Dom3dCollection
+                args.id_dom3d
             end
             % ---
             argu = f_to_namedarg(args,'with_out','id');
-            vdom = SurfaceDom3d(argu{:},'parent_mesh',obj.parent_mesh);
+            sdom = SurfaceDom3d(argu{:},'parent_mesh',obj.parent_mesh);
             % ---
-            obj.data.(args.id) = vdom;
+            obj.data.(args.id) = sdom;
         end
         % -----------------------------------------------------------------
     end
