@@ -14,19 +14,11 @@ arguments
     node
     elem
     args.condition char
-    args.elem_type char = []
     args.tol = 1e-12
-    args.defined_on char = []
 end
 
 % --- default input value
 condition = args.condition;
-elem_type = args.elem_type;
-% ---
-if isempty(args.defined_on)
-    defined_on = 'elem';
-end
-
 %--------------------------------------------------------------------------
 condition = f_cut_equation(condition,'tol',args.tol);
 %--------------------------------------------------------------------------
@@ -35,11 +27,22 @@ neqcond = condition.neqcond;
 %--------------------------------------------------------------------------
 nbEqcond = length(eqcond);
 %--------------------------------------------------------------------------
-if isempty(elem_type)
-    elem_type = f_elemtype(elem,'defined_on',defined_on);
-end
+elem = sort(elem,1,"descend");
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
+id_gr = {};
+el_gr = {};
+nb_gr = 1;
+for i = size(elem,1):1
+    if any(elem(i,:) == 0)
+        nb_gr = nb_gr + 1;
+    else
+        el_gr{1} = elem;
+    end
+end
+
+
+
+%--------------------------------------------------------------------------
 nbNo_inEl = con.nbNo_inEl;
 nbElem = size(elem,2);
 %----- barrycenter
