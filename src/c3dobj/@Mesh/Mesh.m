@@ -92,7 +92,6 @@ classdef Mesh < Xhandle
 
     % --- Methods
     methods
-        % --- get
         function plot(obj,varargin)
             if isempty(obj.node) || isempty(obj.elem)
                 f_fprintf(1,'An empty Mesh object',0,'\n');

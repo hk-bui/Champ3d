@@ -32,6 +32,7 @@ classdef TriMesh < Mesh
             obj.node = args.node;
             obj.elem = args.elem;
             % ---
+            obj.calflatnode;
         end
     end
 

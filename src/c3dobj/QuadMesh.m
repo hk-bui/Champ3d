@@ -28,10 +28,13 @@ classdef QuadMesh < Mesh
                 args.elem = []
             end
             % ---
+            obj = obj@Mesh;
+            % ---
             obj.elem_type = 'quad';
             obj.node = args.node;
             obj.elem = args.elem;
             % ---
+            obj.calflatnode;
         end
     end
 
