@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Mesh1d < handle
+classdef Mesh1d < Xhandle
 
     % --- Properties
     properties
@@ -33,18 +33,14 @@ classdef Mesh1d < handle
     methods
         function obj = Mesh1d(args)
             arguments
-                args.id char
-                args.len {mustBeNumeric}
+                args.id char = '0'
+                args.len {mustBeNumeric}  = 0
                 args.dtype = 'lin'
                 args.dnum {mustBeInteger} = 1
                 args.flog {mustBeNumeric} = 1.05
             end
             % ---
-            obj.id = args.id;
-            obj.len = args.len;
-            obj.dtype = args.dtype;
-            obj.dnum = args.dnum;
-            obj.flog = args.flog;
+            obj <= args;
             % ---
         end
     end

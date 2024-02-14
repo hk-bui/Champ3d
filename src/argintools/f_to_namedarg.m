@@ -84,4 +84,6 @@ elseif isstruct(argsin)
         end
     end
     %----------------------------------------------------------------------
+else
+    validargs = [];
 end

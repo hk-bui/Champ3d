@@ -60,17 +60,21 @@ classdef PhysicalModel < Xhandle
                 % ---
                 args.id char
                 % ---
-                args.mesh1d_collection
+                args.mesh1d_collection = []
                 args.id_xline = []
                 args.id_yline = []
                 % ---
                 args.mesh_file = []
             end
             % ---
+            if isempty(args.mesh1d_collection)
+                args.mesh1d_collection = obj.mesh1d_collection;
+            end
+            % ---
             if obj.is_available(args,'mesh_file')
                 msh = TriMeshFromFemm(obj.tmp.args{:});
                 obj.mesh2d_collection.data.(args.id) = msh;
-            elseif obj.is_available(args,{'id_mesh1d','id_xline','id_yline'})
+            elseif obj.is_available(args,{'mesh1d_collection','id_xline','id_yline'})
                 msh = QuadMeshFrom1d(obj.tmp.args{:});
                 obj.mesh2d_collection.data.(args.id) = msh;
             end

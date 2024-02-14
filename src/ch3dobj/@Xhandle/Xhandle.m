@@ -57,18 +57,21 @@ classdef Xhandle < matlab.mixin.Copyable
             field_name = f_to_scellargin(field_name);
             % ---
             res = 1;
+            args4obj = [];
             for i = 1:length(field_name)
                 if isfield(args,field_name{i})
                     if isempty(args.(field_name{i}))
                         res = 0;
                         args = rmfield(args,field_name{i});
+                    else
+                        args4obj.(field_name{i}) = args.(field_name{i});
                     end
                 else
                     res = 0;
                 end
             end
             % ---
-            obj.tmp.args = f_to_namedarg(args);
+            obj.tmp.args = f_to_namedarg(args4obj);
         end
         %------------------------------------------------------------------
         %------------------------------------------------------------------
