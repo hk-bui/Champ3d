@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Xhandle < handle
+classdef Xhandle < matlab.mixin.Copyable
 
     methods
         function le(obj,objx)
