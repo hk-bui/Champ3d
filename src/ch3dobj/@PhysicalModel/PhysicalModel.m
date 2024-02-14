@@ -11,12 +11,12 @@
 classdef PhysicalModel < Xhandle
     properties
         info 
-        mesh1d struct = []
-        mesh2d struct = []
-        mesh3d struct = []
-        emmodel struct = []
-        thmodel struct = []
-        memodel struct = []
+        mesh1d_collection Mesh1dCollection
+        mesh2d_collection Mesh2dCollection
+        mesh3d_collection Mesh3dCollection
+        emmodel_collection 
+        thmodel_collection 
+        memodel_collection 
     end
 
     % --- Constructors
@@ -27,6 +27,10 @@ classdef PhysicalModel < Xhandle
             end
             % ---
             obj.info = args.info;
+            % ---
+            obj.mesh1d_collection = Mesh1dCollection;
+            obj.mesh2d_collection = Mesh2dCollection;
+            obj.mesh3d_collection = Mesh3dCollection;
         end
     end
 
@@ -46,7 +50,7 @@ classdef PhysicalModel < Xhandle
             % ---
             if obj.is_available(args,{'len','dtype','dnum','flog'})
                 line = Mesh1d(obj.tmp.args{:});
-                obj.mesh1d.(args.id) = line;
+                obj.mesh1d_collection.data.(args.id) = line;
             end
         end
         % -----------------------------------------------------------------
@@ -65,10 +69,10 @@ classdef PhysicalModel < Xhandle
             % ---
             if obj.is_available(args,'mesh_file')
                 msh = TriMeshFromFemm(obj.tmp.args{:});
-                obj.mesh2d.(args.id) = msh;
-            elseif obj.is_available('id_mesh1d','id_xline','id_yline')
+                obj.mesh2d_collection.data.(args.id) = msh;
+            elseif obj.is_available(args,{'id_mesh1d','id_xline','id_yline'})
                 msh = QuadMeshFrom1d(obj.tmp.args{:});
-                obj.mesh2d.(args.id) = msh;
+                obj.mesh2d_collection.data.(args.id) = msh;
             end
         end
         % -----------------------------------------------------------------
@@ -87,10 +91,10 @@ classdef PhysicalModel < Xhandle
             % ---
             if obj.is_available(args,'mesh_file')
                 msh = TriMeshFromFemm(obj.tmp.args{:});
-                obj.mesh2d.(args.id) = msh;
+                obj.mesh2d_collection.(args.id) = msh;
             elseif obj.is_available('id_mesh1d','id_xline','id_yline')
                 msh = QuadMeshFrom1d(obj.tmp.args{:});
-                obj.mesh2d.(args.id) = msh;
+                obj.mesh2d_collection.(args.id) = msh;
             end
         end
         % -----------------------------------------------------------------
