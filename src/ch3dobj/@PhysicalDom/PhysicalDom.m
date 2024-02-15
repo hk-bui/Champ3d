@@ -8,31 +8,28 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef EmModel < Xhandle
+classdef PhysicalDom < Xhandle
     properties
-        econductor
-        mconductor
-        pmagnet
-        airbox
-        nomesh
-        coil
-        bsfield
-        sibc
+        parent_mesh
+        mesh2d_collection
+        id_mesh2d
+        dom2d_collection
+        id_dom2d
+        mesh3d_collection
+        id_mesh3d
+        dom3d_collection
+        id_dom3d
         % ---
-        matrix
-        field
+        to_be_rebuild
     end
 
     % --- Methods
     methods
-        function add_econductor(obj,args)
+        function coef_array = call_coefficient(obj,args)
             arguments
                 obj
                 % ---
-                args.id
-                args.id_dom2d
-                args.id_dom3d
-                args.sigma
+                args.coef_name = []
             end
         end
     end
