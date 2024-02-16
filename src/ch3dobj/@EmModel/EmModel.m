@@ -12,7 +12,6 @@ classdef EmModel < Xhandle
     properties
         info
         % ---
-        emmodel
         fr = 0
         jome
         % ---
@@ -43,7 +42,14 @@ classdef EmModel < Xhandle
         function obj = EmModel(args)
             arguments
                 args.info = 'no_info'
-                args.emmodel = 'no_info'
+                args.mesh2d_collection = []
+                args.mesh3d_collection = []
+                args.dom2d_collection = []
+                args.dom3d_collection = []
+                args.id_mesh2d = []
+                args.id_mesh3d = []
+                % ---
+                args.parent_mesh = []
             end
             % ---
             obj <= args;

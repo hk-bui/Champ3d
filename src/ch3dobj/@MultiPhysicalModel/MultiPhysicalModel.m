@@ -285,17 +285,15 @@ classdef MultiPhysicalModel < Xhandle
                 args.id char
                 % ---
                 args.parent_mesh = []
+                % ---
                 args.mesh3d_collection = []
                 args.id_mesh3d = []
                 % ---
                 args.dom3d_collection = []
-                args.id_dom3d = []
                 % ---
-                args.defined_on char = []
+                args.emmodel_class {mustBeMember(args.emmodel_class,...
+                    {'FEM3dAPhijw','FEM3dAPhits','FEM3dVjw','FEM3dVts'})}
                 % ---
-                args.elem_code = []
-                args.gid_face = []
-                args.condition char = []
             end
             % ---
             if isempty(args.mesh3d_collection)
@@ -320,8 +318,9 @@ classdef MultiPhysicalModel < Xhandle
             argu = f_to_namedarg(args,'with_only',...
                 {'parent_mesh','dom3d_collection','id_dom3d','defined_on',...
                  'gid_face','condition'});
-            sdom = SurfaceDom3d(argu{:});
-            obj.dom3d_collection.data.(args.id) = sdom;
+            % ---
+            emmod = feval(args.emmodel_class,argu{:});
+            obj.dom3d_collection.data.(args.id) = emmod;
             % ---
         end
         % -----------------------------------------------------------------

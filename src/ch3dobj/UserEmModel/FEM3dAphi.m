@@ -13,7 +13,9 @@ classdef FEM3dAphi < EmModel
     % --- Contructor
     methods
         function obj = FEM3dAphi(args)
-            
+            arguments
+                
+            end
         end
     end
 end

@@ -74,6 +74,128 @@ classdef Xhandle < matlab.mixin.Copyable
             obj.tmp.args = f_to_namedarg(args4obj);
         end
         %------------------------------------------------------------------
+        function args = getargs(obj,args)
+            % ---
+            args = obj.cal_mesh3d_collection(args);
+            args = obj.cal_id_mesh3d(args);
+            args = obj.cal_parent_mesh(args);
+            % ---
+            args = obj.cal_dom3d_collection(args);
+            args = obj.cal_dom2d_collection(args);
+            % ---
+        end
         %------------------------------------------------------------------
     end
+
+    % ---
+    methods (Hidden)
+        % ---
+        function args = cal_mesh3d_collection(obj,args)
+            if isfield(args,'mesh3d_collection')
+                if isempty(args.mesh3d_collection)
+                    if isfield(obj,'mesh3d_collection')
+                        args.mesh3d_collection = obj.mesh3d_collection;
+                    end
+                end
+            end
+        end
+        % ---
+        function args = cal_mesh2d_collection(obj,args)
+            if isfield(args,'mesh2d_collection')
+                if isempty(args.mesh2d_collection)
+                    if isfield(obj,'mesh2d_collection')
+                        args.mesh2d_collection = obj.mesh2d_collection;
+                    end
+                end
+            end
+        end
+        % ---
+        function args = cal_dom3d_collection(obj,args)
+            if isfield(args,'dom3d_collection')
+                if isempty(args.dom3d_collection)
+                    if isfield(obj,'dom3d_collection')
+                        args.dom3d_collection = obj.dom3d_collection;
+                    end
+                end
+            end
+        end
+        % ---
+        function args = cal_dom2d_collection(obj,args)
+            if isfield(args,'dom2d_collection')
+                if isempty(args.dom2d_collection)
+                    if isfield(obj,'dom2d_collection')
+                        args.dom2d_collection = obj.dom2d_collection;
+                    end
+                end
+            end
+        end
+        % ---
+        function args = cal_id_mesh3d(obj,args)
+            if isfield(args,'id_mesh3d')
+                if isempty(args.id_mesh3d)
+                    if isfield(obj,'mesh3d_collection')
+                        if ~isempty(obj.mesh3d_collection.data)
+                            fn = fieldnames(obj.mesh3d_collection.data);
+                            fn = fn{1};
+                            args.id_mesh3d = fn;
+                        end
+                    end
+                end
+            end
+        end
+        % ---
+        function args = cal_id_mesh2d(obj,args)
+            if isfield(args,'id_mesh2d')
+                if isempty(args.id_mesh2d)
+                    if isfield(obj,'mesh2d_collection')
+                        if ~isempty(obj.mesh2d_collection.data)
+                            fn = fieldnames(obj.mesh2d_collection.data);
+                            fn = fn{1};
+                            args.id_mesh2d = fn;
+                        end
+                    end
+                end
+            end
+        end
+        % ---
+        function args = cal_parent_mesh(obj,args)
+            if isfield(args,'parent_mesh')
+                if isempty(args.parent_mesh)
+                    args = obj.cal_mesh3d_collection(args);
+                    args = obj.cal_id_mesh3d(args);
+                    args = obj.cal_mesh2d_collection(args);
+                    args = obj.cal_id_mesh2d(args);
+                    % ---
+                    if isfield(args,'mesh3d_collection')
+                        if ~isempty(args.mesh3d_collection.data)
+                            if isfield(args,'id_mesh3d')
+                                if ~isempty(args.id_mesh3d)
+                                    args.parent_mesh = ...
+                                        args.mesh3d_collection.data.(args.id_mesh3d);
+                                end
+                            end
+                        end
+                    end
+                    % ---
+                    if isfield(args,'mesh2d_collection')
+                        if ~isempty(args.mesh2d_collection.data)
+                            if isfield(args,'id_mesh2d')
+                                if ~isempty(args.id_mesh2d)
+                                    args.parent_mesh = ...
+                                        args.mesh2d_collection.data.(args.id_mesh2d);
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        % ---
+        % ---
+        % ---
+        % ---
+        % ---
+        % ---
+    end
+
 end
