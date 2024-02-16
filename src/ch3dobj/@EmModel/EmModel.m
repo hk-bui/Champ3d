@@ -10,7 +10,7 @@
 
 classdef EmModel < Xhandle
     properties
-        info
+        id
         % ---
         fr = 0
         jome
@@ -22,6 +22,7 @@ classdef EmModel < Xhandle
         id_mesh2d
         id_mesh3d
         % ---
+        parent_multiphysical_model
         parent_mesh
         % ---
         econductor
@@ -41,7 +42,9 @@ classdef EmModel < Xhandle
     methods
         function obj = EmModel(args)
             arguments
-                args.info = 'no_info'
+                args.id = 'no_id'
+                % ---
+                args.parent_multiphysical_model = []
                 args.mesh2d_collection = []
                 args.mesh3d_collection = []
                 args.dom2d_collection = []
@@ -51,6 +54,8 @@ classdef EmModel < Xhandle
                 % ---
                 args.parent_mesh = []
             end
+            % ---
+            args = obj.getargs(args);
             % ---
             obj <= args;
             % ---
@@ -72,10 +77,7 @@ classdef EmModel < Xhandle
             end
             % ---
             args.parent_model = obj;
-            % ---
-            %argu = f_to_namedarg(args);
             phydom = Econductor(args);
-            % ---
             obj.econductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------

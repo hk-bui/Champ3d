@@ -219,6 +219,8 @@ classdef MultiPhysicalModel < Xhandle
                 % ---
                 args.id char
                 % ---
+                args.emmodel = []
+                % ---
                 args.parent_mesh = []
                 % ---
                 args.mesh3d_collection = []
@@ -233,12 +235,13 @@ classdef MultiPhysicalModel < Xhandle
             % ---
             args = obj.getargs(args);
             % ---
-            argu = f_to_namedarg(args,'with_only',...
-                {'parent_mesh','dom3d_collection','id_dom3d','defined_on',...
-                 'gid_face','condition'});
-            % ---
-            emmod = feval(args.emmodel_class,argu{:});
-            obj.dom3d_collection.data.(args.id) = emmod;
+            if isempty(args.emmodel)
+                argu = f_to_namedarg(args,'with_out','emmodel_class');
+                emmod = feval(args.emmodel_class,argu{:});
+                obj.emmodel_collection.data.(args.id) = emmod;
+            else
+                obj.emmodel_collection.data.(args.id) = args.emmodel;
+            end
             % ---
         end
         % -----------------------------------------------------------------

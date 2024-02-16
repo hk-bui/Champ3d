@@ -75,7 +75,9 @@ classdef Xhandle < matlab.mixin.Copyable
         end
         %------------------------------------------------------------------
         function args = getargs(obj,args)
-            % ---
+            % --- do first
+            args = obj.cal_parent_multiphysical_model(args);
+            % --- then
             args = obj.cal_mesh3d_collection(args);
             args = obj.cal_id_mesh3d(args);
             args = obj.cal_mesh2d_collection(args);
@@ -150,10 +152,12 @@ classdef Xhandle < matlab.mixin.Copyable
             if isfield(args,'id_mesh3d')
                 if isempty(args.id_mesh3d)
                     if isprop(obj,'mesh3d_collection')
-                        if ~isempty(obj.mesh3d_collection.data)
-                            fn = fieldnames(obj.mesh3d_collection.data);
-                            fn = fn{1};
-                            args.id_mesh3d = fn;
+                        if isprop(obj.mesh3d_collection,'data')
+                            if ~isempty(obj.mesh3d_collection.data)
+                                fn = fieldnames(obj.mesh3d_collection.data);
+                                fn = fn{1};
+                                args.id_mesh3d = fn;
+                            end
                         end
                     end
                 end
@@ -164,10 +168,12 @@ classdef Xhandle < matlab.mixin.Copyable
             if isfield(args,'id_mesh2d')
                 if isempty(args.id_mesh2d)
                     if isprop(obj,'mesh2d_collection')
-                        if ~isempty(obj.mesh2d_collection.data)
-                            fn = fieldnames(obj.mesh2d_collection.data);
-                            fn = fn{1};
-                            args.id_mesh2d = fn;
+                        if isprop(obj.mesh2d_collection,'data')
+                            if ~isempty(obj.mesh2d_collection.data)
+                                fn = fieldnames(obj.mesh2d_collection.data);
+                                fn = fn{1};
+                                args.id_mesh2d = fn;
+                            end
                         end
                     end
                 end
@@ -183,22 +189,26 @@ classdef Xhandle < matlab.mixin.Copyable
                     args = obj.cal_id_mesh2d(args);
                     % ---
                     if isfield(args,'mesh3d_collection')
-                        if ~isempty(args.mesh3d_collection.data)
-                            if isfield(args,'id_mesh3d')
-                                if ~isempty(args.id_mesh3d)
-                                    args.parent_mesh = ...
-                                        args.mesh3d_collection.data.(args.id_mesh3d);
+                        if isprop(args.mesh3d_collection,'data')
+                            if ~isempty(args.mesh3d_collection.data)
+                                if isfield(args,'id_mesh3d')
+                                    if ~isempty(args.id_mesh3d)
+                                        args.parent_mesh = ...
+                                            args.mesh3d_collection.data.(args.id_mesh3d);
+                                    end
                                 end
                             end
                         end
                     end
                     % ---
                     if isfield(args,'mesh2d_collection')
-                        if ~isempty(args.mesh2d_collection.data)
-                            if isfield(args,'id_mesh2d')
-                                if ~isempty(args.id_mesh2d)
-                                    args.parent_mesh = ...
-                                        args.mesh2d_collection.data.(args.id_mesh2d);
+                        if isprop(args.mesh2d_collection,'data')
+                            if ~isempty(args.mesh2d_collection.data)
+                                if isfield(args,'id_mesh2d')
+                                    if ~isempty(args.id_mesh2d)
+                                        args.parent_mesh = ...
+                                            args.mesh2d_collection.data.(args.id_mesh2d);
+                                    end
                                 end
                             end
                         end
@@ -213,11 +223,13 @@ classdef Xhandle < matlab.mixin.Copyable
                 id_ = id__{i};
                 if isfield(args,id_)
                     if isempty(args.(id_))
-                        if isprop(obj,'mesh1d_collection')
-                            if ~isempty(obj.mesh1d_collection.data)
-                                fn = fieldnames(obj.mesh1d_collection.data);
-                                fn = fn{1};
-                                args.(id_) = fn;
+                        if isprop(args,'mesh1d_collection')
+                            if isprop(args.mesh1d_collection,'data')
+                                if ~isempty(args.mesh1d_collection.data)
+                                    fn = fieldnames(args.mesh1d_collection.data);
+                                    fn = fn{1};
+                                    args.(id_) = fn;
+                                end
                             end
                         end
                     end
@@ -225,6 +237,40 @@ classdef Xhandle < matlab.mixin.Copyable
             end
         end
         % ---
+        function args = cal_parent_multiphysical_model(obj,args)
+            if isfield(args,'parent_multiphysical_model')
+                if ~isempty(args.parent_multiphysical_model)
+                    mpmodel = args.parent_multiphysical_model;
+                    if isprop(mpmodel,'mesh1d_collection')
+                        if isfield(args,'mesh1d_collection')
+                            args.mesh1d_collection = mpmodel.mesh1d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'mesh2d_collection')
+                        if isfield(args,'mesh2d_collection')
+                            args.mesh2d_collection = mpmodel.mesh2d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'mesh3d_collection')
+                        if isfield(args,'mesh3d_collection')
+                            args.mesh3d_collection = mpmodel.mesh3d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'dom2d_collection')
+                        if isfield(args,'dom2d_collection')
+                            args.dom2d_collection = mpmodel.dom2d_collection;
+                        end
+                    end
+                    if isprop(mpmodel,'dom3d_collection')
+                        if isfield(args,'dom3d_collection')
+                            args.dom3d_collection = mpmodel.dom3d_collection;
+                        end
+                    end
+                end
+            end
+            % ---
+            %obj <= args;
+        end
         % ---
         % ---
         % ---

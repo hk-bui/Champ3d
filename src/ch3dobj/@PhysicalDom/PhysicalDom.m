@@ -9,6 +9,11 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalDom < Xhandle
+    properties
+        dom
+        to_be_rebuild
+    end
+    % ---
     properties (Hidden)
         parent_model
         parent_mesh
@@ -28,11 +33,6 @@ classdef PhysicalDom < Xhandle
         Cp
     end
     % ---
-    properties
-        dom
-        % ---
-        to_be_rebuild
-    end
 
     % --- Contructor
     methods
