@@ -10,6 +10,7 @@
 
 classdef ScalarArray
     properties
+        dim
         value
     end
 

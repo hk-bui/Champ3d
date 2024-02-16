@@ -10,6 +10,7 @@
 
 classdef TensorArray
     properties
+        dim
         value
     end
 

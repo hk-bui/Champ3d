@@ -10,6 +10,7 @@
 
 classdef VectorArray
     properties
+        dim
         value
     end
 
