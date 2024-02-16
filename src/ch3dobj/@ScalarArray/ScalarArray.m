@@ -8,14 +8,14 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Coefficient
+classdef ScalarArray
     properties
         value
     end
 
     % --- Contructor
     methods
-        function obj = Coefficient(args)
+        function obj = ScalarArray(args)
         end
     end
 end

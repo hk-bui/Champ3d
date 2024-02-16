@@ -8,14 +8,14 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Coefficient
+classdef TensorArray
     properties
         value
     end
 
     % --- Contructor
     methods
-        function obj = Coefficient(args)
+        function obj = TensorArray(args)
         end
     end
 end
