@@ -9,5 +9,17 @@
 %--------------------------------------------------------------------------
 
 classdef Econductor < PhysicalDom
+    properties
+        sigma
+    end
 
+    % --- Contructor
+    methods
+        function obj = Econductor(args)
+            argu = f_to_namedarg(args);
+            obj = obj@PhysicalDom(argu{:});
+            % ---
+            obj.sigma = args.sigma;
+        end
+    end
 end

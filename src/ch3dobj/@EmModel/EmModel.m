@@ -10,6 +10,21 @@
 
 classdef EmModel < Xhandle
     properties
+        info
+        % ---
+        emmodel
+        fr = 0
+        jome
+        % ---
+        mesh2d_collection
+        mesh3d_collection
+        dom2d_collection
+        dom3d_collection
+        id_mesh2d
+        id_mesh3d
+        % ---
+        parent_mesh
+        % ---
         econductor
         mconductor
         pmagnet
@@ -23,17 +38,89 @@ classdef EmModel < Xhandle
         field
     end
 
+    % --- Constructor
+    methods
+        function obj = EmModel(args)
+            arguments
+                args.info = 'no_info'
+                args.emmodel = 'no_info'
+            end
+            % ---
+            obj <= args;
+            % ---
+            obj.jome = 1j*2*pi*obj.fr;
+        end
+    end
+
     % --- Methods
     methods
+        % -----------------------------------------------------------------
         function add_econductor(obj,args)
             arguments
                 obj
                 % ---
-                args.id
-                args.id_dom2d
-                args.id_dom3d
-                args.sigma
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.sigma = 0
             end
+            % ---
+            args.parent_model = obj;
+            % ---
+            %argu = f_to_namedarg(args);
+            phydom = Econductor(args);
+            % ---
+            obj.econductor.(args.id) = phydom;
+        end
+        % -----------------------------------------------------------------
+        function add_airbox(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_nomesh(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_sibc(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_bsfield(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_embc(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_open_iscoil(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_close_iscoil(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_open_jscoil(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_close_jscoil(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_open_vscoil(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_close_vscoil(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_mconductor(obj) 
+        end
+        % -----------------------------------------------------------------
+        function add_pmagnet(obj) 
+        end
+        % -----------------------------------------------------------------
+    end
+
+    % --- Methods/Abs
+    methods
+        function build(obj)
+        end
+        function solve(obj)
+        end
+        function postpro(obj)
         end
     end
 end

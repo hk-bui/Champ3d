@@ -278,6 +278,52 @@ classdef MultiPhysicalModel < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
+        function add_emmodel3d(obj,args)
+            arguments
+                obj
+                % ---
+                args.id char
+                % ---
+                args.parent_mesh = []
+                args.mesh3d_collection = []
+                args.id_mesh3d = []
+                % ---
+                args.dom3d_collection = []
+                args.id_dom3d = []
+                % ---
+                args.defined_on char = []
+                % ---
+                args.elem_code = []
+                args.gid_face = []
+                args.condition char = []
+            end
+            % ---
+            if isempty(args.mesh3d_collection)
+                args.mesh3d_collection = obj.mesh3d_collection;
+            end
+            % ---
+            if isempty(args.parent_mesh)
+                if isempty(args.id_mesh3d)
+                    if ~isempty(obj.mesh3d_collection.data)
+                        fn = fieldnames(obj.mesh3d_collection.data);
+                        fn = fn{1};
+                    end
+                    args.id_mesh3d = fn;
+                end
+                args.parent_mesh = args.mesh3d_collection.data.(args.id_mesh3d);
+            end
+            % ---
+            if isempty(args.dom3d_collection)
+                args.dom3d_collection = obj.dom3d_collection;
+            end
+            % ---
+            argu = f_to_namedarg(args,'with_only',...
+                {'parent_mesh','dom3d_collection','id_dom3d','defined_on',...
+                 'gid_face','condition'});
+            sdom = SurfaceDom3d(argu{:});
+            obj.dom3d_collection.data.(args.id) = sdom;
+            % ---
+        end
         % -----------------------------------------------------------------
         % -----------------------------------------------------------------
         % -----------------------------------------------------------------

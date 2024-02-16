@@ -9,5 +9,11 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphi < EmModel
-
+    
+    % --- Contructor
+    methods
+        function obj = FEM3dAphi(args)
+            
+        end
+    end
 end
