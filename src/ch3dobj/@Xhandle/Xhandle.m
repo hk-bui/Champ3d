@@ -12,6 +12,7 @@ classdef Xhandle < matlab.mixin.Copyable
     %----------------------------------------------------------------------
     properties (Hidden)
         tmp
+        my
     end
     %----------------------------------------------------------------------
     methods
@@ -72,6 +73,10 @@ classdef Xhandle < matlab.mixin.Copyable
             end
             % ---
             obj.tmp.args = f_to_namedarg(args4obj);
+        end
+        %------------------------------------------------------------------
+        function mesh2d = my_mesh2d(obj)
+
         end
         %------------------------------------------------------------------
         function args = getargs(obj,args)

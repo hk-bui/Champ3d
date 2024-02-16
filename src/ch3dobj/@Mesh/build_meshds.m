@@ -34,6 +34,7 @@ con = f_connexion(elem_type_);
 nbNo_inEl = con.nbNo_inEl;
 nbFa_inEl = con.nbFa_inEl;
 nbEd_inFa = con.nbEd_inFa;
+
 nbNo_inEd = con.nbNo_inEd;
 siNo_inEd = con.siNo_inEd;
 nbEd_inEl = con.nbEd_inEl;
@@ -63,6 +64,20 @@ if any(f_strcmpi(get,all_get))
         obj.sign_edge_in_elem = sign_edge_in_elem_;
     end
 end
+% ---
+all_get = {'all','cedge'};
+if any(f_strcmpi(get,all_get))
+    if isempty(obj.edge)
+        obj.edge = f_edge(elem_,'elem_type',elem_type_);
+    end
+    if isempty(obj.cedge)
+        edge_ = obj.edge;
+        nb_edge_ = size(edge_,2);
+        dim = size(node_,1);
+        obj.cedge = mean(reshape(node_(:,edge_(1:nbNo_inEd,:)),dim,nbNo_inEd,nb_edge_),2);
+        obj.cedge = squeeze(obj.cedge);
+    end
+end
 %--------------------------------------------------------------------------
 %----- faces
 all_get = {'all','face','sign_face_in_elem'};
@@ -78,6 +93,24 @@ if any(f_strcmpi(get,all_get))
         obj.id_face_in_elem   = id_face_in_elem_;
         obj.ori_face_in_elem  = ori_face_in_elem_;
         obj.sign_face_in_elem = sign_face_in_elem_;
+    end
+end
+% ---
+all_get = {'all','cface'};
+if any(f_strcmpi(get,all_get))
+    if isempty(obj.face)
+        obj.face = f_face(elem_,'elem_type',elem_type_);
+    end
+    if isempty(obj.cface)
+        dim = size(node_,1);
+        [filface,id_face_] = f_filterface(obj.face);
+        obj.cface = zeros(dim,size(obj.face,2));
+        for i = 1:length(filface)
+            face_ = filface{i};
+            nb_face_ = size(face_,2);
+            nbNo_inFa = size(face_,1);
+            obj.cface(:,id_face_{i}) = squeeze(mean(reshape(node_(:,face_(1:nbNo_inFa,:)),dim,nbNo_inFa,nb_face_),2));
+        end
     end
 end
 %--------------------------------------------------------------------------

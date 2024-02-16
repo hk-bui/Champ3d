@@ -15,15 +15,12 @@ classdef EmModel < Xhandle
         fr = 0
         jome
         % ---
-        mesh2d_collection
-        mesh3d_collection
-        dom2d_collection
-        dom3d_collection
         id_mesh2d
         id_mesh3d
         % ---
-        parent_multiphysical_model
-        parent_mesh
+        geo_model
+        mesh2d
+        mesh3d
         % ---
         econductor
         mconductor
@@ -44,15 +41,12 @@ classdef EmModel < Xhandle
             arguments
                 args.id = 'no_id'
                 % ---
-                args.parent_multiphysical_model = []
-                args.mesh2d_collection = []
-                args.mesh3d_collection = []
-                args.dom2d_collection = []
-                args.dom3d_collection = []
+                args.geo_model = []
                 args.id_mesh2d = []
                 args.id_mesh3d = []
                 % ---
-                args.parent_mesh = []
+                args.mesh2d = []
+                args.mesh3d = []
             end
             % ---
             args = obj.getargs(args);

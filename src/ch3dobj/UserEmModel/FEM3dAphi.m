@@ -16,15 +16,11 @@ classdef FEM3dAphi < EmModel
             arguments
                 args.id = 'no_id'
                 % ---
-                args.parent_multiphysical_model = []
-                args.mesh2d_collection = []
-                args.mesh3d_collection = []
-                args.dom2d_collection = []
-                args.dom3d_collection = []
+                args.geo_model = []
                 args.id_mesh2d = []
                 args.id_mesh3d = []
                 % ---
-                args.parent_mesh = []
+                args.mesh3d = []
             end
             % ---
             args = obj.getargs(args);

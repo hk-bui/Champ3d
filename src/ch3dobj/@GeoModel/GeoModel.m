@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef MultiPhysicalModel < Xhandle
+classdef GeoModel < Xhandle
     properties
         info 
         mesh1d_collection Mesh1dCollection
@@ -16,14 +16,11 @@ classdef MultiPhysicalModel < Xhandle
         mesh3d_collection Mesh3dCollection
         dom2d_collection  Dom2dCollection
         dom3d_collection  Dom3dCollection
-        emmodel_collection 
-        thmodel_collection 
-        mecmodel_collection
     end
 
     % --- Constructors
     methods
-        function obj = MultiPhysicalModel(args)
+        function obj = GeoModel(args)
             arguments
                 args.info = 'no_info';
             end
@@ -210,38 +207,6 @@ classdef MultiPhysicalModel < Xhandle
                  'gid_face','condition'});
             sdom = SurfaceDom3d(argu{:});
             obj.dom3d_collection.data.(args.id) = sdom;
-            % ---
-        end
-        % -----------------------------------------------------------------
-        function add_emmodel3d(obj,args)
-            arguments
-                obj
-                % ---
-                args.id char
-                % ---
-                args.emmodel = []
-                % ---
-                args.parent_mesh = []
-                % ---
-                args.mesh3d_collection = []
-                args.id_mesh3d = []
-                % ---
-                args.dom3d_collection = []
-                % ---
-                args.emmodel_class {mustBeMember(args.emmodel_class,...
-                    {'FEM3dAPhijw','FEM3dAPhits','FEM3dVjw','FEM3dVts'})}
-                % ---
-            end
-            % ---
-            args = obj.getargs(args);
-            % ---
-            if isempty(args.emmodel)
-                argu = f_to_namedarg(args,'with_out','emmodel_class');
-                emmod = feval(args.emmodel_class,argu{:});
-                obj.emmodel_collection.data.(args.id) = emmod;
-            else
-                obj.emmodel_collection.data.(args.id) = args.emmodel;
-            end
             % ---
         end
         % -----------------------------------------------------------------
