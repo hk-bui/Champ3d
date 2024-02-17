@@ -51,18 +51,22 @@ classdef FEM3dAphi < EmModel
                 %coef_name  = 'sigma';
                 %coef_array = f_callcoefficient(c3dobj,'phydomobj',phydomobj,...
                 %    'coefficient',coef_name);
-                coef_array = 1;
-                %----------------------------------------------------------
-                sigmawewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
-                    'coefficient',coef_array);
-                %----------------------------------------------------------
-                % --- Output
-                c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_elem = id_elem;
-                c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigma_array = coef_array;
-                c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigmawewe = sigmawewe;
-                c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_node_phi = id_node_phi;
-                %----------------------------------------------------------
-                coeftype = f_coeftype(phydomobj.(coef_name));
+
+
+
+                
+                % coef_array = 1;
+                % %----------------------------------------------------------
+                % sigmawewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...
+                %     'coefficient',coef_array);
+                % %----------------------------------------------------------
+                % % --- Output
+                % c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_elem = id_elem;
+                % c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigma_array = coef_array;
+                % c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).sigmawewe = sigmawewe;
+                % c3dobj.emdesign.(id_emdesign).econductor.(id_phydom).id_node_phi = id_node_phi;
+                % %----------------------------------------------------------
+                % coeftype = f_coeftype(phydomobj.(coef_name));
             end
         end
     end

@@ -8,12 +8,13 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Coefficient
+classdef Coefficient < Xhandle
     properties
         f
         depend_on
+        from
         varargin_list
-        vectorized
+        fvectorized
         % ---
         value
     end
@@ -27,8 +28,13 @@ classdef Coefficient
                     {'celem','cface', ...
                      'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
                      'bs','js','hs','ps','as','phis','ts','omes','temps'})}
+                args.from = []
                 args.varargin_list
-                args.vectorized = 0
+                args.fvectorized = 0
+            end
+            % ---
+            if isempty(args.from)
+                error('#from must be given ! Give EMModel, THModel, ... ');
             end
             obj <= args;
         end
