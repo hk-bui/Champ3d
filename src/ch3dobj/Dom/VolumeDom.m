@@ -117,6 +117,25 @@ classdef VolumeDom < Xhandle
 
     % --- Methods
     methods
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = 'none'
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+            end
+            % ---
+            submesh = obj.submesh;
+            argu = f_to_namedarg(args);
+            for i = 1:length(submesh)
+                submesh{i}.plot(argu{:}); hold on
+                delete(submesh{i});
+            end
+        end
+    end
+
+    % --- Methods
+    methods
         function objy = plus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_elem = [f_torowv(obj.gid_elem) f_torowv(objx.gid_elem)];

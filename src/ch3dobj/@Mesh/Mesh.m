@@ -24,21 +24,8 @@ classdef Mesh < Xhandle
         cedge
         origin
         % ---
-        id_edge_in_elem
-        ori_edge_in_elem
-        sign_edge_in_elem
-        id_face_in_elem
-        ori_face_in_elem
-        sign_face_in_elem
-        % ---
-        id_edge_in_face
-        ori_edge_in_face
-        sign_edge_in_face
-        % ---
-        div
-        grad
-        rot
-        % ---
+        meshds
+        discrete
         intkit
         % ---
         is_build
@@ -50,8 +37,6 @@ classdef Mesh < Xhandle
         gid_face
         flat_node
         % --- link
-        dom2d_collection
-        dom3d_collection
     end
 
     % --- Dependent Properties
@@ -70,6 +55,20 @@ classdef Mesh < Xhandle
             end
             % ---
             obj.info = args.info;
+            obj.meshds.id_edge_in_elem = [];
+            obj.meshds.ori_edge_in_elem = [];
+            obj.meshds.sign_edge_in_elem = [];
+            obj.meshds.id_face_in_elem = [];
+            obj.meshds.ori_face_in_elem = [];
+            obj.meshds.sign_face_in_elem = [];
+            % ---
+            obj.meshds.id_edge_in_face = [];
+            obj.meshds.ori_edge_in_face = [];
+            obj.meshds.sign_edge_in_face = [];
+            % ---
+            obj.discrete.div = [];
+            obj.discrete.grad = [];
+            obj.discrete.rot = [];
         end
     end
 

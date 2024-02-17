@@ -23,9 +23,12 @@ classdef Coefficient
         function obj = Coefficient(args)
             arguments
                 args.f
-                args.depend_on
+                args.depend_on {mustBeMember(args.depend_on,...
+                    {'celem','cface', ...
+                     'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
+                     'bs','js','hs','ps','as','phis','ts','omes','temps'})}
                 args.varargin_list
-                args.vectorized
+                args.vectorized = 0
             end
             obj <= args;
         end

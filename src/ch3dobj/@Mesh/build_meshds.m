@@ -34,7 +34,6 @@ con = f_connexion(elem_type_);
 nbNo_inEl = con.nbNo_inEl;
 nbFa_inEl = con.nbFa_inEl;
 nbEd_inFa = con.nbEd_inFa;
-
 nbNo_inEd = con.nbNo_inEd;
 siNo_inEd = con.siNo_inEd;
 nbEd_inEl = con.nbEd_inEl;
@@ -55,13 +54,13 @@ if any(f_strcmpi(get,all_get))
     if isempty(obj.edge)
         obj.edge = f_edge(elem_,'elem_type',elem_type_);
     end
-    if isempty(obj.id_edge_in_elem)
+    if isempty(obj.meshds.id_edge_in_elem)
         [id_edge_in_elem_, ori_edge_in_elem_, sign_edge_in_elem_] = ...
             f_edgeinelem(elem_,obj.edge,'elem_type',elem_type_);
         % ---
-        obj.id_edge_in_elem   = id_edge_in_elem_;
-        obj.ori_edge_in_elem  = ori_edge_in_elem_;
-        obj.sign_edge_in_elem = sign_edge_in_elem_;
+        obj.meshds.id_edge_in_elem   = id_edge_in_elem_;
+        obj.meshds.ori_edge_in_elem  = ori_edge_in_elem_;
+        obj.meshds.sign_edge_in_elem = sign_edge_in_elem_;
     end
 end
 % ---
@@ -86,13 +85,13 @@ if any(f_strcmpi(get,all_get))
         obj.face = f_face(elem_,'elem_type',elem_type_);
     end
     % ---
-    if isempty(obj.id_face_in_elem) || isempty(obj.sign_face_in_elem)
+    if isempty(obj.meshds.id_face_in_elem) || isempty(obj.meshds.sign_face_in_elem)
         [id_face_in_elem_, ori_face_in_elem_, sign_face_in_elem_] = ...
             f_faceinelem(elem_,node_,obj.face,'elem_type',elem_type_);
         % ---
-        obj.id_face_in_elem   = id_face_in_elem_;
-        obj.ori_face_in_elem  = ori_face_in_elem_;
-        obj.sign_face_in_elem = sign_face_in_elem_;
+        obj.meshds.id_face_in_elem   = id_face_in_elem_;
+        obj.meshds.ori_face_in_elem  = ori_face_in_elem_;
+        obj.meshds.sign_face_in_elem = sign_face_in_elem_;
     end
 end
 % ---
@@ -122,22 +121,22 @@ if any(f_strcmpi(get,all_get))
         obj.face = f_face(elem_,'elem_type',elem_type_);
     end
     % ---
-    if isempty(obj.id_face_in_elem) || isempty(obj.sign_face_in_elem)
+    if isempty(obj.meshds.id_face_in_elem) || isempty(obj.meshds.sign_face_in_elem)
         [id_face_in_elem_, ori_face_in_elem_, sign_face_in_elem_] = ...
             f_faceinelem(elem_,node_,obj.face,'elem_type',elem_type_);
         % ---
-        obj.id_face_in_elem   = id_face_in_elem_;
-        obj.ori_face_in_elem  = ori_face_in_elem_;
-        obj.sign_face_in_elem = sign_face_in_elem_;
+        obj.meshds.id_face_in_elem   = id_face_in_elem_;
+        obj.meshds.ori_face_in_elem  = ori_face_in_elem_;
+        obj.meshds.sign_face_in_elem = sign_face_in_elem_;
     end
     % ---
     nbElem = size(obj.elem, 2);
     nbFace = size(obj.face, 2);
     % ---
-    obj.div = sparse(nbElem,nbFace);
+    obj.discrete.div = sparse(nbElem,nbFace);
     for i = 1:nbFa_inEl
-        obj.div = obj.div + ...
-            sparse(1:nbElem,obj.id_face_in_elem(i,:),obj.sign_face_in_elem(i,:),nbElem,nbFace);
+        obj.discrete.div = obj.discrete.div + ...
+            sparse(1:nbElem,obj.meshds.id_face_in_elem(i,:),obj.meshds.sign_face_in_elem(i,:),nbElem,nbFace);
     end
     % ---
     clear id_face_in_elem_ ori_face_in_elem_ sign_face_in_elem_
@@ -152,22 +151,22 @@ if any(f_strcmpi(get,all_get))
             obj.edge = f_edge(elem_,'elem_type',elem_type_);
         end
         % ---
-        if isempty(obj.id_face_in_elem) || isempty(obj.sign_face_in_elem)
+        if isempty(obj.meshds.id_face_in_elem) || isempty(obj.meshds.sign_face_in_elem)
             [id_edge_in_elem_, ori_edge_in_elem_, sign_edge_in_elem_] = ...
                 f_edgeinelem(elem_,node_,obj.edge,'elem_type',elem_type_);
             % ---
-            obj.id_edge_in_elem   = id_edge_in_elem_;
-            obj.ori_edge_in_elem  = ori_edge_in_elem_;
-            obj.sign_edge_in_elem = sign_edge_in_elem_;
+            obj.meshds.id_edge_in_elem   = id_edge_in_elem_;
+            obj.meshds.ori_edge_in_elem  = ori_edge_in_elem_;
+            obj.meshds.sign_edge_in_elem = sign_edge_in_elem_;
         end
         % ---
         nbElem = size(obj.elem, 2);
         nbEdge = size(obj.edge, 2);
         % ---
-        obj.rot = sparse(nbElem,nbEdge);
+        obj.discrete.rot = sparse(nbElem,nbEdge);
         for i = 1:nbEd_inEl
-            obj.rot = obj.rot + ...
-                sparse(1:nbElem,obj.id_edge_in_elem(i,:),obj.sign_edge_in_elem(i,:),nbElem,nbEdge);
+            obj.discrete.rot = obj.discrete.rot + ...
+                sparse(1:nbElem,obj.meshds.id_edge_in_elem(i,:),obj.meshds.sign_edge_in_elem(i,:),nbElem,nbEdge);
         end
         % ---
         clear id_edge_in_elem_ ori_edge_in_elem_ sign_edge_in_elem_
@@ -181,13 +180,13 @@ if any(f_strcmpi(get,all_get))
             obj.face = f_face(elem_,'elem_type',elem_type_);
         end
         % ---
-        if isempty(obj.id_edge_in_face) || isempty(obj.sign_edge_in_face)
+        if isempty(obj.meshds.id_edge_in_face) || isempty(obj.meshds.sign_edge_in_face)
             [id_edge_in_face_, ori_edge_in_face_, sign_edge_in_face_] = ...
                 f_edgeinface(obj.face,obj.edge);
             % ---
-            obj.id_edge_in_face   = id_edge_in_face_;
-            obj.ori_edge_in_face  = ori_edge_in_face_;
-            obj.sign_edge_in_face = sign_edge_in_face_;
+            obj.meshds.id_edge_in_face   = id_edge_in_face_;
+            obj.meshds.ori_edge_in_face  = ori_edge_in_face_;
+            obj.meshds.sign_edge_in_face = sign_edge_in_face_;
         end
         % ---
         nbEdge = size(obj.edge, 2);
@@ -204,7 +203,7 @@ if any(f_strcmpi(get,all_get))
             iquad = setdiff(1:nbFace,itria);
         end
         % ---
-        obj.rot = sparse(nbFace,nbEdge);
+        obj.discrete.rot = sparse(nbFace,nbEdge);
         for k = 1:2 %---- 2 faceType
             switch k
                 case 1
@@ -213,8 +212,8 @@ if any(f_strcmpi(get,all_get))
                     iface = iquad;
             end
             for i = 1:nbEd_inFa{k}
-                obj.rot = obj.rot + ...
-                    sparse(iface,obj.id_edge_in_face(i,iface),obj.sign_edge_in_face(i,iface),nbFace,nbEdge);
+                obj.discrete.rot = obj.discrete.rot + ...
+                    sparse(iface,obj.meshds.id_edge_in_face(i,iface),obj.meshds.sign_edge_in_face(i,iface),nbFace,nbEdge);
             end
         end
         clear id_edge_in_face_ sign_edge_in_face_
@@ -230,9 +229,9 @@ if any(f_strcmpi(get,all_get))
     nbNode = size(obj.node, 2);
     nbEdge = size(obj.edge, 2);
     % ---
-    obj.grad = sparse(nbEdge,nbNode);
+    obj.discrete.grad = sparse(nbEdge,nbNode);
     for i = 1:nbNo_inEd
-        obj.grad = obj.grad + ...
+        obj.discrete.grad = obj.discrete.grad + ...
             sparse(1:nbEdge,obj.edge(i,:),siNo_inEd(i),nbEdge,nbNode);
     end
 end

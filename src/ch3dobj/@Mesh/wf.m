@@ -36,7 +36,7 @@ elem = obj.elem;
 %--------------------------------------------------------------------------
 elem_type = obj.elem_type;
 %--------------------------------------------------------------------------
-ori_face_in_elem = obj.ori_face_in_elem;
+ori_face_in_elem = obj.meshds.ori_face_in_elem;
 %--------------------------------------------------------------------------
 if ~isempty(w)
     if (numel(u) ~= numel(v)) || (numel(u) ~= numel(w))
