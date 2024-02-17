@@ -12,6 +12,8 @@ classdef HexaMeshFromQuadMesh < HexMesh
 
     % --- Properties
     properties
+        parent_mesh1d
+        parent_mesh2d
         id_zline
     end
 
@@ -28,14 +30,15 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 args.node = []
                 args.elem = []
                 % --- sub
-                args.parent_mesh
+                args.parent_mesh1d
+                args.parent_mesh2d
                 args.id_zline = []
             end
             % ---
             obj = obj@HexMesh;
             obj <= args;
             % ---
-            if ~isempty(obj.parent_mesh) && ~isempty(obj.id_zline)
+            if ~isempty(obj.parent_mesh2d) && ~isempty(obj.id_zline)
                 obj.build;
             end
         end
@@ -48,14 +51,14 @@ classdef HexaMeshFromQuadMesh < HexMesh
             % ---
             obj.id_zline = f_to_scellargin(obj.id_zline);
             % ---
-            all_id_line = fieldnames(obj.parent_mesh.parent_mesh.dom);
+            all_id_line = fieldnames(obj.parent_mesh1d.dom);
             %--------------------------------------------------------------
             zline = [];
             for i = 1:length(obj.id_zline)
                 id = obj.id_zline{i};
                 valid_id = f_validid(id,all_id_line);
                 for j = 1:length(valid_id)
-                    zline = [zline obj.parent_mesh.parent_mesh.dom.(valid_id{j})];
+                    zline = [zline obj.parent_mesh1d.dom.(valid_id{j})];
                 end
             end
             % ---
@@ -79,7 +82,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
             %--------------------------------------------------------------
             % build vertices (nodes) in 3D
             % ---
-            mesh2d = obj.parent_mesh;
+            mesh2d = obj.parent_mesh2d;
             % ---
             nbNode2D = mesh2d.nb_node;
             nb_node  = nbNode2D*(nb_layer+1);
