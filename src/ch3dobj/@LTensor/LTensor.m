@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef TensorArray
+classdef LTensor
     properties
         dim
         value
@@ -16,7 +16,10 @@ classdef TensorArray
 
     % --- Contructor
     methods
-        function obj = TensorArray(args)
+        function obj = LTensor(args)
+            arguments
+                args.main_value
+            end
         end
     end
 end
