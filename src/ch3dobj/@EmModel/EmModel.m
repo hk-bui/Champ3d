@@ -15,12 +15,7 @@ classdef EmModel < Xhandle
         fr = 0
         jome
         % ---
-        id_mesh2d
-        id_mesh3d
-        % ---
-        geo_model
-        mesh2d
-        mesh3d
+        parent_mesh
         % ---
         econductor
         mconductor
@@ -41,15 +36,8 @@ classdef EmModel < Xhandle
             arguments
                 args.id = 'no_id'
                 % ---
-                args.geo_model = []
-                args.id_mesh2d = []
-                args.id_mesh3d = []
-                % ---
-                args.mesh2d = []
-                args.mesh3d = []
+                args.parent_mesh = []
             end
-            % ---
-            args = obj.getargs(args);
             % ---
             obj <= args;
             % ---
@@ -72,7 +60,6 @@ classdef EmModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            args = obj.getargs(args);
             phydom = Econductor(args);
             obj.econductor.(args.id) = phydom;
         end

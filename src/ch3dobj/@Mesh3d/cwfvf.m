@@ -30,16 +30,16 @@ end
 elem_type = obj.elem_type;
 %--------------------------------------------------------------------------
 con = f_connexion(elem_type);
-nbG = con.nbG;
 Weigh = con.Weigh;
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
-Wf = cell(1,nbG);
-detJ = cell(1,nbG);
-for iG = 1:nbG
-    Wf{iG} = obj.mesh3d.(id_mesh3d).intkit.Wf{iG}(id_elem,:,:);
-    detJ{iG} = obj.mesh3d.(id_mesh3d).intkit.detJ{iG}(id_elem,1);
+if isempty(obj.intkit)
+    obj.build_intkit;
 end
+%--------------------------------------------------------------------------
+Wf   = obj.intkit.Wf;
+detJ = obj.intkit.detJ;
+nbG  = length(Wf);
 %--------------------------------------------------------------------------
 coefwfvf = zeros(nb_elem,nbFa_inEl);
 %--------------------------------------------------------------------------

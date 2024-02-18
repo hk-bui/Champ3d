@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Coefficient < Xhandle
+classdef Parameter < Xhandle
     properties
         f
         depend_on
@@ -21,16 +21,20 @@ classdef Coefficient < Xhandle
 
     % --- Contructor
     methods
-        function obj = Coefficient(args)
+        function obj = Parameter(args)
             arguments
-                args.f
+                args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
                     {'celem','cface', ...
                      'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
                      'bs','js','hs','ps','as','phis','ts','omes','temps'})}
                 args.from = []
-                args.varargin_list
+                args.varargin_list = []
                 args.fvectorized = 0
+            end
+            % ---
+            if isempty(args.f)
+                error('#f must be given ! Give a function handle');
             end
             % ---
             if isempty(args.from)

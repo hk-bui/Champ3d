@@ -17,7 +17,6 @@ classdef Econductor < PhysicalDom
     methods
         function obj = Econductor(args)
             obj = obj@PhysicalDom(args);
-            args = obj.getargs(args);
             obj <= args;
         end
     end

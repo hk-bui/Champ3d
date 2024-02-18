@@ -15,15 +15,8 @@ classdef FEM3dAphi < EmModel
         function obj = FEM3dAphi(args)
             arguments
                 args.id = 'no_id'
-                % ---
-                args.geo_model = []
-                args.id_mesh2d = []
-                args.id_mesh3d = []
-                % ---
-                args.mesh3d = []
+                args.parent_mesh = []
             end
-            % ---
-            args = obj.getargs(args);
             % ---
             obj <= args;
         end
@@ -54,7 +47,7 @@ classdef FEM3dAphi < EmModel
 
 
 
-                
+
                 % coef_array = 1;
                 % %----------------------------------------------------------
                 % sigmawewe = f_cwewe(c3dobj,'phydomobj',phydomobj,...

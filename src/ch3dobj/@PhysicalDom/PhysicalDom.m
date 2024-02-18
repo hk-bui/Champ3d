@@ -18,9 +18,7 @@ classdef PhysicalDom < Xhandle
     properties
         parent_model
         parent_mesh
-        dom2d_collection
         id_dom2d
-        dom3d_collection
         id_dom3d
     end
     % ---
@@ -33,7 +31,6 @@ classdef PhysicalDom < Xhandle
     methods
         function obj = PhysicalDom(args)
             obj = obj@Xhandle;
-            args = obj.getargs(args);
             obj <= args;
         end
     end

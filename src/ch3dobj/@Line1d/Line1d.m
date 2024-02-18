@@ -43,9 +43,7 @@ classdef Line1d < Xhandle
             % ---
             obj <= args;
             % ---
-            if obj.is_available(args,{'id','len','dtype','dnum','flog'})
-                obj.build;
-            end
+            obj.build;
         end
     end
 
