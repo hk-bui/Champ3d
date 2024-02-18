@@ -74,6 +74,19 @@ classdef Xhandle < matlab.mixin.Copyable
             % ---
             obj.tmp.args = f_to_namedarg(args4obj);
         end
+        %------------------------------------------------------------------
+        function confpar = conformize_parameter(obj,parameter)
+            if ~isa(parameter,'Parameter')
+                if isnumeric(parameter)
+                    confpar = Parameter('f',parameter);
+                else
+                    warning('Non conformal parameter');
+                    confpar = [];
+                end
+            end
+        end
+        %------------------------------------------------------------------
+        %------------------------------------------------------------------
     end
 
     % ---

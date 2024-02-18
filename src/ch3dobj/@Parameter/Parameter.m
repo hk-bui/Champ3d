@@ -27,19 +27,27 @@ classdef Parameter < Xhandle
                 args.depend_on {mustBeMember(args.depend_on,...
                     {'celem','cface', ...
                      'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
-                     'bs','js','hs','ps','as','phis','ts','omes','temps'})}
+                     'bs','js','hs','ps','as','phis','ts','omes','temps'})} = 'celem'
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
             end
             % ---
             if isempty(args.f)
-                error('#f must be given ! Give a function handle');
+                error('#f must be given ! Give a function handle or numeric value');
             end
             % ---
-            if isempty(args.from)
-                error('#from must be given ! Give EMModel, THModel, ... ');
+            if isnumeric(args.f)
+                constant_parameter = args.f;
+                args.f = @()(constant_parameter);
+            elseif isa(args.f,'function_handle')
+                if isempty(args.from)
+                    error('#from must be given ! Give EMModel, THModel, ... ');
+                end
+            else
+                error('#f must be function handle or numeric value');
             end
+            % ---
             obj <= args;
         end
     end
