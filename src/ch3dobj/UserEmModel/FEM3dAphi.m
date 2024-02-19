@@ -48,6 +48,7 @@ classdef FEM3dAphi < EmModel
                     id_node_phi = f_uniquenode(elem);
                     %------------------------------------------------------
                     sigma_array = obj.(phydom_type).(id_phydom).sigma.evaluate_on(dom);
+                    det(squeeze(sigma_array(1,:,:)));
                     %------------------------------------------------------
                     sigmawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
                     mean(mean(mean(sigmawewe)))

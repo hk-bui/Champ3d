@@ -61,42 +61,19 @@ classdef LVector < Xhandle
                 end
             end
             % ---
-            if size(lvector.main_dir,2) == 3
-                dim = 3;
-                gvector = zeros(nb_elem,3);
-            else
-                dim = 2;
-                gvector = zeros(nb_elem,2);
-            end
-            % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
                     % ---
-                    gvector(i,:) = lvector.main_value(i,:) .* lvector.main_dir(i,:);
+                    raxis = lvector.rot_axis(i,:) ./ norm(lvector.rot_axis(i,:));
+                    a = lvector.rot_angle(i,:);
                     %------------------------------------------------------
-                    rot_axis_ = lvector.rot_axis(i,:) ./ norm(lvector.rot_axis(i,:));
-                    %------------------------------------------------------
-                    a = lvector.rot_angle(i,:) / 180 * pi;
-                    if dim == 3
-                        ux = rot_axis_(1); uy = rot_axis_(2); uz = rot_axis_(3);
-                        R = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) - uz*sin(a)   ux*uz*(1-cos(a)) + uy*sin(a) ; ...
-                            uy*ux*(1-cos(a)) + uz*sin(a)  cos(a) + uy^2 * (1-cos(a))     uy*uz*(1-cos(a)) - ux*sin(a) ;...
-                            uz*ux*(1-cos(a)) - uy*sin(a)  uz*uy*(1-cos(a)) + ux*sin(a)   cos(a) + uz^2 * (1-cos(a))];
-                    elseif dim == 2
-                        ux = rot_axis_(1); uy = rot_axis_(2);
-                        R = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) ; ...
-                            uy*ux*(1-cos(a))               cos(a) + uy^2 * (1-cos(a))];
-                    end
-                    % ---
-                    vecout = R * gvector(i,:).';
-                    gvector(i,:) = vecout.';
+                    lvector.main_dir(i,:) = obj.rotaroundaxis(lvector.main_dir(i,:),raxis,a);
                     %------------------------------------------------------
                 end
-            else
-                % ---
-                gvector = lvector.main_value .* lvector.main_dir;
-                % ---
             end
+            % ---
+            gvector = lvector.main_value .* lvector.main_dir;
+            % ---
         end
         % -----------------------------------------------------------------
         function vrot = rotaroundaxis(obj,v,rot_axis,rot_angle)
