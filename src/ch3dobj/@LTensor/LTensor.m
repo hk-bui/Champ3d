@@ -34,18 +34,6 @@ classdef LTensor < Xhandle
                 args.rot_angle = []
             end
             % ---
-            % if ~isempty(args.rot_angle)
-            %     if ~isnumeric(args.rot_angle)
-            %         error('#rot_angle must be numeric');
-            %     end
-            % end
-            % % ---
-            % if ~isempty(args.rot_axis)
-            %     if ~isnumeric(args.rot_axis)
-            %         error('#rot_axis must be numeric');
-            %     end
-            % end
-            % ---
             obj <= args;
         end
     end
