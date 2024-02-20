@@ -27,6 +27,7 @@ classdef FEM3dAphi < EmModel
 
     % --- Methods
     methods
+        % -----------------------------------------------------------------
         function build_econductor(obj)
             phydom_type = 'econductor';
             % ---
@@ -39,7 +40,7 @@ classdef FEM3dAphi < EmModel
                 phydom = obj.(phydom_type).(id_phydom);
                 dom__ = phydom.dom;
                 for j = 1:length(dom__)
-                    dom = dom__{i};
+                    dom = dom__{j};
                     parent_mesh = dom.parent_mesh;
                     gid_elem    = dom.gid_elem;
                     %------------------------------------------------------
@@ -47,7 +48,7 @@ classdef FEM3dAphi < EmModel
                     %------------------------------------------------------
                     id_node_phi = f_uniquenode(elem);
                     %------------------------------------------------------
-                    sigma_array = obj.(phydom_type).(id_phydom).sigma.evaluate_on(dom);
+                    sigma_array = obj.(phydom_type).(id_phydom).sigma.get_on(dom);
                     %------------------------------------------------------
                     sigmawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
                     %------------------------------------------------------
@@ -57,5 +58,80 @@ classdef FEM3dAphi < EmModel
                 end
             end
         end
+        % -----------------------------------------------------------------
+        function build_mconductor(obj)
+            phydom_type = 'mconductor';
+            % ---
+            allphydom = fieldnames(obj.(phydom_type));
+            % ---
+            for i = 1:length(allphydom)
+                % ---
+                id_phydom = allphydom{i};
+                % ---
+                phydom = obj.(phydom_type).(id_phydom);
+                dom__ = phydom.dom;
+                for j = 1:length(dom__)
+                    dom = dom__{j};
+                    parent_mesh = dom.parent_mesh;
+                    gid_elem    = dom.gid_elem;
+                    %------------------------------------------------------
+                    elem = parent_mesh.elem(:,gid_elem);
+                    %------------------------------------------------------
+                    mu0 = 4 * pi * 1e-7;
+                    nu0 = 1/mu0;
+                    nu0nur = nu0 .* obj.(phydom_type).(id_phydom).mur.get_inverse_on(dom);
+                    %------------------------------------------------------
+                    nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
+                    %------------------------------------------------------
+                    obj.(phydom_type).(id_phydom).matrix.nu0nurwfwf = nu0nurwfwf;
+                    %------------------------------------------------------
+                end
+            end
+        end
+        % -----------------------------------------------------------------
+        function build_airbox(obj)
+            % ---
+            if isempty(obj.airbox)
+                if ~isfield(obj.parent_mesh.dom,'default_domain')
+                    obj.parent_mesh.add_default_domain;
+                end
+                obj.add_airbox('id','default_airbox','id_dom3d','default_domain');
+            end
+            % ---
+            phydom_type = 'airbox';
+            % ---
+            allphydom = fieldnames(obj.(phydom_type));
+            % ---
+            for i = 1:length(allphydom)
+                % ---
+                id_phydom = allphydom{i};
+                % ---
+                phydom = obj.(phydom_type).(id_phydom);
+                dom__ = phydom.dom;
+                for j = 1:length(dom__)
+                    dom = dom__{j};
+                    parent_mesh = dom.parent_mesh;
+                    gid_elem    = dom.gid_elem;
+                    %------------------------------------------------------
+                    elem = parent_mesh.elem(:,gid_elem);
+                    %------------------------------------------------------
+                    mu0 = 4 * pi * 1e-7;
+                    nu0 = 1/mu0;
+                    nu0nur = nu0 .* obj.(phydom_type).(id_phydom).mur.get_inverse_on(dom);
+                    %------------------------------------------------------
+                    nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
+                    %------------------------------------------------------
+                    obj.(phydom_type).(id_phydom).matrix.nu0nurwfwf = nu0nurwfwf;
+                    %------------------------------------------------------
+                end
+            end
+        end
+        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
     end
 end

@@ -70,43 +70,68 @@ classdef EmModel < Xhandle
             obj.econductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_airbox(obj) 
+        function add_airbox(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            phydom = Airbox(args);
+            obj.airbox.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_nomesh(obj) 
+        function add_nomesh(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_sibc(obj) 
+        function add_sibc(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_bsfield(obj) 
+        function add_bsfield(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_embc(obj) 
+        function add_embc(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_open_iscoil(obj) 
+        function add_open_iscoil(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_close_iscoil(obj) 
+        function add_close_iscoil(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_open_jscoil(obj) 
+        function add_open_jscoil(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_close_jscoil(obj) 
+        function add_close_jscoil(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_open_vscoil(obj) 
+        function add_open_vscoil(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_close_vscoil(obj) 
+        function add_close_vscoil(obj,args) 
         end
         % -----------------------------------------------------------------
-        function add_mconductor(obj) 
+        function add_mconductor(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.mur = 0
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            phydom = Mconductor(args);
+            obj.mconductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_pmagnet(obj) 
+        function add_pmagnet(obj,args) 
         end
         % -----------------------------------------------------------------
     end

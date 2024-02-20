@@ -32,7 +32,7 @@ classdef LVector < Xhandle
 
     % --- Methods
     methods
-        function gvector = evaluate_on(obj,dom)
+        function gvector = get_on(obj,dom)
             % ---
             if isa(dom,'VolumeDom')
                 id_elem = dom.gid_elem;
@@ -56,7 +56,7 @@ classdef LVector < Xhandle
                     if isnumeric(lvfield)
                         lvector.(fn) = repmat(lvfield,nb_elem,1);
                     elseif isa(lvfield,'Parameter')
-                        lvector.(fn) = lvfield.evaluate_on(dom);
+                        lvector.(fn) = lvfield.get_on(dom);
                     end
                 end
             end
@@ -75,6 +75,12 @@ classdef LVector < Xhandle
             gvector = lvector.main_value .* lvector.main_dir;
             % ---
         end
+        % -----------------------------------------------------------------
+        function ginv = get_inverse_on(obj,dom)
+            gvector = obj.get_on(dom);
+            ginv = - gvector;
+        end
+        % -----------------------------------------------------------------
         % -----------------------------------------------------------------
         function vrot = rotaroundaxis(obj,v,rot_axis,rot_angle)
             % ---

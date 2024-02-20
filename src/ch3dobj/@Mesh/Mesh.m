@@ -107,6 +107,7 @@ classdef Mesh < Xhandle
 
     % --- Methods
     methods
+        % -----------------------------------------------------------------
         function plot(obj,varargin)
             if isempty(obj.node) || isempty(obj.elem)
                 f_fprintf(1,'An empty Mesh object',0,'\n');
@@ -114,6 +115,16 @@ classdef Mesh < Xhandle
                 f_fprintf(1,'A Mesh object',0,'\n');
             end
         end
+        % -----------------------------------------------------------------
+        function add_default_domain(obj,varargin)
+            gid_elem_ = 1:obj.nb_elem;
+            if isa(obj,'Mesh2d')
+                obj.dom.default_domain = VolumeDom2d('parent_mesh',obj,'gid_elem',gid_elem_);
+            elseif isa(obj,'Mesh3d')
+                obj.dom.default_domain = VolumeDom3d('parent_mesh',obj,'gid_elem',gid_elem_);
+            end
+        end
+        % -----------------------------------------------------------------
     end
 end
 

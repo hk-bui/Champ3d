@@ -8,19 +8,16 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Mconductor < PhysicalDom
+classdef Airbox < PhysicalDom
     properties
-        mur = 1
+
     end
 
     % --- Contructor
     methods
-        function obj = Mconductor(args)
+        function obj = Airbox(args)
             obj = obj@PhysicalDom(args);
             obj <= args;
-            if isnumeric(obj.mur)
-                obj.mur = Parameter('f',obj.mur);
-            end
         end
     end
 end

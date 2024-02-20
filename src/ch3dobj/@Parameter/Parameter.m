@@ -71,13 +71,84 @@ classdef Parameter < Xhandle
 
     % --- Methods
     methods
-        function vout = evaluate_on(obj,dom)
+        %------------------------------------------------------------------
+        function vout = get_on(obj,dom)
             if obj.fvectorized
                 vout = eval_fvectorized(obj,dom);
                 vout = obj.column_format(vout);
             else
                 vout = eval_fserial(obj,dom);
                 vout = obj.column_format(vout);
+            end
+        end
+        %------------------------------------------------------------------
+        function vout = get_inverse_on(obj,dom)
+            vout = [];
+            vin  = obj.get_on(dom);
+            sizev = size(vin);
+            lensv = length(sizev); 
+            if lensv == 2
+                if sizev(2) == 1
+                    vout = 1./vin;
+                else
+                    vout = - vin;
+                end
+            elseif lensv == 3
+                if sizev(2) == sizev(3)
+                    if sizev(2) == 2
+                        % --- 
+                        vout = zeros(sizev(1),2,2);
+                        % ---
+                        a11(1,:) = vin(:,1,1);
+                        a12(1,:) = vin(:,1,2);
+                        a21(1,:) = vin(:,2,1);
+                        a22(1,:) = vin(:,2,2);
+                        d = a11.*a22 - a21.*a12;
+                        ix = find(d);
+                        vout(ix,1,1) = +1./d(ix).*a22(ix);
+                        vout(ix,1,2) = -1./d(ix).*a12(ix);
+                        vout(ix,2,1) = -1./d(ix).*a21(ix);
+                        vout(ix,2,2) = +1./d(ix).*a11(ix);
+                    elseif sizev(2) == 3
+                        % --- 
+                        vout = zeros(sizev(1),3,3);
+                        % ---
+                        a11(1,:) = vin(:,1,1);
+                        a12(1,:) = vin(:,1,2);
+                        a13(1,:) = vin(:,1,3);
+                        a21(1,:) = vin(:,2,1);
+                        a22(1,:) = vin(:,2,2);
+                        a23(1,:) = vin(:,2,3);
+                        a31(1,:) = vin(:,3,1);
+                        a32(1,:) = vin(:,3,2);
+                        a33(1,:) = vin(:,3,3);
+                        A11 = a22.*a33 - a23.*a32;
+                        A12 = a32.*a13 - a12.*a33;
+                        A13 = a12.*a23 - a13.*a22;
+                        A21 = a23.*a31 - a21.*a33;
+                        A22 = a33.*a11 - a31.*a13;
+                        A23 = a13.*a21 - a23.*a11;
+                        A31 = a21.*a32 - a31.*a22;
+                        A32 = a31.*a12 - a32.*a11;
+                        A33 = a11.*a22 - a12.*a21;
+                        d = a11.*a22.*a33 + a21.*a32.*a13 + a31.*a12.*a23 - ...
+                            a11.*a32.*a23 - a31.*a22.*a13 - a21.*a12.*a33;
+                        ix = find(d);
+                        vout(ix,1,1) = 1./d(ix).*A11(ix);
+                        vout(ix,1,2) = 1./d(ix).*A12(ix);
+                        vout(ix,1,3) = 1./d(ix).*A13(ix);
+                        vout(ix,2,1) = 1./d(ix).*A21(ix);
+                        vout(ix,2,2) = 1./d(ix).*A22(ix);
+                        vout(ix,2,3) = 1./d(ix).*A23(ix);
+                        vout(ix,3,1) = 1./d(ix).*A31(ix);
+                        vout(ix,3,2) = 1./d(ix).*A32(ix);
+                        vout(ix,3,3) = 1./d(ix).*A33(ix);
+                    else
+                        f_fprintf(1,'Cannot inverse !',0,'\n');
+                    end
+                end
+            else
+                f_fprintf(1,'Cannot inverse !',0,'\n');
             end
         end
         %------------------------------------------------------------------
