@@ -9,51 +9,81 @@
 %--------------------------------------------------------------------------
 
 function coefwfvf = cwfvf(obj,args)
-% CWFVF computes the mass matrix int_v(coef x Wf x Vf x dv)
 arguments
     obj
+    args.id_elem = []
     args.coefficient = 1
     args.vector_field = [1 1 1];
+    args.order = 'full'
 end
-
-coefficient = args.coefficient;
-vector_field = args.vector_field; % must be nb_elem x 3
-
 %--------------------------------------------------------------------------
-if isempty(coefficient)
-    coef_array = 1;
-    coef_array_type = 'iso_array';
+id_elem = args.id_elem;
+coefficient = args.coefficient;
+order = args.order;
+vector_field = args.vector_field;
+%--------------------------------------------------------------------------
+if isempty(id_elem)
+    nb_elem = obj.nb_elem;
+    id_elem = 1:nb_elem;
 else
-    [coef_array, coef_array_type] = f_tensor_array(coefficient);
+    nb_elem = length(id_elem);
 end
+% ---
+if isnumeric(order)
+    if order < 1
+        order = '0';
+    else
+        order = 'full';
+    end
+end
+%--------------------------------------------------------------------------
+[coefficient, coef_array_type] = obj.column_format(coefficient);
+vector_field = obj.column_format(vector_field);
 %--------------------------------------------------------------------------
 elem_type = obj.elem_type;
-%--------------------------------------------------------------------------
 con = f_connexion(elem_type);
-Weigh = con.Weigh;
 nbFa_inEl = con.nbFa_inEl;
 %--------------------------------------------------------------------------
-if isempty(obj.intkit)
+if isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
     obj.build_intkit;
 end
 %--------------------------------------------------------------------------
-Wf   = obj.intkit.Wf;
-detJ = obj.intkit.detJ;
-nbG  = length(Wf);
+switch order
+    case '0'
+        nbG = 1;
+        Weigh = con.cWeigh;
+        % ---
+        Wf = cell(1,nbG);
+        detJ = cell(1,nbG);
+        for iG = 1:nbG
+            Wf{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
+            detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+        end
+    case 'full'
+        nbG = con.nbG;
+        Weigh = con.Weigh;
+        % ---
+        Wf = cell(1,nbG);
+        detJ = cell(1,nbG);
+        for iG = 1:nbG
+            Wf{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
+            detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+        end
+end
 %--------------------------------------------------------------------------
 coefwfvf = zeros(nb_elem,nbFa_inEl);
 %--------------------------------------------------------------------------
-if isempty(vector_field)
-    vfx = 1;
-    vfy = 1;
-    vfz = 1;
+if numel(vector_field) == 3
+    vfx = vector_field(1);
+    vfy = vector_field(2);
+    vfz = vector_field(3);
 else
     vfx = vector_field(:,1);
     vfy = vector_field(:,2);
     vfz = vector_field(:,3);
 end
 %--------------------------------------------------------------------------
-if any(strcmpi(coef_array_type,{'iso_array'}))
+if any(strcmpi(coef_array_type,{'scalar'}))
     %----------------------------------------------------------------------
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
@@ -63,12 +93,12 @@ if any(strcmpi(coef_array_type,{'iso_array'}))
             wfiy = Wf{iG}(:,2,i);
             wfiz = Wf{iG}(:,3,i);
             coefwfvf(:,i) = coefwfvf(:,i) + ...
-                weigh .* dJ .* ( coef_array .* ...
+                weigh .* dJ .* ( coefficient .* ...
                 (wfix .* vfx + wfiy .* vfy + wfiz .* vfz) );
         end
     end
     %----------------------------------------------------------------------
-elseif any(strcmpi(coef_array_type,{'tensor_array'}))
+elseif any(strcmpi(coef_array_type,{'tensor'}))
     %----------------------------------------------------------------------
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
@@ -79,15 +109,15 @@ elseif any(strcmpi(coef_array_type,{'tensor_array'}))
             wfiz = Wf{iG}(:,3,i);
             coefwfvf(:,i) = coefwfvf(:,i) + ...
                 weigh .* dJ .* (...
-                coef_array(:,1,1) .* wfix .* vfx +...
-                coef_array(:,1,2) .* wfiy .* vfx +...
-                coef_array(:,1,3) .* wfiz .* vfx +...
-                coef_array(:,2,1) .* wfix .* vfy +...
-                coef_array(:,2,2) .* wfiy .* vfy +...
-                coef_array(:,2,3) .* wfiz .* vfy +...
-                coef_array(:,3,1) .* wfix .* vfz +...
-                coef_array(:,3,2) .* wfiy .* vfz +...
-                coef_array(:,3,3) .* wfiz .* vfz );
+                coefficient(:,1,1) .* wfix .* vfx +...
+                coefficient(:,1,2) .* wfiy .* vfx +...
+                coefficient(:,1,3) .* wfiz .* vfx +...
+                coefficient(:,2,1) .* wfix .* vfy +...
+                coefficient(:,2,2) .* wfiy .* vfy +...
+                coefficient(:,2,3) .* wfiz .* vfy +...
+                coefficient(:,3,1) .* wfix .* vfz +...
+                coefficient(:,3,2) .* wfiy .* vfz +...
+                coefficient(:,3,3) .* wfiz .* vfz );
         end
     end
     %----------------------------------------------------------------------

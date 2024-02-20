@@ -16,7 +16,7 @@ arglist = {'elem_type','get','n_direction','n_component'};
 elem_type = [];
 get = []; % 'ndecomposition' = 'ndec' = 'n-decomposition',
 n_direction = 'auto'; % 'outward' = 'out' = 'o', 'inward' = 'in' = 'i'
-                     %  otherwise : 'automatic' = 'natural' = 'auto'
+                      %  otherwise : 'automatic' = 'natural' = 'auto'
 n_component = []; % 1, 2 or 3
 %--------------------------------------------------------------------------
 % --- check and update input

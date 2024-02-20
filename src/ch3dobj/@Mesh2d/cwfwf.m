@@ -78,15 +78,13 @@ if any(f_strcmpi(coef_array_type,{'scalar'}))
         for i = 1:nbFa_inEl
             weix = Wf{iG}(:,1,i);
             weiy = Wf{iG}(:,2,i);
-            weiz = Wf{iG}(:,3,i);
             for j = i:nbFa_inEl % !!! i
                 wejx = Wf{iG}(:,1,j);
                 wejy = Wf{iG}(:,2,j);
-                wejz = Wf{iG}(:,3,j);
                 % ---
                 coefwfwf(:,i,j) = coefwfwf(:,i,j) + ...
                     weigh .* dJ .* ( coefficient .* ...
-                    (weix .* wejx + weiy .* wejy + weiz .* wejz) );
+                    (weix .* wejx + weiy .* wejy) );
             end
         end
     end
@@ -99,23 +97,16 @@ elseif any(f_strcmpi(coef_array_type,{'tensor'}))
         for i = 1:nbFa_inEl
             weix = Wf{iG}(:,1,i);
             weiy = Wf{iG}(:,2,i);
-            weiz = Wf{iG}(:,3,i);
             for j = i:nbFa_inEl % !!! i
                 wejx = Wf{iG}(:,1,j);
                 wejy = Wf{iG}(:,2,j);
-                wejz = Wf{iG}(:,3,j);
                 % ---
                 coefwfwf(:,i,j) = coefwfwf(:,i,j) + ...
                     weigh .* dJ .* (...
                     coefficient(:,1,1) .* weix .* wejx +...
                     coefficient(:,1,2) .* weiy .* wejx +...
-                    coefficient(:,1,3) .* weiz .* wejx +...
                     coefficient(:,2,1) .* weix .* wejy +...
-                    coefficient(:,2,2) .* weiy .* wejy +...
-                    coefficient(:,2,3) .* weiz .* wejy +...
-                    coefficient(:,3,1) .* weix .* wejz +...
-                    coefficient(:,3,2) .* weiy .* wejz +...
-                    coefficient(:,3,3) .* weiz .* wejz );
+                    coefficient(:,2,2) .* weiy .* wejy );
             end
         end
     end

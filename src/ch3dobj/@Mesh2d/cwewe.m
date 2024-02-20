@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function coefwfwf = cwfwf(obj,args)
+function coefwewe = cwewe(obj,args)
 arguments
     obj
     args.id_elem = []
@@ -39,9 +39,9 @@ end
 %--------------------------------------------------------------------------
 elem_type = obj.elem_type;
 con = f_connexion(elem_type);
-nbFa_inEl = con.nbFa_inEl;
+nbEd_inEl = con.nbEd_inEl;
 %--------------------------------------------------------------------------
-if isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
+if isempty(obj.intkit.We) || isempty(obj.intkit.cWe)
     obj.build_intkit;
 end
 %--------------------------------------------------------------------------
@@ -50,43 +50,41 @@ switch order
         nbG = 1;
         Weigh = con.cWeigh;
         % ---
-        Wf = cell(1,nbG);
+        We = cell(1,nbG);
         detJ = cell(1,nbG);
         for iG = 1:nbG
-            Wf{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
+            We{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
             detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
         end
     case 'full'
         nbG = con.nbG;
         Weigh = con.Weigh;
         % ---
-        Wf = cell(1,nbG);
+        We = cell(1,nbG);
         detJ = cell(1,nbG);
         for iG = 1:nbG
-            Wf{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
+            We{iG} = obj.intkit.We{iG}(id_elem,:,:);
             detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
         end
 end
 %--------------------------------------------------------------------------
-coefwfwf = zeros(nb_elem,nbFa_inEl,nbFa_inEl);
+coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
 %--------------------------------------------------------------------------
 if any(f_strcmpi(coef_array_type,{'scalar'}))
     %----------------------------------------------------------------------
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
         weigh = Weigh(iG);
-        for i = 1:nbFa_inEl
-            weix = Wf{iG}(:,1,i);
-            weiy = Wf{iG}(:,2,i);
-            weiz = Wf{iG}(:,3,i);
-            for j = i:nbFa_inEl % !!! i
-                wejx = Wf{iG}(:,1,j);
-                wejy = Wf{iG}(:,2,j);
-                wejz = Wf{iG}(:,3,j);
+        for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            for j = i:nbEd_inEl % !!! i
+                wejx = We{iG}(:,1,j);
+                wejy = We{iG}(:,2,j);
                 % ---
-                coefwfwf(:,i,j) = coefwfwf(:,i,j) + ...
+                coefwewe(:,i,j) = coefwewe(:,i,j) + ...
                     weigh .* dJ .* ( coefficient .* ...
-                    (weix .* wejx + weiy .* wejy + weiz .* wejz) );
+                    (weix .* wejx + weiy .* wejy) );
             end
         end
     end
@@ -96,26 +94,19 @@ elseif any(f_strcmpi(coef_array_type,{'tensor'}))
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
         weigh = Weigh(iG);
-        for i = 1:nbFa_inEl
-            weix = Wf{iG}(:,1,i);
-            weiy = Wf{iG}(:,2,i);
-            weiz = Wf{iG}(:,3,i);
-            for j = i:nbFa_inEl % !!! i
-                wejx = Wf{iG}(:,1,j);
-                wejy = Wf{iG}(:,2,j);
-                wejz = Wf{iG}(:,3,j);
+        for i = 1:nbEd_inEl
+            weix = We{iG}(:,1,i);
+            weiy = We{iG}(:,2,i);
+            for j = i:nbEd_inEl % !!! i
+                wejx = We{iG}(:,1,j);
+                wejy = We{iG}(:,2,j);
                 % ---
-                coefwfwf(:,i,j) = coefwfwf(:,i,j) + ...
+                coefwewe(:,i,j) = coefwewe(:,i,j) + ...
                     weigh .* dJ .* (...
                     coefficient(:,1,1) .* weix .* wejx +...
                     coefficient(:,1,2) .* weiy .* wejx +...
-                    coefficient(:,1,3) .* weiz .* wejx +...
                     coefficient(:,2,1) .* weix .* wejy +...
-                    coefficient(:,2,2) .* weiy .* wejy +...
-                    coefficient(:,2,3) .* weiz .* wejy +...
-                    coefficient(:,3,1) .* weix .* wejz +...
-                    coefficient(:,3,2) .* weiy .* wejz +...
-                    coefficient(:,3,3) .* weiz .* wejz );
+                    coefficient(:,2,2) .* weiy .* wejy );
             end
         end
     end

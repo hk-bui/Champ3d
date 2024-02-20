@@ -37,6 +37,7 @@ classdef EmModel < Xhandle
                 args.id = 'no_id'
                 % ---
                 args.parent_mesh = []
+                args.fr = 0
             end
             % ---
             obj <= args;
@@ -85,34 +86,70 @@ classdef EmModel < Xhandle
             obj.airbox.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_nomesh(obj,args) 
+        function add_nomesh(obj,args)
         end
         % -----------------------------------------------------------------
-        function add_sibc(obj,args) 
+        function add_sibc(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.sigma = 0
+                args.mur = 0
+                args.r_ht = []
+                args.r_et = []
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            phydom = Sibc(args);
+            obj.sibc.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_bsfield(obj,args) 
+        function add_bsfield(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.bs = []
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            if isempty(args.id_dom3d)
+                if ~isfield(obj.parent_mesh.dom,'default_domain')
+                    obj.parent_mesh.add_default_domain;
+                end
+                args.id_dom3d = 'default_domain';
+            end
+            % ---
+            phydom = Bsfield(args);
+            obj.bsfield.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_embc(obj,args) 
+        function add_embc(obj,args)
         end
         % -----------------------------------------------------------------
-        function add_open_iscoil(obj,args) 
+        function add_open_iscoil(obj,args)
         end
         % -----------------------------------------------------------------
-        function add_close_iscoil(obj,args) 
+        function add_close_iscoil(obj,args)
         end
         % -----------------------------------------------------------------
-        function add_open_jscoil(obj,args) 
+        function add_open_jscoil(obj,args)
         end
         % -----------------------------------------------------------------
-        function add_close_jscoil(obj,args) 
+        function add_close_jscoil(obj,args)
         end
         % -----------------------------------------------------------------
-        function add_open_vscoil(obj,args) 
+        function add_open_vscoil(obj,args)
         end
         % -----------------------------------------------------------------
-        function add_close_vscoil(obj,args) 
+        function add_close_vscoil(obj,args)
         end
         % -----------------------------------------------------------------
         function add_mconductor(obj,args)
@@ -131,7 +168,20 @@ classdef EmModel < Xhandle
             obj.mconductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_pmagnet(obj,args) 
+        function add_pmagnet(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.br = []
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            phydom = PMagnet(args);
+            obj.pmagnet.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
     end

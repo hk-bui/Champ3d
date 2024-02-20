@@ -16,6 +16,7 @@ classdef VolumeDom < Xhandle
         elem_code
         gid_elem
         condition
+        submesh
     end
 
     % --- Dependent Properties
@@ -46,14 +47,64 @@ classdef VolumeDom < Xhandle
 
     % --- Methods
     methods
-        function allmeshes = submesh(obj)
+        % -----------------------------------------------------------------
+        function allmeshes = build_submesh(obj)
+            % ---
+            if ~isempty(obj.submesh)
+                allmeshes = obj.submesh;
+                return
+            end
+            % ---
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             % -------------------------------------------------------------
             allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
             allmeshes{1}.gid_elem = obj.gid_elem;
             allmeshes{1}.parent_mesh = obj.parent_mesh;
+            % ---
+            obj.submesh = allmeshes;
         end
+        % -----------------------------------------------------------------
+        function gid = gid(obj)
+            node = obj.parent_mesh.node;
+            elem = obj.parent_mesh.elem(:,obj.gid_elem);
+            elem_type = obj.parent_mesh.elem_type;
+            %--------------------------------------------------------------
+            id_node = f_uniquenode(elem);
+            id_edge = obj.parent_mesh.meshds.id_edge_in_elem(:,obj.gid_elem);
+            id_edge = unique(id_edge);
+            id_face = obj.parent_mesh.meshds.id_face_in_elem(:,obj.gid_elem);
+            id_face = unique(id_face);
+            %--------------------------------------------------------------
+            bound_face = f_boundface(elem,node,'elem_type',elem_type);
+            id_bound_face = f_findvecnd(bound_face,obj.parent_mesh.face);
+            id_bound_node = f_uniquenode(bound_face);
+            if isa(obj.parent_mesh,'Mesh3d')
+                id_bound_edge = f_edgeinface(bound_face,obj.parent_mesh.edge);
+            elseif isa(obj.parent_mesh,'Mesh2d')
+                id_bound_edge = id_bound_face;
+            end
+            id_bound_edge = unique(id_bound_edge);
+            %--------------------------------------------------------------
+            id_inner_node = setdiff(id_node,id_bound_node);
+            id_inner_edge = setdiff(id_edge,id_bound_edge);
+            id_inner_face = setdiff(id_face,id_bound_face);
+            %--------------------------------------------------------------
+            gid.gid_elem = obj.gid_elem;
+            gid.gid_node = id_node;
+            gid.gid_edge = id_edge;
+            gid.gid_face = id_face;
+            %--------------------------------------------------------------
+            gid.gid_bound_node = id_bound_node;
+            gid.gid_bound_edge = id_bound_edge;
+            gid.gid_bound_face = id_bound_face;
+            %--------------------------------------------------------------
+            gid.gid_inner_node = id_inner_node;
+            gid.gid_inner_edge = id_inner_edge;
+            gid.gid_inner_face = id_inner_face;
+            %--------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
     end
 
     % --- Methods
@@ -126,11 +177,12 @@ classdef VolumeDom < Xhandle
                 args.alpha {mustBeNumeric} = 0.9
             end
             % ---
-            submesh = obj.submesh;
+            obj.build_submesh;
+            submesh_ = obj.submesh;
             argu = f_to_namedarg(args);
-            for i = 1:length(submesh)
-                submesh{i}.plot(argu{:}); hold on
-                delete(submesh{i});
+            for i = 1:length(submesh_)
+                submesh_{i}.plot(argu{:}); hold on
+                delete(submesh_{i});
             end
         end
     end

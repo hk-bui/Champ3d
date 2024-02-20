@@ -34,6 +34,7 @@ classdef PhysicalDom < Xhandle
             obj = obj@Xhandle;
             obj <= args;
             obj.get_geodom;
+            obj.to_be_rebuild = 1;
         end
     end
 

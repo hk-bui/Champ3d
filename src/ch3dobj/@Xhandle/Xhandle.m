@@ -75,14 +75,20 @@ classdef Xhandle < matlab.mixin.Copyable
             obj.tmp.args = f_to_namedarg(args4obj);
         end
         %------------------------------------------------------------------
-        function confpar = conformize_parameter(obj,parameter)
-            if ~isa(parameter,'Parameter')
-                if isnumeric(parameter)
-                    confpar = Parameter('f',parameter);
-                else
-                    warning('Non conformal parameter');
-                    confpar = [];
-                end
+        function colarray = column_array(obj,coef,args)
+            arguments
+                obj
+                coef
+                args.nb_elem = 1
+            end
+            % ---
+            nb_elem = args.nb_elem;
+            % ---
+            colx = column_format(obj,coef);
+            if numel(colx) == 1
+                colarray = repmat(colx,nb_elem,1);
+            else
+                colarray = colx;
             end
         end
         %------------------------------------------------------------------

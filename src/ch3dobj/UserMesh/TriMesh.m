@@ -12,7 +12,7 @@ classdef TriMesh < Mesh2d
 
     % --- Properties
     properties
-
+        lid_face
     end
 
     % --- Dependent Properties

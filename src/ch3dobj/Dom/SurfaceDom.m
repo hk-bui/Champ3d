@@ -16,6 +16,7 @@ classdef SurfaceDom < Xhandle
         gid_face
         defined_on
         condition
+        submesh
     end
 
     % --- Dependent Properties
@@ -44,7 +45,12 @@ classdef SurfaceDom < Xhandle
 
     % --- Methods
     methods
-        function allmeshes = submesh(obj)
+        function allmeshes = build_submesh(obj)
+            % ---
+            if ~isempty(obj.submesh)
+                allmeshes = obj.submesh;
+                return
+            end
             % ---
             node = obj.parent_mesh.node;
             face = obj.parent_mesh.face(:,obj.gid_face);
@@ -59,18 +65,22 @@ classdef SurfaceDom < Xhandle
                 nb_sm = nb_sm + 1;
                 allmeshes{nb_sm} = TriMesh('node',node,'elem',face(1:3,id_tria));
                 allmeshes{nb_sm}.gid_face = obj.gid_face(id_tria);
+                allmeshes{nb_sm}.lid_face = id_tria;
                 allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             if ~isempty(id_quad)
                 nb_sm = nb_sm + 1;
                 allmeshes{nb_sm} = QuadMesh('node',node,'elem',face(1:4,id_quad));
                 allmeshes{nb_sm}.gid_face = obj.gid_face(id_quad);
+                allmeshes{nb_sm}.lid_face = id_quad;
                 allmeshes{nb_sm}.parent_mesh = obj.parent_mesh;
             end
             % ---
             if nb_sm == 0
                 allmeshes{1} = Mesh;
             end
+            % ---
+            obj.submesh = allmeshes;
         end
     end
 
@@ -111,11 +121,12 @@ classdef SurfaceDom < Xhandle
                 args.alpha {mustBeNumeric} = 0.9
             end
             % ---
-            submesh = obj.submesh;
+            obj.build_submesh;
+            submesh_ = obj.submesh;
             argu = f_to_namedarg(args);
-            for i = 1:length(submesh)
-                submesh{i}.plot(argu{:}); hold on
-                delete(submesh{i});
+            for i = 1:length(submesh_)
+                submesh_{i}.plot(argu{:}); hold on
+                delete(submesh_{i});
             end
             % ---
         end
