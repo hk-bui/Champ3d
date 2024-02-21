@@ -23,7 +23,8 @@ for i = 1:length(allphydom)
     dom = phydom.dom;
     % ---
     parent_mesh = dom.parent_mesh;
-    gid_elem    = dom.gid_elem;
+    % --- current field
+    current_field = sparse(3,parent_mesh.nb_elem);
     % ---
     if isa(phydom,'CloseCoil')
         % ---
@@ -78,9 +79,15 @@ for i = 1:length(allphydom)
             vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gid_elem);
             vJs = f_normalize(vJs);
             % ---
-            figure
-            f_quiver(parent_mesh.celem(:,gid_elem),real(vJs(:,gid_elem)));
+            current_field = current_field + vJs;
         end
+        % ---
+        % current turn density vector field
+        % current_turn_density  = current_field .* nb_turn ./ cs_area;
+        % ---
+        figure
+        f_quiver(parent_mesh.celem(:,dom.gid_elem),real(current_field(:,dom.gid_elem)));
+        % ---
     end
 end
 

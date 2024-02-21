@@ -8,20 +8,21 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FEM3dAphijw < FEM3dAphi
-    % --- Constructor
-    methods
-        function obj = FEM3dAphijw(args)
-            arguments
-                args.id = 'no_id'
-                % ---
-                args.parent_mesh = []
-                args.fr = 0
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            obj = obj@FEM3dAphi(argu{:});
-            % ---
-        end
-    end
-end
+function build(obj)
+% ---
+obj.build_econductor;
+obj.build_mconductor;
+obj.build_airbox;
+obj.build_bsfield;
+obj.build_pmagnet;
+obj.build_sibc;
+obj.build_nomesh;
+obj.build_coil;
+
+
+
+
+
+
+
+

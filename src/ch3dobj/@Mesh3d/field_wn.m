@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function vector_field = field_wf(obj,args)
+function scalar_field = field_wn(obj,args)
 arguments
     obj
     args.id_elem = []
@@ -28,7 +28,7 @@ if isempty(id_elem)
     id_elem = 1:nb_elem;
 end
 %--------------------------------------------------------------------------
-if numel(dof) ~= obj.nb_face
+if numel(dof) ~= obj.nb_node
     error('dof must be defined in whole mesh !');
 end
 %--------------------------------------------------------------------------
@@ -37,14 +37,14 @@ dof = obj.column_format(dof);
 %--------------------------------------------------------------------------
 elem_type = obj.elem_type;
 con = f_connexion(elem_type);
-nbFa_inEl = con.nbFa_inEl;
+nbNo_inEl = con.nbNo_inEl;
 %--------------------------------------------------------------------------
-if isempty(obj.meshds.id_face_in_elem)
+if isempty(obj.meshds.id_node_in_elem)
     obj.build_meshds;
 end
-id_face_in_elem = obj.meshds.id_face_in_elem;
+elem = obj.meshds.elem;
 %--------------------------------------------------------------------------
-if isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
+if isempty(obj.intkit.We) || isempty(obj.intkit.cWe)
     obj.build_intkit;
 end
 %--------------------------------------------------------------------------
@@ -54,68 +54,36 @@ switch on_
         % ---
         Wx = cell(1,nbG);
         for iG = 1:nbG
-            Wx{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
+            Wx{iG} = obj.intkit.cWn{iG}(id_elem,:);
         end
     case 'gauss_points'
         nbG = con.nbG;
         % ---
         Wx = cell(1,nbG);
         for iG = 1:nbG
-            Wx{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
+            Wx{iG} = obj.intkit.Wn{iG}(id_elem,:);
         end
 end
 %--------------------------------------------------------------------------
 for i = 1:nbG
-    vector_field{i} = sparse(3,nb_elem);
+    scalar_field{i} = sparse(1,nb_elem);
 end
 %--------------------------------------------------------------------------
 if any(f_strcmpi(coef_array_type,{'scalar'}))
     %----------------------------------------------------------------------
     for iG = 1:nbG
-        fi = zeros(length(id_elem),3);
-        for i = 1:nbFa_inEl
-            wix = Wx{iG}(:,1,i);
-            wiy = Wx{iG}(:,2,i);
-            wiz = Wx{iG}(:,3,i);
-            id_face = id_face_in_elem(i,id_elem);
-            fi(:,1) = fi(:,1) + coefficient .* wix .* dof(id_face);
-            fi(:,2) = fi(:,2) + coefficient .* wiy .* dof(id_face);
-            fi(:,3) = fi(:,3) + coefficient .* wiz .* dof(id_face);
+        fi = zeros(length(id_elem),1);
+        for i = 1:nbNo_inEl
+            wi = Wx{iG}(:,1,i);
+            id_edge = elem(i,id_elem);
+            fi(:,1) = fi(:,1) + coefficient .* wi .* dof(id_edge);
         end
         % ---
-        vector_field{iG}(1:3,id_elem) = fi.';
+        scalar_field{iG}(1,id_elem) = fi.';
     end
     % ---
     if nbG == 1
-        vector_field = vector_field{1};
-    end
-    %----------------------------------------------------------------------
-elseif any(f_strcmpi(coef_array_type,{'tensor'}))
-    %----------------------------------------------------------------------
-    for iG = 1:nbG
-        fi = zeros(3,length(id_elem));
-        %------------------------------------------------------------------
-        for i = 1:nbFa_inEl
-            wix = Wx(:,1,i);
-            wiy = Wx(:,2,i);
-            wiz = Wx(:,3,i);
-            id_face = id_face_in_elem(i,id_elem);
-            fi(1,:) = fi(1,:) + (coefficient(:,1,1) .* wix + ...
-                                 coefficient(:,1,2) .* wiy + ...
-                                 coefficient(:,1,3) .* wiz) .* dof(id_face) ;
-            fi(2,:) = fi(2,:) + (coefficient(:,2,1) .* wix + ...
-                                 coefficient(:,2,2) .* wiy + ...
-                                 coefficient(:,2,3) .* wiz) .* dof(id_face) ;
-            fi(3,:) = fi(3,:) + (coefficient(:,3,1) .* wix + ...
-                                 coefficient(:,3,2) .* wiy + ...
-                                 coefficient(:,3,3) .* wiz) .* dof(id_face) ;
-        end
-        % ---
-        vector_field{iG}(1:3,id_elem) = fi.';
-    end
-    % ---
-    if nbG == 1
-        vector_field = vector_field{1};
+        scalar_field = scalar_field{1};
     end
     %----------------------------------------------------------------------
 end

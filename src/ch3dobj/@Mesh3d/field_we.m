@@ -29,7 +29,7 @@ if isempty(id_elem)
 end
 %--------------------------------------------------------------------------
 if numel(dof) ~= obj.nb_edge
-    error('dof must be difined in whole mesh !');
+    error('dof must be defined in whole mesh !');
 end
 %--------------------------------------------------------------------------
 [coefficient, coef_array_type] = obj.column_format(coefficient);
