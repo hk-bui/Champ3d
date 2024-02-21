@@ -50,9 +50,14 @@ classdef PhysicalDom < Xhandle
                         id_dom_ = f_to_scellargin(obj.id_dom2d);
                     end
                     % ---
-                    obj.dom = cell(1,length(id_dom_));
-                    for i = 1:length(id_dom_)
-                        obj.dom{i} = obj.parent_model.parent_mesh.dom.(id_dom_{i});
+                    %obj.dom = cell(1,length(id_dom_));
+                    %for i = 1:length(id_dom_)
+                    %    obj.dom{i} = obj.parent_model.parent_mesh.dom.(id_dom_{i});
+                    %end
+                    % ---
+                    obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
+                    for i = 2:length(id_dom_)
+                        obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
                     end
                 end
             end
@@ -65,7 +70,7 @@ classdef PhysicalDom < Xhandle
         function plot(obj,args)
             arguments
                 obj
-                args.edge_color = 'none'
+                args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
             end

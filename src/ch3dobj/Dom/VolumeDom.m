@@ -337,7 +337,7 @@ classdef VolumeDom < Xhandle
         function plot(obj,args)
             arguments
                 obj
-                args.edge_color = 'none'
+                args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
             end
