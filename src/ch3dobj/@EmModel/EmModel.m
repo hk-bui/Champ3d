@@ -156,6 +156,20 @@ classdef EmModel < Xhandle
         end
         % -----------------------------------------------------------------
         function add_close_jscoil(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.id_electrode_dom3d = []
+                args.js = []
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            phydom = CloseJsCoil(args);
+            obj.coil.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
         function add_open_vscoil(obj,args)
