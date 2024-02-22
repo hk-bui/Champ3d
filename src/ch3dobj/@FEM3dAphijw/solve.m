@@ -448,6 +448,7 @@ clear wfjs
 %--------------------------------------------------------------------------
 obj.dof.t_js = t_jsfield;
 obj.dof.js  = obj.parent_mesh.discrete.rot * t_jsfield;
+obj.matrix.js  = obj.parent_mesh.field_wf('dof',obj.dof.js);
 %--------------------------------------------------------------------------
 % --- bsfield
 a_bsfield = zeros(nb_edge,1);
