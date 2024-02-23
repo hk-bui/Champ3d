@@ -1,0 +1,89 @@
+%--------------------------------------------------------------------------
+% This code is written by: H-K. Bui, 2024
+% as a contribution to champ3d code.
+%--------------------------------------------------------------------------
+% champ3d is copyright (c) 2023 H-K. Bui.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
+% Huu-Kien.Bui@univ-nantes.fr
+% IREENA Lab - UR 4642, Nantes Universite'
+%--------------------------------------------------------------------------
+
+function scalar_field = field_wn(obj,args)
+arguments
+    obj
+    args.id_elem = []
+    args.coefficient = 1
+    args.dof = 1
+    args.on {mustBeMember(args.on,{'center','gauss_points'})} = 'center'
+end
+%--------------------------------------------------------------------------
+id_elem = args.id_elem;
+coefficient = args.coefficient;
+dof = args.dof;
+on_ = args.on;
+%--------------------------------------------------------------------------
+nb_elem = obj.nb_elem;
+% ---
+if isempty(id_elem)
+    id_elem = 1:nb_elem;
+end
+%--------------------------------------------------------------------------
+if numel(dof) ~= obj.nb_node
+    error('dof must be defined in whole mesh !');
+end
+%--------------------------------------------------------------------------
+[coefficient, coef_array_type] = obj.column_format(coefficient);
+dof = obj.column_format(dof);
+%--------------------------------------------------------------------------
+elem_type = obj.elem_type;
+con = f_connexion(elem_type);
+nbNo_inEl = con.nbNo_inEl;
+%--------------------------------------------------------------------------
+if isempty(obj.meshds.id_node_in_elem)
+    obj.build_meshds;
+end
+elem = obj.meshds.elem;
+%--------------------------------------------------------------------------
+if isempty(obj.intkit.We) || isempty(obj.intkit.cWe)
+    obj.build_intkit;
+end
+%--------------------------------------------------------------------------
+switch on_
+    case 'center'
+        nbG = 1;
+        % ---
+        Wx = cell(1,nbG);
+        for iG = 1:nbG
+            Wx{iG} = obj.intkit.cWn{iG}(id_elem,:);
+        end
+    case 'gauss_points'
+        nbG = con.nbG;
+        % ---
+        Wx = cell(1,nbG);
+        for iG = 1:nbG
+            Wx{iG} = obj.intkit.Wn{iG}(id_elem,:);
+        end
+end
+%--------------------------------------------------------------------------
+for i = 1:nbG
+    scalar_field{i} = sparse(1,nb_elem);
+end
+%--------------------------------------------------------------------------
+if any(f_strcmpi(coef_array_type,{'scalar'}))
+    %----------------------------------------------------------------------
+    for iG = 1:nbG
+        fi = zeros(length(id_elem),1);
+        for i = 1:nbNo_inEl
+            wi = Wx{iG}(:,1,i);
+            id_edge = elem(i,id_elem);
+            fi(:,1) = fi(:,1) + coefficient .* wi .* dof(id_edge);
+        end
+        % ---
+        scalar_field{iG}(1,id_elem) = fi.';
+    end
+    % ---
+    if nbG == 1
+        scalar_field = scalar_field{1};
+    end
+    %----------------------------------------------------------------------
+end
