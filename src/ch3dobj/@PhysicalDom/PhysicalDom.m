@@ -135,14 +135,14 @@ classdef PhysicalDom < Xhandle
                 id_quad = setdiff(1:length(js),id_tria);
                 % ---
                 if ~isempty(id_tria)
-                    msh.Faces = f_unique(face(1:3,id_tria)).';
+                    msh.Faces = (face(1:3,id_tria)).';
                     msh.FaceVertexCData = f_tocolv(full(js(itria)));
                     msh.FaceColor = 'flat';
                     patch(msh); hold on
                 end
                 % ---
                 if ~isempty(id_quad)
-                    msh.Faces = f_unique(face(1:4,id_quad)).';
+                    msh.Faces = (face(1:4,id_quad)).';
                     msh.FaceVertexCData = f_tocolv(full(js(id_quad)));
                     msh.FaceColor = 'flat';
                     patch(msh); hold on
