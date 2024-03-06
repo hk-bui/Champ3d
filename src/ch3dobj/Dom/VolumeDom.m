@@ -109,12 +109,14 @@ classdef VolumeDom < Xhandle
             arguments
                 obj
                 args.cut_equation = []
+                args.tolerance = 1e-12;
             end
             % ---
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             elem_type = obj.parent_mesh.elem_type;
             cut_equation = f_cut_equation(args.cut_equation);
+            tol = args.tolerance;
             %--------------------------------------------------------------
             eqcond = cut_equation.eqcond;
             neqcond = cut_equation.neqcond;
@@ -139,17 +141,20 @@ classdef VolumeDom < Xhandle
             end
             % ---
             for i = 1:nbEqcond
-                eqcond_L = strrep(eqcond{i},'==','<');
-                eqcond_R = strrep(eqcond{i},'==','>');
+                eqcond_L = strrep(eqcond{i},'==',['<+' num2str(tol) '+']);
+                eqcond_R = strrep(eqcond{i},'==',['>-' num2str(tol) '+']);
                 eval(['iEqcond_L{i} = (' eqcond_L ');']);
                 eval(['iEqcond_R{i} = (' eqcond_R ');']);
                 checksum_L = sum(iEqcond_L{i});
                 checksum_R = sum(iEqcond_R{i});
                 checksum   = checksum_L + checksum_R;
                 % just need one node touched
-                iElemEqcond{i} = find( (checksum_L < nbNo_inEl & checksum_L > 0 & ...
-                    checksum_R < nbNo_inEl & checksum_R > 0)  ...
-                    |(checksum   < nbNo_inEl));
+                iElemEqcond{i} = find((checksum_L > 0 & checksum_R > 0));
+                % --- no tol
+                %iElemEqcond{i} = find( (checksum_L < nbNo_inEl & checksum_L > 0 & ...
+                %    checksum_R < nbNo_inEl & checksum_R > 0)  ...
+                %    |(checksum   < nbNo_inEl));
+
             end
             % ---
             for i = 1:nbEqcond
@@ -165,11 +170,13 @@ classdef VolumeDom < Xhandle
             arguments
                 obj
                 args.cut_equation = []
+                args.tolerance = 1e-12;
             end
             % ---
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             cut_equation = f_cut_equation(args.cut_equation);
+            tol = args.tolerance;
             %--------------------------------------------------------------
             eqcond = cut_equation.eqcond;
             neqcond = cut_equation.neqcond;

@@ -8,12 +8,12 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ProcessingSurface3d < CutVolumeDom3d
+classdef ProcessingSurface3d < VolumeDom3d
 
     % --- Properties
     properties
         parent_model
-        %id_dom3d
+        id_dom3d
         parallel_line_1
         parallel_line_2
         dtype_parallel
@@ -25,7 +25,7 @@ classdef ProcessingSurface3d < CutVolumeDom3d
         mesh
         fields
         % ---
-        %cut_equation
+        cut_equation
         %gid_elem
         %gid_side_node_1
         %gid_side_node_2
@@ -108,21 +108,43 @@ classdef ProcessingSurface3d < CutVolumeDom3d
                                 num2str(ci(3)) '*z =' num2str(d)];
             % ---
             gid_elem_ = [];
-            gid_side_node_1_ = [];
-            gid_side_node_2_ = [];
             iddom3 = f_to_scellargin(obj.id_dom3d);
             for i = 1:length(iddom3)
                 dom2cut = obj.parent_model.parent_mesh.dom.(iddom3{i});
-                cut_dom = dom2cut.get_cutdom('cut_equation',obj.cut_equation);
-                gid_elem_ = [gid_elem_ cut_dom.gid_elem];
-                gid_side_node_1_ = [gid_side_node_1_ cut_dom.gid_side_node_1];
-                gid_side_node_2_ = [gid_side_node_2_ cut_dom.gid_side_node_2];
+                gid_e = dom2cut.get_cutelem('cut_equation',obj.cut_equation);
+                gid_elem_ = [gid_elem_ gid_e];
             end
             % ---
+            nbNo_inEl = size(obj.parent_mesh.elem,1);
+            cx = reshape(obj.parent_mesh.node(1,obj.parent_mesh.elem(:,gid_elem_)),...
+                         nbNo_inEl,[]);
+            cy = reshape(obj.parent_mesh.node(2,obj.parent_mesh.elem(:,gid_elem_)),...
+                         nbNo_inEl,[]);
+            cz = reshape(obj.parent_mesh.node(3,obj.parent_mesh.elem(:,gid_elem_)),...
+                         nbNo_inEl,[]);
+            % ---
+            xmin = min([obj.parallel_line_1(:,1);obj.parallel_line_2(:,1)]);
+            ymin = min([obj.parallel_line_1(:,2);obj.parallel_line_2(:,2)]);
+            zmin = min([obj.parallel_line_1(:,3);obj.parallel_line_2(:,3)]);
+            xmax = max([obj.parallel_line_1(:,1);obj.parallel_line_2(:,1)]);
+            ymax = max([obj.parallel_line_1(:,2);obj.parallel_line_2(:,2)]);
+            zmax = max([obj.parallel_line_1(:,3);obj.parallel_line_2(:,3)]);
+            % ---
+            cx = sum(cx >= xmin - 1e-9 & cx <= xmax + 1e-9, 1);
+            cy = sum(cy >= ymin - 1e-9 & cy <= ymax + 1e-9, 1);
+            cz = sum(cz >= zmin - 1e-9 & cz <= zmax + 1e-9, 1);
+            % ---
+            gid_elem_ = gid_elem_(cx > 0 | cy > 0 | cz > 0);
+            % ---
             obj.gid_elem = gid_elem_;
-            obj.gid_side_node_1 = gid_side_node_1_;
-            obj.gid_side_node_2 = gid_side_node_2_;
             % -------------------------------------------------------------
+            obj.mesh = QuadMeshFrom3d('parallel_line_1',obj.parallel_line_1, ...
+                                  'parallel_line_2',obj.parallel_line_2, ...
+                                  'dnum_orthogonal',obj.dnum_orthogonal, ...
+                                  'dnum_parallel',obj.dnum_parallel, ...
+                                  'dtype_orthogonal',obj.dtype_orthogonal, ...
+                                  'dtype_parallel',obj.dtype_parallel, ...
+                                  'flog',obj.flog);
         end
         % -----------------------------------------------------------------
     end
@@ -135,11 +157,16 @@ classdef ProcessingSurface3d < CutVolumeDom3d
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.showcutdom = 0
             end
             % ---
-            argu = f_to_namedarg(args);
-            plot@CutVolumeDom3d(obj,argu{:}); hold on
-            % -------------------------------------------------------------
+            obj.mesh.plot('face_color',args.face_color,...
+                          'edge_color',args.edge_color,...
+                          'alpha',args.alpha); hold on;
+            % ---
+            if args.showcutdom
+                plot@VolumeDom3d(obj,'face_color','none','edge_color',[0.9 0.9 0.9]);
+            end
         end
     end
 
