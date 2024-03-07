@@ -14,7 +14,7 @@ arguments
     args.id_elem = []
     args.coefficient = 1
     args.dof = 1
-    args.on {mustBeMember(args.on,{'center','gauss_points'})} = 'center'
+    args.on {mustBeMember(args.on,{'center','gauss_points','interpolation_points'})} = 'center'
 end
 %--------------------------------------------------------------------------
 id_elem = args.id_elem;
@@ -44,8 +44,12 @@ if isempty(obj.meshds.id_node_in_elem)
 end
 elem = obj.meshds.elem;
 %--------------------------------------------------------------------------
-if isempty(obj.intkit.We) || isempty(obj.intkit.cWe)
+if isempty(obj.intkit.Wn) || isempty(obj.intkit.cWn)
     obj.build_intkit;
+end
+%--------------------------------------------------------------------------
+if isempty(obj.prokit.Wn)
+    obj.build_prokit;
 end
 %--------------------------------------------------------------------------
 switch on_
@@ -62,6 +66,13 @@ switch on_
         Wx = cell(1,nbG);
         for iG = 1:nbG
             Wx{iG} = obj.intkit.Wn{iG}(id_elem,:);
+        end
+    case 'interpolation_points'
+        nbG = obj.refelem.nbI;
+        % ---
+        Wx = cell(1,nbG);
+        for iG = 1:nbG
+            Wx{iG} = obj.prokit.Wn{iG}(id_elem,:);
         end
 end
 %--------------------------------------------------------------------------

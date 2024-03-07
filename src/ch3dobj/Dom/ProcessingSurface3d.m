@@ -148,8 +148,7 @@ classdef ProcessingSurface3d < VolumeDom3d
         end
         % -----------------------------------------------------------------
     end
-
-    % ---
+    % ---------------------------------------------------------------------
     methods
         function plot(obj,args)
             arguments
@@ -157,19 +156,273 @@ classdef ProcessingSurface3d < VolumeDom3d
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.id_field = []
                 args.showcutdom = 0
             end
             % ---
-            obj.mesh.plot('face_color',args.face_color,...
-                          'edge_color',args.edge_color,...
-                          'alpha',args.alpha); hold on;
+            mshalone  = 1;
+            forcomplx = 1;
+            forvector = 1;
+            fval      = [];
+            for3d     = 0;
             % ---
-            if args.showcutdom
-                plot@VolumeDom3d(obj,'face_color','none','edge_color',[0.9 0.9 0.9]);
+            id_field = args.id_field;
+            if ~isempty(id_field)
+                if isfield(obj.fields,id_field)
+                    fval = obj.fields.(id_field);
+                end
+            end
+            % ---
+            if ~isempty(fval)
+                mshalone = 0;
+                fval = obj.column_format(fval);
+            end
+            %--------------------------------------------------------------
+            edge_color_  = args.edge_color;
+            face_color_  = args.face_color;
+            alpha_       = args.alpha;
+            %--------------------------------------------------------------
+            clear msh;
+            %--------------------------------------------------------------
+            node = obj.mesh.node.';
+            elem = obj.mesh.elem.';
+            %--------------------------------------------------------------
+            msh.Vertices = node;
+            msh.Faces = elem;
+            msh.FaceColor = face_color_;
+            msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
+            %--------------------------------------------------------------
+            if mshalone
+                patch(msh);
+                %---
+                f_showaxis(3,3);
+                alpha(alpha_); hold on
+                %---
+                if args.showcutdom
+                    plot@VolumeDom3d(obj,'face_color','none','edge_color',[0.9 0.9 0.9]);
+                end
+                %---
+                return
+            end           
+            %--------------------------------------------------------------
+            % ---
+            if isreal(fval)
+                forcomplx = 0;
+            end
+            % ---
+            if size(fval,2) == 1
+                forvector = 0;
+            end
+            % ---
+            if size(fval,2) == 3
+                for3d = 1;
+            end
+            %--------------------------------------------------------------
+            if forvector
+                fx = fval(:,1);
+                fy = fval(:,2);
+                if for3d
+                    fz = fval(:,3);
+                end
+            end
+            %--------------------------------------------------------------
+            if forvector
+                if forcomplx
+                    % ---
+                    subplot(131);
+                    msh.FaceColor = 'flat';
+                    msh.FaceVertexCData = (f_magnitude(fval.')).';
+                    patch(msh,'DisplayName','magnitude');
+                    title('Magnitude');
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                    % ---
+                    subplot(132);
+                    msh.FaceColor = 'none';
+                    msh.FaceVertexCData = [];
+                    patch(msh,'DisplayName','real-part'); hold on
+                    f_quiver(node.',real(fval));
+                    title('Real part')
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                    % ---
+                    subplot(133);
+                    msh.FaceColor = 'none';
+                    msh.FaceVertexCData = [];
+                    patch(msh,'DisplayName','imag-part'); hold on
+                    f_quiver(node.',imag(fval));
+                    title('Imag part')
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                else
+                    % ---
+                    subplot(121);
+                    msh.FaceColor = 'none';
+                    msh.FaceVertexCData = (f_magnitude(fval.')).';
+                    patch(msh,'DisplayName','magnitude');
+                    title('Magnitude');
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                    % ---
+                    subplot(122);
+                    msh.FaceVertexCData = [];
+                    patch(msh,'DisplayName','vector-field'); hold on
+                    f_quiver(node.',fval);
+                    title(id_field);
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                end
+            else
+                if forcomplx
+                    % ---
+                    subplot(121);
+                    msh.FaceColor = 'none';
+                    msh.FaceVertexCData = real(fval);
+                    patch(msh,'DisplayName','real-part');
+                    title('Real part');
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                    % ---
+                    subplot(122);
+                    msh.FaceVertexCData = imag(fval);
+                    patch(msh,'DisplayName','imag-part');
+                    title('Imag part');
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                else
+                    msh.FaceColor = 'none';
+                    msh.FaceVertexCData = fval;
+                    patch(msh);
+                    title(id_field);
+                    f_showaxis(3,2);
+                    alpha(alpha_); hold on
+                end
             end
         end
+        % ---
+        function add_field(obj,args)
+            arguments
+                obj
+                args.id_field = 'field01'
+                args.field_name {mustBeMember(args.field_name,...
+                    {'b','j','h','p','a','phi','t','ome',''})} = ''
+                args.field_value = []
+                %args.field_name {mustBeMember(args.field_name,{'bv','jv','hv','pv','av','phiv','tv','omev',...
+                %     'bs','js','hs','ps','as','phis','ts','omes'})}
+            end
+            % ---
+            id_field = args.id_field;
+            fn = args.field_name;
+            % ---
+            if ~isempty(fn)
+                if isa(obj.parent_model,'FEM3dAphi')
+                    fi = obj.getfieldAphi(fn);
+                end
+                % ---
+                obj.fields.(id_field) = fi;
+            else
+                obj.fields.(id_field) = args.field_value;
+            end
+            % ---
+        end
     end
-
+    % ---------------------------------------------------------------------
+    methods
+        function fi = getfieldAphi(obj,field_name)
+            % ---
+            msh = obj.parent_mesh;
+            model = obj.parent_model;
+            nbI = msh.refelem.nbI;
+            % ---
+            vf = [];
+            sf = [];
+            % ---
+            if any(f_strcmpi(field_name,{'b'}))
+                vf = msh.field_wf('dof',model.dof.b,'on','interpolation_points');
+            end
+            % ---
+            if any(f_strcmpi(field_name,{'e'}))
+                vf = msh.field_we('dof',model.dof.e,'on','interpolation_points');
+            end
+            % ---
+            if any(f_strcmpi(field_name,{'a'}))
+                vf = msh.field_we('dof',model.dof.a,'on','interpolation_points');
+            end
+            % ---
+            if any(f_strcmpi(field_name,{'j'}))
+                % ---
+                ev = msh.field_we('dof',model.dof.e,'on','interpolation_points');
+                % ---
+                if ~isempty(model.econductor)
+                    id_econductor__ = fieldnames(model.econductor);
+                end
+                % ---
+                for i = 1:nbI
+                    vf{i} = sparse(3,msh.nb_elem);
+                end
+                % ---
+                for i = 1:nbI
+                    for iec = 1:length(id_econductor__)
+                        %------------------------------------------------------
+                        id_phydom = id_econductor__{iec};
+                        %------------------------------------------------------
+                        [coefficient, coef_array_type] = ...
+                            model.column_format(model.econductor.(id_phydom).matrix.sigma_array);
+                        %------------------------------------------------------
+                        id_elem = model.econductor.(id_phydom).matrix.gid_elem;
+                        %------------------------------------------------------
+                        if any(f_strcmpi(coef_array_type,{'scalar'}))
+                            %--------------------------------------------------
+                            vf{i}(:,id_elem) = coefficient .* ev{i}(:,id_elem);
+                            %--------------------------------------------------
+                        elseif any(f_strcmpi(coef_array_type,{'tensor'}))
+                            %--------------------------------------------------
+                            vf{i}(1,id_elem) = coefficient(:,1,1).' .* ev{i}(1,id_elem) + ...
+                                               coefficient(:,1,2).' .* ev{i}(2,id_elem) + ...
+                                               coefficient(:,1,3).' .* ev{i}(3,id_elem);
+                            vf{i}(2,id_elem) = coefficient(:,2,1).' .* ev{i}(1,id_elem) + ...
+                                               coefficient(:,2,2).' .* ev{i}(2,id_elem) + ...
+                                               coefficient(:,2,3).' .* ev{i}(3,id_elem);
+                            vf{i}(3,id_elem) = coefficient(:,3,1).' .* ev{i}(1,id_elem) + ...
+                                               coefficient(:,3,2).' .* ev{i}(2,id_elem) + ...
+                                               coefficient(:,3,3).' .* ev{i}(3,id_elem);
+                        end
+                    end
+                end
+            end
+            % -------------------------------------------------------------
+            id_elem = obj.gid_elem;
+            % -------------------------------------------------------------
+            xi  = []; yi  = []; zi  = [];
+            vfx = []; vfy = []; vfz = [];
+            for i = 1:nbI
+                xi = [xi; msh.prokit.node{i}(id_elem,1)];
+                yi = [yi; msh.prokit.node{i}(id_elem,2)];
+                zi = [zi; msh.prokit.node{i}(id_elem,3)];
+                vfx = [vfx vf{i}(1,id_elem)];
+                vfy = [vfy vf{i}(2,id_elem)];
+                vfz = [vfz vf{i}(3,id_elem)];
+            end
+            % ---
+            Fx = scatteredInterpolant(xi,yi,zi,full(vfx.'),'natural');
+            Fy = scatteredInterpolant(xi,yi,zi,full(vfy.'),'natural');
+            Fz = scatteredInterpolant(xi,yi,zi,full(vfz.'),'natural');
+            % ---
+            xnode = obj.mesh.node(1,:);
+            ynode = obj.mesh.node(2,:);
+            znode = obj.mesh.node(3,:);
+            nb_node = obj.mesh.nb_node;
+            % ---
+            fi = zeros(nb_node,3);
+            fi(:,1) = Fx(xnode,ynode,znode);
+            fi(:,2) = Fy(xnode,ynode,znode);
+            fi(:,3) = Fz(xnode,ynode,znode);
+            % ---
+            fi = fi.';
+        end
+    end
+    % ---------------------------------------------------------------------
+    % ---------------------------------------------------------------------
 end
 
 

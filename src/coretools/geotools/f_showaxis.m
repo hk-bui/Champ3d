@@ -1,9 +1,5 @@
-function VM = f_magnitude(V,varargin)
-% F_NORM returns the norm of vectors in an array of column vectors.
 %--------------------------------------------------------------------------
-% VM = F_NORM(V);
-%--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2023
+% This code is written by: H-K. Bui, 2024
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
@@ -12,8 +8,16 @@ function VM = f_magnitude(V,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-
-VM = sqrt(sum(V .* conj(V)));
-if ~isreal(V)
-    VM = abs(VM);
+function f_showaxis(dim,view_n)
+%--------------------------------------------------------------
+xlabel('x (m)');
+if dim >= 2
+    ylabel('y (m)');
 end
+if dim >= 3
+    zlabel('z (m)');
+end
+view(view_n);
+axis equal; axis tight; hold on
+%--------------------------------------------------------------
+f_chlogo;

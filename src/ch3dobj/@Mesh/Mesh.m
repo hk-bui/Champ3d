@@ -26,9 +26,11 @@ classdef Mesh < Xhandle
         % ---
         dom
         % ---
+        refelem
         meshds
         discrete
         intkit
+        prokit
         % ---
         is_build = 0
         meshds_to_be_rebuild = 1
@@ -88,6 +90,14 @@ classdef Mesh < Xhandle
             obj.intkit.We = {};
             obj.intkit.Wf = {};
             obj.intkit.Wn = {};
+            % ---
+            obj.prokit.detJ = {};
+            obj.prokit.gradWn = {};
+            obj.prokit.Jinv = {};
+            obj.prokit.We = {};
+            obj.prokit.Wf = {};
+            obj.prokit.Wn = {};
+            obj.prokit.node = {};
         end
     end
 

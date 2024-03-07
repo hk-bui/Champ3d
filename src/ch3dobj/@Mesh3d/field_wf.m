@@ -14,7 +14,7 @@ arguments
     args.id_elem = []
     args.coefficient = 1
     args.dof = 1
-    args.on {mustBeMember(args.on,{'center','gauss_points'})} = 'center'
+    args.on {mustBeMember(args.on,{'center','gauss_points','interpolation_points'})} = 'center'
 end
 %--------------------------------------------------------------------------
 id_elem = args.id_elem;
@@ -48,6 +48,10 @@ if isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
     obj.build_intkit;
 end
 %--------------------------------------------------------------------------
+if isempty(obj.prokit.Wf)
+    obj.build_prokit;
+end
+%--------------------------------------------------------------------------
 switch on_
     case 'center'
         nbG = 1;
@@ -62,6 +66,13 @@ switch on_
         Wx = cell(1,nbG);
         for iG = 1:nbG
             Wx{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
+        end
+    case 'interpolation_points'
+        nbG = obj.refelem.nbI;
+        % ---
+        Wx = cell(1,nbG);
+        for iG = 1:nbG
+            Wx{iG} = obj.prokit.Wf{iG}(id_elem,:,:);
         end
 end
 %--------------------------------------------------------------------------
