@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef CloseCoil < PhysicalDom
+classdef CloseCoil < Coil
     properties
         etrode_equation
         electrode_dom
@@ -18,7 +18,7 @@ classdef CloseCoil < PhysicalDom
     % --- Contructor
     methods
         function obj = CloseCoil(args)
-            obj = obj@PhysicalDom(args);
+            obj = obj@Coil(args);
             obj <= args;
             % ---
             obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
@@ -63,7 +63,7 @@ classdef CloseCoil < PhysicalDom
             end
             % ---
             argu = f_to_namedarg(args);
-            plot@PhysicalDom(obj,argu{:}); hold on
+            plot@Coil(obj,argu{:}); hold on
             % ---
             etrode = obj.electrode_dom;
             etrode.plot('face_color',f_color(100));

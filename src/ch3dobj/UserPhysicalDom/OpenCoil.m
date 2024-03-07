@@ -8,19 +8,22 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef OpenCoil < PhysicalDom
+classdef OpenCoil < Coil
     properties
-        id_electrode_dom3d
-        electrode_dom
-        shape_dom
+        etrode_equation
+        gid_node_petrode
+        gid_node_netrode
     end
 
     % --- Contructor
     methods
         function obj = OpenCoil(args)
-            obj = obj@PhysicalDom(args);
+            obj = obj@Coil(args);
             obj <= args;
-            obj.get_electrode;  
+            % ---
+            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            % ---
+            obj.get_electrode;
         end
     end
 
@@ -31,22 +34,41 @@ classdef OpenCoil < PhysicalDom
             if ~isempty(obj.parent_model)
                 if ~isempty(obj.parent_model.parent_mesh)
                     % ---
-                    if ~isempty(obj.id_electrode_dom3d)
-                        id_dom_ = f_to_scellargin(obj.id_electrode_dom3d);
+                    parent_mesh = obj.parent_model.parent_mesh;
+                    etrode_eq = obj.etrode_equation;
+                    id_dom3d = f_to_scellargin(obj.id_dom3d);
+                    id_dom3d = id_dom3d{1};
+                    % ---
+                    gid_elem = parent_mesh.dom.(id_dom3d).gid_elem;
+                    boface = f_boundface(parent_mesh.elem(:,gid_elem),...
+                       parent_mesh.node,'elem_type',parent_mesh.elem_type);
+                    % ---
+                    gid_node = f_uniquenode(boface);
+                    % ---
+                    bonode = parent_mesh.node(:,gid_node);
+                    % ---
+                    petrode = [];
+                    netrode = [];
+                    for i = 1:length(etrode_eq)
+                        condi = etrode_eq{i};
+                        lid_node = f_findnode(bonode,'condition',condi);
+                        if i == 1
+                            petrode = lid_node;
+                            % ---
+                            if isempty(petrode)
+                                warning(['Electrode not found from eq ' etrode_eq{i}]);
+                            end
+                        else
+                            netrode = [netrode lid_node];
+                            % ---
+                            if isempty(netrode)
+                                warning(['Electrode not found from eq ' etrode_eq{i}]);
+                            end
+                        end
                     end
-                    % ---
-                    obj.electrode_dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
-                    for i = 2:length(id_dom_)
-                        obj.electrode_dom = obj.electrode_dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
-                    end
-                    % ---
-                    coilshape = obj.dom - obj.electrode_dom;
-                    % ---
-                    obj.shape_dom = eval(class(obj.electrode_dom));
-                    obj.shape_dom <= coilshape;
-                    % ---
-                    obj.shape_dom.gid_side_node_1 = obj.electrode_dom.gid_side_node_2;
-                    obj.shape_dom.gid_side_node_2 = obj.electrode_dom.gid_side_node_1;
+                    % -----------------------------------------------------
+                    obj.gid_node_petrode = petrode;
+                    obj.gid_node_netrode = netrode;
                 end
             end
         end
@@ -60,10 +82,17 @@ classdef OpenCoil < PhysicalDom
             end
             % ---
             argu = f_to_namedarg(args);
-            plot@PhysicalDom(obj,argu{:}); hold on
+            plot@Coil(obj,argu{:}); hold on
             % ---
-            etrode = obj.electrode_dom;
-            etrode.plot('face_color',f_color(100));
+            penode = obj.parent_model.parent_mesh.node(:,obj.gid_node_petrode);
+            nenode = obj.parent_model.parent_mesh.node(:,obj.gid_node_netrode);
+            if size(penode,1) == 2
+                plot(penode(1,:),penode(2,:),'ro'); hold on
+                plot(nenode(1,:),nenode(2,:),'bo'); hold on
+            elseif size(penode,1) == 3
+                plot(penode(1,:),penode(2,:),penode(3,:),'ro'); hold on
+                plot(nenode(1,:),nenode(2,:),nenode(3,:),'bo'); hold on
+            end
         end
         % -----------------------------------------------------------------
     end

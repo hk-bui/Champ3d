@@ -109,7 +109,7 @@ classdef VolumeDom < Xhandle
             arguments
                 obj
                 args.cut_equation = []
-                args.tolerance = 1e-12;
+                args.tolerance = 1e-9;
             end
             % ---
             node = obj.parent_mesh.node;
@@ -170,54 +170,16 @@ classdef VolumeDom < Xhandle
             arguments
                 obj
                 args.cut_equation = []
-                args.tolerance = 1e-12;
-            end
-            % ---
-            node = obj.parent_mesh.node;
-            elem = obj.parent_mesh.elem(:,obj.gid_elem);
-            cut_equation = f_cut_equation(args.cut_equation);
-            tol = args.tolerance;
-            %--------------------------------------------------------------
-            eqcond = cut_equation.eqcond;
-            neqcond = cut_equation.neqcond;
-            %--------------------------------------------------------------
-            nbEqcond = length(eqcond);
-            %--------------------------------------------------------------
-            IDNode = f_uniquenode(elem);
-            x = node(1,IDNode);
-            y = node(2,IDNode);
-            z = node(3,IDNode);
-            %--------------------------------------------------------------
-            checksum = [];
-            neqNode  = [];
-            %--------------------------------------------------------------
-            if length(neqcond) > 1                     % 1 & something else
-                eval(['checksum = (' neqcond ');']);
-                neqNode = find(checksum);
-            else
-                neqNode = 1:length(IDNode);
+                args.tolerance = 1e-9;
             end
             %--------------------------------------------------------------
-            for i = 1:nbEqcond
-                eqc = eqcond{i};
-                isep = strfind(eqc,'==');
-                eqcond_L = eqc(1:isep-1);
-                eqcond_R = eqc(isep+2:end);
-                % == with tolerance
-                eqc = [eqcond_L '<=' eqcond_R '+' num2str(tol) ' & ' ...
-                    eqcond_L '>=' eqcond_R '-' num2str(tol)];
-                eval(['checksum = (' eqc ');']);
-                eqNode{i} = find(checksum);
-            end
+            IDNode = f_uniquenode(obj.parent_mesh.elem(:,obj.gid_elem));
+            lnode  = obj.parent_mesh.node(:,IDNode);
             %--------------------------------------------------------------
-            eNode = neqNode;
-            for i = 1:nbEqcond
-                eNode = intersect(eNode,eqNode{i});
-            end
-            eNode(eNode == 0) = [];
+            lid_node = f_findnode(lnode,'condition',args.cut_equation,...
+                                        'tolerance',args.tolerance);
             %--------------------------------------------------------------
-            lid_node = unique(eNode);
-            gid_node = unique(IDNode(eNode));
+            gid_node = unique(IDNode(lid_node));
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
