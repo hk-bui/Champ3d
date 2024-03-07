@@ -110,14 +110,14 @@ classdef HexMesh < Mesh3d
             con.cWeigh  = 8; % 2x2x2
             con.nbG = length(con.U);
             % ---
-            con.nbI = 8;
+            con.nbI = 9;
             e = 1e-6;
             con.nU = [-1 +1 +1 -1 -1 +1 +1 -1];
             con.nV = [-1 -1 +1 +1 -1 -1 +1 +1];
             con.nW = [-1 -1 -1 -1 +1 +1 +1 +1];
-            con.iU = (1-e) * con.nU;
-            con.iV = (1-e) * con.nV;
-            con.iW = (1-e) * con.nW;
+            con.iU = [(1-e) * con.nU    0];
+            con.iV = [(1-e) * con.nV    0];
+            con.iW = [(1-e) * con.nW    0];
             % ---
             con.N{1} = @(u,v,w) 1/8.*(1-u).*(1-v).*(1-w);
             con.N{2} = @(u,v,w) 1/8.*(1+u).*(1-v).*(1-w);

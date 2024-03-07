@@ -230,11 +230,11 @@ classdef ProcessingSurface3d < VolumeDom3d
                 if forcomplx
                     % ---
                     subplot(131);
-                    msh.FaceColor = 'flat';
+                    msh.FaceColor = 'interp';
                     msh.FaceVertexCData = (f_magnitude(fval.')).';
                     patch(msh,'DisplayName','magnitude');
                     title('Magnitude');
-                    f_showaxis(3,2);
+                    %f_showaxis(3,3);
                     alpha(alpha_); hold on
                     % ---
                     subplot(132);
@@ -243,7 +243,7 @@ classdef ProcessingSurface3d < VolumeDom3d
                     patch(msh,'DisplayName','real-part'); hold on
                     f_quiver(node.',real(fval));
                     title('Real part')
-                    f_showaxis(3,2);
+                    f_showaxis(3,3);
                     alpha(alpha_); hold on
                     % ---
                     subplot(133);
@@ -252,7 +252,7 @@ classdef ProcessingSurface3d < VolumeDom3d
                     patch(msh,'DisplayName','imag-part'); hold on
                     f_quiver(node.',imag(fval));
                     title('Imag part')
-                    f_showaxis(3,2);
+                    f_showaxis(3,3);
                     alpha(alpha_); hold on
                 else
                     % ---
