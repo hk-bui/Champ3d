@@ -31,7 +31,7 @@ classdef SolidCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.setup_ready = 0;
+            obj.setup_done = 0;
             % ---
             obj.setup;
         end
@@ -40,11 +40,11 @@ classdef SolidCoil < Coil
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_ready
+            if ~obj.setup_done
                 % ---
                 setup@Coil(obj);
                 % ---
-                obj.setup_ready = 1;
+                obj.setup_done = 1;
             end
         end
     end

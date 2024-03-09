@@ -44,7 +44,7 @@ classdef CloseJsCoil < CloseCoil
             % ---
             obj <= args;
             % ---
-            obj.setup_ready = 0;
+            obj.setup_done = 0;
             % ---
             obj.setup;
             % ---
@@ -55,7 +55,7 @@ classdef CloseJsCoil < CloseCoil
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_ready
+            if ~obj.setup_done
                 % ---
                 setup@CloseCoil(obj);
                 % ---
@@ -69,7 +69,7 @@ classdef CloseJsCoil < CloseCoil
                     obj.cs_area = 1;
                 end
                 % ---
-                obj.setup_ready = 1;
+                obj.setup_done = 1;
             end
         end
     end

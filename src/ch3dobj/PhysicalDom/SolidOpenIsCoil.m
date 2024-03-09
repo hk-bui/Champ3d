@@ -8,17 +8,14 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedCoil < Coil
+classdef SolidOpenIsCoil < SolidCoil & OpenCoil
     properties
-        connexion = 'serie'
-        cs_area = 1
-        nb_turn = 1
-        fill_factor = 1
+        coil_mode = 'tx'
     end
 
     % --- Contructor
     methods
-        function obj = StrandedCoil(args)
+        function obj = SolidOpenIsCoil(args)
             arguments
                 args.id
                 args.parent_model
@@ -28,9 +25,14 @@ classdef StrandedCoil < Coil
                 args.cs_area
                 args.nb_turn
                 args.fill_factor
+                args.etrode_equation
+                % ---
+                args.i_coil
+                args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
-            obj@Coil;
+            obj@SolidCoil;
+            obj@OpenCoil;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -49,10 +51,29 @@ classdef StrandedCoil < Coil
         function setup(obj)
             if ~obj.setup_done
                 % ---
-                setup@Coil(obj);
+                setup@SolidCoil(obj);
+                obj.setup_done = 0;
+                setup@OpenCoil(obj);
+                % ---
+                if isempty(obj.i_coil)
+                    obj.coil_mode = 'rx';
+                elseif isnumeric(obj.i_coil)
+                    if obj.i_coil == 0
+                        obj.coil_mode = 'rx';
+                    end
+                    % ---
+                    obj.i_coil = Parameter('f',obj.i_coil);
+                end
                 % ---
                 obj.setup_done = 1;
             end
+        end
+    end
+
+    % --- Methods
+    methods
+        function plot(obj)
+            plot@OpenCoil(obj);
         end
     end
 

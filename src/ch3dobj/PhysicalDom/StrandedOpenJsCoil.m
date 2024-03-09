@@ -40,7 +40,7 @@ classdef StrandedOpenJsCoil < StrandedCoil & OpenCoil
             % ---
             obj <= args;
             % ---
-            obj.setup_ready = 0;
+            obj.setup_done = 0;
             % ---
             obj.setup;
         end
@@ -49,10 +49,10 @@ classdef StrandedOpenJsCoil < StrandedCoil & OpenCoil
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_ready
+            if ~obj.setup_done
                 % ---
                 setup@StrandedCoil(obj);
-                obj.setup_ready = 0;
+                obj.setup_done = 0;
                 setup@OpenCoil(obj);
                 % ---
                 if isempty(obj.j_coil)
@@ -65,7 +65,7 @@ classdef StrandedOpenJsCoil < StrandedCoil & OpenCoil
                     obj.j_coil = Parameter('f',obj.j_coil);
                 end
                 % ---
-                obj.setup_ready = 1;
+                obj.setup_done = 1;
             end
         end
     end

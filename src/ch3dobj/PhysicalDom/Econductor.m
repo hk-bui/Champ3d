@@ -32,7 +32,7 @@ classdef Econductor < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_ready = 0;
+            obj.setup_done = 0;
             % ---
             obj.setup;
         end
@@ -41,7 +41,7 @@ classdef Econductor < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_ready
+            if ~obj.setup_done
                 % ---
                 setup@PhysicalDom(obj);
                 % ---
@@ -49,7 +49,7 @@ classdef Econductor < PhysicalDom
                     obj.sigma = Parameter('f',obj.sigma);
                 end
                 % ---
-                obj.setup_ready = 1;
+                obj.setup_done = 1;
             end
         end
     end

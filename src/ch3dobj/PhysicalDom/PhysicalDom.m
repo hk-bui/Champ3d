@@ -21,7 +21,7 @@ classdef PhysicalDom < Xhandle
         parent_mesh
         dom
         matrix
-        setup_ready = 0
+        setup_done = 0
     end
     % ---
     properties(Access = private, Hidden)
@@ -47,7 +47,7 @@ classdef PhysicalDom < Xhandle
             % ---
             obj <= args;
             % ---
-            obj.setup_ready = 0;
+            obj.setup_done = 0;
             % ---
             obj.setup;
         end
@@ -56,10 +56,10 @@ classdef PhysicalDom < Xhandle
     % --- Methods
     methods
         function setup(obj)
-            if ~obj.setup_ready
+            if ~obj.setup_done
                 obj.get_geodom;
                 % ---
-                obj.setup_ready = 1;
+                obj.setup_done = 1;
             end
         end
     end

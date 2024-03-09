@@ -37,7 +37,7 @@ classdef OpenCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.setup_ready = 0;
+            obj.setup_done = 0;
             % ---
             obj.setup;
         end
@@ -46,7 +46,7 @@ classdef OpenCoil < Coil
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_ready
+            if ~obj.setup_done
                 % ---
                 setup@Coil(obj);
                 % ---
@@ -54,7 +54,7 @@ classdef OpenCoil < Coil
                 % ---
                 obj.get_electrode;
                 % ---
-                obj.setup_ready = 1;
+                obj.setup_done = 1;
             end
         end
     end
