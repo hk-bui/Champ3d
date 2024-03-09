@@ -14,11 +14,11 @@ classdef QuadMeshFrom3d < QuadMesh
     properties
         parallel_line_1
         parallel_line_2
-        dtype_parallel
-        dtype_orthogonal
-        dnum_parallel
-        dnum_orthogonal
-        flog
+        dtype_parallel = 'lin'
+        dtype_orthogonal = 'lin'
+        dnum_parallel = 6
+        dnum_orthogonal = 6
+        flog = 1.05
     end
 
     % --- Dependent Properties
@@ -31,50 +31,61 @@ classdef QuadMeshFrom3d < QuadMesh
         function obj = QuadMeshFrom3d(args)
             arguments
                 % --- super
-                args.info = 'no_info'
-                args.parallel_line_1 = []
-                args.parallel_line_2 = []
-                args.dtype_parallel {mustBeMember(args.dtype_parallel,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
-                args.dtype_orthogonal {mustBeMember(args.dtype_orthogonal,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
-                args.dnum_parallel = 6
-                args.dnum_orthogonal = 6
-                args.flog = 1.05;
+                args.parallel_line_1
+                args.parallel_line_2
+                args.dtype_parallel {mustBeMember(args.dtype_parallel,{'lin','log+','log-','log+-','log-+','log='})}
+                args.dtype_orthogonal {mustBeMember(args.dtype_orthogonal,{'lin','log+','log-','log+-','log-+','log='})}
+                args.dnum_parallel
+                args.dnum_orthogonal
+                args.flog
             end
             % ---
-            obj = obj@QuadMesh;
+            obj@QuadMesh;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
             % ---
             obj <= args;
             % ---
-            if obj.is_available(args,{'parallel_line_1','parallel_line_2'})
-                % ---
-                if size(obj.parallel_line_1,1) == 3
-                    obj.parallel_line_1 = obj.parallel_line_1.';
-                end
-                if size(obj.parallel_line_2,1) == 3
-                    obj.parallel_line_2 = obj.parallel_line_2.';
-                end
-                % ---
-                if any(f_strcmpi(obj.dtype_parallel,{'log+-','log-+','log='}))
-                    if mod(obj.dnum_parallel,2) ~= 0
-                        obj.dnum_parallel = obj.dnum_parallel + 1;
-                    end
-                end
-                % ---
-                if any(f_strcmpi(obj.dtype_orthogonal,{'log+-','log-+','log='}))
-                    if mod(obj.dnum_orthogonal,2) ~= 0
-                        obj.dnum_orthogonal = obj.dnum_orthogonal + 1;
-                    end
-                end
-                % ---
-                obj.build;
-            end
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+            % ---
         end
     end
 
     % --- Methods
-    methods (Access = private)
+    methods
         % -----------------------------------------------------------------
-        function obj = build(obj)
+        function obj = setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            if isempty(obj.parallel_line_1) || isempty(obj.parallel_line_2)
+                return
+            end
+            % ---
+            if size(obj.parallel_line_1,1) == 3
+                obj.parallel_line_1 = obj.parallel_line_1.';
+            end
+            if size(obj.parallel_line_2,1) == 3
+                obj.parallel_line_2 = obj.parallel_line_2.';
+            end
+            % ---
+            if any(f_strcmpi(obj.dtype_parallel,{'log+-','log-+','log='}))
+                if mod(obj.dnum_parallel,2) ~= 0
+                    obj.dnum_parallel = obj.dnum_parallel + 1;
+                end
+            end
+            % ---
+            if any(f_strcmpi(obj.dtype_orthogonal,{'log+-','log-+','log='}))
+                if mod(obj.dnum_orthogonal,2) ~= 0
+                    obj.dnum_orthogonal = obj.dnum_orthogonal + 1;
+                end
+            end
             % ---
             bl = obj.parallel_line_1(1,:);
             br = obj.parallel_line_1(2,:);
@@ -126,7 +137,7 @@ classdef QuadMeshFrom3d < QuadMesh
             obj.node = node;
             obj.elem = elem;
             obj.elem_code = elem_code;
-            obj.is_build = 1;
+            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
     end

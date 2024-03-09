@@ -27,33 +27,49 @@ classdef HexaMeshFromQuadMesh < HexMesh
         function obj = HexaMeshFromQuadMesh(args)
             arguments
                 % --- super
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
                 % --- sub
-                args.parent_mesh1d = []
-                args.parent_mesh2d = []
-                args.id_zline = []
+                args.parent_mesh1d
+                args.parent_mesh2d
+                args.id_zline
             end
             % ---
-            if isempty(args.parent_mesh1d)
-                if isprop(args.parent_mesh2d,'parent_mesh')
-                    args.parent_mesh1d = args.parent_mesh2d.parent_mesh;
-                end
+            obj@HexMesh;
+            % ---
+            if isempty(fieldnames(args))
+                return
             end
             % ---
-            obj = obj@HexMesh;
             obj <= args;
             % ---
-            if ~isempty(obj.parent_mesh2d) && ~isempty(obj.id_zline)
-                obj.build;
-            end
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+            % ---
         end
     end
 
-    % --- Methods
-    methods (Access = private)
+    % --- setup
+    methods
         % -----------------------------------------------------------------
-        function obj = build(obj)
+        function obj = setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@HexMesh(obj);
+            % ---
+            if isempty(obj.parent_mesh2d) || isempty(obj.id_zline)
+                return
+            end
+            % ---
+            if isempty(obj.parent_mesh1d)
+                if isprop(obj.parent_mesh2d,'parent_mesh')
+                    obj.parent_mesh1d = obj.parent_mesh2d.parent_mesh;
+                end
+            end
             % ---
             obj.id_zline = f_to_scellargin(obj.id_zline);
             % ---
@@ -75,7 +91,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 %-----
                 zl = zline(i);
                 %-----
-                zl.build;
+                zl.setup;
                 z = zl.node;
                 zdiv   = [zdiv z];
                 %-----
@@ -86,7 +102,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 codeidz = [codeidz zl.elem_code .* ones(1,nbz)];
             end
             %--------------------------------------------------------------
-            % build vertices (nodes) in 3D
+            % setup vertices (nodes) in 3D
             % ---
             mesh2d = obj.parent_mesh2d;
             % ---
@@ -98,7 +114,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
                node_(3,i*nbNode2D+1:(i+1)*nbNode2D) = sum(zdiv(1:i)) .* ones(1,nbNode2D);
             end
             %--------------------------------------------------------------
-            % build volume elements (elem) in 3D
+            % setup volume elements (elem) in 3D
             nbElem2D = mesh2d.nb_elem;
             nb_elem = nbElem2D * nb_layer;
             elem_ = zeros(8, nb_elem);
@@ -143,7 +159,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
             obj.cedge = cedge_;
             obj.cface = cface_;
             % ---
-            obj.is_build = 1;
+            obj.setup_done = 1;
         end
     end
 

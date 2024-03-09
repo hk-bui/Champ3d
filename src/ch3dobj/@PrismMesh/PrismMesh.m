@@ -30,10 +30,30 @@ classdef PrismMesh < Mesh3d
             % ---
             obj = obj@Mesh3d;
             % ---
-            obj.elem_type = 'prism';
-            obj.node = args.node;
-            obj.elem = args.elem;
+            if isempty(fieldnames(args))
+                return
+            end
             % ---
+            obj <= args;
+            % ---
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+            % ---
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
+            if obj.setup_done
+                return
+            end
+            % ---
+            obj.elem_type = 'prism';
+            obj.reference;
+            % ---
+            obj.setup_done = 1;
         end
     end
 

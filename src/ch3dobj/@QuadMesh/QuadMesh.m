@@ -24,17 +24,37 @@ classdef QuadMesh < Mesh2d
     methods
         function obj = QuadMesh(args)
             arguments
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
             end
             % ---
             obj = obj@Mesh2d;
             % ---
-            obj.elem_type = 'quad';
-            obj.node = args.node;
-            obj.elem = args.elem;
+            if isempty(fieldnames(args))
+                return
+            end
             % ---
+            obj <= args;
+            % ---
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            obj.elem_type = 'quad';
+            obj.reference;
             obj.calflatnode;
+            % ---
+            obj.setup_done = 1;
         end
     end
 
@@ -72,6 +92,10 @@ classdef QuadMesh < Mesh2d
             axis equal; axis tight; alpha(alpha_); hold on
             %--------------------------------------------------------------
             f_chlogo;
+        end
+        % -----------------------------------------------------------------
+        function reference(obj)
+            % --- XTODO
         end
     end
 

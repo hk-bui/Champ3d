@@ -24,17 +24,36 @@ classdef HexMesh < Mesh3d
     methods
         function obj = HexMesh(args)
             arguments
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
             end
             % ---
-            obj = obj@Mesh3d;
+            obj@Mesh3d;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
+            obj <= args;
+            % ---
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+            % ---
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
+            if obj.setup_done
+                return
+            end
             % ---
             obj.elem_type = 'hexa';
-            obj.node = args.node;
-            obj.elem = args.elem;
-            % ---
             obj.reference;
+            % ---
+            obj.setup_done = 1;
         end
     end
 

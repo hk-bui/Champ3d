@@ -26,30 +26,43 @@ classdef QuadMeshFrom1d < QuadMesh
         function obj = QuadMeshFrom1d(args)
             arguments
                 % --- super
-                args.info = 'no_info'
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
                 % --- sub
                 args.parent_mesh
-                args.id_xline = []
-                args.id_yline = []
+                args.id_xline
+                args.id_yline
                 % ---
             end
             % ---
-            obj = obj@QuadMesh;
+            obj@QuadMesh;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
             % ---
             obj <= args;
             % ---
-            if obj.is_available(args,{'parent_mesh','id_xline','id_yline'})
-                obj.build;
-            end
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
+            % ---
         end
     end
 
     % --- Methods
-    methods (Access = private)
+    methods
         % -----------------------------------------------------------------
-        function obj = build(obj)
+        function obj = setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
+                    isempty(obj.id_yline)
+                return
+            end
             % ---
             obj.id_xline = f_to_scellargin(obj.id_xline);
             obj.id_yline = f_to_scellargin(obj.id_yline);
@@ -79,7 +92,7 @@ classdef QuadMeshFrom1d < QuadMesh
                 % ---
                 xl = xline(i);
                 % ---
-                xl.build;
+                xl.setup;
                 x     = xl.node;
                 xdom  = [xdom x];
                 % ---
@@ -94,7 +107,7 @@ classdef QuadMeshFrom1d < QuadMesh
                 % ---
                 yl = yline(i);
                 % ---
-                yl.build;
+                yl.setup;
                 y  = yl.node;
                 ydom = [ydom y];
                 % ---
@@ -138,7 +151,7 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;
-            obj.is_build = 1;
+            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
         % -----------------------------------------------------------------

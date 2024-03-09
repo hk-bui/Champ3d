@@ -20,7 +20,6 @@ classdef PhysicalDom < Xhandle
     properties
         parent_mesh
         dom
-        matrix
         setup_done = 0
     end
     % ---

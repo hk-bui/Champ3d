@@ -21,8 +21,8 @@ classdef Line1d < Xhandle
         elem_code
     end
     % ---
-    properties (Access = protected)
-        is_build = 0;
+    properties
+        setup_done = 0;
     end
 
     % --- Dependent Properties
@@ -41,24 +41,32 @@ classdef Line1d < Xhandle
                 args.flog {mustBeNumeric} = 1.05
             end
             % ---
-            obj <= args;
+            obj@Xhandle;
             % ---
-            if any(f_strcmpi(obj.dtype,{'log+-','log-+','log='}))
-                if mod(obj.dnum,2) ~= 0
-                    obj.dnum = obj.dnum + 1;
-                end
+            if isempty(fieldnames(args))
+                return
             end
             % ---
-            obj.build;
+            obj <= args;
+            % ---
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
         end
     end
 
     % --- Methods
     methods
-        function build(obj)
+        function setup(obj)
             % ---
-            if obj.is_build == 1
+            if obj.setup_done
                 return
+            end
+            % ---
+            if any(f_strcmpi(obj.dtype,{'log+-','log-+','log='}))
+                if mod(obj.dnum,2) ~= 0
+                    obj.dnum = obj.dnum + 1;
+                end
             end
             %--------------------------------------------------------------
             len_   = obj.len;
@@ -94,7 +102,7 @@ classdef Line1d < Xhandle
             %--------------------------------------------------------------
             obj.node = node_;
             obj.elem_code = f_str2code(obj.id);
-            obj.is_build = 1;
+            obj.setup_done = 1;
         end
     end
 end

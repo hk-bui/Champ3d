@@ -12,7 +12,6 @@ classdef Mesh1d < Xhandle
 
     % --- Properties
     properties
-        info = []
         dom = []
     end
 
@@ -23,14 +22,8 @@ classdef Mesh1d < Xhandle
 
     % --- Constructors
     methods
-        function obj = Mesh1d(args)
-            arguments
-                args.info = 'no_info'
-                args.data = []
-            end
-            % ---
-            obj.info = args.info;
-            obj.dom = args.data;
+        function obj = Mesh1d()
+            obj@Xhandle;
         end
     end
 

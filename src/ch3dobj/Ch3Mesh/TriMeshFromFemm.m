@@ -26,28 +26,38 @@ classdef TriMeshFromFemm < TriMesh
         function obj = TriMeshFromFemm(args)
             arguments
                 % --- super
-                args.info char = 'no_info'
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
                 % ---
-                args.mesh_file = []
+                args.mesh_file
             end
             % --- super
-            obj = obj@TriMesh;
-            obj <= args;
-            % --- sub
-            obj.mesh_file = args.mesh_file;
+            obj@TriMesh;
             % ---
-            if ~isempty(obj.mesh_file)
-                obj.build;
+            if isempty(fieldnames(args))
+                return
             end
+            % ---
+            obj <= args;
+            % ---
+            obj.setup_done = 0;
+            % ---
+            obj.setup;
         end
     end
 
     % --- Methods
-    methods (Access = private)
+    methods
         % -----------------------------------------------------------------
-        function obj = build(obj)
+        function obj = setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            if isempty(obj.mesh_file)
+                return
+            end
             % ----- 1/ read all -----
             fileID = fopen(obj.mesh_file);
             fileDA = textscan(fileID,'%s %s %s %s %s %s %s %s %s');
@@ -77,9 +87,8 @@ classdef TriMeshFromFemm < TriMesh
             obj.elem = elem_;
             obj.elem_code = elem_code_;
             obj.data = data_;
-            obj.is_build = 1;
+            obj.setup_done = 1;
         end
-        % -----------------------------------------------------------------
         % -----------------------------------------------------------------
     end
 
