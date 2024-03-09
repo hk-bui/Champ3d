@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi
+classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi
     
     % --- entry
     properties
@@ -30,7 +30,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi
 
     % --- Contructor
     methods
-        function obj = StrandedCloseJsCoilAphi(args)
+        function obj = StrandedOpenJsCoilAphi(args)
             arguments
                 args.id
                 args.parent_model
@@ -46,7 +46,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
-            obj@CloseCoilAphi;
+            obj@OpenCoilAphi;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -68,7 +68,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi
                 return
             end
             % ---
-            setup@CloseCoilAphi(obj);
+            setup@OpenCoilAphi(obj);
             % ---
             if isempty(obj.j_coil)
                 obj.coil_mode = 'rx';
@@ -96,7 +96,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi
                 return
             end
             % ---
-            build@CloseCoilAphi(obj);
+            build@OpenCoilAphi(obj);
             % --- current turn density vector field
             current_turn_density  = obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
             % ---
@@ -124,7 +124,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi
             end
             % ---
             argu = f_to_namedarg(args);
-            plot@CloseCoilAphi(obj,argu{:});
+            plot@OpenCoilAphi(obj,argu{:});
             % ---
         end
     end

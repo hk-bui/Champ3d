@@ -13,14 +13,6 @@ classdef Coil < PhysicalDom
     properties
         
     end
-    % --- computed
-    properties
-        i_coil
-        v_coil
-        j_coil
-        z_coil
-        L0
-    end
 
     % --- Contructor
     methods
