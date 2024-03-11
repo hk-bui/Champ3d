@@ -8,21 +8,17 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
+classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
     
     % --- entry
     properties
-        connexion {mustBeMember(connexion,{'serial','parallel'})} = 'serial'
-        cs_area = 1
-        nb_turn = 1
-        fill_factor = 1
-        j_coil = 0
+        i_coil = 0
         coil_mode = 'rx'
     end
 
     % --- computed
     properties
-        i_coil
+        j_coil
         v_coil
         z_coil
         L0
@@ -30,7 +26,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
 
     % --- Contructor
     methods
-        function obj = StrandedCloseJsCoilAphi(args)
+        function obj = SolidOpenIsCoilAphi(args)
             arguments
                 args.id
                 args.parent_model
@@ -38,15 +34,13 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
                 args.id_dom3d
                 args.etrode_equation
                 % ---
-                args.connexion
-                args.cs_area
-                args.nb_turn
-                args.fill_factor
-                args.j_coil
+                args.sigma
+                args.i_coil
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
-            obj@CloseCoilAphi;
+            obj@OpenCoilAphi;
+            obj@SolidCoilAphi;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -68,16 +62,18 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
                 return
             end
             % ---
-            setup@CloseCoilAphi(obj);
+            setup@OpenCoilAphi(obj);
+            obj.setup_done = 0;
+            setup@SolidCoilAphi(obj);
             % ---
-            if isempty(obj.j_coil)
+            if isempty(obj.i_coil)
                 obj.coil_mode = 'rx';
-            elseif isnumeric(obj.j_coil)
-                if obj.j_coil == 0
+            elseif isnumeric(obj.i_coil)
+                if obj.i_coil == 0
                     obj.coil_mode = 'rx';
                 end
                 % ---
-                obj.j_coil = Parameter('f',obj.j_coil);
+                obj.i_coil = Parameter('f',obj.i_coil);
             end
             % ---
             obj.setup_done = 1;
@@ -96,9 +92,9 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
                 return
             end
             % ---
-            build@CloseCoilAphi(obj);
+            build@OpenCoilAphi(obj);
             obj.build_done = 0;
-            build@JsCoilAphi(obj);
+            build@IsCoilAphi(obj);
             obj.build_done = 1;
         end
     end
@@ -114,7 +110,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
             end
             % ---
             argu = f_to_namedarg(args);
-            plot@CloseCoilAphi(obj,argu{:});
+            plot@OpenCoilAphi(obj,argu{:});
             % ---
         end
     end

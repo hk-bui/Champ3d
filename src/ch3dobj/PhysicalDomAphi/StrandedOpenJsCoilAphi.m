@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi
+classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
     
     % --- entry
     properties
@@ -97,18 +97,8 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi
             end
             % ---
             build@OpenCoilAphi(obj);
-            % --- current turn density vector field
-            current_turn_density  = obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
-            % ---
-            js_array = obj.j_coil.get_on(obj.dom);
-            js_array = js_array .* obj.matrix.unit_current_field;
-            % ---
-            gid_elem = obj.dom.gid_elem;
-            wfjs = obj.parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',js_array);
-            % ---
-            obj.matrix.current_turn_density = current_turn_density;
-            obj.matrix.wfjs = wfjs;
-            % ---
+            obj.build_done = 0;
+            build@JsCoilAphi(obj);
             obj.build_done = 1;
         end
     end

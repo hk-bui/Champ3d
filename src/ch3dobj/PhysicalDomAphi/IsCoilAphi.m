@@ -8,39 +8,28 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SolidCoilAphi < Econductor
-
+classdef IsCoilAphi < Xhandle
+    
     % --- Contructor
     methods
-        function obj = SolidCoilAphi()
-            obj@Econductor;
+        function obj = IsCoilAphi()
+            obj@Xhandle;
         end
     end
-    
+
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Econductor(obj);
-                % ---
-                if isnumeric(obj.sigma)
-                    obj.sigma = Parameter('f',obj.sigma);
-                end
-                % ---
-                obj.setup_done = 1;
-            end
         end
     end
 
-    % --- Methods
+    % --- build
     methods
-        function z_coil = get_zcoil(obj)
+        function build(obj)
             % ---
-            z_coil = 0;
+            dom = obj.dom;
+            obj.matrix.i_coil = obj.i_coil.get_on(dom);
             % ---
-            obj.z_coil = z_coil;
         end
     end
-
 end

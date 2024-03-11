@@ -10,8 +10,6 @@
 
 classdef EmModel < Xhandle
     properties
-        id
-        % ---
         frequency = 0
         jome
         % ---
@@ -25,20 +23,29 @@ classdef EmModel < Xhandle
         coil
         bsfield
         sibc
+        embc
         % ---
         matrix
         fields
         dof
+        % ---
+        build_done = 0
+        assembly_done = 0
+        solve_done = 0
     end
 
     % --- Constructor
     methods
         function obj = EmModel(args)
             arguments
-                args.id = 'no_id'
-                % ---
-                args.parent_mesh = []
-                args.frequency = 0
+                args.parent_mesh
+                args.frequency
+            end
+            % ---
+            obj@Xhandle;
+            % ---
+            if isempty(fieldnames(args))
+                return
             end
             % ---
             obj <= args;
@@ -70,7 +77,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Econductor(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = EconductorAphi(argu{:});
+            end
+            % ---
             obj.econductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -168,6 +178,8 @@ classdef EmModel < Xhandle
                 args.coil_type {mustBeMember(args.coil_type,{'stranded','solid'})}
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})} = 'tx'
                 args.source_type {mustBeMember(args.source_type,'current_fed','voltage_fed','current_density_fed')}
+                args.connexion {mustBeMember(args.connexion,{'serial','parallel'})}
+                args.fill_factor = 1
                 args.j_coil = 0
                 args.i_coil = 0
                 args.v_coil = 0
@@ -179,7 +191,52 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = CloseJsCoil(argu{:});
+            coil_model = [];
+            % ---
+            if f_strcmpi(args.coil_type,'stranded')
+                coil_model = [coil_model 'Stranded'];
+            elseif f_strcmpi(args.coil_type,'solid')
+                coil_model = [coil_model 'Solid'];
+            end
+            % ---
+            if length(f_to_scellargin(args.etrode_equation)) == 1
+                coil_model = [coil_model 'Close'];
+            else
+                coil_model = [coil_model 'Open'];
+            end
+            % ---
+            if f_strcmpi(args.source_type,'current_fed')
+                coil_model = [coil_model 'Is'];
+                if f_strcmpi(args.coil_mode,'tx')
+                    if isempty(args.i_coil)
+                        error('#i_coil must be given !');
+                    end
+                end
+            elseif f_strcmpi(args.source_type,'voltage_fed')
+                coil_model = [coil_model 'Vs'];
+                if f_strcmpi(args.coil_mode,'tx')
+                    if isempty(args.v_coil)
+                        error('#v_coil must be given !');
+                    end
+                end
+            elseif f_strcmpi(args.source_type,'current_density_fed')
+                coil_model = [coil_model 'Js'];
+                if f_strcmpi(args.coil_mode,'tx')
+                    if isempty(args.j_coil)
+                        error('#j_coil must be given !');
+                    end
+                end
+            end
+            % ---
+            coil_model = [coil_model 'Coil'];
+            % ---
+            if isa(obj,'FEM3dAphijw')
+                % ---
+                coil_model = [coil_model 'Aphi'];
+                % ---
+                phydom = feval(coil_model,argu{:});
+            end
+            % ---
             obj.coil.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
