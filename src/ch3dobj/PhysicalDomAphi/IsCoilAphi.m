@@ -9,6 +9,12 @@
 %--------------------------------------------------------------------------
 
 classdef IsCoilAphi < Xhandle
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
     
     % --- Contructor
     methods
@@ -20,6 +26,11 @@ classdef IsCoilAphi < Xhandle
     % --- setup
     methods
         function setup(obj)
+            if obj.setup_done
+                return
+            end
+            % ---
+            obj.setup_done = 1;
         end
     end
 
@@ -30,6 +41,13 @@ classdef IsCoilAphi < Xhandle
             dom = obj.dom;
             obj.matrix.i_coil = obj.i_coil.get_on(dom);
             % ---
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+
         end
     end
 end

@@ -9,6 +9,12 @@
 %--------------------------------------------------------------------------
 
 classdef VsCoilAphi < Xhandle
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
     
     % --- Contructor
     methods
@@ -30,6 +36,13 @@ classdef VsCoilAphi < Xhandle
             dom = obj.dom;
             obj.matrix.v_coil = obj.v_coil.get_on(dom);
             % ---
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+
         end
     end
 end

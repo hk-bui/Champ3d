@@ -41,16 +41,17 @@ classdef Bsfield < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@PhysicalDom(obj);
-                % ---
-                if isnumeric(obj.bs)
-                    obj.bs = Parameter('f',obj.bs);
-                end
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@PhysicalDom(obj);
+            % ---
+            if isnumeric(obj.bs)
+                obj.bs = Parameter('f',obj.bs);
+            end
+            % ---
+            obj.setup_done = 1;
         end
     end
 end

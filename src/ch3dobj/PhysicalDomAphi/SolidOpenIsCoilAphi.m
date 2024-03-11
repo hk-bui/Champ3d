@@ -24,6 +24,12 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
         L0
     end
 
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Contructor
     methods
         function obj = SolidOpenIsCoilAphi(args)

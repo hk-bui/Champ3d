@@ -28,6 +28,12 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
         L0
     end
 
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Contructor
     methods
         function obj = StrandedCloseJsCoilAphi(args)
@@ -97,9 +103,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
             end
             % ---
             build@CloseCoilAphi(obj);
-            obj.build_done = 0;
             build@JsCoilAphi(obj);
-            obj.build_done = 1;
         end
     end
 

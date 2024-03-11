@@ -20,8 +20,13 @@ classdef PhysicalDom < Xhandle
     properties
         parent_mesh
         dom
+    end
+
+    % --- computed
+    properties (Access = private)
         setup_done = 0
     end
+
     % ---
     properties(Access = private, Hidden)
 
@@ -55,11 +60,12 @@ classdef PhysicalDom < Xhandle
     % --- Methods
     methods
         function setup(obj)
-            if ~obj.setup_done
-                obj.get_geodom;
-                % ---
-                obj.setup_done = 1;
+            if obj.setup_done
+                return
             end
+            obj.get_geodom;
+            % ---
+            obj.setup_done = 1;
         end
     end
     % --- Methods

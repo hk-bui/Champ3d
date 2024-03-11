@@ -73,4 +73,11 @@ classdef NomeshAphi < Nomesh
             obj.build_done = 1;
         end
     end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+
+        end
+    end
 end
