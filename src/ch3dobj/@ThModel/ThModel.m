@@ -14,29 +14,48 @@ classdef ThModel < Xhandle
         % ---
         parent_mesh
         % ---
-        tconductor
-        tcapacitor
-        bc_convection
-        bc_radiation
+        thconductor
+        thcapacitor
+        convection
+        radiation
+        % ---
+        ps
+        pv
+        % ---
+        timesystem
+        Temp0 = 0
         % ---
         matrix
         fields
+        dof
+        % ---
+        build_done = 0
+        assembly_done = 0
+        solve_done = 0
     end
 
     % --- Constructor
     methods
         function obj = ThModel(args)
             arguments
-                args.id = 'no_id'
+                args.id
                 % ---
-                args.parent_mesh = []
+                args.parent_mesh
+                args.timesystem
+                args.Temp0
+            end
+            % ---
+            obj@Xhandle;
+            % ---
+            if isempty(fieldnames(args))
+                return
             end
             % ---
             obj <= args;
             % ---
             obj.init('property_name','fields',...
                      'field_name',{'tempv','temps'}, ...
-                     'init_value',2.*ones(1,obj.parent_mesh.nb_elem));
+                     'init_value',args.Temp0);
             % ---
         end
     end
@@ -44,7 +63,7 @@ classdef ThModel < Xhandle
     % --- Methods
     methods
         % -----------------------------------------------------------------
-        function add_tconductor(obj,args)
+        function add_thconductor(obj,args)
             arguments
                 obj
                 % ---
@@ -56,25 +75,101 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            phydom = Econductor(args);
-            obj.tconductor.(args.id) = phydom;
+            argu = f_to_namedarg(args);
+            % ---
+            if isa(obj,'FEM3dTemp')
+                phydom = ThconductorTemp(argu{:});
+            end
+            % ---
+            obj.thconductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_tcapacitor(obj,args)
-            
+        function add_thcapacitor(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.rho = 0
+                args.cp = 0
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            argu = f_to_namedarg(args);
+            % ---
+            if isa(obj,'FEM3dTemp')
+                phydom = ThcapacitorTemp(argu{:});
+            end
+            % ---
+            obj.thcapacitor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_thbc(obj)
+        function add_convection(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.h = 0
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            argu = f_to_namedarg(args);
+            % ---
+            if isa(obj,'FEM3dTemp')
+                phydom = ThconvectionTemp(argu{:});
+            end
+            % ---
+            obj.convection.(args.id) = phydom;
         end
-    end
-
-    % --- Methods/Abs
-    methods
-        function build(obj)
+        % -----------------------------------------------------------------
+        function add_ps(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.ps = 0
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            argu = f_to_namedarg(args);
+            % ---
+            if isa(obj,'FEM3dTemp')
+                phydom = ThPsTemp(argu{:});
+            end
+            % ---
+            obj.ps.(args.id) = phydom;
         end
-        function solve(obj)
+        % -----------------------------------------------------------------
+        function add_pv(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+                args.pv = 0
+            end
+            % ---
+            args.parent_model = obj;
+            % ---
+            argu = f_to_namedarg(args);
+            % ---
+            if isa(obj,'FEM3dTemp')
+                phydom = ThPvTemp(argu{:});
+            end
+            % ---
+            obj.ps.(args.id) = phydom;
         end
-        function postpro(obj)
-        end
+        % -----------------------------------------------------------------
+        %function add_thbc(obj)
+        %end
     end
 end

@@ -10,6 +10,7 @@
 
 classdef EmModel < Xhandle
     properties
+        id
         frequency = 0
         jome
         % ---
@@ -25,6 +26,8 @@ classdef EmModel < Xhandle
         sibc
         embc
         % ---
+        timesystem
+        % ---
         matrix
         fields
         dof
@@ -38,8 +41,10 @@ classdef EmModel < Xhandle
     methods
         function obj = EmModel(args)
             arguments
+                args.id
                 args.parent_mesh
                 args.frequency
+                args.timesystem
             end
             % ---
             obj@Xhandle;
