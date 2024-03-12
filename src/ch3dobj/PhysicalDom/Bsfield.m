@@ -9,10 +9,16 @@
 %--------------------------------------------------------------------------
 
 classdef Bsfield < PhysicalDom
+
     properties
         bs
     end
 
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+    end
+    
     % --- Contructor
     methods
         function obj = Bsfield(args)

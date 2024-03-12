@@ -9,8 +9,14 @@
 %--------------------------------------------------------------------------
 
 classdef PMagnet < PhysicalDom
+
     properties
         br
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
     end
 
     % --- Contructor

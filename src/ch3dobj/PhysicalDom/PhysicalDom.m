@@ -9,6 +9,7 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalDom < Xhandle
+
     % --- entry
     properties
         id
@@ -16,6 +17,7 @@ classdef PhysicalDom < Xhandle
         id_dom2d
         id_dom3d
     end
+    
     % --- computed
     properties
         parent_mesh

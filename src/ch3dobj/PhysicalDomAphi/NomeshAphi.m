@@ -12,8 +12,13 @@ classdef NomeshAphi < Nomesh
 
     % --- computed
     properties
-        build_done = 0
         matrix
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
     end
 
     % --- Contructor

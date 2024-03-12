@@ -132,7 +132,7 @@ classdef EmModel < Xhandle
                 args.id_dom2d = []
                 args.id_dom3d = []
                 args.sigma = 0
-                args.mur = 0
+                args.mur = 1
                 args.r_ht = []
                 args.r_et = []
             end
@@ -143,12 +143,13 @@ classdef EmModel < Xhandle
             % ---
             if isa(obj,'FEM3dAphijw')
                 phydom = SibcAphijw(argu{:});
-                nomsh  = NomeshAphi('parent_model',args.parent_model, ...
-                                    'id_dom2d',args.id_dom2d,...
-                                    'id_dom3d',args.id_dom3d);
+                %nomsh  = NomeshAphi('parent_model',args.parent_model, ...
+                %                    'id_dom2d',args.id_dom2d,...
+                %                    'id_dom3d',args.id_dom3d);
             end
             % ---
             obj.sibc.(args.id) = phydom;
+            %obj.nomesh.(['nomesh_for_sibc_' args.id]) = nomsh;
         end
         % -----------------------------------------------------------------
         function add_bsfield(obj,args)

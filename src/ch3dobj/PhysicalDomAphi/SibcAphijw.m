@@ -91,7 +91,7 @@ classdef SibcAphijw < Sibc
             cparam_array = obj.cparam.get_on(dom);
             % ---
             mu0 = 4 * pi * 1e-7;
-            fr = obj.frequency;
+            fr = obj.parent_model.frequency;
             skindepth = sqrt(2./(2*pi*fr.*(mu0.*mur_array).*sigma_array));
             % ---
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
@@ -140,8 +140,8 @@ classdef SibcAphijw < Sibc
             %--------------------------------------------------------------
             gsibcwewe = sparse(nb_edge,nb_edge);
             %--------------------------------------------------------------
-            gid_face = sibc.matrix.gid_face;
-            lmatrix  = sibc.matrix.gsibcwewe;
+            gid_face = obj.matrix.gid_face;
+            lmatrix  = obj.matrix.gsibcwewe;
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
                 nbEd_inFa = size(lmatrix{igr},2);

@@ -9,7 +9,8 @@
 %--------------------------------------------------------------------------
 
 classdef Coil < PhysicalDom
-    % --- entry
+    
+    % --- 
     properties (Access = private)
         setup_done = 0
     end

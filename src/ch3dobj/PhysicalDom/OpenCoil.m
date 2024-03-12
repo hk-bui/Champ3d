@@ -9,19 +9,23 @@
 %--------------------------------------------------------------------------
 
 classdef OpenCoil < Coil
+
     % --- entry
     properties
         etrode_equation
     end
+
     % --- computed
     properties
         gid_node_petrode
         gid_node_netrode
     end
+
     % --- computed
     properties (Access = private)
         setup_done = 0
     end
+    
     % --- Contructor
     methods
         function obj = OpenCoil(args)

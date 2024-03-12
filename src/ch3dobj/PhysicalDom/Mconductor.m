@@ -13,6 +13,7 @@ classdef Mconductor < PhysicalDom
     properties
         mur = 1
     end
+    
     % ---
     properties(Access = private)
         setup_done = 0
