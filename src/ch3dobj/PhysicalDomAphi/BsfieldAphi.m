@@ -100,39 +100,41 @@ classdef BsfieldAphi < Bsfield
                 return
             end
             %--------------------------------------------------------------
-            a_bsfield = zeros(nb_edge,1);
+            nb_edge = obj.parent_model.parent_mesh.nb_edge;
+            nb_face = obj.parent_model.parent_mesh.nb_face;
+            id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
+            nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
             %--------------------------------------------------------------
             wfbs = sparse(nb_face,1);
             %--------------------------------------------------------------
-            id_phydom = id_bsfield__{iec};
-            %--------------------------------------------------------------
-            f_fprintf(0,'--- #bsfield',1,id_phydom,0,'\n');
-            %--------------------------------------------------------------
-            id_elem = obj.bsfield.(id_phydom).matrix.gid_elem;
+            gid_elem = obj.bsfield.(id_phydom).matrix.gid_elem;
             lmatrix = obj.bsfield.(id_phydom).matrix.wfbs;
             for i = 1:nbFa_inEl
                 wfbs = wfbs + ...
-                    sparse(id_face_in_elem(i,id_elem),1,lmatrix(:,i),nb_face,1);
+                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
             end
             %--------------------------------------------------------------
-            rotb = obj.parent_mesh.discrete.rot.' * wfbs;
-            rotrot = obj.parent_mesh.discrete.rot.' * ...
-                obj.matrix.wfwf * ...
-                obj.parent_mesh.discrete.rot;
+            rotb = obj.parent_model.parent_mesh.discrete.rot.' * wfbs;
+            rotrot = obj.parent_model.parent_mesh.discrete.rot.' * ...
+                     obj.parent_model.matrix.wfwf * ...
+                     obj.parent_model.parent_mesh.discrete.rot;
             %--------------------------------------------------------------
-            id_edge_a_unknown = obj.matrix.id_edge_a;
+            id_edge_a_unknown = obj.parent_model.matrix.id_edge_a;
             %--------------------------------------------------------------
             rotb = rotb(id_edge_a_unknown,1);
             rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
             %--------------------------------------------------------------
-            int_oned_a = zeros(nb_edge,1);
-            int_oned_a(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
-            clear rotb rotrot
+            a_bsfield = sparse(nb_edge,1);
+            a_bsfield(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
             %--------------------------------------------------------------
-            a_bsfield = a_bsfield + int_oned_a;
+            clear rotb rotrot wfbs
             %--------------------------------------------------------------
-            obj.dof.a_bs = a_bsfield;
-            obj.dof.bs   = obj.parent_mesh.discrete.rot * a_bsfield;
+            obj.parent_model.dof.a_bs = ...
+                obj.parent_model.dof.a_bs + a_bsfield;
+            %--------------------------------------------------------------
+            %obj.parent_model.dof.bs   = ...
+            %    obj.parent_model.dof.bs + ...
+            %    obj.parent_model.parent_mesh.discrete.rot * a_bsfield;
             %--------------------------------------------------------------
             obj.assembly_done = 1;
         end

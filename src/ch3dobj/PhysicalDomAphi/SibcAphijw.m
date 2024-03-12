@@ -12,8 +12,14 @@ classdef SibcAphijw < Sibc
 
     % --- computed
     properties
-        build_done = 0
         matrix
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -41,6 +47,7 @@ classdef SibcAphijw < Sibc
             % ---
             obj.setup_done = 0;
             obj.build_done = 0;
+            obj.assembly_done = 0;
             % ---
             obj.setup;
         end
@@ -49,18 +56,16 @@ classdef SibcAphijw < Sibc
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Sibc(obj);
-                % ---
-                if isnumeric(obj.sigma)
-                    obj.sigma = Parameter('f',obj.sigma);
-                end
-                % ---
-                obj.setup_done = 1;
-                % ---
-                obj.build_done = 0;
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@Sibc(obj);
+            % ---
+            obj.setup_done = 1;
+            % ---
+            obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
@@ -79,7 +84,7 @@ classdef SibcAphijw < Sibc
             gid_face = dom.gid_face;
             nb_face  = length(gid_face);
             % ---
-            id_node_phi = f_uniquenode(dom.parent_mesh.face(:,gid_face));
+            gid_node_phi = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
             sigma_array  = obj.sigma.get_on(dom);
             mur_array    = obj.mur.get_on(dom);
@@ -106,7 +111,7 @@ classdef SibcAphijw < Sibc
                 gid_face_{k} = sm.gid_face;
             end
             % ---
-            obj.matrix.id_node_phi = id_node_phi;
+            obj.matrix.gid_node_phi = gid_node_phi;
             % ---
             obj.matrix.gsibcwewe = gsibcwewe;
             obj.matrix.gid_face = gid_face_;
@@ -116,62 +121,59 @@ classdef SibcAphijw < Sibc
             obj.matrix.skindepth = skindepth;
             % ---
             obj.build_done = 1;
+            obj.assembly_done = 0;
         end
     end
 
     % --- assembly
     methods
         function assembly(obj)
+            % ---
+            obj.build;
+            % ---
+            if obj.assembly_done
+                return
+            end
+            %--------------------------------------------------------------
+            id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
+            nb_edge = obj.parent_model.parent_mesh.nb_edge;
+            %--------------------------------------------------------------
             gsibcwewe = sparse(nb_edge,nb_edge);
-            % ---
-            for iec = 1:length(id_sibc__)
-                %----------------------------------------------------------------------
-                id_phydom = id_sibc__{iec};
-                sibc = obj.sibc.(id_phydom);
-                %------------------------------------------------------------------
-                f_fprintf(0,'--- #sibc ',1,id_phydom,0,'\n');
-                %------------------------------------------------------------------
-                gid_face = sibc.matrix.gid_face;
-                lmatrix  = sibc.matrix.gsibcwewe;
-                %------------------------------------------------------------------
-                for igr = 1:length(lmatrix)
-                    nbEd_inFa = size(lmatrix{igr},2);
-                    id_face = gid_face{igr};
-                    for i = 1:nbEd_inFa
-                        for j = i+1 : nbEd_inFa
-                            gsibcwewe = gsibcwewe + ...
-                                sparse(id_edge_in_face(i,id_face),id_edge_in_face(j,id_face),...
-                                lmatrix{igr}(:,i,j),nb_edge,nb_edge);
-                        end
-                    end
-                end
-                %------------------------------------------------------------------
-                id_node_phi = [id_node_phi ...
-                    sibc.matrix.id_node_phi];
-                %------------------------------------------------------------------
-            end
-            % ---
-            gsibcwewe = gsibcwewe + gsibcwewe.';
-            % ---
-            for iec = 1:length(id_sibc__)
-                %----------------------------------------------------------------------
-                id_phydom = id_sibc__{iec};
-                sibc = obj.sibc.(id_phydom);
-                %----------------------------------------------------------------------
-                gid_face = sibc.matrix.gid_face;
-                lmatrix  = sibc.matrix.gsibcwewe;
-                %----------------------------------------------------------------------
-                for igr = 1:length(lmatrix)
-                    id_face = gid_face{igr};
-                    nbEd_inFa = size(lmatrix{igr},2);
-                    for i = 1:nbEd_inFa
+            %--------------------------------------------------------------
+            gid_face = sibc.matrix.gid_face;
+            lmatrix  = sibc.matrix.gsibcwewe;
+            %--------------------------------------------------------------
+            for igr = 1:length(lmatrix)
+                nbEd_inFa = size(lmatrix{igr},2);
+                id_face = gid_face{igr};
+                for i = 1:nbEd_inFa
+                    for j = i+1 : nbEd_inFa
                         gsibcwewe = gsibcwewe + ...
-                            sparse(id_edge_in_face(i,id_face),id_edge_in_face(i,id_face),...
-                            lmatrix{igr}(:,i,i),nb_edge,nb_edge);
+                            sparse(id_edge_in_face(i,id_face),id_edge_in_face(j,id_face),...
+                            lmatrix{igr}(:,i,j),nb_edge,nb_edge);
                     end
                 end
-
             end
+            %--------------------------------------------------------------
+            gsibcwewe = gsibcwewe + gsibcwewe.';
+            %--------------------------------------------------------------
+            for igr = 1:length(lmatrix)
+                id_face = gid_face{igr};
+                nbEd_inFa = size(lmatrix{igr},2);
+                for i = 1:nbEd_inFa
+                    gsibcwewe = gsibcwewe + ...
+                        sparse(id_edge_in_face(i,id_face),id_edge_in_face(i,id_face),...
+                        lmatrix{igr}(:,i,i),nb_edge,nb_edge);
+                end
+            end
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.sigmawewe = ...
+                obj.parent_model.matrix.sigmawewe + gsibcwewe;
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.id_node_phi = ...
+                [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];
+            %--------------------------------------------------------------
+            obj.assembly_done = 1;
         end
     end
 end

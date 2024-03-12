@@ -19,7 +19,6 @@ classdef AirboxAphi < Airbox
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
 
     % --- Contructor
@@ -42,7 +41,6 @@ classdef AirboxAphi < Airbox
             % ---
             obj.setup_done = 0;
             obj.build_done = 0;
-            obj.assembly_done = 0;
             % ---
             obj.setup;
         end
@@ -51,16 +49,14 @@ classdef AirboxAphi < Airbox
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
+            if ~obj.setup_done
+                % ---
+                setup@Airbox(obj);
+                % ---
+                obj.setup_done = 1;
+                % ---
+                obj.build_done = 0;
             end
-            % ---
-            setup@Airbox(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -79,20 +75,13 @@ classdef AirboxAphi < Airbox
             obj.matrix.gid_inner_edge = dom.gid.gid_inner_edge;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
     % --- assembly
     methods
         function assembly(obj)
-            % ---
-            obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
-            obj.assembly_done = 1;
+
         end
     end
 end

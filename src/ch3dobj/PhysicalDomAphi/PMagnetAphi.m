@@ -12,8 +12,14 @@ classdef PMagnetAphi < PMagnet
 
     % --- computed
     properties
-        build_done = 0
         matrix
+    end
+
+    % --- computed
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -37,6 +43,7 @@ classdef PMagnetAphi < PMagnet
             % ---
             obj.setup_done = 0;
             obj.build_done = 0;
+            obj.assembly_done = 0;
             % ---
             obj.setup;
         end
@@ -58,6 +65,7 @@ classdef PMagnetAphi < PMagnet
             obj.setup_done = 1;
             % ---
             obj.build_done = 0;
+            obj.assembly_done = 0;
         end
     end
 
@@ -82,47 +90,56 @@ classdef PMagnetAphi < PMagnet
             obj.matrix.wfbr = wfbr;
             % ---
             obj.build_done = 1;
+            obj.assembly_done = 0;
         end
     end
 
     % --- assembly
     methods
         function assembly(obj)
-            a_pmagnet = zeros(nb_edge,1);
-            for iec = 1:length(id_pmagnet__)
-                %----------------------------------------------------------------------
-                wfbr = sparse(nb_face,1);
-                %----------------------------------------------------------------------
-                id_phydom = id_pmagnet__{iec};
-                %----------------------------------------------------------------------
-                f_fprintf(0,'--- #pmagnet',1,id_phydom,0,'\n');
-                %----------------------------------------------------------------------
-                id_elem = obj.pmagnet.(id_phydom).matrix.gid_elem;
-                lmatrix = obj.pmagnet.(id_phydom).matrix.wfbr;
-                for i = 1:nbFa_inEl
-                    wfbr = wfbr + ...
-                        sparse(id_face_in_elem(i,id_elem),1,lmatrix(:,i),nb_face,1);
-                end
-                %----------------------------------------------------------------------
-                rotb = obj.parent_mesh.discrete.rot.' * wfbr;
-                rotrot = obj.parent_mesh.discrete.rot.' * ...
-                    obj.matrix.wfwf * ...
-                    obj.parent_mesh.discrete.rot;
-                %----------------------------------------------------------------------
-                id_edge_a_unknown = obj.matrix.id_edge_a;
-                %----------------------------------------------------------------------
-                rotb = rotb(id_edge_a_unknown,1);
-                rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
-                %----------------------------------------------------------------------
-                int_oned_a = zeros(nb_edge,1);
-                int_oned_a(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
-                clear rotb rotrot
-                %----------------------------------------------------------------------
-                a_pmagnet = a_pmagnet + int_oned_a;
+            % ---
+            obj.build;
+            % ---
+            if obj.assembly_done
+                return
             end
-            %--------------------------------------------------------------------------
-            obj.dof.a_pm = a_pmagnet;
-            obj.dof.bpm  = obj.parent_mesh.discrete.rot * a_pmagnet;
+            %--------------------------------------------------------------
+            nb_edge = obj.parent_model.parent_mesh.nb_edge;
+            nb_face = obj.parent_model.parent_mesh.nb_face;
+            id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
+            nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
+            %--------------------------------------------------------------
+            wfbr = sparse(nb_face,1);
+            %--------------------------------------------------------------
+            gid_elem = obj.pmagnet.(id_phydom).matrix.gid_elem;
+            lmatrix = obj.pmagnet.(id_phydom).matrix.wfbr;
+            for i = 1:nbFa_inEl
+                wfbr = wfbr + ...
+                    sparse(id_face_in_elem(i,gid_elem),1,lmatrix(:,i),nb_face,1);
+            end
+            %--------------------------------------------------------------
+            rotb = obj.parent_model.parent_mesh.discrete.rot.' * wfbr;
+            rotrot = obj.parent_model.parent_mesh.discrete.rot.' * ...
+                     obj.parent_model.matrix.wfwf * ...
+                     obj.parent_model.parent_mesh.discrete.rot;
+            %--------------------------------------------------------------
+            id_edge_a_unknown = obj.matrix.id_edge_a;
+            %--------------------------------------------------------------
+            rotb = rotb(id_edge_a_unknown,1);
+            rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
+            %--------------------------------------------------------------
+            a_pmagnet = sparse(nb_edge,1);
+            a_pmagnet(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
+            clear rotb rotrot wfbr
+            %--------------------------------------------------------------
+            obj.parent_model.dof.a_pm = ...
+                obj.parent_model.dof.a_pm + a_pmagnet;
+            %--------------------------------------------------------------
+            %obj.parent_model.dof.bpm  = ...
+            %    obj.parent_model.dof.bpm + ...
+            %    obj.parent_model.parent_mesh.discrete.rot * a_pmagnet;
+            %--------------------------------------------------------------
+            obj.assembly_done = 1;
         end
     end
 end

@@ -61,8 +61,6 @@ classdef JsCoilAphi < Xhandle
             id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
             nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
             %--------------------------------------------------------------
-            t_jsfield = sparse(nb_edge,1);
-            %--------------------------------------------------------------
             wfjs = sparse(nb_face,1);
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;
@@ -82,21 +80,20 @@ classdef JsCoilAphi < Xhandle
             rotj = rotj(id_edge_t_unknown,1);
             rotrot = rotrot(id_edge_t_unknown,id_edge_t_unknown);
             %--------------------------------------------------------------
-            int_oned_t = zeros(nb_edge,1);
-            int_oned_t(id_edge_t_unknown) = f_solve_axb(rotrot,rotj);
-            clear rotj rotrot
+            t_jsfield = sparse(nb_edge,1);
+            t_jsfield(id_edge_t_unknown) = f_solve_axb(rotrot,rotj);
             %--------------------------------------------------------------
-            t_jsfield = t_jsfield + int_oned_t;
-            %--------------------------------------------------------------
-            clear wfjs
+            clear rotj rotrot wfjs
             %--------------------------------------------------------------
             obj.parent_model.dof.t_js = ...
                 obj.parent_model.dof.t_js + t_jsfield;
-            obj.parent_model.dof.js = ...
-                obj.parent_model.parent_mesh.discrete.rot * t_jsfield;
-            obj.parent_model.matrix.js = ...
-                obj.parent_model.parent_mesh.field_wf('dof',obj.parent_model.dof.js);
-            % ---
+            %--------------------------------------------------------------
+            %obj.parent_model.dof.js = ...
+            %    obj.parent_model.parent_mesh.discrete.rot * t_jsfield;
+            %obj.parent_model.matrix.js = ...
+            %    obj.parent_model.matrix.js + ...
+            %    obj.parent_model.parent_mesh.field_wf('dof',obj.parent_model.dof.js);
+            %--------------------------------------------------------------
             obj.assembly_done = 1;
         end
     end

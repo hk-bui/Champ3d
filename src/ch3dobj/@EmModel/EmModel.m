@@ -97,7 +97,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Airbox(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = AirboxAphi(argu{:});
+            end
+            % ---
             obj.airbox.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -114,7 +117,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Nomesh(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = NomeshAphi(argu{:});
+            end
+            % ---
             obj.nomesh.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -135,7 +141,13 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Sibc(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = SibcAphijw(argu{:});
+                nomsh  = NomeshAphi('parent_model',args.parent_model, ...
+                                    'id_dom2d',args.id_dom2d,...
+                                    'id_dom3d',args.id_dom3d);
+            end
+            % ---
             obj.sibc.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -160,7 +172,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Bsfield(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = BsfieldAphi(argu{:});
+            end
+            % ---
             obj.bsfield.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -290,7 +305,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = Mconductor(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = MconductorAphi(argu{:});
+            end
+            % ---
             obj.mconductor.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
@@ -308,7 +326,10 @@ classdef EmModel < Xhandle
             % ---
             argu = f_to_namedarg(args);
             % ---
-            phydom = PMagnet(argu{:});
+            if isa(obj,'FEM3dAphijw')
+                phydom = PMagnetAphi(argu{:});
+            end
+            % ---
             obj.pmagnet.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
