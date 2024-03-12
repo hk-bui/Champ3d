@@ -14,7 +14,7 @@ arguments
     elem
     args.defined_on {mustBeMember(args.defined_on,{'face','elem'})} = 'face'
     args.scalar_field = []
-    args.face_color = []
+    args.face_color = 'c'
     args.edge_color = 'none'
 end
 %--------------------------------------------------------------------------
@@ -28,10 +28,6 @@ if isreal(scalar_field)
 else
     fs{1} = real(scalar_field);
     fs{2} = imag(scalar_field);
-end
-%--------------------------------------------------------------------------
-if ~isempty(fs)
-    face_color = 'flat';
 end
 %--------------------------------------------------------------------------
 for i = 1:length(fs)
@@ -53,18 +49,27 @@ for i = 1:length(fs)
         msh.FaceColor = face_color;
         msh.EdgeColor = edge_color;
         %------------------------------------------------------------------
-        id_tria = find(elem(4,:) == 0);
-        id_quad = setdiff(1:size(elem,2),id_tria);
-        % ---
-        if ~isempty(id_tria)
-            msh.Faces = (elem(1:3,id_tria)).';
-            msh.FaceVertexCData = full(fs{i}(itria));
-            patch(msh); hold on
-        end
-        % ---
-        if ~isempty(id_quad)
-            msh.Faces = (elem(1:4,id_quad)).';
-            msh.FaceVertexCData = full(fs{i}(id_quad));
+        if numel(fs{i}) == size(elem,2)
+            id_tria = find(elem(4,:) == 0);
+            id_quad = setdiff(1:size(elem,2),id_tria);
+            % ---
+            if ~isempty(id_tria)
+                msh.Faces = (elem(1:3,id_tria)).';
+                msh.FaceVertexCData = full(fs{i}(id_tria));
+                msh.FaceColor = 'flat';
+                patch(msh); hold on
+            end
+            % ---
+            if ~isempty(id_quad)
+                msh.Faces = (elem(1:4,id_quad)).';
+                msh.FaceVertexCData = full(fs{i}(id_quad));
+                msh.FaceColor = 'flat';
+                patch(msh); hold on
+            end
+        elseif numel(fs{i}) == size(node,2)
+            msh.Faces = elem.';
+            msh.FaceVertexCData = full(fs{i});
+            msh.FaceColor = 'interp';
             patch(msh); hold on
         end
         % ---

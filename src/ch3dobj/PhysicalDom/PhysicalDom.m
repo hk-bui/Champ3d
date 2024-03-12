@@ -114,7 +114,7 @@ classdef PhysicalDom < Xhandle
         function plotjv(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             obj.plotfieldv('show_dom',args.show_dom,'field_name','jv')
@@ -123,7 +123,7 @@ classdef PhysicalDom < Xhandle
         function plotev(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             obj.plotfieldv('show_dom',args.show_dom,'field_name','ev')
@@ -132,7 +132,7 @@ classdef PhysicalDom < Xhandle
         function plotbv(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             obj.plotfieldv('show_dom',args.show_dom,'field_name','bv')
@@ -189,7 +189,7 @@ classdef PhysicalDom < Xhandle
         function plottemp(obj,args)
             arguments
                 obj
-                args.show_dom = 1
+                args.show_dom = 0
             end
             % ---
             obj.plotfields('show_dom',args.show_dom,'field_name','temp')

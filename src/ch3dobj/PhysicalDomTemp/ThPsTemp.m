@@ -122,7 +122,7 @@ classdef ThPsTemp < ThPs
             face = obj.parent_model.parent_mesh.face;
             nb_node = obj.parent_model.parent_mesh.nb_node;
             %--------------------------------------------------------------
-            pswn = sparse(nb_node,nb_node);
+            pswn = sparse(nb_node,1);
             %--------------------------------------------------------------
             gid_face = obj.matrix.gid_face;
             lmatrix  = obj.matrix.pswn;

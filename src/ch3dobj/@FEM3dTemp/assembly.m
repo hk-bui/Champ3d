@@ -66,6 +66,8 @@ id_node_t = unique(obj.matrix.id_node_t);
 %
 %--------------------------------------------------------------------------
 % --- LSH
+Temp_prev = 0;
+for i = 1:10
 delta_t = 1;
 % ---
 LHS = (1./delta_t) .* obj.matrix.rhocpwnwn + ...
@@ -75,7 +77,6 @@ LHS = (1./delta_t) .* obj.matrix.rhocpwnwn + ...
 LHS = LHS(id_node_t,id_node_t);
 %--------------------------------------------------------------------------
 % --- RHS
-Temp_prev = 0;
 RHS = obj.matrix.pvwn + obj.matrix.pswn + ...
       (1./delta_t) .* obj.matrix.rhocpwnwn * Temp_prev;
 % ---
@@ -91,3 +92,5 @@ obj.dof.temp(id_node_t) = sol;
 obj.fields.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
 obj.fields.temp  = obj.dof.temp;
 
+Temp_prev = obj.dof.temp;
+end
