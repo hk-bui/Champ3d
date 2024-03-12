@@ -63,14 +63,6 @@ for i = 1:length(allowed_physical_dom)
     end
 end
 %--------------------------------------------------------------------------
-obj.assembly_done = 1;
-
-
-%--------------------------------------------------------------------------
-con = f_connexion(parent_mesh.elem_type);
-nbEd_inEl = con.nbEd_inEl;
-nbFa_inEl = con.nbFa_inEl;
-id_edge_in_elem = parent_mesh.meshds.id_edge_in_elem;
 id_edge_in_face = parent_mesh.meshds.id_edge_in_face;
 id_face_in_elem = parent_mesh.meshds.id_face_in_elem;
 %--------------------------------------------------------------------------
@@ -88,16 +80,15 @@ id_elem_mcon = obj.matrix.id_elem_mcon;
 id_node_netrode = obj.matrix.id_node_netrode;
 id_node_petrode = obj.matrix.id_node_petrode;
 %--------------------------------------------------------------------------
+id_edge_a_unknown   = setdiff(id_inner_edge_airbox,id_inner_edge_nomesh);
+id_node_phi_unknown = setdiff(id_node_phi,...
+                   [id_inner_node_nomesh id_node_netrode id_node_petrode]);
+%--------------------------------------------------------------------------
 %
 %               MATRIX SYSTEM
 %
 %--------------------------------------------------------------------------
-id_edge_a_unknown   = setdiff(id_inner_edge_airbox,id_inner_edge_nomesh);
-id_node_phi_unknown = setdiff(id_node_phi,...
-                   [id_inner_node_nomesh id_node_netrode id_node_petrode]);
-
 % --- LSH
-% --- obj.matrix.nu0nurwfwf
 id_elem_air = setdiff(id_elem_airbox,[id_elem_nomesh id_elem_mcon]);
 id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
 mu0 = 4 * pi * 1e-7;
@@ -106,8 +97,6 @@ nu0wfwf = (1/mu0) .* obj.matrix.wfwfx;
 obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
     obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
     nu0wfwf(id_face_in_elem_air,id_face_in_elem_air);
-% ---
-%obj.matrix.sigmawewe = obj.matrix.sigmawewe + gsibcwewe;
 % ---
 freq = obj.frequency;
 jome = 1j*2*pi*freq;
@@ -124,7 +113,6 @@ S22 = S22(id_node_phi_unknown,id_node_phi_unknown);
 LHS = S11;              clear S11;
 LHS = [LHS  S12];
 LHS = [LHS; S12.' S22]; clear S12 S22;
-
 %--------------------------------------------------------------------------
 % --- RHS
 bsfieldRHS = - obj.parent_mesh.discrete.rot.' * ...
@@ -182,7 +170,8 @@ for iec = 1:length(id_coil__)
         RHS = RHS + [vRHSed; vRHSno];
     end
 end
-
+%--------------------------------------------------------------------------
+obj.assembly_done = 1;
 %--------------------------------------------------------------------------
 sol = f_solve_axb(LHS,RHS);
 %--------------------------------------------------------------------------
