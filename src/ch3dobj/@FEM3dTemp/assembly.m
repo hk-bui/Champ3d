@@ -55,6 +55,7 @@ for i = 1:length(allowed_physical_dom)
         % ---
         f_fprintf(0,['Assembly #' phydom_type],1,id_phydom,0,'\n');
         % ---
+        phydom.reset;
         phydom.assembly;
     end
 end
@@ -65,11 +66,10 @@ id_node_t = unique(obj.matrix.id_node_t);
 %               MATRIX SYSTEM
 %
 %--------------------------------------------------------------------------
-% --- LSH
-Temp_prev = 0;
-for i = 1:10
+Temp_prev = obj.matrix.Temp_prev;
 delta_t = 1;
-% ---
+%--------------------------------------------------------------------------
+% --- LSH
 LHS = (1./delta_t) .* obj.matrix.rhocpwnwn + ...
       obj.parent_mesh.discrete.grad.' * obj.matrix.lambdawewe * obj.parent_mesh.discrete.grad + ...
       obj.matrix.hwnwn;
@@ -82,15 +82,10 @@ RHS = obj.matrix.pvwn + obj.matrix.pswn + ...
 % ---
 RHS = RHS(id_node_t,1);
 %--------------------------------------------------------------------------
+obj.matrix.LHS = LHS;
+obj.matrix.RHS = RHS;
+%--------------------------------------------------------------------------
 obj.assembly_done = 1;
 %--------------------------------------------------------------------------
-sol = f_solve_axb(LHS,RHS);
-%--------------------------------------------------------------------------
-obj.dof.temp = zeros(nb_node,1);
-obj.dof.temp(id_node_t) = sol;
-%--------------------------------------------------------------------------
-obj.fields.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
-obj.fields.temp  = obj.dof.temp;
 
-Temp_prev = obj.dof.temp;
-end
+

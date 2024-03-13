@@ -32,6 +32,7 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
     properties (Access = private)
         setup_done = 0
         build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -135,6 +136,10 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
             if isprop(obj,'assembly_done')
                 obj.assembly_done = 0;
             end
+            % ---
+            reset@OpenCoilAphi(obj);
+            reset@JsCoilAphi(obj);
+            % ---
         end
     end
 

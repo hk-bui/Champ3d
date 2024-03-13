@@ -172,4 +172,14 @@ classdef ThModel < Xhandle
         %function add_thbc(obj)
         %end
     end
+
+    % --- Methods
+    methods
+        function setup(obj)
+            nb_elem = obj.parent_mesh.nb_elem;
+            nb_face = obj.parent_mesh.nb_face;
+            % ---
+            obj.fields.tempv = zeros(1,nb_elem) + obj.Temp0;
+        end
+    end
 end

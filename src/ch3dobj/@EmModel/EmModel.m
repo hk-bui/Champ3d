@@ -337,7 +337,7 @@ classdef EmModel < Xhandle
         % -----------------------------------------------------------------
     end
 
-    % --- Methods/Abs
+    % --- Methods
     methods
         function setup(obj)
             nb_elem = obj.parent_mesh.nb_elem;

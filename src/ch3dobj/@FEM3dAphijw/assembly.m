@@ -59,6 +59,7 @@ for i = 1:length(allowed_physical_dom)
         % ---
         f_fprintf(0,['Assembly #' phydom_type],1,id_phydom,0,'\n');
         % ---
+        phydom.reset;
         phydom.assembly;
     end
 end

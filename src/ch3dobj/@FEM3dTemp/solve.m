@@ -55,31 +55,15 @@ while erro0 > tole0 & nite0 < maxi0
     f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
     %----------------------------------------------------------------------
     % --- postpro
-    id_edge_a_unknown = obj.matrix.id_edge_a_unknown;
-    id_node_phi_unknown = obj.matrix.id_node_phi_unknown;
-    nb_edge = obj.parent_mesh.nb_edge;
+    id_node_t = obj.matrix.id_node_t;
     nb_node = obj.parent_mesh.nb_node;
-    % ---
-    len_sol = length(x);
-    len_a_unknown = length(id_edge_a_unknown);
-    len_phi_unknown = length(id_node_phi_unknown);
-    % ---
-    obj.dof.a   = zeros(nb_edge,1);
-    obj.dof.phi = zeros(nb_node,1);
-    obj.dof.a(id_edge_a_unknown)     = x(1:len_a_unknown);
-    obj.dof.phi(id_node_phi_unknown) = x(len_a_unknown+1 : ...
-        len_a_unknown+len_phi_unknown);
     %----------------------------------------------------------------------
-    obj.dof.dphiv = 0;
-    if (len_a_unknown + len_phi_unknown) < len_sol
-        obj.dof.dphiv = x(len_a_unknown+len_phi_unknown+1 : len_sol);
-    end
+    obj.dof.temp = zeros(nb_node,1);
+    obj.dof.temp(id_node_t) = x;
     %----------------------------------------------------------------------
-    freq = obj.frequency;
-    jome = 1j*2*pi*freq;
-    % ---
-    obj.dof.b = obj.parent_mesh.discrete.rot * obj.dof.a;
-    obj.dof.e = -jome .* (obj.dof.a + obj.parent_mesh.discrete.grad * obj.dof.phi);
+    obj.fields.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
+    obj.fields.temp  = obj.dof.temp;
+    Temp_prev = obj.dof.temp;
     %----------------------------------------------------------------------
     obj.postpro;
     %----------------------------------------------------------------------

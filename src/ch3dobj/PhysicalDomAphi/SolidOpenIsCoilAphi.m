@@ -28,6 +28,7 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
     properties (Access = private)
         setup_done = 0
         build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor
@@ -69,7 +70,6 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             end
             % ---
             setup@OpenCoilAphi(obj);
-            obj.setup_done = 0;
             setup@SolidCoilAphi(obj);
             % ---
             if isempty(obj.i_coil)
@@ -133,6 +133,11 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
             if isprop(obj,'assembly_done')
                 obj.assembly_done = 0;
             end
+            % ---
+            reset@OpenCoilAphi(obj);
+            reset@SolidCoilAphi(obj);
+            reset@IsCoilAphi(obj);
+            % ---
         end
     end
 

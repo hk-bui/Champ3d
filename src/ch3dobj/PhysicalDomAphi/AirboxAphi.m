@@ -19,6 +19,7 @@ classdef AirboxAphi < Airbox
     properties (Access = private)
         setup_done = 0
         build_done = 0
+        assembly_done = 0
     end
 
     % --- Contructor

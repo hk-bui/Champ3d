@@ -12,8 +12,9 @@ classdef VsCoilAphi < Xhandle
 
     % --- computed
     properties (Access = private)
-        build_done = 0;
-        assembly_done = 0;
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
     
     % --- Contructor

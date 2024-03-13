@@ -22,6 +22,8 @@ classdef FEM3dTemp < ThModel
             obj = obj@ThModel(argu{:});
             % ---
             obj <= args;
+            % ---
+            obj.setup;
         end
     end
 end

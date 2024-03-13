@@ -12,8 +12,9 @@ classdef IsCoilAphi < Xhandle
 
     % --- computed
     properties (Access = private)
-        build_done = 0;
-        assembly_done = 0;
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
     
     % --- Contructor
@@ -54,6 +55,8 @@ classdef IsCoilAphi < Xhandle
                 [obj.parent_model.matrix.id_node_petrode obj.gid_node_petrode];
             % ---
             obj.assembly_done = 1;
+            % ---
+            disp('xxx')
         end
     end
 
