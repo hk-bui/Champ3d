@@ -16,7 +16,7 @@ f_fprintf(0,'   ');
 %--------------------------------------------------------------------------
 erro0 = 1;
 tole0 = 1e-3;
-maxi0 = 3;
+maxi0 = 10;
 erro1 = 1;
 tole1 = 1e-6;
 maxi1 = 1e3;
@@ -44,7 +44,7 @@ while erro0 > tole0 & nite0 < maxi0
         erro0 = 1;
         x0 = x;
     elseif niter > 1
-        erro0 = norm(x0 - x)/norm(x0);
+        erro0 = norm(x - x0)/norm(x);
         x0 = x;
     else
         erro0 = 0;
