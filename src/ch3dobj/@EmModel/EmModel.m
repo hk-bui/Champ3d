@@ -257,42 +257,6 @@ classdef EmModel < Xhandle
             obj.coil.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
-        function add_open_iscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_close_iscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_open_jscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_close_jscoil(obj,args)
-            arguments
-                obj
-                % ---
-                args.id = 'no_id'
-                args.id_dom2d = []
-                args.id_dom3d = []
-                args.etrode_equation = []
-                args.js = 1
-                args.nb_turn = 1
-                args.cs_area = 1
-            end
-            % ---
-            args.parent_model = obj;
-            % ---
-            argu = f_to_namedarg(args);
-            % ---
-            phydom = CloseJsCoil(argu{:});
-            obj.coil.(args.id) = phydom;
-        end
-        % -----------------------------------------------------------------
-        function add_open_vscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_close_vscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
         function add_mconductor(obj,args)
             arguments
                 obj
