@@ -26,6 +26,9 @@ classdef HexMesh < Mesh3d
             arguments
                 args.node
                 args.elem
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj@Mesh3d;
@@ -67,6 +70,7 @@ classdef HexMesh < Mesh3d
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
                 args.id_elem = []
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             edge_color_  = args.edge_color;
             face_color_  = args.face_color;
@@ -84,7 +88,12 @@ classdef HexMesh < Mesh3d
                 boface = f_boundface(obj.elem(:,args.id_elem),obj.node,'elem_type','hexa');
             end
             %--------------------------------------------------------------
-            msh.Vertices = obj.node.';
+            if f_strcmpi(args.coordinate_system,'global')
+                msh.Vertices = obj.gnode.';
+            else
+                msh.Vertices = obj.node.';
+            end
+            %--------------------------------------------------------------
             msh.Faces = f_unique(boface(1:4,:)).';
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray

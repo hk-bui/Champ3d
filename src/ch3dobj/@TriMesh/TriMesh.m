@@ -24,8 +24,11 @@ classdef TriMesh < Mesh2d
     methods
         function obj = TriMesh(args)
             arguments
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj = obj@Mesh2d;
@@ -67,6 +70,7 @@ classdef TriMesh < Mesh2d
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             edge_color_  = args.edge_color;
             face_color_  = args.face_color;
@@ -74,7 +78,12 @@ classdef TriMesh < Mesh2d
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
-            msh.Vertices = obj.node.';
+            if f_strcmpi(args.coordinate_system,'global')
+                msh.Vertices = obj.gnode.';
+            else
+                msh.Vertices = obj.node.';
+            end
+            %--------------------------------------------------------------
             msh.Faces = obj.elem(1:3,:).';
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray

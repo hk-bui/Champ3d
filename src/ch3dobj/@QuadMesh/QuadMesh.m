@@ -26,6 +26,9 @@ classdef QuadMesh < Mesh2d
             arguments
                 args.node
                 args.elem
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj = obj@Mesh2d;
@@ -68,6 +71,7 @@ classdef QuadMesh < Mesh2d
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
                 args.field_value = []
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             edge_color_  = args.edge_color;
             face_color_  = args.face_color;
@@ -75,7 +79,12 @@ classdef QuadMesh < Mesh2d
             %--------------------------------------------------------------
             clear msh;
             %--------------------------------------------------------------
-            msh.Vertices = obj.node.';
+            if f_strcmpi(args.coordinate_system,'global')
+                msh.Vertices = obj.gnode.';
+            else
+                msh.Vertices = obj.node.';
+            end
+            %--------------------------------------------------------------
             msh.Faces = obj.elem(1:4,:).';
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray

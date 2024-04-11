@@ -33,6 +33,9 @@ classdef PrismMeshFromTriMesh < PrismMesh
                 args.parent_mesh1d
                 args.parent_mesh2d
                 args.id_zline
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj@PrismMesh;

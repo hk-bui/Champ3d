@@ -30,6 +30,9 @@ classdef TriMeshFromFemm < TriMesh
                 args.elem
                 % ---
                 args.mesh_file
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % --- super
             obj@TriMesh;

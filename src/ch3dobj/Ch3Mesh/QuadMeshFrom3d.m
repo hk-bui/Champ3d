@@ -38,6 +38,9 @@ classdef QuadMeshFrom3d < QuadMesh
                 args.dnum_parallel
                 args.dnum_orthogonal
                 args.flog
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj@QuadMesh;

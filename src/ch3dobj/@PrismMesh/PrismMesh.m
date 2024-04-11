@@ -24,8 +24,11 @@ classdef PrismMesh < Mesh3d
     methods
         function obj = PrismMesh(args)
             arguments
-                args.node = []
-                args.elem = []
+                args.node
+                args.elem
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj = obj@Mesh3d;
@@ -66,6 +69,7 @@ classdef PrismMesh < Mesh3d
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             edge_color_  = args.edge_color;
             face_color_  = args.face_color;
@@ -80,7 +84,12 @@ classdef PrismMesh < Mesh3d
             boface = f_boundface(obj.elem,obj.node,'elem_type','prism');
             allfac = 1:size(boface,2);
             %--------------------------------------------------------------
-            msh.Vertices = obj.node.';
+            if f_strcmpi(args.coordinate_system,'global')
+                msh.Vertices = obj.gnode.';
+            else
+                msh.Vertices = obj.node.';
+            end
+            %--------------------------------------------------------------
             msh.FaceColor = face_color_;
             msh.EdgeColor = edge_color_; % [0.7 0.7 0.7] --> gray
             %--------------------------------------------------------------

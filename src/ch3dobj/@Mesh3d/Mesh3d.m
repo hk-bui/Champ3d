@@ -14,17 +14,10 @@ classdef Mesh3d < Mesh
     methods
         function obj = Mesh3d()
             obj@Mesh;
-            % ---
-            obj.gcoor.cartesian.o = [0 0 0];
-            % ---
-            obj.gcoor.cylindrical.o = [0 0 0];
-            obj.gcoor.cylindrical.otheta = [1 0 0]; % w/ counterclockwise convention
-            % ---
-            obj.move.linear.vector_step = [0 0 0];
-            % ---
-            obj.move.rotational.angle_step = 0;       % deg, counterclockwise
-            obj.move.rotational.origin     = [0 0 0]; % rot around o-->axis
-            obj.move.rotational.axis       = [0 0 1]; % rot around o-->axis
+            % --- for cartesian/cylindrical
+            obj.gcoor.origin = [0 0 0];
+            % --- for cylindrical only
+            obj.gcoor.otheta = [1 0 0]; % w/ counterclockwise convention
         end
     end
 
@@ -84,6 +77,40 @@ classdef Mesh3d < Mesh
                  'gid_face','condition'});
             sdom = SurfaceDom3d(argu{:});
             obj.dom.(args.id) = sdom;
+            % ---
+        end
+    end
+    % --- Methods for coordinates
+    methods
+        % ---
+        function gnode_xyz = get_gnode_cartesian(obj)
+            % --- lock to gcoor
+            if any(obj.gcoor.origin ~= [0 0 0])
+                gnode_xyz = obj.node - obj.gcoor.origin.';
+            else
+                gnode_xyz = obj.node;
+            end
+            % ---
+        end
+        % ---
+        function gnode_xyz = get_gnode_cylindrical(obj)
+            % --- lock to gcoor
+            if any(obj.gcoor.origin ~= [0 0 0])
+                gnode_xyz = obj.node - obj.gcoor.origin.';
+            else
+                gnode_xyz = obj.node;
+            end
+            % ---
+            if any(obj.gcoor.otheta ~= [1 0 0])
+                otheta0 = [1 0 0];
+                otheta1 = obj.gcoor.otheta;
+                rot_axis  = cross(otheta0,otheta1);
+                rot_angle = acosd(dot(otheta0,otheta1)/(norm(otheta0)*norm(otheta1)));
+                % ---
+                gnode_xyz = f_rotaroundaxis(gnode_xyz.','rot_axis',rot_axis,'angle',rot_angle);
+                % ---
+                gnode_xyz = gnode_xyz.';
+            end
             % ---
         end
     end
