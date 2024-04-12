@@ -14,13 +14,13 @@ classdef LTime < Xhandle
     properties
         id
         % ---
-        lit = 1
+        lit = 0
         ltime_array
     end
 
     % --- Dependent Properties
     properties (Dependent = true)
-        
+        ltime_now
     end
 
     % --- Constructors
@@ -28,18 +28,29 @@ classdef LTime < Xhandle
         function obj = LTime(args)
             arguments
                 args.id
-                args.time_array {mustBeNumeric} = []
+                args.ltime_array {mustBeNumeric} = []
                 args.t0 {mustBeNumeric} = 0
                 args.t_end {mustBeNumeric} = 0
                 args.dnum {mustBeNumeric} = 1
             end
             obj = obj@Xhandle;
             % ---
-            if isempty(args.time_array)
+            if isempty(args.ltime_array)
                 obj.ltime_array = [args.t0, ...
                     args.t0 + cumsum((args.t_end-args.t0)/args.dnum .* ones(1,args.dnum))];
             else
-                obj.ltime_array = args.time_array;
+                obj.ltime_array = args.ltime_array;
+            end
+        end
+    end
+
+    % --- Methods
+    methods
+        function val = get.ltime_now(obj)
+            if obj.lit > 0
+                val = obj.ltime_array(obj.lit);
+            else
+                val = -inf;
             end
         end
     end
