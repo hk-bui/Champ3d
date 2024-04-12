@@ -154,6 +154,18 @@ classdef Mesh < Xhandle
         end
     end
     % --- Methods
+    methods (Access = public)
+        % ---
+        function objx = uplus(obj)
+            objx = copy(obj);
+        end
+        % ---
+        function objx = ctranspose(obj)
+            objx = copy(obj);
+        end
+        % ---
+    end
+    % --- Methods
     methods
         % -----------------------------------------------------------------
         function plot(obj,varargin)
