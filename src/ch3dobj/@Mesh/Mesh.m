@@ -42,6 +42,8 @@ classdef Mesh < Xhandle
         gid_edge
         gid_face
         flat_node
+        % --- global origin
+        gorigin
         % --- global coordinates
         gcoor_type {mustBeMember(gcoor_type,{'cartesian','cylindrical'})} = 'cartesian'
         move_type {mustBeMember(move_type,{'linear','rotational'})} = 'linear'

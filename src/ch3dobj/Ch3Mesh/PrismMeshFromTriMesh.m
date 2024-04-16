@@ -110,6 +110,9 @@ classdef PrismMeshFromTriMesh < PrismMesh
                node_(3,i*nbNode2D+1:(i+1)*nbNode2D) = sum(zdiv(1:i)) .* ones(1,nbNode2D);
             end
             %--------------------------------------------------------------
+            % lock to origin
+            node_ = node_ + obj.gorigin.';
+            %--------------------------------------------------------------
             % setup volume elements (elem) in 3D
             nbElem2D = mesh2d.nb_elem;
             nb_elem = nbElem2D * nb_layer;
