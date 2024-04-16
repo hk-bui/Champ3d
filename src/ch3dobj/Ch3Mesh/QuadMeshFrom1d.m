@@ -33,6 +33,8 @@ classdef QuadMeshFrom1d < QuadMesh
                 args.id_xline
                 args.id_yline
                 % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj@QuadMesh;
@@ -126,8 +128,8 @@ classdef QuadMeshFrom1d < QuadMesh
                 y2 = [y2 y1(ik,:)];
             end
             %----- centering
-            x2 = x2 - mean(x2);
-            y2 = y2 - mean(y2);
+            %x2 = x2 - mean(x2);
+            %y2 = y2 - mean(y2);
             %-----
             node_ = [x2; y2];
             %-----

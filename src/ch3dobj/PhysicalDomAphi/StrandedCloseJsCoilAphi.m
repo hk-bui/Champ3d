@@ -17,7 +17,7 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
         nb_turn = 1
         fill_factor = 1
         j_coil = 0
-        coil_mode = 'rx'
+        coil_mode = 'tx'
     end
 
     % --- computed

@@ -49,10 +49,13 @@ classdef SurfaceDom < Xhandle
             % ---
             if ~isempty(obj.submesh)
                 allmeshes = obj.submesh;
+                for i = 1:length(allmeshes)
+                    allmeshes{i}.node = obj.parent_mesh.gnode;
+                end
                 return
             end
             % ---
-            node = obj.parent_mesh.node;
+            node = obj.parent_mesh.gnode;
             face = obj.parent_mesh.face(:,obj.gid_face);
             % ---
             nb_face = size(face,2);

@@ -194,7 +194,7 @@ classdef EmModel < Xhandle
                 args.etrode_equation = []
                 args.coil_type {mustBeMember(args.coil_type,{'stranded','solid'})}
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})} = 'tx'
-                args.source_type {mustBeMember(args.source_type,'current_fed','voltage_fed','current_density_fed')}
+                args.source_type {mustBeMember(args.source_type,{'current_fed','voltage_fed','current_density_fed'})}
                 args.connexion {mustBeMember(args.connexion,{'serial','parallel'})}
                 args.fill_factor = 1
                 args.j_coil = 0
@@ -205,8 +205,6 @@ classdef EmModel < Xhandle
             end
             % ---
             args.parent_model = obj;
-            % ---
-            argu = f_to_namedarg(args);
             % ---
             coil_model = [];
             % ---
@@ -247,6 +245,23 @@ classdef EmModel < Xhandle
             % ---
             coil_model = [coil_model 'Coil'];
             % ---
+            if any(f_strcmpi(coil_model,{'StrandedOpenJsCoil','StrandedCloseJsCoil'}))
+                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
+                             'etrode_equation','connexion', ...
+                             'cs_area','nb_turn','fill_factor',...
+                             'j_coil','coil_mode'};
+            elseif f_strcmpi(coil_model,'SolidOpenVsCoil')
+                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
+                             'etrode_equation',...
+                             'v_coil','coil_mode'};
+            elseif f_strcmpi(coil_model,'SolidOpenIsCoil')
+                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
+                             'etrode_equation',...
+                             'i_coil','coil_mode'};
+            end
+            % ---
+            argu = f_to_namedarg(args,'with_only',validargs);
+            % ---
             if isa(obj,'FEM3dAphijw')
                 % ---
                 coil_model = [coil_model 'Aphi'];
@@ -255,42 +270,6 @@ classdef EmModel < Xhandle
             end
             % ---
             obj.coil.(args.id) = phydom;
-        end
-        % -----------------------------------------------------------------
-        function add_open_iscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_close_iscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_open_jscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_close_jscoil(obj,args)
-            arguments
-                obj
-                % ---
-                args.id = 'no_id'
-                args.id_dom2d = []
-                args.id_dom3d = []
-                args.etrode_equation = []
-                args.js = 1
-                args.nb_turn = 1
-                args.cs_area = 1
-            end
-            % ---
-            args.parent_model = obj;
-            % ---
-            argu = f_to_namedarg(args);
-            % ---
-            phydom = CloseJsCoil(argu{:});
-            obj.coil.(args.id) = phydom;
-        end
-        % -----------------------------------------------------------------
-        function add_open_vscoil(obj,args)
-        end
-        % -----------------------------------------------------------------
-        function add_close_vscoil(obj,args)
         end
         % -----------------------------------------------------------------
         function add_mconductor(obj,args)

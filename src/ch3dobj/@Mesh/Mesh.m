@@ -21,7 +21,6 @@ classdef Mesh < Xhandle
         celem
         cface
         cedge
-        origin
         % ---
         dom
         % ---
@@ -43,7 +42,13 @@ classdef Mesh < Xhandle
         gid_edge
         gid_face
         flat_node
-        % --- link
+        % --- global origin
+        gorigin
+        % --- global coordinates
+        gcoor_type {mustBeMember(gcoor_type,{'cartesian','cylindrical'})} = 'cartesian'
+        move_type {mustBeMember(move_type,{'linear','rotational'})} = 'linear'
+        gcoor
+        move
     end
 
     % --- Dependent Properties
@@ -52,6 +57,11 @@ classdef Mesh < Xhandle
         nb_elem
         nb_edge
         nb_face
+        % ---
+        dim
+        gnode
+        gnode_cartesian
+        gnode_cylindrical
     end
 
     % --- Constructors
@@ -94,6 +104,9 @@ classdef Mesh < Xhandle
             obj.prokit.Wf = {};
             obj.prokit.Wn = {};
             obj.prokit.node = {};
+            % ---
+            obj.gcoor.origin = [];
+            obj.gcoor.otheta = [];
         end
     end
 
@@ -103,17 +116,57 @@ classdef Mesh < Xhandle
         function val = get.nb_node(obj)
             val = size(obj.node,2);
         end
+        % ---
         function val = get.nb_elem(obj)
             val = size(obj.elem,2);
         end
+        % ---
         function val = get.nb_edge(obj)
             val = size(obj.edge,2);
         end
+        % ---
         function val = get.nb_face(obj)
             val = size(obj.face,2);
         end
+        % ---
+        function val = get.dim(obj)
+            val = size(obj.node,1);
+        end
+        % ---
+        function val = get.gnode(obj)
+            if f_strcmpi(obj.gcoor_type,'cartesian')
+                val = obj.get_gnode_cartesian;
+            elseif f_strcmpi(obj.gcoor_type,'cylindrical')
+                val = obj.get_gnode_cylindrical;
+            end
+        end
+        
     end
-
+    % --- Methods
+    methods (Access = protected)
+        function newmesh = copyElement(obj)
+            newmesh = copyElement@matlab.mixin.Copyable(obj);
+            % ---
+            alldom = fieldnames(obj.dom);
+            % ---
+            for i = 1:length(alldom)
+                newmesh.dom.(alldom{i}) = copy(obj.dom.(alldom{i}));
+                newmesh.dom.(alldom{i}).parent_mesh = newmesh;
+            end
+        end
+    end
+    % --- Methods
+    methods (Access = public)
+        % ---
+        function objx = uplus(obj)
+            objx = copy(obj);
+        end
+        % ---
+        function objx = ctranspose(obj)
+            objx = copy(obj);
+        end
+        % ---
+    end
     % --- Methods
     methods
         % -----------------------------------------------------------------

@@ -33,6 +33,9 @@ classdef PrismMeshFromTriMesh < PrismMesh
                 args.parent_mesh1d
                 args.parent_mesh2d
                 args.id_zline
+                % ---
+                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
+                args.gcoor
             end
             % ---
             obj@PrismMesh;
@@ -106,6 +109,9 @@ classdef PrismMeshFromTriMesh < PrismMesh
             for i = 1:nb_layer
                node_(3,i*nbNode2D+1:(i+1)*nbNode2D) = sum(zdiv(1:i)) .* ones(1,nbNode2D);
             end
+            %--------------------------------------------------------------
+            % lock to origin
+            node_ = node_ - obj.gorigin.';
             %--------------------------------------------------------------
             % setup volume elements (elem) in 3D
             nbElem2D = mesh2d.nb_elem;
