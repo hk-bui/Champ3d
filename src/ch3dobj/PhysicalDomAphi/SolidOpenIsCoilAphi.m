@@ -13,7 +13,7 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
     % --- entry
     properties
         i_coil = 0
-        coil_mode = 'rx'
+        coil_mode = 'tx'
     end
 
     % --- computed
