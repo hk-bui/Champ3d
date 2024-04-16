@@ -13,6 +13,7 @@ classdef MultiPhysicalModel < Xhandle
     % --- Properties
     properties
         model
+        coupling
         time_system
     end
 
@@ -43,6 +44,11 @@ classdef MultiPhysicalModel < Xhandle
                 end
             end
         end
+        % ---
+    end
+
+    % --- Methods
+    methods
         function build_timesystem(obj)
             % ---
             time_system_ = TimeSystem;
