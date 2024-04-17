@@ -65,11 +65,10 @@ classdef TriMeshFromFemm < TriMesh
             fileID = fopen(obj.mesh_file);
             fileDA = textscan(fileID,'%s %s %s %s %s %s %s %s %s');
             fclose(fileID);
-            % ----- 2/ mesh et solution data -----
+            % ----- 2/ mesh and solution data -----
             iData   = find(strcmp(fileDA{1,1}(:,1),'[Solution]'));
             iNoeud  = iData+1;          nb_node = str2double(fileDA{1,1}(iNoeud,1));
             iElem   = iNoeud+nb_node+1; nb_elem  = str2double(fileDA{1,1}(iElem ,1));
-            
             % 2/a/ points
             node_ = zeros(2,nb_node);
             node_(1,:) = str2double(fileDA{1,1}(iNoeud+1 : iNoeud+nb_node,1));

@@ -46,9 +46,10 @@ classdef Mesh < Xhandle
         gorigin
         % --- global coordinates
         gcoor_type {mustBeMember(gcoor_type,{'cartesian','cylindrical'})} = 'cartesian'
-        move_type {mustBeMember(move_type,{'linear','rotational'})} = 'linear'
-        gcoor
-        move
+        gcoor_origin
+        gcoor_otheta
+        % --- moving frame
+        moving_frame {mustBeMember(moving_frame,'MovingFrame')}
     end
 
     % --- Dependent Properties
@@ -105,8 +106,8 @@ classdef Mesh < Xhandle
             obj.prokit.Wn = {};
             obj.prokit.node = {};
             % ---
-            obj.gcoor.origin = [];
-            obj.gcoor.otheta = [];
+            obj.gcoor_origin = [];
+            obj.gcoor_otheta = [];
         end
     end
 
@@ -166,6 +167,30 @@ classdef Mesh < Xhandle
             objx = copy(obj);
         end
         % ---
+    end
+    % --- Methods
+    methods
+        % -----------------------------------------------------------------
+        function lock_to_gcoor(obj)
+            if isa(obj,'Mesh2d')
+                % ---------------------------------------------------------
+            elseif isa(obj,'Mesh3d')
+                % ---------------------------------------------------------
+            end
+        end
+        % -----------------------------------------------------------------
+        function cal_celem(obj,args)
+            arguments
+                obj
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
+            end
+        end
+        % ---
+        function cal_cface(obj,args)
+        end
+        % ---
+        function cal_cedge(obj,args)
+        end
     end
     % --- Methods
     methods

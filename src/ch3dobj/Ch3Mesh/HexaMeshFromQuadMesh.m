@@ -119,7 +119,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
                node_(3,i*nbNode2D+1:(i+1)*nbNode2D) = sum(zdiv(1:i)) .* ones(1,nbNode2D);
             end
             %--------------------------------------------------------------
-            % lock to origin
+            % lock to gcoor
             node_ = node_ - obj.gorigin.';
             %--------------------------------------------------------------
             % setup volume elements (elem) in 3D
