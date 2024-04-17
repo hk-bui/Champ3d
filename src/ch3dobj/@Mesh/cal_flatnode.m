@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function obj = calflatnode(obj)
+function obj = cal_flatnode(obj)
 
 % ---
 node      = obj.node;

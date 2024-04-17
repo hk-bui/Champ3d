@@ -55,7 +55,7 @@ classdef TriMesh < Mesh2d
             % ---
             obj.elem_type = 'tri';
             obj.reference;
-            obj.calflatnode;
+            obj.cal_flatnode;
             % ---
             obj.setup_done = 1;
         end
