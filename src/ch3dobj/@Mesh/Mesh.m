@@ -41,12 +41,6 @@ classdef Mesh < Xhandle
         gid_edge
         gid_face
         flat_node
-        % --- global origin
-        gorigin
-        % --- global coordinates
-        gcoor_type {mustBeMember(gcoor_type,{'cartesian','cylindrical'})} = 'cartesian'
-        gcoor_origin
-        gcoor_otheta
         % --- moving frame
         moving_frame {mustBeMember(moving_frame,'MovingFrame')}
     end
@@ -61,9 +55,6 @@ classdef Mesh < Xhandle
         refelem
         % ---
         dim
-        gnode
-        gnode_cartesian
-        gnode_cylindrical
     end
 
     % --- Constructors
@@ -107,8 +98,6 @@ classdef Mesh < Xhandle
             obj.prokit.Wn = {};
             obj.prokit.node = {};
             % ---
-            obj.gcoor_origin = [];
-            obj.gcoor_otheta = [];
         end
     end
 
@@ -139,14 +128,6 @@ classdef Mesh < Xhandle
             val = obj.reference;
         end
         % ---
-        function val = get.gnode(obj)
-            if f_strcmpi(obj.gcoor_type,'cartesian')
-                val = obj.get_gnode_cartesian;
-            elseif f_strcmpi(obj.gcoor_type,'cylindrical')
-                val = obj.get_gnode_cylindrical;
-            end
-        end
-        
     end
     % --- Methods
     methods (Access = protected)
@@ -176,27 +157,198 @@ classdef Mesh < Xhandle
     % --- Methods
     methods
         % -----------------------------------------------------------------
-        function lock_to_gcoor(obj)
-            if isa(obj,'Mesh2d')
-                % ---------------------------------------------------------
-            elseif isa(obj,'Mesh3d')
-                % ---------------------------------------------------------
+        function lock_to_gcoor(obj,args)
+            arguments
+                obj
+                args.gcoor_system {mustBeMember(args.gcoor_system,{'cartesian','cylindrical'})} = 'cartesian'
+                args.gcoor_origin = []
+                args.gcoor_otheta = []
             end
+            % ---
+            gcoor_system = args.gcoor_system;
+            % --- for cartesian/cylindrical
+            gcoor_origin = args.gcoor_origin;
+            % --- for cylindrical only w/ counterclockwise convention
+            gcoor_otheta = args.gcoor_otheta;
+            % ---
+            if f_strcmpi(gcoor_system,'cartesian')
+                obj.lock_to_cartesian('gcoor_origin',gcoor_origin);
+            elseif f_strcmpi(gcoor_system,'cylindrical')
+                obj.lock_to_cylindrical('gcoor_origin',gcoor_origin,'gcoor_otheta',gcoor_otheta);
+            end
+            % ---
+            obj.celem = obj.cal_celem('coordinate_system','local');
+            obj.cface = obj.cal_cface('coordinate_system','local');
+            obj.cedge = obj.cal_cedge('coordinate_system','local');
         end
         % -----------------------------------------------------------------
-        function cal_celem(obj,args)
+        function celem = cal_celem(obj,args)
             arguments
                 obj
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
+            % ---
+            coordinate_system = args.coordinate_system;
+            % ---
+            if f_strcmpi(coordinate_system,'local')
+                node_ = obj.node;
+            else
+                %node_ = obj.gnode;
+            end
+            % ---
+            dim_  = size(node_,1);
+            elem_ = obj.elem;
+            nb_elem_ = obj.nb_elem;
+            % ---
+            refelem_  = obj.refelem;
+            nbNo_inEl = refelem_.nbNo_inEl;
+            % ---
+            celem = mean(reshape(node_(:,elem_(1:nbNo_inEl,:)),dim_,nbNo_inEl,nb_elem_),2);
+            celem = squeeze(celem);
+            % ---
         end
         % ---
-        function cal_cface(obj,args)
+        function cface = cal_cface(obj,args)
+            arguments
+                obj
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
+            end
+            % ---
+            coordinate_system = args.coordinate_system;
+            % ---
+            if f_strcmpi(coordinate_system,'local')
+                node_ = obj.node;
+            else
+                %node_ = obj.gnode;
+            end
+            % ---
+            dim_  = size(node_,1);
+            % ---
+            [filface,id_face_] = f_filterface(obj.face);
+            cface = zeros(dim_,size(obj.face,2));
+            for i = 1:length(filface)
+                face_ = filface{i};
+                nb_face_ = size(face_,2);
+                nbNo_inFa = size(face_,1);
+                cface(:,id_face_{i}) = squeeze(mean(reshape(node_(:,face_(1:nbNo_inFa,:)),dim_,nbNo_inFa,nb_face_),2));
+            end
         end
         % ---
-        function cal_cedge(obj,args)
+        function cedge = cal_cedge(obj,args)
+            arguments
+                obj
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
+            end
+            % ---
+            coordinate_system = args.coordinate_system;
+            % ---
+            if f_strcmpi(coordinate_system,'local')
+                node_ = obj.node;
+            else
+                %node_ = obj.gnode;
+            end
+            % ---
+            dim_  = size(node_,1);
+            % ---
+            refelem_  = obj.refelem;
+            nbNo_inEd = refelem_.nbNo_inEd;
+            % ---
+            edge_ = obj.edge;
+            nb_edge_ = size(edge_,2);
+            % ---
+            cedge = mean(reshape(node_(:,edge_(1:nbNo_inEd,:)),dim_,nbNo_inEd,nb_edge_),2);
+            cedge = squeeze(cedge);
         end
     end
+
+    % --- Methods
+    methods (Access = private)
+        % -----------------------------------------------------------------
+        function lock_to_cartesian(obj,args)
+            arguments
+                obj
+                args.gcoor_origin = []
+            end
+            % ---
+            gcoor_origin = args.gcoor_origin;
+            % ---
+            if isa(obj,'Mesh2d')
+                if isempty(gcoor_origin)
+                    return
+                elseif any(gcoor_origin ~= [0 0])
+                    obj.node = obj.node - gcoor_origin.';
+                end
+            elseif isa(obj,'Mesh3d')
+                if isempty(gcoor_origin)
+                    return
+                elseif any(gcoor_origin ~= [0 0 0])
+                    obj.node = obj.node - gcoor_origin.';
+                end
+            end
+        end
+        % -----------------------------------------------------------------
+        function lock_to_cylindrical(obj,args)
+            arguments
+                obj
+                args.gcoor_origin = []
+                args.gcoor_otheta = []
+            end
+            % ---
+            gcoor_origin = args.gcoor_origin;
+            gcoor_otheta = args.gcoor_otheta;
+            % ---
+            if isa(obj,'Mesh2d')
+                if isempty(gcoor_origin)
+                    return
+                elseif any(gcoor_origin ~= [0 0])
+                    node_ = obj.node - gcoor_origin.';
+                end
+                % ---
+                if isempty(gcoor_otheta)
+                    return
+                elseif any(gcoor_otheta ~= [1 0])
+                    otheta0 = [1 0 0];
+                    otheta1 = [gcoor_otheta 0];
+                    rot_axis  = cross(otheta0,otheta1);
+                    rot_angle = - acosd(dot(otheta0,otheta1)/(norm(otheta0)*norm(otheta1)));
+                    % ---
+                    node_ = [node_; zeros(1,size(node_,2))];
+                    % ---
+                    node_ = f_rotaroundaxis(node_.','rot_axis',rot_axis,'angle',rot_angle);
+                    % ---
+                    node_ = node_.';
+                    node_ = node_(1:2,:);
+                end
+                % ---
+                obj.node = node_;
+                % ---
+            elseif isa(obj,'Mesh3d')
+                if isempty(gcoor_origin)
+                    return
+                elseif any(gcoor_origin ~= [0 0 0])
+                    node_ = obj.node - gcoor_origin.';
+                end
+                % ---
+                if isempty(gcoor_otheta)
+                    return
+                elseif any(gcoor_otheta ~= [1 0 0])
+                    otheta0 = [1 0 0];
+                    otheta1 = gcoor_otheta;
+                    rot_axis  = cross(otheta0,otheta1);
+                    rot_angle = acosd(dot(otheta0,otheta1)/(norm(otheta0)*norm(otheta1)));
+                    % ---
+                    node_ = f_rotaroundaxis(node_.','rot_axis',rot_axis,'angle',rot_angle);
+                    % ---
+                    node_ = node_.';
+                end
+                % ---
+                obj.node = node_;
+                % ---
+            end
+        end
+        % -----------------------------------------------------------------
+    end
+
     % --- Methods
     methods
         % -----------------------------------------------------------------

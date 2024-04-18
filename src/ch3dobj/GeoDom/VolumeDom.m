@@ -52,11 +52,11 @@ classdef VolumeDom < Xhandle
             % ---
             if ~isempty(obj.submesh)
                 allmeshes = obj.submesh;
-                allmeshes{1}.node = obj.parent_mesh.gnode;
+                allmeshes{1}.node = obj.parent_mesh.node;
                 return
             end
             % ---
-            node = obj.parent_mesh.gnode;
+            node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             % -------------------------------------------------------------
             allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
@@ -263,7 +263,6 @@ classdef VolumeDom < Xhandle
                 % ---------------------------------------------------------
                 node = obj.parent_mesh.node;
                 elem = obj.parent_mesh.elem(:,gid_elem_);
-                elem_type = obj.parent_mesh.elem_type;
                 % ---
                 idElem = ...
                     f_findelem(node,elem,'condition', obj.condition);
@@ -287,7 +286,6 @@ classdef VolumeDom < Xhandle
                 % ---------------------------------------------------------
                 node = obj.parent_mesh.node;
                 elem = obj.parent_mesh.elem(:,gid_elem_);
-                elem_type = obj.parent_mesh.elem_type;
                 % ---
                 idElem = ...
                     f_findelem(node,elem,'condition', obj.condition);
@@ -309,6 +307,7 @@ classdef VolumeDom < Xhandle
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             % ---
             obj.build_submesh;

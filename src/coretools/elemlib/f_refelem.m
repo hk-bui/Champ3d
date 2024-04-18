@@ -8,7 +8,10 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function refelem = f_refelem(elem_type,varargin)
+function refelem = f_refelem(elem_type)
+arguments
+    elem_type {mustBeMember(elem_type,{'tri','triangle','quad','tet','tetra','prism','hex','hexa'})}
+end
 
 switch elem_type
     case {33,'tri','triangle'}

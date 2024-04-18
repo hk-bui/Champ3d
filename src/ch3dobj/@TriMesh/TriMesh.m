@@ -26,9 +26,6 @@ classdef TriMesh < Mesh2d
             arguments
                 args.node
                 args.elem
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % ---
             obj = obj@Mesh2d;
@@ -78,7 +75,8 @@ classdef TriMesh < Mesh2d
             clear msh;
             %--------------------------------------------------------------
             if f_strcmpi(args.coordinate_system,'global')
-                msh.Vertices = obj.gnode.';
+                %msh.Vertices = obj.moving_frame;
+                msh.Vertices = obj.node.';
             else
                 msh.Vertices = obj.node.';
             end

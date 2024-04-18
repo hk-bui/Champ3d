@@ -26,9 +26,6 @@ classdef HexMesh < Mesh3d
             arguments
                 args.node
                 args.elem
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % ---
             obj@Mesh3d;
@@ -88,7 +85,8 @@ classdef HexMesh < Mesh3d
             end
             %--------------------------------------------------------------
             if f_strcmpi(args.coordinate_system,'global')
-                msh.Vertices = obj.gnode.';
+                %msh.Vertices = obj.moving_frame;
+                msh.Vertices = obj.node.';
             else
                 msh.Vertices = obj.node.';
             end
@@ -111,7 +109,7 @@ classdef HexMesh < Mesh3d
 
     % --- Methods
     methods (Static)
-                function refelem = reference(obj)
+        function refelem = reference(obj)
             refelem.nbNo_inEl = 8;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 4; 1 5; 2 3; 2 6; 3 4; 3 7; 4 8; 5 6; 5 8; 6 7; 7 8];

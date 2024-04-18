@@ -14,10 +14,6 @@ classdef Mesh2d < Mesh
     methods
         function obj = Mesh2d()
             obj = obj@Mesh;
-            % --- for cartesian/cylindrical
-            %obj.gcoor.origin = [0 0];
-            % --- for cylindrical only
-            %obj.gcoor.otheta = [1 0]; % w/ counterclockwise convention
         end
     end
 
@@ -74,42 +70,7 @@ classdef Mesh2d < Mesh
             % ---
         end
     end
-    % --- Methods for coordinates
-    methods
-        % ---
-        function gnode_xy = get_gnode_cartesian(obj)
-            % --- lock to gcoor
-            if any(obj.gcoor.origin ~= [0 0])
-                gnode_xy = obj.node - obj.gcoor.origin.';
-            else
-                gnode_xy = obj.node;
-            end
-        end
-        % ---
-        function gnode_xy = get_gnode_cylindrical(obj)
-            % --- lock to gcoor
-            if any(obj.gcoor.origin ~= [0 0])
-                gnode_xy = obj.node - obj.gcoor.origin.';
-            else
-                gnode_xy = obj.node;
-            end
-            % ---
-            if any(obj.gcoor.otheta ~= [1 0])
-                otheta0 = [1 0 0];
-                otheta1 = [obj.gcoor.otheta 0];
-                rot_axis  = cross(otheta0,otheta1);
-                rot_angle = acosd(dot(otheta0,otheta1)/(norm(otheta0)*norm(otheta1)));
-                % ---
-                gnode_xy = [gnode_xy; zeros(1,size(gnode_xy,2))];
-                % ---
-                gnode_xy = f_rotaroundaxis(gnode_xy.','rot_axis',rot_axis,'angle',rot_angle);
-                % ---
-                gnode_xy = gnode_xy.';
-                gnode_xy = gnode_xy(1:2,:);
-            end
-            % ---
-        end
-    end
+
     % --- Methods
     methods
         % -----------------------------------------------------------------

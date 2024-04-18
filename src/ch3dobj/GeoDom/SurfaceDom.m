@@ -50,12 +50,12 @@ classdef SurfaceDom < Xhandle
             if ~isempty(obj.submesh)
                 allmeshes = obj.submesh;
                 for i = 1:length(allmeshes)
-                    allmeshes{i}.node = obj.parent_mesh.gnode;
+                    allmeshes{i}.node = obj.parent_mesh.node;
                 end
                 return
             end
             % ---
-            node = obj.parent_mesh.gnode;
+            node = obj.parent_mesh.node;
             face = obj.parent_mesh.face(:,obj.gid_face);
             % ---
             nb_face = size(face,2);
@@ -122,6 +122,7 @@ classdef SurfaceDom < Xhandle
                 args.edge_color = [0.4940 0.1840 0.5560]
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             % ---
             obj.build_submesh;

@@ -26,9 +26,6 @@ classdef PrismMesh < Mesh3d
             arguments
                 args.node
                 args.elem
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % ---
             obj = obj@Mesh3d;
@@ -84,7 +81,8 @@ classdef PrismMesh < Mesh3d
             allfac = 1:size(boface,2);
             %--------------------------------------------------------------
             if f_strcmpi(args.coordinate_system,'global')
-                msh.Vertices = obj.gnode.';
+                %msh.Vertices = obj.moving_frame;
+                msh.Vertices = obj.node.';
             else
                 msh.Vertices = obj.node.';
             end

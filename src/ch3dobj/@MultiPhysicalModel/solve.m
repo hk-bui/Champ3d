@@ -12,7 +12,7 @@ function solve(obj,args)
 arguments
     obj
     args.coupling_scheme {mustBeMember(args.coupling_scheme,{'weak','strong'})} = 'weak';
-    args.emcoupling {mustBeMember(args.emcoupling,{'bsfield'})} = 'bsfield'
+    args.emcoupling {mustBeMember(args.emcoupling,{'DomainDecomposition'})} = 'DomainDecomposition'
 end
 % ---
 if any(f_strcmpi(args.coupling_scheme,{'weak'}))
