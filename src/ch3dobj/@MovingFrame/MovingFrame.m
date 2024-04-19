@@ -8,8 +8,6 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-
-
 classdef MovingFrame < Xhandle
     properties
         main_value
