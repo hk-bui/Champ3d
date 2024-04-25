@@ -44,6 +44,8 @@ if rot_angle == 0
     return
 end
 %--------------------------------------------------------------------------
+rot_axis_origin = f_tocolv(rot_axis_origin);
+%--------------------------------------------------------------------------
 a  = rot_angle / 180 * pi;
 ux = rot_axis(1);
 uy = rot_axis(2);
@@ -53,11 +55,11 @@ R = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) - uz*sin(a)   ux*uz*(1-cos(a
      uy*ux*(1-cos(a)) + uz*sin(a)  cos(a) + uy^2 * (1-cos(a))     uy*uz*(1-cos(a)) - ux*sin(a) ;...
      uz*ux*(1-cos(a)) - uy*sin(a)  uz*uy*(1-cos(a)) + ux*sin(a)   cos(a) + uz^2 * (1-cos(a))];
 %--------------------------------------------------------------------------
-node = node - rot_axis_origin.';
+node = node - rot_axis_origin;
 %--------------------------------------------------------------------------
 rotated_node = R * node;
 %--------------------------------------------------------------------------
-rotated_node = rotated_node + rot_axis_origin.';
+rotated_node = rotated_node + rot_axis_origin;
 %--------------------------------------------------------------------------
 if dim == 2
     rotated_node = rotated_node(1:2,:);

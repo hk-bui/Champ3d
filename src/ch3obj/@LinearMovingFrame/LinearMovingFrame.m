@@ -19,8 +19,18 @@ classdef LinearMovingFrame < MovingFrame
     methods
         function obj = LinearMovingFrame(args)
             arguments
-                args.lin_dir  = []
-                args.lin_step = []
+                args.lin_dir  = 0
+                args.lin_step = 0
+            end
+            % ---
+            obj = obj@MovingFrame;
+            % ---
+            if isnumeric(args.lin_dir)
+                args.lin_dir = Parameter('f',args.lin_dir);
+            end
+            % ---
+            if isnumeric(args.lin_step)
+                args.lin_step = Parameter('f',args.lin_step);
             end
             % ---
             obj <= args;
@@ -30,9 +40,15 @@ classdef LinearMovingFrame < MovingFrame
 
     % --- Methods
     methods
-        function node = move(obj,mesh)
+        function movnode = move(obj,fixnode)
+            ldir = obj.lin_dir.get;
+            lstp = obj.lin_step.get;
+            movnode = fixnode + lstp .* ldir;
         end
-        function node = inverse_move(obj,mesh)
+        function movnode = inverse_move(obj,fixnode)
+            ldir = obj.lin_dir.get;
+            lstp = obj.lin_step.get;
+            movnode = fixnode - lstp .* ldir;
         end
     end
 

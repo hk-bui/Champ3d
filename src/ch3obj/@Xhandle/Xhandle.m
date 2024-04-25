@@ -34,11 +34,4 @@ classdef Xhandle < matlab.mixin.Copyable
         end
         %------------------------------------------------------------------
     end
-    % ---
-    methods (Hidden)
-        % ---
-        % ---
-        % ---
-    end
-
 end
