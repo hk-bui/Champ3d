@@ -74,6 +74,9 @@ classdef Parameter < Xhandle
     methods
         %------------------------------------------------------------------
         function vout = get_on(obj,dom)
+            if nargin < 2
+                dom = [];
+            end
             if obj.fvectorized
                 vout = obj.eval_fvectorized(dom);
                 vout = f_column_format(vout);
