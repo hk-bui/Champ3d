@@ -58,11 +58,11 @@ classdef ProcessingSurface3d < VolumeDom3d
                 obj.id_dom3d = 'default_domain';
             end
             % ---
-            if obj.is_available(args,{'parent_model'})
+            if f_is_available(args,{'parent_model'})
                 obj.parent_mesh = obj.parent_model.parent_mesh;
             end
             % ---
-            if obj.is_available(args,{'parallel_line_1','parallel_line_2'})
+            if f_is_available(args,{'parallel_line_1','parallel_line_2'})
                 % ---
                 if size(obj.parallel_line_1,1) == 3
                     obj.parallel_line_1 = obj.parallel_line_1.';

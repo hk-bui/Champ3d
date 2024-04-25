@@ -49,7 +49,7 @@ classdef GeoModel < Xhandle
                 args.flog {mustBeNumeric} = 1.05
             end
             % ---
-            if obj.is_available(args,{'id','len','dtype','dnum','flog'})
+            if f_is_available(args,{'id','len','dtype','dnum','flog'})
                 line = Mesh1d(obj.tmp.args{:});
                 obj.mesh1d_collection.data.(args.id) = line;
             end
@@ -72,10 +72,10 @@ classdef GeoModel < Xhandle
                 args.mesh1d_collection = obj.mesh1d_collection;
             end
             % ---
-            if obj.is_available(args,'mesh_file')
+            if f_is_available(args,'mesh_file')
                 msh = TriMeshFromFemm(obj.tmp.args{:});
                 obj.mesh2d_collection.data.(args.id) = msh;
-            elseif obj.is_available(args,{'mesh1d_collection','id_xline','id_yline'})
+            elseif f_is_available(args,{'mesh1d_collection','id_xline','id_yline'})
                 msh = QuadMeshFrom1d(obj.tmp.args{:});
                 obj.mesh2d_collection.data.(args.id) = msh;
             end

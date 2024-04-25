@@ -44,7 +44,7 @@ classdef ProcessingLine3d < ProcessingSurface3d
             % ---
             obj.parent_mesh = obj.parent_model.parent_mesh;
             % ---
-            if obj.is_available(args,{'line'})
+            if f_is_available(args,{'line'})
                 % ---
                 if size(obj.line,1) == 3
                     obj.line = obj.line.';
