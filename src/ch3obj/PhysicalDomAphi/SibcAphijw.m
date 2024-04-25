@@ -86,9 +86,9 @@ classdef SibcAphijw < Sibc
             % ---
             gid_node_phi = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
-            sigma_array  = obj.sigma.get_on('dom',dom);
-            mur_array    = obj.mur.get_on('dom',dom);
-            cparam_array = obj.cparam.get_on('dom',dom);
+            sigma_array  = obj.sigma.get('in_dom',dom);
+            mur_array    = obj.mur.get('in_dom',dom);
+            cparam_array = obj.cparam.get('in_dom',dom);
             % ---
             mu0 = 4 * pi * 1e-7;
             fr = obj.parent_model.frequency;

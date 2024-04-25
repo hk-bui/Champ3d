@@ -32,7 +32,7 @@ classdef IsCoilAphi < Xhandle
             end
             % ---
             dom = obj.dom;
-            obj.matrix.i_coil = obj.i_coil.get_on('dom',dom);
+            obj.matrix.i_coil = obj.i_coil.get('in_dom',dom);
             % ---
             obj.build_done = 1;
             obj.assembly_done = 0;

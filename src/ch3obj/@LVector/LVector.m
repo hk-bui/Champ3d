@@ -56,7 +56,7 @@ classdef LVector < Xhandle
                     if isnumeric(lvfield)
                         lvector.(fn) = repmat(lvfield,nb_elem,1);
                     elseif isa(lvfield,'Parameter')
-                        lvector.(fn) = lvfield.get_on('dom',dom);
+                        lvector.(fn) = lvfield.get('in_dom',dom);
                     end
                 end
             end
@@ -77,7 +77,7 @@ classdef LVector < Xhandle
         end
         % -----------------------------------------------------------------
         function ginv = get_inverse_on(obj,dom)
-            gvector = obj.get_on('dom',dom);
+            gvector = obj.get('in_dom',dom);
             ginv = - gvector;
         end
         % -----------------------------------------------------------------

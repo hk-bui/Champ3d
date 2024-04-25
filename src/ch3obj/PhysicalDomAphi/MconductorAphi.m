@@ -82,8 +82,8 @@ classdef MconductorAphi < Mconductor
             mu0 = 4 * pi * 1e-7;
             nu0 = 1/mu0;
             % ---
-            mur_array = obj.mur.get_on('dom',dom);
-            nur_array = obj.mur.get_inverse_on(dom);
+            mur_array = obj.mur.get('in_dom',dom);
+            nur_array = obj.mur.get_inverse('in_dom',dom);
             nu0nur = nu0 .* nur_array;
             % ---
             nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);

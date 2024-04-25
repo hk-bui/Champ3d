@@ -83,7 +83,7 @@ classdef ThconductorTemp < Thconductor
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            lambda_array = obj.lambda.get_on('dom',dom);
+            lambda_array = obj.lambda.get('in_dom',dom);
             % ---
             lambdawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',lambda_array);
             % ---

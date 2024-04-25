@@ -92,7 +92,7 @@ classdef PMagnetAphi < PMagnet
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
             % ---
-            br = obj.br.get_on('dom',dom);
+            br = obj.br.get('in_dom',dom);
             wfbr = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br);
             % ---
             obj.matrix.gid_elem = gid_elem;

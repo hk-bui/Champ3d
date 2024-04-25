@@ -82,7 +82,7 @@ classdef ThPsTemp < ThPs
             % ---
             gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
-            ps_array = obj.ps.get_on('dom',dom);
+            ps_array = obj.ps.get('in_dom',dom);
             ps_array = f_column_array(ps_array,'nb_elem',nb_face);
             % ---
             dom.build_submesh;
