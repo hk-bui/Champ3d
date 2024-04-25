@@ -73,11 +73,13 @@ classdef Parameter < Xhandle
     % --- Methods
     methods
         %------------------------------------------------------------------
-        function vout = get_on(obj,dom)
-            % ---
-            if nargin < 2
-                dom = [];
+        function vout = get_on(obj,args)
+            arguments
+                obj
+                args.dom = []
             end
+            % ---
+            dom = args.dom;
             % ---
             if obj.fvectorized
                 vout = obj.eval_fvectorized(dom);
@@ -88,17 +90,14 @@ classdef Parameter < Xhandle
             end
         end
         %------------------------------------------------------------------
-        function vout = get_inverse_on(obj,dom,args)
+        function vout = get_inverse_on(obj,args)
             arguments
                 obj
-                dom
+                args.dom = []
                 args.parameter_type {mustBeMember(args.parameter_type,{'auto','vector'})} = 'vector'
             end
             % ---
-            if nargin < 2
-                dom = [];
-            end
-            % ---
+            dom = args.dom;
             parameter_type = args.parameter_type;
             % ---
             vout = [];
