@@ -84,8 +84,8 @@ classdef ThcapacitorTemp < Thcapacitor
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            rho_array = obj.rho.get_on(dom);
-            cp_array  = obj.cp.get_on(dom);
+            rho_array = obj.rho.get_on('dom',dom);
+            cp_array  = obj.cp.get_on('dom',dom);
             rho_cp_array = rho_array .* cp_array;
             % ---
             rhocpwnwn = parent_mesh.cwnwn('id_elem',gid_elem,'coefficient',rho_cp_array);

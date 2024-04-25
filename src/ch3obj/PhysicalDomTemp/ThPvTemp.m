@@ -83,7 +83,7 @@ classdef ThPvTemp < ThPv
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            pv_array = obj.pv.get_on(dom);
+            pv_array = obj.pv.get_on('dom',dom);
             % ---
             pvwn = parent_mesh.cwn('id_elem',gid_elem,'coefficient',pv_array);
             % ---

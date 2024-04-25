@@ -102,7 +102,7 @@ classdef Parameter < Xhandle
             parameter_type = args.parameter_type;
             % ---
             vout = [];
-            vin  = obj.get_on(dom);
+            vin  = obj.get_on('dom',dom);
             sizev = size(vin);
             lensv = length(sizev);
             % ---

@@ -66,7 +66,7 @@ classdef LTensor < Xhandle
                     if isnumeric(ltfield)
                         ltensor.(fn) = repmat(ltfield,nb_elem,1);
                     elseif isa(ltfield,'Parameter')
-                        ltensor.(fn) = ltfield.get_on(dom);
+                        ltensor.(fn) = ltfield.get_on('dom',dom);
                     end
                 end
             end
@@ -90,7 +90,7 @@ classdef LTensor < Xhandle
         % -----------------------------------------------------------------
         function ginv = get_inverse_on(obj,dom)
             ginv = [];
-            gtensor  = obj.get_on(dom);
+            gtensor  = obj.get_on('dom',dom);
             sizeg = size(gtensor);
             lensg = length(sizeg); 
             if lensg == 3

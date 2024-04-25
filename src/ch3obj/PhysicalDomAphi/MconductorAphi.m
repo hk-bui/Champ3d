@@ -82,7 +82,7 @@ classdef MconductorAphi < Mconductor
             mu0 = 4 * pi * 1e-7;
             nu0 = 1/mu0;
             % ---
-            mur_array = obj.mur.get_on(dom);
+            mur_array = obj.mur.get_on('dom',dom);
             nur_array = obj.mur.get_inverse_on(dom);
             nu0nur = nu0 .* nur_array;
             % ---
