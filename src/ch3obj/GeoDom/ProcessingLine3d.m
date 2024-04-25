@@ -131,7 +131,7 @@ classdef ProcessingLine3d < ProcessingSurface3d
             % ---
             if ~isempty(fval)
                 mshalone = 0;
-                fval = obj.column_format(fval);
+                fval = f_column_format(fval);
             end
             %--------------------------------------------------------------
             node = obj.mesh.node;

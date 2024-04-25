@@ -154,7 +154,7 @@ classdef EconductorAphi < Econductor
             gid_elem = obj.matrix.gid_elem;
             sigma_array = obj.matrix.sigma_array;
             %--------------------------------------------------------------
-            [coef, coef_array_type] = obj.column_format(sigma_array);
+            [coef, coef_array_type] = f_column_format(sigma_array);
             %--------------------------------------------------------------
             ev = obj.parent_model.fields.ev(:,gid_elem);
             jv = zeros(3,length(gid_elem));

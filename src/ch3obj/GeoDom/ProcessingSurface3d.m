@@ -177,7 +177,7 @@ classdef ProcessingSurface3d < VolumeDom3d
             % ---
             if ~isempty(fval)
                 mshalone = 0;
-                fval = obj.column_format(fval);
+                fval = f_column_format(fval);
             end
             %--------------------------------------------------------------
             edge_color_  = args.edge_color;

@@ -37,8 +37,8 @@ if isnumeric(order)
     end
 end
 %--------------------------------------------------------------------------
-[coefficient, coef_array_type] = obj.column_format(coefficient);
-vector_field = obj.column_format(vector_field);
+[coefficient, coef_array_type] = f_column_format(coefficient);
+vector_field = f_column_format(vector_field);
 %--------------------------------------------------------------------------
 refelem = obj.refelem;
 nbEd_inEl = refelem.nbEd_inEl;

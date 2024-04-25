@@ -90,7 +90,7 @@ classdef Mesh2d < Mesh
             for3d    = 0;
             if ~isempty(args.field_value)
                 mshalone = 0;
-                fval = obj.column_format(args.field_value);
+                fval = f_column_format(args.field_value);
                 % ---
                 if isreal(fval)
                     forcomplx = 0;

@@ -32,8 +32,8 @@ if numel(dof) ~= obj.nb_node
     error('dof must be defined in whole mesh !');
 end
 %--------------------------------------------------------------------------
-[coefficient, coef_array_type] = obj.column_format(coefficient);
-dof = obj.column_format(dof);
+[coefficient, coef_array_type] = f_column_format(coefficient);
+dof = f_column_format(dof);
 %--------------------------------------------------------------------------
 refelem = obj.refelem;
 nbNo_inEl = refelem.nbNo_inEl;

@@ -35,7 +35,7 @@ if isnumeric(order)
     end
 end
 %--------------------------------------------------------------------------
-[coefficient, coef_array_type] = obj.column_format(coefficient);
+[coefficient, coef_array_type] = f_column_format(coefficient);
 %--------------------------------------------------------------------------
 refelem = obj.refelem;
 nbEd_inEl = refelem.nbEd_inEl;
