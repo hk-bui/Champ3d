@@ -83,7 +83,7 @@ classdef ThconvectionTemp < Thconvection
             gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
             h_array = obj.h.get_on(dom);
-            h_array = obj.column_array(h_array,'nb_elem',nb_face);
+            h_array = f_column_array(h_array,'nb_elem',nb_face);
             % ---
             dom.build_submesh;
             submesh = dom.submesh;

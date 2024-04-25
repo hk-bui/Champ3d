@@ -96,7 +96,7 @@ classdef SibcAphijw < Sibc
             % ---
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
-            z_sibc = obj.column_array(z_sibc,'nb_elem',lnb_face);
+            z_sibc = f_column_array(z_sibc,'nb_elem',lnb_face);
             % ---
             dom.build_submesh;
             submesh = dom.submesh;
@@ -184,8 +184,8 @@ classdef SibcAphijw < Sibc
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             lnb_face = length(obj.dom.gid_face);
             % ---
-            sigma_array = obj.column_array(obj.matrix.sigma_array,'nb_elem',lnb_face);
-            skindepth   = obj.column_array(obj.matrix.skindepth,'nb_elem',lnb_face);
+            sigma_array = f_column_array(obj.matrix.sigma_array,'nb_elem',lnb_face);
+            skindepth   = f_column_array(obj.matrix.skindepth,'nb_elem',lnb_face);
             % ---
             es = sparse(2,lnb_face);
             js = sparse(2,lnb_face);
