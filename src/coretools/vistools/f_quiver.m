@@ -1,4 +1,4 @@
-function f_quiver(node,vector,varargin)
+function f_quiver(node,vector,args)
 % F_QUIVER plots arrows of vector field. 
 %--------------------------------------------------------------------------
 % F_QUIVER(node,vector);
@@ -14,25 +14,23 @@ function f_quiver(node,vector,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'vtype','afactor','sfactor','id_node','component','vsize'};
-
-% --- default input value
-vtype = 'proportional'; % 'proportional', 'equal'
-afactor = 5;
-sfactor = 1;
-id_node = [];
-component = [];
-vsize = [];
-%--------------------------------------------------------------------------
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+arguments
+    node
+    vector
+    args.vtype {mustBeMember(args.vtype,{'proportional','equal'})} = 'proportional'
+    args.afactor = 5
+    args.sfactor = 1
+    args.id_node = []
+    args.component = []
+    args.vsize = []
 end
+% --- 
+vtype = args.vtype;
+afactor = args.afactor;
+sfactor = args.sfactor;
+id_node = args.id_node;
+component = args.component;
+vsize = args.vsize;
 %--------------------------------------------------------------------------
 if ~isempty(id_node)
     node = node(:,id_node);
