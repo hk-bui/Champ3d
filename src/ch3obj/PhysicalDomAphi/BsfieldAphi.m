@@ -79,7 +79,12 @@ classdef BsfieldAphi < Bsfield
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
             % ---
-            bs = obj.bs.get('in_dom',dom);
+            if isa(obj.bs,'Parameter')
+                bs = obj.bs.get('in_dom',dom);
+            elseif iscell(obj.bs)
+                bs = obj.bs;
+            end
+            % ---
             wfbs = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs);
             % ---
             obj.matrix.gid_elem = gid_elem;
