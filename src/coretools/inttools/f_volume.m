@@ -1,4 +1,4 @@
-function vol = f_volume(node,elem,varargin)
+function vol = f_volume(node,elem,args)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -9,28 +9,26 @@ function vol = f_volume(node,elem,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'cdetJ'};
+arguments
+    node
+    elem
+    args.cdetJ = []
+    args.elem_type {mustBeMember(args.elem_type,{'','tri','triangle','quad','tet','tetra','prism','hex','hexa'})} = ''
+end
 
-% --- default input value
-cdetJ = [];
-% --- default ouptu value
+% --- 
+cdetJ = args.cdetJ;
+elem_type = args.elem_type;
+% --- default ouput value
 vol = [];
-
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+%--------------------------------------------------------------------------
+if isempty(elem_type)
+    elem_type = f_elemtype(elem,'defined_on','elem');
 end
 %--------------------------------------------------------------------------
-elem_type = f_elemtype(elem,'defined_on','elem');
-%--------------------------------------------------------------------------
 if ~isempty(cdetJ)
-    con = f_connexion(elem_type);
-    cWeigh = con.cWeigh;
+    refelem = f_refelem(elem_type);
+    cWeigh = refelem.cWeigh;
     % ---
     vol = cdetJ{1} .* cWeigh;
     % ---
@@ -38,16 +36,14 @@ if ~isempty(cdetJ)
 end
 %--------------------------------------------------------------------------
 if any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
-    con = f_connexion(elem_type);
-    cU  = con.cU;
-    cV  = con.cV;
-    cW  = con.cW;
-    cWeigh = con.cWeigh;
+    refelem = f_refelem(elem_type);
+    cU  = refelem.cU;
+    cV  = refelem.cV;
+    cW  = refelem.cW;
+    cWeigh = refelem.cWeigh;
     %----------------------------------------------------------------------
-    mesh.node = node;
-    mesh.elem = elem;
-    mesh.elem_type = elem_type;
-    [vol, ~] = f_jacobien(mesh,'u',cU,'v',cV,'w',cW);
+    [vol, ~] = f_jacobien(node,elem,'elem_type',elem_type,...
+                          'u',cU,'v',cV,'w',cW);
     %----------------------------------------------------------------------
     vol = vol{1} .* cWeigh;
     %----------------------------------------------------------------------

@@ -8,25 +8,19 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function Wn = f_wn(obj,varargin)
+function Wn = wn(obj,args)
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w'};
-
-% --- default input value
-u = [];
-v = [];
-w = [];
-
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+arguments
+    obj
+    args.u = []
+    args.v = []
+    args.w = []
 end
 
+% ---
+u = args.u;
+v = args.v;
+w = args.w;
 %--------------------------------------------------------------------------
 elem = obj.elem;
 elem_type = obj.elem_type;

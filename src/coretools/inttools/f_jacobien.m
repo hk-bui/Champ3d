@@ -1,4 +1,4 @@
-function [detJ, Jinv] = f_jacobien(mesh,varargin)
+function [detJ, Jinv] = f_jacobien(node,elem,args)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -9,38 +9,25 @@ function [detJ, Jinv] = f_jacobien(mesh,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','flat_node','get'};
-
-% --- default input value
-u = [];
-v = [];
-w = [];
-flat_node = [];
-get = '_all';
-elem_type = [];
-
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+arguments
+    node
+    elem
+    args.u = []
+    args.v = []
+    args.w = []
+    args.flat_node = []
+    args.elem_type {mustBeMember(args.elem_type,{'','tri','triangle','quad','tet','tetra','prism','hex','hexa'})} = ''
 end
 
+% -------------------------------------------------------------------------
+u = args.u;
+v = args.v;
+w = args.w;
+flat_node = args.flat_node;
+elem_type = args.elem_type;
 %--------------------------------------------------------------------------
-if ~isfield(mesh,'node') || ~isfield(mesh,'elem')
-    error([mfilename ' : #mesh3d/2d struct must contain at least .node and .elem']);
-end
-%--------------------------------------------------------------------------
-node = mesh.node;
-elem = mesh.elem;
-%--------------------------------------------------------------------------
-if isfield(mesh,'elem_type')
-    elem_type = mesh.elem_type;
-else
-    error([mfilename ' : #mesh struct must contain .elem_type']);
+if isempty(elem_type)
+    elem_type = f_elemtype(elem,'defined_on','elem');
 end
 %--------------------------------------------------------------------------
 if ~isempty(w)
@@ -53,13 +40,13 @@ else
     end
 end
 %--------------------------------------------------------------------------
-con = f_connexion(elem_type);
-nbNo_inEl = con.nbNo_inEl;
+refelem = f_refelem(elem_type);
+nbNo_inEl = refelem.nbNo_inEl;
 %--------------------------------------------------------------------------
 if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     dim = 2;
-    fgradNx = con.gradNx;
-    fgradNy = con.gradNy;
+    fgradNx = refelem.gradNx;
+    fgradNy = refelem.gradNy;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------
@@ -111,9 +98,9 @@ if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     %----------------------------------------------------------------------
 elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     dim = 3;
-    fgradNx = con.gradNx;
-    fgradNy = con.gradNy;
-    fgradNz = con.gradNz;
+    fgradNx = refelem.gradNx;
+    fgradNy = refelem.gradNy;
+    fgradNz = refelem.gradNz;
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------
@@ -179,3 +166,4 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     end
     %----------------------------------------------------------------------
 end
+

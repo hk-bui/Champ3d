@@ -38,7 +38,10 @@ if isnumeric(order)
 end
 %--------------------------------------------------------------------------
 [coefficient, coef_array_type] = f_column_format(coefficient);
-vector_field = f_column_format(vector_field);
+%--------------------------------------------------------------------------
+if ~iscell(vector_field)
+    vector_field = f_column_format(vector_field);
+end
 %--------------------------------------------------------------------------
 refelem = obj.refelem;
 nbEd_inEl = refelem.nbEd_inEl;
@@ -72,19 +75,32 @@ end
 %--------------------------------------------------------------------------
 coefwevf = zeros(nb_elem,nbEd_inEl);
 %--------------------------------------------------------------------------
-if numel(vector_field) == 3
-    vfx = vector_field(1);
-    vfy = vector_field(2);
-    vfz = vector_field(3);
-elseif size(vector_field,1) >  length(id_elem) && ...
-       size(vector_field,1) == obj.nb_elem
-    vfx = vector_field(id_elem,1);
-    vfy = vector_field(id_elem,2);
-    vfz = vector_field(id_elem,3);
+vfx = cell(3,1);
+vfy = cell(3,1);
+vfz = cell(3,1);
+if ~iscell(vector_field)
+    for iG = 1:nbG
+        if numel(vector_field) == 3
+            vfx{iG} = vector_field(1);
+            vfy{iG} = vector_field(2);
+            vfz{iG} = vector_field(3);
+        elseif size(vector_field,1) >  length(id_elem) && ...
+               size(vector_field,1) == obj.nb_elem
+            vfx{iG} = vector_field(id_elem,1);
+            vfy{iG} = vector_field(id_elem,2);
+            vfz{iG} = vector_field(id_elem,3);
+        else
+            vfx{iG} = vector_field(:,1);
+            vfy{iG} = vector_field(:,2);
+            vfz{iG} = vector_field(:,3);
+        end
+    end
 else
-    vfx = vector_field(:,1);
-    vfy = vector_field(:,2);
-    vfz = vector_field(:,3);
+    for iG = 1:nbG
+        vfx{iG} = vector_field{iG}(:,1);
+        vfy{iG} = vector_field{iG}(:,2);
+        vfz{iG} = vector_field{iG}(:,3);
+    end
 end
 %--------------------------------------------------------------------------
 if any(strcmpi(coef_array_type,{'scalar'}))
@@ -92,13 +108,18 @@ if any(strcmpi(coef_array_type,{'scalar'}))
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
         weigh = Weigh(iG);
+        % ---
+        vix = vfx{iG}(:,1);
+        viy = vfy{iG}(:,1);
+        viz = vfz{iG}(:,1);
+        % ---
         for i = 1:nbEd_inEl
             wix = We{iG}(:,1,i);
             wiy = We{iG}(:,2,i);
             wiz = We{iG}(:,3,i);
             coefwevf(:,i) = coefwevf(:,i) + ...
                 weigh .* dJ .* ( coefficient .* ...
-                (wix .* vfx + wiy .* vfy + wiz .* vfz) );
+                (wix .* vix + wiy .* viy + wiz .* viz) );
         end
     end
     %----------------------------------------------------------------------
@@ -107,21 +128,26 @@ elseif any(strcmpi(coef_array_type,{'tensor'}))
     for iG = 1:nbG
         dJ    = f_tocolv(detJ{iG});
         weigh = Weigh(iG);
+        % ---
+        vix = vfx{iG}(:,1);
+        viy = vfy{iG}(:,1);
+        viz = vfz{iG}(:,1);
+        % ---
         for i = 1:nbEd_inEl
             wix = We{iG}(:,1,i);
             wiy = We{iG}(:,2,i);
             wiz = We{iG}(:,3,i);
             coefwevf(:,i) = coefwevf(:,i) + ...
                 weigh .* dJ .* (...
-                coefficient(:,1,1) .* wix .* vfx +...
-                coefficient(:,1,2) .* wiy .* vfx +...
-                coefficient(:,1,3) .* wiz .* vfx +...
-                coefficient(:,2,1) .* wix .* vfy +...
-                coefficient(:,2,2) .* wiy .* vfy +...
-                coefficient(:,2,3) .* wiz .* vfy +...
-                coefficient(:,3,1) .* wix .* vfz +...
-                coefficient(:,3,2) .* wiy .* vfz +...
-                coefficient(:,3,3) .* wiz .* vfz );
+                coefficient(:,1,1) .* wix .* vix +...
+                coefficient(:,1,2) .* wiy .* vix +...
+                coefficient(:,1,3) .* wiz .* vix +...
+                coefficient(:,2,1) .* wix .* viy +...
+                coefficient(:,2,2) .* wiy .* viy +...
+                coefficient(:,2,3) .* wiz .* viy +...
+                coefficient(:,3,1) .* wix .* viz +...
+                coefficient(:,3,2) .* wiy .* viz +...
+                coefficient(:,3,3) .* wiz .* viz );
         end
     end
     %----------------------------------------------------------------------

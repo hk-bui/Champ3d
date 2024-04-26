@@ -9,6 +9,7 @@
 %--------------------------------------------------------------------------
 
 function [colx,array_type] = f_column_format(x)
+
 arguments
     x {mustBeNumeric}
 end

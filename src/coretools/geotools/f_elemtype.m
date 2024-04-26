@@ -1,4 +1,4 @@
-function elem_type = f_elemtype(meshorelem,varargin)
+function elem_type = f_elemtype(meshorelem,args)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -9,21 +9,15 @@ function elem_type = f_elemtype(meshorelem,varargin)
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'defined_on'};
+arguments
+    meshorelem
+    args.defined_on {mustBeMember(args.defined_on,{'elem','face'})} = 'elem'
+end
 
-% --- default input value
-defined_on = 'elem';
+% --- default
+defined_on = args.defined_on;
 elem_type  = [];
 
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
-end
 %--------------------------------------------------------------------------
 if isstruct(meshorelem)
     nbnoinel = size(meshorelem.elem, 1);

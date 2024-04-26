@@ -16,7 +16,7 @@ end
 % ---
 nb_elem = args.nb_elem;
 % ---
-colx = column_format(coef);
+colx = f_column_format(coef);
 if numel(colx) == 1
     colarray = repmat(colx,nb_elem,1);
 else

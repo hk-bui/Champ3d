@@ -8,30 +8,23 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-function [gradWn, gradF] = gradwn(obj,varargin)
+function [gradWn, gradF] = gradwn(obj,args)
 
-% --- valid argument list (to be updated each time modifying function)
-arglist = {'u','v','w','jinv','get'};
-
-% --- default input value
-u = [];
-v = [];
-w = [];
-jinv = [];
-get = []; % 'gradF'
-
-% --- default output value
-
-
-% --- check and update input
-for i = 1:length(varargin)/2
-    if any(strcmpi(arglist,varargin{2*i-1}))
-        eval([lower(varargin{2*i-1}) '= varargin{2*i};']);
-    else
-        error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
-    end
+arguments
+    obj
+    args.u = []
+    args.v = []
+    args.w = []
+    args.jinv = []
+    args.get {mustBeMember(args.get,{'','gradF','sum_on_face'})} = ''
 end
 
+% ---
+u = args.u;
+v = args.v;
+w = args.w;
+jinv = args.jinv;
+get = args.get;
 %--------------------------------------------------------------------------
 elem = obj.elem;
 elem_type = obj.elem_type;
@@ -136,7 +129,7 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
             fgradwn(:,3,j) = dot(Jinv3, gradNxyz, 2);
         end
         %------------------------------------------------------------------
-        if any(strcmpi(get,{'gradF','sum_on_face'}))
+        if any(f_strcmpi(get,{'gradF','sum_on_face'}))
             fgradf = zeros(nb_elem,dim,nbFa_inEl);
             for j = 1:nbFa_inEl
                 nbN = length(find(FaNo_inEl(j,:)));
