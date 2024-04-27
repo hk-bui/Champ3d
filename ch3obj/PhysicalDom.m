@@ -73,20 +73,28 @@ classdef PhysicalDom < Xhandle
     % --- Methods
     methods
         function get_geodom(obj)
-            if ~isempty(obj.parent_model)
-                if ~isempty(obj.parent_model.parent_mesh)
-                    % ---
-                    if ~isempty(obj.id_dom3d)
-                        id_dom_ = f_to_scellargin(obj.id_dom3d);
-                    elseif ~isempty(obj.id_dom2d)
-                        id_dom_ = f_to_scellargin(obj.id_dom2d);
-                    end
-                    % ---
-                    obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
-                    for i = 2:length(id_dom_)
-                        obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
-                    end
-                end
+            if isempty(obj.parent_model)
+                return
+            end
+            if isempty(obj.parent_model.parent_mesh)
+                return
+            end
+            % ---
+            id_dom_ = [];
+            % ---
+            if ~isempty(obj.id_dom3d)
+                id_dom_ = f_to_scellargin(obj.id_dom3d);
+            elseif ~isempty(obj.id_dom2d)
+                id_dom_ = f_to_scellargin(obj.id_dom2d);
+            end
+            % ---
+            if isempty(id_dom_)
+                return
+            end
+            % ---
+            obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
+            for i = 2:length(id_dom_)
+                obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
             end
         end
         % -----------------------------------------------------------------
