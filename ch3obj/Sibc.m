@@ -33,9 +33,9 @@ classdef Sibc < PhysicalDom
                 args.id_dom3d
                 args.sigma
                 args.mur
-                args.r_ht
-                args.r_et
-                args.cparam
+                args.r_ht {mustBeNumeric}
+                args.r_et {mustBeNumeric}
+                args.cparam {mustBeNumeric}
             end
             % ---
             obj = obj@PhysicalDom;
@@ -69,14 +69,12 @@ classdef Sibc < PhysicalDom
             end
             % ---
             cparam_ = 0;
-            if isnumeric(obj.r_ht) && isnumeric(obj.r_et)
-                if ~isempty(obj.r_ht) && ~isempty(obj.r_et)
-                    cparam_ = 1/obj.r_ht - 1/obj.r_et;
-                elseif ~isempty(obj.r_ht)
-                    cparam_ = 1/obj.r_ht;
-                elseif ~isempty(obj.r_et)
-                    cparam_ = - 1/obj.r_et;
-                end
+            if ~isempty(obj.r_ht) && ~isempty(obj.r_et)
+                cparam_ = 1/obj.r_ht - 1/obj.r_et;
+            elseif ~isempty(obj.r_ht)
+                cparam_ = 1/obj.r_ht;
+            elseif ~isempty(obj.r_et)
+                cparam_ = - 1/obj.r_et;
             end
             % ---
             obj.cparam = Parameter('f',cparam_);

@@ -65,7 +65,10 @@ classdef PhysicalDom < Xhandle
             if obj.setup_done
                 return
             end
+            % ---
             obj.get_geodom;
+            % ---
+            paramlist = {'sigma','mur','bs','br'};
             % ---
             obj.setup_done = 1;
         end
