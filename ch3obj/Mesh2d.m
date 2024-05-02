@@ -36,9 +36,7 @@ classdef Mesh2d < Mesh
             % ---
             args.parent_mesh = obj;
             % ---
-            argu = f_to_namedarg(args,'with_only',...
-                         {'parent_mesh','id_xline','id_yline','elem_code',...
-                          'gid_elem','condition'});
+            argu = f_to_namedarg(args,'for','VolumeDom2d');
             vdom = VolumeDom2d(argu{:});
             obj.dom.(args.id) = vdom;
             % ---
@@ -62,10 +60,8 @@ classdef Mesh2d < Mesh
             % ---
             args.parent_mesh = obj;
             % ---
-            argu = f_to_namedarg(args,'with_only',...
-                         {'mesh1d','parent_mesh','id_xline','id_yline','elem_code',...
-                          'gid_elem','condition'});
-            vdom = VolumeDom2d(argu{:});
+            argu = f_to_namedarg(args,'for','SurfaceDom2d');
+            vdom = SurfaceDom2d(argu{:});
             obj.dom.(args.id) = vdom;
             % ---
         end

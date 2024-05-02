@@ -24,7 +24,7 @@ classdef FEM3dVjw < FEM3dV
                 args.frequency = 0
             end
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','FEM3dV');
             obj = obj@FEM3dV(argu{:});
             % ---
             obj <= args;

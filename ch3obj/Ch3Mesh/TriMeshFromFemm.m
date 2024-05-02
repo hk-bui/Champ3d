@@ -46,8 +46,6 @@ classdef TriMeshFromFemm < TriMesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -71,7 +69,7 @@ classdef TriMeshFromFemm < TriMesh
             % ----- 2/ mesh and solution data -----
             iData   = find(strcmp(fileDA{1,1}(:,1),'[Solution]'));
             iNoeud  = iData+1;          nb_node = str2double(fileDA{1,1}(iNoeud,1));
-            iElem   = iNoeud+nb_node+1; nb_elem  = str2double(fileDA{1,1}(iElem ,1));
+            iElem   = iNoeud+nb_node+1; nb_elem = str2double(fileDA{1,1}(iElem ,1));
             % 2/a/ points
             node_ = zeros(2,nb_node);
             node_(1,:) = str2double(fileDA{1,1}(iNoeud+1 : iNoeud+nb_node,1));
@@ -92,7 +90,6 @@ classdef TriMeshFromFemm < TriMesh
             obj.elem = elem_;
             obj.elem_code = elem_code_;
             obj.data = data_;
-            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
     end

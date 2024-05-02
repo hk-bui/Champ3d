@@ -49,8 +49,6 @@ classdef QuadMeshFrom1d < QuadMesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
             % ---
         end
@@ -60,10 +58,6 @@ classdef QuadMeshFrom1d < QuadMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
                     isempty(obj.id_yline)
@@ -157,7 +151,6 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;
-            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
         % -----------------------------------------------------------------

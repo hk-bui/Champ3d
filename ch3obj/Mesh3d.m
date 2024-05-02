@@ -39,13 +39,10 @@ classdef Mesh3d < Mesh
             args.parent_mesh = obj;
             % ---
             if isempty(args.id_dom3d) && isempty(args.cut_equation)
-                argu = f_to_namedarg(args,'with_only',...
-                    {'parent_mesh','id_dom2d','id_zline',...
-                     'elem_code','gid_elem','condition'});
+                argu = f_to_namedarg(args,'for','VolumeDom3d');
                 vdom = VolumeDom3d(argu{:});
             else
-                argu = f_to_namedarg(args,'with_only',...
-                    {'parent_mesh','id_dom3d','cut_equation'});
+                argu = f_to_namedarg(args,'for','CutVolumeDom3d');
                 vdom = CutVolumeDom3d(argu{:});
             end
             obj.dom.(args.id) = vdom;
@@ -68,9 +65,7 @@ classdef Mesh3d < Mesh
             % ---
             args.parent_mesh = obj;
             % ---
-            argu = f_to_namedarg(args,'with_only',...
-                {'parent_mesh','id_dom3d','defined_on',...
-                 'gid_face','condition'});
+            argu = f_to_namedarg(args,'for','SurfaceDom3d');
             sdom = SurfaceDom3d(argu{:});
             obj.dom.(args.id) = sdom;
             % ---

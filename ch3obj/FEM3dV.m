@@ -24,12 +24,11 @@ classdef FEM3dV < EmModel
                 args.frequency = 0
             end
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','EmModel');
             obj = obj@EmModel(argu{:});
             % ---
             obj <= args;
             % ---
-            obj.setup;
         end
     end
 end

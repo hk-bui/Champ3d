@@ -57,8 +57,6 @@ classdef QuadMeshFrom3d < QuadMesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
             % ---
         end
@@ -68,10 +66,6 @@ classdef QuadMeshFrom3d < QuadMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             if isempty(obj.parallel_line_1) || isempty(obj.parallel_line_2)
                 return
@@ -104,8 +98,8 @@ classdef QuadMeshFrom3d < QuadMesh
             vec1 = br - bl;
             vec2 = tr - tl;
             % ---
-            if norm(cross(vec1,vec2)) ~= 0
-                error('Lines are not parallel !')
+            if abs(dot(cross(vec1,vec2),vec1)) < 1e-9
+                error('Lines are not in plane !')
             end
             % ---
             if dot(vec1,vec2) < 0
@@ -146,7 +140,6 @@ classdef QuadMeshFrom3d < QuadMesh
             obj.node = node;
             obj.elem = elem;
             obj.elem_code = elem_code;
-            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
     end

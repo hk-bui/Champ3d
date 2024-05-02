@@ -42,8 +42,6 @@ classdef PrismMesh < Mesh3d
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
             % ---
         end
@@ -52,13 +50,7 @@ classdef PrismMesh < Mesh3d
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             obj.elem_type = 'prism';
-            % ---
-            obj.setup_done = 1;
         end
     end
 

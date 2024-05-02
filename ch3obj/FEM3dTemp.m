@@ -24,12 +24,11 @@ classdef FEM3dTemp < ThModel
                 args.Temp0 = 0
             end
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','ThModel');
             obj = obj@ThModel(argu{:});
             % ---
             obj <= args;
             % ---
-            obj.setup;
         end
     end
     % --- Methods/public

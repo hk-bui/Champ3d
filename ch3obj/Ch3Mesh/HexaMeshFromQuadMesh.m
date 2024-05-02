@@ -50,8 +50,6 @@ classdef HexaMeshFromQuadMesh < HexMesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
             % ---
         end
@@ -61,10 +59,6 @@ classdef HexaMeshFromQuadMesh < HexMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             setup@HexMesh(obj);
             % ---
@@ -166,7 +160,6 @@ classdef HexaMeshFromQuadMesh < HexMesh
             obj.cedge = cedge_;
             obj.cface = cface_;
             % ---
-            obj.setup_done = 1;
         end
     end
 

@@ -32,7 +32,6 @@ classdef FEM3dAphits < FEM3dAphi
             % ---
             obj <= args;
             % ---
-            obj.setup;
         end
     end
     % --- Methods/public

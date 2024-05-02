@@ -45,8 +45,6 @@ classdef OpenCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end

@@ -42,8 +42,6 @@ classdef QuadMesh < Mesh2d
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -51,15 +49,8 @@ classdef QuadMesh < Mesh2d
     % --- setup
     methods
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
             obj.elem_type = 'quad';
             obj.cal_flatnode;
-            % ---
-            obj.setup_done = 1;
         end
     end
 

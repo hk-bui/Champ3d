@@ -52,13 +52,7 @@ classdef HexMesh < Mesh3d
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             obj.elem_type = 'hexa';
-            % ---
-            obj.setup_done = 1;
         end
     end
 

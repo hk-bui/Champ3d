@@ -10,8 +10,6 @@
 
 classdef ThModel < Xhandle
     properties
-        id
-        % ---
         parent_mesh
         % ---
         thconductor
@@ -79,7 +77,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Thconductor');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThconductorTemp(argu{:});
@@ -101,7 +99,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Thcapacitor');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThcapacitorTemp(argu{:});
@@ -122,7 +120,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Thconvection');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThconvectionTemp(argu{:});
@@ -143,7 +141,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','ThPs');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThPsTemp(argu{:});
@@ -164,7 +162,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','ThPv');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThPvTemp(argu{:});
