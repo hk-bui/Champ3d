@@ -23,8 +23,14 @@ classdef CloseCoil < Coil
     
     % --- Valid args list
     methods (Static)
-        function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation'};
+        function argslist = validargs(fname)
+            if nargin < 1
+                argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation'};
+            elseif ischar(fname)
+                if f_strcmpi(fname,'plot')
+                    argslist = {'edge_color','face_color','alpha'};
+                end
+            end
         end
     end
     % --- Contructor

@@ -16,17 +16,30 @@ arguments
     fargs.with_only = []
 end
 % ---
-cls_name = fargs.for;
+forname = fargs.for;
 with_out = fargs.with_out;
 with_only = fargs.with_only;
 %--------------------------------------------------------------------------
 validargslist = {};
-if ~isempty(cls_name)
+if ~isempty(forname)
+    % ---
+    forname = split(forname,'.');
+    cls_name = forname{1};
+    % ---
+    fun_name = [];
+    if length(forname) > 1
+        fun_name = forname{2};
+    end
+    % ---
     try
         metlist = methods(cls_name);
         if any(f_strcmpi('validargs',metlist))
             f2 = str2func([cls_name '.validargs']);
-            validargslist = f2();
+            if isempty(fun_name)
+                validargslist = f2();
+            else
+                validargslist = f2(fun_name);
+            end
         end
     catch
         % ---
