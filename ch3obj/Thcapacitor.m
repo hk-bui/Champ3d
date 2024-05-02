@@ -10,16 +10,11 @@
 
 classdef Thcapacitor < PhysicalDom
 
-    properties
+    properties (SetObservable)
         rho = 0
         cp  = 0
     end
 
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -45,8 +40,6 @@ classdef Thcapacitor < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -54,21 +47,7 @@ classdef Thcapacitor < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            if isnumeric(obj.rho)
-                obj.rho = Parameter('f',obj.rho);
-            end
-            % ---
-            if isnumeric(obj.cp)
-                obj.cp = Parameter('f',obj.cp);
-            end
-            % ---
-            obj.setup_done = 1;
         end
     end
 end

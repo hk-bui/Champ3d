@@ -56,7 +56,6 @@ classdef IsCoilAphi < Xhandle
             % ---
             obj.assembly_done = 1;
             % ---
-            disp('xxx')
         end
     end
 

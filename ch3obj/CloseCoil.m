@@ -11,7 +11,7 @@
 classdef CloseCoil < Coil
 
     % --- entry
-    properties
+    properties (SetObservable)
         etrode_equation
     end
 
@@ -19,11 +19,6 @@ classdef CloseCoil < Coil
     properties
         electrode_dom
         shape_dom
-    end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
     end
     
     % --- Valid args list
@@ -50,8 +45,6 @@ classdef CloseCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -60,10 +53,6 @@ classdef CloseCoil < Coil
     methods
         function setup(obj)
             % ---
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Coil(obj);
             % ---
             obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
@@ -71,7 +60,6 @@ classdef CloseCoil < Coil
             % ---
             obj.get_electrode;
             % ---
-            obj.setup_done = 1;
         end
     end
     % --- Methods

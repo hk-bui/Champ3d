@@ -10,15 +10,10 @@
 
 classdef Econductor < PhysicalDom
 
-    properties
+    properties (SetObservable)
         sigma = 0
     end
 
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -43,8 +38,6 @@ classdef Econductor < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,17 +45,7 @@ classdef Econductor < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            if isnumeric(obj.sigma)
-                obj.sigma = Parameter('f',obj.sigma);
-            end
-            % ---
-            obj.setup_done = 1;
         end
     end
 end

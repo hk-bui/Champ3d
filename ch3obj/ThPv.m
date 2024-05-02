@@ -10,15 +10,10 @@
 
 classdef ThPv < PhysicalDom
 
-    properties
+    properties (SetObservable)
         pv = 0
     end
 
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -43,8 +38,6 @@ classdef ThPv < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,17 +45,7 @@ classdef ThPv < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            if isnumeric(obj.pv)
-                obj.pv = Parameter('f',obj.pv);
-            end
-            % ---
-            obj.setup_done = 1;
         end
     end
 end

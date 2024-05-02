@@ -10,15 +10,10 @@
 
 classdef Bsfield < PhysicalDom
 
-    properties
+    properties (SetObservable)
         bs
     end
 
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -43,8 +38,6 @@ classdef Bsfield < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,9 +45,6 @@ classdef Bsfield < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
             % ---
             if isempty(obj.id_dom3d)
                 if ~isfield(obj.parent_model.parent_mesh.dom,'default_domain')
@@ -65,11 +55,6 @@ classdef Bsfield < PhysicalDom
             % ---
             setup@PhysicalDom(obj);
             % ---
-            if isnumeric(obj.bs)
-                obj.bs = Parameter('f',obj.bs);
-            end
-            % ---
-            obj.setup_done = 1;
         end
     end
 end

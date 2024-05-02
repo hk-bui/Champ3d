@@ -12,21 +12,14 @@ classdef PhysicalDom < Xhandle
 
     % --- entry
     properties (SetObservable)
-        id
         parent_model
         id_dom2d
         id_dom3d
     end
 
     % --- computed
-    properties
-        parent_mesh
+    properties (SetObservable)
         dom
-    end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
     end
 
     % ---
@@ -58,8 +51,6 @@ classdef PhysicalDom < Xhandle
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -67,15 +58,24 @@ classdef PhysicalDom < Xhandle
     % --- Methods
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
             % ---
             obj.get_geodom;
             % ---
-            paramlist = {'sigma','mur','bs','br'};
+            paramlist = {'sigma','mur','bs','br','r_ht','r_et',...
+                         'i_coil','v_coil','j_coil',...
+                         'rho','cp','lambda','ps','pv'};
             % ---
-            obj.setup_done = 1;
+            for i = 1:length(paramlist)
+                param = paramlist{i};
+                if isprop(obj,param)
+                    if isnumeric(obj.(param))
+                        if ~isempty(obj.(param))
+                            obj.(param) = Parameter('f',obj.(param));
+                        end
+                    end
+                end
+            end
+            % ---
         end
     end
     % --- Methods

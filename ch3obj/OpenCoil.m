@@ -11,7 +11,7 @@
 classdef OpenCoil < Coil
 
     % --- entry
-    properties
+    properties (SetObservable)
         etrode_equation
     end
 
@@ -19,11 +19,6 @@ classdef OpenCoil < Coil
     properties
         gid_node_petrode
         gid_node_netrode
-    end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
     end
     
     % --- Valid args list
@@ -59,16 +54,13 @@ classdef OpenCoil < Coil
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Coil(obj);
-                % ---
-                obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
-                % ---
-                obj.get_electrode;
-                % ---
-                obj.setup_done = 1;
-            end
+            % ---
+            setup@Coil(obj);
+            % ---
+            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            % ---
+            obj.get_electrode;
+            % ---
         end
     end
     % --- Methods

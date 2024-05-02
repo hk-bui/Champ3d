@@ -10,10 +10,6 @@
 
 classdef Airbox < PhysicalDom
 
-    properties(Access = private)
-        setup_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -37,8 +33,6 @@ classdef Airbox < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -46,12 +40,7 @@ classdef Airbox < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@PhysicalDom(obj);
-                % ---
-                obj.setup_done = 1;
-            end
+            setup@PhysicalDom(obj);
         end
     end
 end

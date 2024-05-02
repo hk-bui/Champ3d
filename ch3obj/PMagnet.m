@@ -13,11 +13,6 @@ classdef PMagnet < PhysicalDom
     properties (SetObservable)
         br
     end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
     
     % --- Valid args list
     methods (Static)
@@ -43,8 +38,6 @@ classdef PMagnet < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,13 +45,7 @@ classdef PMagnet < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            obj.setup_done = 1;
         end
     end
 end

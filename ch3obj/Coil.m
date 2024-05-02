@@ -10,11 +10,6 @@
 
 classdef Coil < PhysicalDom
     
-    % --- 
-    properties (Access = private)
-        setup_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -38,8 +33,6 @@ classdef Coil < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -47,13 +40,7 @@ classdef Coil < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            obj.setup_done = 1;
         end
     end
 

@@ -62,7 +62,7 @@ classdef OpenCoilAphi < OpenCoil
             % ---
             setup@OpenCoil(obj);
             % ---
-            obj.parent_mesh = obj.dom.parent_mesh;
+            %obj.parent_mesh = obj.dom.parent_mesh;
             % ---
             obj.matrix.gid_elem = [];
             obj.matrix.unit_current_field = [];

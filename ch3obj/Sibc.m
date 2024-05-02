@@ -10,7 +10,7 @@
 
 classdef Sibc < PhysicalDom
 
-    properties
+    properties (SetObservable)
         sigma = 0
         mur = 1
         r_ht = 0
@@ -18,16 +18,11 @@ classdef Sibc < PhysicalDom
         cparam = 0
     end
 
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
             argslist = {'parent_model','id_dom2d','id_dom3d','sigma','mur', ...
-                        'r_ht','r_et','cparam'};
+                        'r_ht','r_et'};
         end
     end
     % --- Contructor
@@ -41,7 +36,6 @@ classdef Sibc < PhysicalDom
                 args.mur
                 args.r_ht {mustBeNumeric}
                 args.r_et {mustBeNumeric}
-                args.cparam {mustBeNumeric}
             end
             % ---
             obj = obj@PhysicalDom;
@@ -52,8 +46,6 @@ classdef Sibc < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -61,18 +53,8 @@ classdef Sibc < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
             % ---
             setup@PhysicalDom(obj);
-            % ---
-            if isnumeric(obj.sigma)
-                obj.sigma = Parameter('f',obj.sigma);
-            end
-            if isnumeric(obj.mur)
-                obj.mur = Parameter('f',obj.mur);
-            end
             % ---
             cparam_ = 0;
             if ~isempty(obj.r_ht) && ~isempty(obj.r_et)
@@ -85,7 +67,6 @@ classdef Sibc < PhysicalDom
             % ---
             obj.cparam = Parameter('f',cparam_);
             % ---
-            obj.setup_done = 1;
         end
     end
 end

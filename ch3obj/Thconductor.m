@@ -10,13 +10,8 @@
 
 classdef Thconductor < PhysicalDom
 
-    properties
+    properties (SetObservable)
         lambda = 0
-    end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
     end
     
     % --- Valid args list
@@ -43,8 +38,6 @@ classdef Thconductor < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,17 +45,7 @@ classdef Thconductor < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            if isnumeric(obj.lambda)
-                obj.lambda = Parameter('f',obj.lambda);
-            end
-            % ---
-            obj.setup_done = 1;
         end
     end
 end
