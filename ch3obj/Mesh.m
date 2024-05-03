@@ -28,12 +28,6 @@ classdef Mesh < Xhandle
         discrete
         intkit
         prokit
-        % ---
-        setup_done = 0
-        build_meshds_done = 0
-        build_discrete_done = 0
-        build_intkit_done = 0
-        build_prokit_done = 0
         % --- submesh
         parent_mesh
         gid_node
@@ -42,6 +36,14 @@ classdef Mesh < Xhandle
         gid_face
         flat_node
         % ---
+    end
+
+    % --- Dependent Properties
+    properties (Access = private, Hidden)
+        build_meshds_done = 0
+        build_discrete_done = 0
+        build_intkit_done = 0
+        build_prokit_done = 0
     end
 
     % --- Dependent Properties
@@ -681,7 +683,7 @@ classdef Mesh < Xhandle
             fnmeshds = fieldnames(obj.meshds);
             for i = 1:length(fnmeshds)
                 if isempty(obj.meshds.(fnmeshds{i}))
-                    obj.build_meshds;
+                    obj.build_meshds('get',fnmeshds{i});
                     break
                 end
             end
@@ -716,9 +718,9 @@ classdef Mesh < Xhandle
             if for3d
                 realz = (reshape(obj.node(3,obj.elem),nbNo_inEl,[])).';
             end
-            nb_inode  = length(U);
-            node_g = cell(1,nb_inode);
-            for i = 1:nb_inode
+            nb_gnode  = length(U);
+            node_g = cell(1,nb_gnode);
+            for i = 1:nb_gnode
                 node_g{i} = zeros(obj.nb_elem,dim_);
                 node_g{i}(:,1) = sum(Wn{i} .* realx,2);
                 node_g{i}(:,2) = sum(Wn{i} .* realy,2);

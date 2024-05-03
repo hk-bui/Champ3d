@@ -12,7 +12,7 @@ classdef EconductorAphi < Econductor
 
     % --- computed
     properties
-        matrix
+        matrix = struct('gid_elem',[],'gid_node_phi',[],'sigmawewe',[],'sigma_array',[])
     end
 
     % --- computed

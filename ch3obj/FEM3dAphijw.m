@@ -38,39 +38,31 @@ classdef FEM3dAphijw < FEM3dAphi
     methods (Access = public)
         % -----------------------------------------------------------------
         function build(obj)
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             if obj.build_done
                 return
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             tic;
             f_fprintf(0,'Build',1,class(obj),0,'\n');
             f_fprintf(0,'   ');
             % ---
             parent_mesh = obj.parent_mesh;
             % ---
-            if ~parent_mesh.build_meshds_done
-                parent_mesh.build_meshds;
-            end
-            % ---
-            if ~parent_mesh.build_discrete_done
-                parent_mesh.build_discrete;
-            end
-            % ---
-            if ~parent_mesh.build_intkit_done
-                parent_mesh.build_intkit;
-            end
-            %--------------------------------------------------------------------------
+            parent_mesh.build_meshds;
+            parent_mesh.build_discrete;
+            parent_mesh.build_intkit;
+            %--------------------------------------------------------------
             if isempty(obj.airbox)
                 if ~isfield(obj.parent_mesh.dom,'default_domain')
                     obj.parent_mesh.add_default_domain;
                 end
                 obj.airbox.default_airbox = AirboxAphi('parent_model',obj,'id_dom3d','default_domain');
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                 'bsfield','coil','nomesh','pmagnet','embc'};
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             for i = 1:length(allowed_physical_dom)
                 phydom_type = allowed_physical_dom{i};
                 % ---
@@ -94,9 +86,9 @@ classdef FEM3dAphijw < FEM3dAphi
                     phydom.build;
                 end
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             obj.build_done = 1;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
         function assembly(obj)
@@ -272,17 +264,17 @@ classdef FEM3dAphijw < FEM3dAphi
         end
         % -----------------------------------------------------------------
         function solve(obj)
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             f_fprintf(0,'Solve',1,class(obj),0,'\n');
             f_fprintf(0,'   ');
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             erro0 = 1;
             tole0 = 1e-3;
             maxi0 = 10;
             erro1 = 1;
             tole1 = 1e-6;
             maxi1 = 1e3;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             nite0 = 0;
             % ---
             while erro0 > tole0 & nite0 < maxi0
