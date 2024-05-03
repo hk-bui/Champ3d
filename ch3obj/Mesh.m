@@ -343,7 +343,6 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function obj = build_meshds(obj,args)
-
             arguments
                 obj
                 % ---
@@ -661,13 +660,6 @@ classdef Mesh < Xhandle
             tic
             f_fprintf(0,'Make #intkit \n');
             fprintf('   ');
-            %--------------------------------------------------------------
-            U   = [];
-            V   = [];
-            W   = [];
-            cU  = [];
-            cV  = [];
-            cW  = [];
             %--------------------------------------------------------------
             refelem_ = obj.refelem;
             U  = refelem_.U;
