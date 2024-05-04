@@ -34,6 +34,7 @@ classdef FEM3dAphijw < FEM3dAphi
             % ---
         end
     end
+
     % --- Methods/public
     methods (Access = public)
         % -----------------------------------------------------------------

@@ -26,7 +26,6 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -61,9 +60,6 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -71,12 +67,7 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@OpenCoilAphi(obj);
-            obj.setup_done = 0;
             setup@SolidCoilAphi(obj);
             % ---
             if isempty(obj.v_coil)
@@ -85,13 +76,8 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
                 if obj.v_coil == 0
                     obj.coil_mode = 'rx';
                 end
-                % ---
-                obj.v_coil = Parameter('f',obj.v_coil);
             end
             % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
         end
     end
 
@@ -109,22 +95,6 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
             build@VsCoilAphi(obj);
             % ---
             obj.build_done = 1;
-        end
-    end
-
-    % --- Methods
-    methods
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'k'
-                args.face_color = 'none'
-                args.alpha {mustBeNumeric} = 0.5
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@OpenCoilAphi(obj,argu{:});
-            % ---
         end
     end
 

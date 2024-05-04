@@ -17,7 +17,6 @@ classdef MconductorAphi < Mconductor
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -46,10 +45,6 @@ classdef MconductorAphi < Mconductor
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -57,16 +52,7 @@ classdef MconductorAphi < Mconductor
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Mconductor(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 

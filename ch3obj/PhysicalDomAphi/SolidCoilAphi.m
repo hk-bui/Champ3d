@@ -12,7 +12,6 @@ classdef SolidCoilAphi < Econductor
 
     % ---
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -27,17 +26,7 @@ classdef SolidCoilAphi < Econductor
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Econductor(obj);
-            % ---
-            if isnumeric(obj.sigma)
-                obj.sigma = Parameter('f',obj.sigma);
-            end
-            % ---
-            obj.setup_done = 1;
         end
     end
 

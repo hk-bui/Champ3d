@@ -24,6 +24,12 @@ classdef StrandedCoilAphi < Xhandle
         end
     end
 
+    % --- setup
+    methods
+        function setup(obj)
+        end
+    end
+
     % --- Methods
     methods
         function z_coil = get_zcoil(obj)

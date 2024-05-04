@@ -76,8 +76,8 @@ classdef CloseCoil < Coil
             args4cv3.parent_mesh = obj.parent_model.parent_mesh;
             args4cv3.id_dom3d = obj.id_dom3d;
             args4cv3.cut_equation = obj.etrode_equation;
-            argu = f_to_namedarg(args4cv3,'with_only',...
-                        {'parent_mesh','id_dom3d','cut_equation'});
+            % ---
+            argu = f_to_namedarg(args4cv3,'for','CutVolumeDom3d');
             % ---
             obj.electrode_dom = CutVolumeDom3d(argu{:});
             % ---

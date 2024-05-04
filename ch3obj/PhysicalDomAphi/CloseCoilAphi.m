@@ -17,7 +17,6 @@ classdef CloseCoilAphi < CloseCoil
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -46,9 +45,6 @@ classdef CloseCoilAphi < CloseCoil
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -56,20 +52,7 @@ classdef CloseCoilAphi < CloseCoil
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@CloseCoil(obj);
-            % ---
-            obj.parent_mesh = obj.dom.parent_mesh;
-            % ---
-            obj.matrix.gid_elem = [];
-            obj.matrix.unit_current_field = [];
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
         end
     end
 
@@ -169,7 +152,7 @@ classdef CloseCoilAphi < CloseCoil
             if ~isempty(obj.matrix.unit_current_field)
                 hold on;
                 f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem));
+                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
             end
         end
     end

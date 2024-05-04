@@ -17,7 +17,6 @@ classdef NomeshAphi < Nomesh
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -45,9 +44,6 @@ classdef NomeshAphi < Nomesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -55,14 +51,7 @@ classdef NomeshAphi < Nomesh
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Nomesh(obj);
-                % ---
-                obj.setup_done = 1;
-                % ---
-                obj.build_done = 0;
-            end
+            setup@Nomesh(obj);
         end
     end
 

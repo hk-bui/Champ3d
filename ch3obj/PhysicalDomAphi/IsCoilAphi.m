@@ -12,7 +12,6 @@ classdef IsCoilAphi < Xhandle
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -21,6 +20,12 @@ classdef IsCoilAphi < Xhandle
     methods
         function obj = IsCoilAphi()
             obj@Xhandle;
+        end
+    end
+    
+    % --- setup
+    methods
+        function setup(obj)
         end
     end
 

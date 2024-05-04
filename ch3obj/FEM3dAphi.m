@@ -33,9 +33,15 @@ classdef FEM3dAphi < EmModel
             obj <= args;
         end
     end
-
+    
     % --- Methods/public
     methods (Access = public)
+
+    end
+    % --- Methods/protected
+    methods (Access = protected)
+        % -----------------------------------------------------------------
+        
         % -----------------------------------------------------------------
         function base_matrix(obj)
             %--------------------------------------------------------------

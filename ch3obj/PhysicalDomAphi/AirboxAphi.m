@@ -17,7 +17,6 @@ classdef AirboxAphi < Airbox
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -45,9 +44,6 @@ classdef AirboxAphi < Airbox
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -55,14 +51,7 @@ classdef AirboxAphi < Airbox
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Airbox(obj);
-                % ---
-                obj.setup_done = 1;
-                % ---
-                obj.build_done = 0;
-            end
+            setup@Airbox(obj);
         end
     end
 

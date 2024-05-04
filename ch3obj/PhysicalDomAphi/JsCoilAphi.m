@@ -12,7 +12,6 @@ classdef JsCoilAphi < Xhandle
     
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -21,6 +20,12 @@ classdef JsCoilAphi < Xhandle
     methods
         function obj = JsCoilAphi()
             obj@Xhandle;
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
         end
     end
 

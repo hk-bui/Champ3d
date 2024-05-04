@@ -30,7 +30,6 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -68,9 +67,6 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -78,11 +74,9 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@CloseCoilAphi(obj);
+            setup@StrandedCoilAphi(obj);
+            setup@JsCoilAphi(obj);
             % ---
             if isempty(obj.j_coil)
                 obj.coil_mode = 'rx';
@@ -90,13 +84,8 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
                 if obj.j_coil == 0
                     obj.coil_mode = 'rx';
                 end
-                % ---
-                obj.j_coil = Parameter('f',obj.j_coil);
             end
             % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
         end
     end
 
@@ -112,22 +101,6 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
             % ---
             build@CloseCoilAphi(obj);
             build@JsCoilAphi(obj);
-        end
-    end
-
-    % --- Methods
-    methods
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'k'
-                args.face_color = 'none'
-                args.alpha {mustBeNumeric} = 0.5
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@CloseCoilAphi(obj,argu{:});
-            % ---
         end
     end
 

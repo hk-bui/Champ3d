@@ -50,20 +50,4 @@ classdef Coil < PhysicalDom
         end
     end
 
-    % --- Methods
-    methods
-        % -----------------------------------------------------------------
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'none'
-                args.face_color = 'c'
-                args.alpha {mustBeNumeric} = 0.9
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@PhysicalDom(obj,argu{:}); hold on
-        end
-        % -----------------------------------------------------------------
-    end
 end
