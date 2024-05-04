@@ -684,7 +684,6 @@ classdef Mesh < Xhandle
             for i = 1:length(fnmeshds)
                 if isempty(obj.meshds.(fnmeshds{i}))
                     obj.build_meshds('get',fnmeshds{i});
-                    break
                 end
             end
             %--------------------------------------------------------------
