@@ -8,9 +8,8 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef EmModel < Xhandle
+classdef EmModel < PhysicalModel
     properties
-        id
         frequency = 0
         jome
         % ---
@@ -26,15 +25,6 @@ classdef EmModel < Xhandle
         sibc
         embc
         % ---
-        ltime
-        % ---
-        matrix
-        fields
-        dof
-        % ---
-        build_done = 0
-        assembly_done = 0
-        solve_done = 0
     end
     
     % --- Valid args list
@@ -52,7 +42,7 @@ classdef EmModel < Xhandle
                 args.ltime {mustBeMember(args.ltime,'LTime')}
             end
             % ---
-            obj@Xhandle;
+            obj@PhysicalModel;
             % ---
             obj <= args;
             % ---

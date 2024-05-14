@@ -12,7 +12,6 @@ classdef Line1d < Xhandle
 
     % --- Properties
     properties
-        id
         len
         dtype = 'lin'
         dnum = 1

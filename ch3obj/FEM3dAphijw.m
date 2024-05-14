@@ -9,6 +9,11 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphijw < FEM3dAphi
+    properties
+        build_done = 0
+        assembly_done = 0
+        solve_done = 0
+    end
 
     % --- Valid args list
     methods (Static)
