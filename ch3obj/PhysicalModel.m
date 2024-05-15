@@ -29,6 +29,14 @@ classdef PhysicalModel < Xhandle
             % ---
             obj@Xhandle;
             % ---
+            obj.ltime = LTime;
+        end
+    end
+    % --- Methods
+    methods
+        function solve_all(obj)
+            timemodel = TimeVaryingModel(obj);
+            timemodel.solve;
         end
     end
 end
