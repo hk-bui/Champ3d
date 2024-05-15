@@ -202,10 +202,10 @@ classdef SibcAphijw < Sibc
                 js(1,lid_face) = sigma_array(lid_face,1).' .* es(1,lid_face);
                 js(2,lid_face) = sigma_array(lid_face,1).' .* es(2,lid_face);
                 %----------------------------------------------------------
-                obj.parent_model.fields.es(:,gid_face) = es(:,lid_face);
-                obj.parent_model.fields.js(:,gid_face) = js(:,lid_face);
+                obj.parent_model.field.es(:,gid_face) = es(:,lid_face);
+                obj.parent_model.field.js(:,gid_face) = js(:,lid_face);
                 %----------------------------------------------------------
-                obj.parent_model.fields.ps(:,gid_face) = ...
+                obj.parent_model.field.ps(:,gid_face) = ...
                     real(1/2 .* skindepth(lid_face,1).' .* ...
                     sum(es(:,lid_face) .* conj(js(:,lid_face))));
                 %----------------------------------------------------------

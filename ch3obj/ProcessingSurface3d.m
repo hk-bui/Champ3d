@@ -23,7 +23,7 @@ classdef ProcessingSurface3d < VolumeDom3d
         flog = 1.05;
         % ---
         mesh
-        fields
+        field
         % ---
         cut_equation
         %gid_elem
@@ -178,8 +178,8 @@ classdef ProcessingSurface3d < VolumeDom3d
             % ---
             id_field = args.id_field;
             if ~isempty(id_field)
-                if isfield(obj.fields,id_field)
-                    fval = obj.fields.(id_field);
+                if isfield(obj.field,id_field)
+                    fval = obj.field.(id_field);
                 end
             end
             % ---
@@ -329,9 +329,9 @@ classdef ProcessingSurface3d < VolumeDom3d
                     fi = obj.getfieldAphi(fn);
                 end
                 % ---
-                obj.fields.(id_field) = fi;
+                obj.field.(id_field) = fi;
             else
-                obj.fields.(id_field) = args.field_value;
+                obj.field.(id_field) = args.field_value;
             end
             % ---
         end

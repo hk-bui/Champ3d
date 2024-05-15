@@ -13,7 +13,7 @@ classdef PhysicalModel < Xhandle
         ltime
         moving_frame
         matrix
-        fields
+        field
         dof
     end
     

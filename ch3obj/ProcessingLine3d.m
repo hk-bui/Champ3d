@@ -130,8 +130,8 @@ classdef ProcessingLine3d < ProcessingSurface3d
             % ---
             id_field = args.id_field;
             if ~isempty(id_field)
-                if isfield(obj.fields,id_field)
-                    fval = obj.fields.(id_field);
+                if isfield(obj.field,id_field)
+                    fval = obj.field.(id_field);
                 end
             end
             % ---

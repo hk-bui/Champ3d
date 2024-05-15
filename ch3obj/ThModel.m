@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThModel < Xhandle
+classdef ThModel < PhysicalModel
     properties
         parent_mesh
         % ---
@@ -20,16 +20,8 @@ classdef ThModel < Xhandle
         ps
         pv
         % ---
-        ltime
         Temp0 = 0
         % ---
-        matrix
-        fields
-        dof
-        % ---
-        build_done = 0
-        assembly_done = 0
-        solve_done = 0
     end
     
     % --- Valid args list
@@ -47,7 +39,7 @@ classdef ThModel < Xhandle
                 args.Temp0
             end
             % ---
-            obj@Xhandle;
+            obj@PhysicalModel;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -55,7 +47,7 @@ classdef ThModel < Xhandle
             % ---
             obj <= args;
             % ---
-            f_initobj(obj,'property_name','fields',...
+            f_initobj(obj,'property_name','field',...
                      'field_name',{'tempv','temps'}, ...
                      'init_value',args.Temp0);
             % ---
@@ -181,7 +173,7 @@ classdef ThModel < Xhandle
             nb_elem = obj.parent_mesh.nb_elem;
             nb_face = obj.parent_mesh.nb_face;
             % ---
-            obj.fields.tempv = zeros(1,nb_elem) + obj.Temp0;
+            obj.field.tempv = zeros(1,nb_elem) + obj.Temp0;
         end
     end
 end

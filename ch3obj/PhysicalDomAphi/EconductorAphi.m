@@ -147,7 +147,7 @@ classdef EconductorAphi < Econductor
             %--------------------------------------------------------------
             [coef, coef_array_type] = f_column_format(sigma_array);
             %--------------------------------------------------------------
-            ev = obj.parent_model.fields.ev(:,gid_elem);
+            ev = obj.parent_model.field.ev(:,gid_elem);
             jv = zeros(3,length(gid_elem));
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -167,9 +167,9 @@ classdef EconductorAphi < Econductor
                           coef(:,3,3).' .* ev(3,:);
             end
             %--------------------------------------------------------------
-            obj.parent_model.fields.jv(:,gid_elem) = jv;
+            obj.parent_model.field.jv(:,gid_elem) = jv;
             %--------------------------------------------------------------
-            obj.parent_model.fields.pv(:,gid_elem) = ...
+            obj.parent_model.field.pv(:,gid_elem) = ...
                 real(1/2 .* sum(ev .* conj(jv)));
             %--------------------------------------------------------------
         end

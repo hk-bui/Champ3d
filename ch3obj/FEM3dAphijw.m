@@ -358,16 +358,16 @@ classdef FEM3dAphijw < FEM3dAphi
             nb_edge = parent_mesh.nb_edge;
             nb_node = parent_mesh.nb_node;
             %--------------------------------------------------------------------------
-            obj.fields.av = obj.parent_mesh.field_we('dof',obj.dof.a);
-            obj.fields.bv = obj.parent_mesh.field_wf('dof',obj.dof.b);
-            obj.fields.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
-            obj.fields.phiv = obj.parent_mesh.field_wn('dof',obj.dof.phi);
-            obj.fields.phi = obj.dof.phi;
+            obj.field.av = obj.parent_mesh.field_we('dof',obj.dof.a);
+            obj.field.bv = obj.parent_mesh.field_wf('dof',obj.dof.b);
+            obj.field.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
+            obj.field.phiv = obj.parent_mesh.field_wn('dof',obj.dof.phi);
+            obj.field.phi = obj.dof.phi;
             % -------------------------------------------------------------------------
-            obj.fields.jv = sparse(3,nb_elem);
-            obj.fields.pv = sparse(1,nb_elem);
-            obj.fields.js = sparse(2,nb_face);
-            obj.fields.ps = sparse(1,nb_face);
+            obj.field.jv = sparse(3,nb_elem);
+            obj.field.pv = sparse(1,nb_elem);
+            obj.field.js = sparse(2,nb_face);
+            obj.field.ps = sparse(1,nb_face);
             %--------------------------------------------------------------------------
             %allowed_physical_dom = {'econductor','sibc','coil'};
             allowed_physical_dom = {'econductor','sibc'};

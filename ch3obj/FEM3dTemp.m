@@ -221,8 +221,8 @@ classdef FEM3dTemp < ThModel
                 obj.dof.temp = zeros(nb_node,1);
                 obj.dof.temp(id_node_t) = x;
                 %----------------------------------------------------------------------
-                obj.fields.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
-                obj.fields.temp  = obj.dof.temp;
+                obj.field.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
+                obj.field.temp  = obj.dof.temp;
                 Temp_prev = obj.dof.temp;
                 %----------------------------------------------------------------------
                 obj.postpro;

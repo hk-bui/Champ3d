@@ -48,7 +48,7 @@ classdef EmModel < PhysicalModel
             % ---
             obj.jome = 1j*2*pi*obj.frequency;
             % ---
-            f_initobj(obj,'property_name','fields',...
+            f_initobj(obj,'property_name','field',...
                      'field_name',{'bv','jv','hv','pv','av','phiv','tv','omev',...
                      'bs','js','hs','ps','as','phis','ts','omes'}, ...
                      'init_value',[]);
@@ -370,15 +370,15 @@ classdef EmModel < PhysicalModel
             nb_elem = obj.parent_mesh.nb_elem;
             nb_face = obj.parent_mesh.nb_face;
             % ---
-            obj.fields.av = sparse(3,nb_elem);
-            obj.fields.bv = sparse(3,nb_elem);
-            obj.fields.ev = sparse(3,nb_elem);
-            obj.fields.phiv = sparse(3,nb_elem);
-            obj.fields.phi = [];
-            obj.fields.jv = sparse(3,nb_elem);
-            obj.fields.pv = sparse(1,nb_elem);
-            obj.fields.js = sparse(2,nb_face);
-            obj.fields.ps = sparse(1,nb_face);
+            obj.field.av = sparse(3,nb_elem);
+            obj.field.bv = sparse(3,nb_elem);
+            obj.field.ev = sparse(3,nb_elem);
+            obj.field.phiv = sparse(3,nb_elem);
+            obj.field.phi = [];
+            obj.field.jv = sparse(3,nb_elem);
+            obj.field.pv = sparse(1,nb_elem);
+            obj.field.js = sparse(2,nb_face);
+            obj.field.ps = sparse(1,nb_face);
         end
     end
 end

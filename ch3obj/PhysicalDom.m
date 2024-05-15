@@ -171,7 +171,7 @@ classdef PhysicalDom < Xhandle
                 id_face = sdom.gid_face;
                 face = obj.parent_model.parent_mesh.face(:,id_face);
                 node = obj.parent_model.parent_mesh.node;
-                js   = obj.parent_model.fields.js(:,id_face);
+                js   = obj.parent_model.field.js(:,id_face);
                 js   = f_magnitude(js);
                 %--------------------------------------------------------------
                 clear msh;
@@ -249,7 +249,7 @@ classdef PhysicalDom < Xhandle
             % ---
             if isa(obj.dom,'VolumeDom3d')
                 id_elem = obj.dom.gid_elem;
-                fv = obj.parent_model.fields.(args.field_name)(:,id_elem);
+                fv = obj.parent_model.field.(args.field_name)(:,id_elem);
                 no = obj.parent_model.parent_mesh.celem(:,id_elem);
                 if isreal(fv)
                     f_quiver(no,fv);
@@ -274,7 +274,7 @@ classdef PhysicalDom < Xhandle
             end
             % ---
             if any(f_strcmpi(args.field_name,{'pv'}))
-                fs = obj.parent_model.fields.(args.field_name);
+                fs = obj.parent_model.field.(args.field_name);
                 % ---
                 gid_elem = obj.dom.gid_elem;
                 celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
@@ -289,14 +289,14 @@ classdef PhysicalDom < Xhandle
                 elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
                 elem_type = f_elemtype(elem);
                 face = f_boundface(elem,node,'elem_type',elem_type);
-                fs = obj.parent_model.fields.(args.field_name);
+                fs = obj.parent_model.field.(args.field_name);
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end
             % ---
             if isa(obj.dom,'SurfaceDom3d')
                 node = obj.parent_model.parent_mesh.node;
                 face = obj.parent_model.parent_mesh.face(:,obj.dom.gid_face);
-                fs = obj.parent_model.fields.(args.field_name);
+                fs = obj.parent_model.field.(args.field_name);
                 fs = fs(obj.dom.gid_face);
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end
