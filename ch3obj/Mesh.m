@@ -1480,18 +1480,6 @@ classdef Mesh < Xhandle
         % -----------------------------------------------------------------
     end
     % --- Methods - Obj
-    methods (Access = public)
-        % ---
-        function objx = uplus(obj)
-            objx = copy(obj);
-        end
-        % ---
-        function objx = ctranspose(obj)
-            objx = copy(obj);
-        end
-        % ---
-    end
-    % --- Methods - Obj
     methods (Access = protected)
         function newmesh = copyElement(obj)
             newmesh = copyElement@matlab.mixin.Copyable(obj);

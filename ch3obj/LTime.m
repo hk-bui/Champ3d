@@ -72,17 +72,4 @@ classdef LTime < Xhandle
             end
         end
     end
-
-    % --- Methods
-    methods (Access = public)
-        % ---
-        function objx = uplus(obj)
-            objx = copy(obj);
-        end
-        % ---
-        function objx = ctranspose(obj)
-            objx = copy(obj);
-        end
-        % ---
-    end
 end
