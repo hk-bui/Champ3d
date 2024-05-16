@@ -78,7 +78,7 @@ classdef LTime < Xhandle
 
     % --- Methods
     methods
-        function val = get.time_now(obj)
+        function val = get.t_now(obj)
             if obj.it > 0
                 val = obj.time_array(obj.it);
             else

@@ -38,7 +38,7 @@ classdef TimeSystem < Xhandle
     % --- Methods
     methods
         % ---
-        function val = get.time_now(obj)
+        function val = get.t_now(obj)
             % ---
             if ~obj.init_done
                 obj.init;
@@ -107,7 +107,7 @@ classdef TimeSystem < Xhandle
                 obj.ltime.(ltime_{i}).it = obj.ltime.(ltime_{i}).it + 1;
                 if obj.ltime.(ltime_{i}).it > obj.ltime.(ltime_{i}).it_max
                     obj.ltime.(ltime_{i}).it = obj.ltime.(ltime_{i}).it - 1;
-                elseif obj.ltime.(ltime_{i}).time_now > obj.time_now
+                elseif obj.ltime.(ltime_{i}).t_now > obj.t_now
                     obj.ltime.(ltime_{i}).it = obj.ltime.(ltime_{i}).it - 1;
                 end
             end
