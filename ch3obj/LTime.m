@@ -13,7 +13,7 @@ classdef LTime < Xhandle
     % --- Properties
     properties
         it = 0
-        time_array
+        t_array
     end
 
     % --- Properties
@@ -24,7 +24,7 @@ classdef LTime < Xhandle
     % --- Dependent Properties
     properties (Dependent = true)
         it_max
-        time_now
+        t_now
     end
     
     % --- Valid args list
@@ -37,20 +37,20 @@ classdef LTime < Xhandle
     methods
         function obj = LTime(args)
             arguments
-                args.time_array {mustBeNumeric}
+                args.t_array {mustBeNumeric}
                 args.t0 {mustBeNumeric}
                 args.t_end {mustBeNumeric}
                 args.dnum {mustBeNumeric}
             end
             obj = obj@Xhandle;
             % ---
-            if isfield(args,'time_array')
-                if ~isempty(args.time_array)
-                    obj.time_array = round(args.time_array,obj.nbdigit); % !!!
+            if isfield(args,'t_array')
+                if ~isempty(args.t_array)
+                    obj.t_array = round(args.t_array,obj.nbdigit); % !!!
                 end
             end
             % ---
-            if isempty(obj.time_array)
+            if isempty(obj.t_array)
                 % ---
                 t0 = 0;
                 t_end = 0;
@@ -66,10 +66,10 @@ classdef LTime < Xhandle
                     dnum = args.dnum;
                 end
                 % ---
-                obj.time_array = [t0, t0 + cumsum((t_end-t0)/dnum .* ones(1,dnum))];
+                obj.t_array = [t0, t0 + cumsum((t_end-t0)/dnum .* ones(1,dnum))];
                 % ---
-                obj.time_array = round(obj.time_array,obj.nbdigit); % !!!
-                obj.time_array = uniquetol(obj.time_array); % !!!
+                obj.t_array = round(obj.t_array,obj.nbdigit); % !!!
+                obj.t_array = uniquetol(obj.t_array); % !!!
                 % ---
             end
             % ---
@@ -80,14 +80,14 @@ classdef LTime < Xhandle
     methods
         function val = get.t_now(obj)
             if obj.it > 0
-                val = obj.time_array(obj.it);
+                val = obj.t_array(obj.it);
             else
                 val = -inf;
             end
         end
         % ---
         function val = get.it_max(obj)
-            val = length(obj.time_array);
+            val = length(obj.t_array);
         end
     end
 end

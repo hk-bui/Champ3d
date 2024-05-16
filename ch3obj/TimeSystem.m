@@ -13,12 +13,12 @@ classdef TimeSystem < Xhandle
     % --- Properties
     properties
         it = 1 % !!!
-        time_array
+        t_array
         ltime
     end
     % ---
     properties (Dependent)
-        time_now
+        t_now
         t0
         t_end
     end
@@ -45,7 +45,7 @@ classdef TimeSystem < Xhandle
             end
             % ---
             if obj.it > 0
-                val = obj.time_array(obj.it);
+                val = obj.t_array(obj.it);
             else
                 val = -inf;
             end
@@ -57,7 +57,7 @@ classdef TimeSystem < Xhandle
                 obj.init;
             end
             % ---
-            val = min(obj.time_array);
+            val = min(obj.t_array);
         end
         % ---
         function val = get.t_end(obj)
@@ -66,7 +66,7 @@ classdef TimeSystem < Xhandle
                 obj.init;
             end
             % ---
-            val = max(obj.time_array);
+            val = max(obj.t_array);
         end
         % ---
     end
@@ -76,7 +76,7 @@ classdef TimeSystem < Xhandle
             arguments
                 obj
                 args.id = 'no_id'
-                args.time_array {mustBeNumeric} = []
+                args.t_array {mustBeNumeric} = []
                 args.t0 {mustBeNumeric} = 0
                 args.t_end {mustBeNumeric} = 0
                 args.dnum {mustBeNumeric} = 1
@@ -117,14 +117,14 @@ classdef TimeSystem < Xhandle
         function init(obj)
             ltime_ = fieldnames(obj.ltime);
             % ---
-            time_array_ = [];
+            t_array_ = [];
             for i = 1:length(ltime_)
-                time_array_ = [time_array_ obj.ltime.(ltime_{i}).time_array];
+                t_array_ = [t_array_ obj.ltime.(ltime_{i}).t_array];
             end
             % ---
-            time_array_ = sort(uniquetol(time_array_));
+            t_array_ = sort(uniquetol(t_array_));
             % ---
-            obj.time_array = time_array_;
+            obj.t_array = t_array_;
             % --- !!!
             obj.it = 0;
             % ---
