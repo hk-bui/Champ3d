@@ -381,7 +381,7 @@ classdef Parameter %< Xhandle
                         'bs','js','hs','ps','as','phis','ts','omes','temps'}))
                     fargs{i} = from_.field.(depon_)(:,id_elem);
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
-                    fargs{i} = from_.ltime.ltime_now;
+                    fargs{i} = from_.ltime.t_now;
                 end
             end
         end
