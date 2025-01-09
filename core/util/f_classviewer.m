@@ -1,4 +1,4 @@
-function clViewer = f_classviewer(ch3obj_path)
+function clViewer = f_classviewer(ch3obj_path,options)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2025
 % as a contribution to champ3d code.
@@ -11,6 +11,7 @@ function clViewer = f_classviewer(ch3obj_path)
 
 arguments
     ch3obj_path = []
+    options.addAllClasses = 0
 end
 % ---
 clViewer = [];
@@ -25,8 +26,13 @@ for i = 1:length(clNames)
     clNames{i} = replace(clNames{i},'.m','');
 end
 % ---
-clViewer = matlab.diagram.ClassViewer();
+% clViewer = matlab.diagram.ClassViewer();
+clViewer = matlab.diagram.ClassViewer('Folders',ch3obj_path);
 % ---
-for i = 1:length(clNames)
-    addClass(clViewer,clNames{i});
+if ~options.addAllClasses
+    removeAllClasses(clViewer);
 end
+% ---
+% for i = 1:length(clNames)
+%     addClass(clViewer,clNames{i});
+% end
