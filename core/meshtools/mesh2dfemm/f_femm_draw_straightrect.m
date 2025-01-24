@@ -1,8 +1,8 @@
 function draw2d = f_femm_draw_straightrect(draw2d,varargin)
 
 %--------------------------------------------------------------------------
-% 'center_y_theta' : angle of the center (degree)
-% 'center_x_r' : radius of the center
+% 'c_angle' : angle of the center (degree)
+% 'c_r' : radius of the center
 % 'r_size' : interior radius
 % 'theta_size' : exterior radius
 % 'c_xy' : xy-coordinates of the center
@@ -21,15 +21,14 @@ function draw2d = f_femm_draw_straightrect(draw2d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_draw2d','center_y_theta','center_x_r','len_x_r','len_y_theta','center','ref_point'};
+arglist = {'id_draw2d','c_angle','c_r','r_len','theta_len','center','ref_point'};
 
 % --- default input value
-coordinate_system = 'Oxy'; % 'rtheta'
-len_x_r     = [];
-len_y_theta = [];
+r_len      = [];
+theta_len  = [];
 center     = [];
-center_x_r        = [];
-center_y_theta    = 0;
+c_r        = [];
+c_angle    = 0;
 id_draw2d  = [];
 ref_point  = [0 0];
 
@@ -48,13 +47,13 @@ if isempty(id_draw2d)
     id_draw2d = ['XXDraw2dNo' num2str(lendr)];
 end
 % -------------------------------------------------------------------------
-if ~isempty(center_x_r) && ~isempty(center_y_theta)
-    center(1) = center_x_r * cosd(center_y_theta);
-    center(2) = center_x_r * sind(center_y_theta);
+if ~isempty(c_r) && ~isempty(c_angle)
+    center(1) = c_r * cosd(c_angle);
+    center(2) = c_r * sind(c_angle);
 end
 % ---
-rsizevec = len_x_r/2 .* [cosd(center_y_theta) sind(center_y_theta)];
-tsizevec = len_y_theta/2 .* [cosd(center_y_theta+90) sind(center_y_theta+90)];
+rsizevec = r_len/2 .* [cosd(c_angle) sind(c_angle)];
+tsizevec = theta_len/2 .* [cosd(c_angle+90) sind(c_angle+90)];
 diagvec1 = +rsizevec + tsizevec;
 diagvec2 = -rsizevec + tsizevec;
 % ---
@@ -76,13 +75,13 @@ upperleft   = center + diagvec2*(1-1/sfactor) + ref_point;
 % -------------------------------------------------------------------------
 draw2d(lendr).id_draw2d = id_draw2d;
 draw2d(lendr).type = 'straight_rectangle';
-draw2d(lendr).center_y_theta = center_y_theta;
-draw2d(lendr).center_x_r = center_x_r;
+draw2d(lendr).c_angle = c_angle;
+draw2d(lendr).c_r = c_r;
 draw2d(lendr).ref_point = ref_point;
 draw2d(lendr).center = center;
-draw2d(lendr).len_x_r = len_x_r;
-draw2d(lendr).len_y_theta = len_y_theta;
-draw2d(lendr).c_vector = [cosd(center_y_theta) sind(center_y_theta)];
+draw2d(lendr).r_len = r_len;
+draw2d(lendr).theta_len = theta_len;
+draw2d(lendr).c_vector = [cosd(c_angle) sind(c_angle)];
 draw2d(lendr).bottomright = bottomright;
 draw2d(lendr).bottomleft  = bottomleft;
 draw2d(lendr).upperright  = upperright;

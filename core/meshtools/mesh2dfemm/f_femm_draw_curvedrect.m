@@ -2,8 +2,8 @@ function draw2d = f_femm_draw_curvedrect(draw2d,varargin)
 
 %--------------------------------------------------------------------------
 % 'c_angle' : angle of the center (degree)
-% 'r_in' : interior radius
-% 'r_ex' : exterior radius
+% 'ri' : interior radius
+% 're' : exterior radius
 % 'arclen' : arc length
 % 'max_angle_len' : maximal angle of segment (default = 2 deg)
 %--------------------------------------------------------------------------
@@ -21,12 +21,12 @@ function draw2d = f_femm_draw_curvedrect(draw2d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_draw2d','c_angle','r_in','r_ex','arc_len','max_angle_len','ref_point'};
+arglist = {'id_draw2d','c_angle','ri','re','arc_len','max_angle_len','ref_point'};
 
 % --- default input value
 c_angle = [];
-r_in = [];
-r_ex = [];
+ri = [];
+re = [];
 arc_len = 0;
 max_angle_len = [];
 id_draw2d = [];
@@ -58,30 +58,30 @@ sfactor = 1e2;
 % -------------------------------------------------------------------------
 if arc_len <= 180
     % ---------------------------------------------------------------------
-    xi1 = r_in * cosd(c_angle - arc_len/2) + ref_point(1);
-    xi2 = r_in * cosd(c_angle + arc_len/2) + ref_point(1);
-    yi1 = r_in * sind(c_angle - arc_len/2) + ref_point(2);
-    yi2 = r_in * sind(c_angle + arc_len/2) + ref_point(2);
+    xi1 = ri * cosd(c_angle - arc_len/2) + ref_point(1);
+    xi2 = ri * cosd(c_angle + arc_len/2) + ref_point(1);
+    yi1 = ri * sind(c_angle - arc_len/2) + ref_point(2);
+    yi2 = ri * sind(c_angle + arc_len/2) + ref_point(2);
     mi_drawarc(xi1,yi1,xi2,yi2,arc_len,max_angle_len);
     % ---------------------------------------------------------------------
-    xe1 = r_ex * cosd(c_angle - arc_len/2) + ref_point(1);
-    xe2 = r_ex * cosd(c_angle + arc_len/2) + ref_point(1);
-    ye1 = r_ex * sind(c_angle - arc_len/2) + ref_point(2);
-    ye2 = r_ex * sind(c_angle + arc_len/2) + ref_point(2);
+    xe1 = re * cosd(c_angle - arc_len/2) + ref_point(1);
+    xe2 = re * cosd(c_angle + arc_len/2) + ref_point(1);
+    ye1 = re * sind(c_angle - arc_len/2) + ref_point(2);
+    ye2 = re * sind(c_angle + arc_len/2) + ref_point(2);
     mi_drawarc(xe1,ye1,xe2,ye2,arc_len,max_angle_len);
     % ---------------------------------------------------------------------
     mi_drawline(xi1,yi1,xe1,ye1);
     mi_drawline(xi2,yi2,xe2,ye2);
     % ---------------------------------------------------------------------
     eps_a = arc_len/2 - arc_len/sfactor;
-    eps_r = r_in + (r_in+r_ex)/sfactor;
+    eps_r = ri + (ri+re)/sfactor;
     bottomright(1) = eps_r * cosd(c_angle - eps_a) + ref_point(1);
     bottomright(2) = eps_r * sind(c_angle - eps_a) + ref_point(2);
     bottomleft(1)  = eps_r * cosd(c_angle + eps_a) + ref_point(1);
     bottomleft(2)  = eps_r * sind(c_angle + eps_a) + ref_point(2);
     % ---------------------------------------------------------------------
     eps_a = arc_len/2 - arc_len/sfactor;
-    eps_r = r_ex - (r_in+r_ex)/sfactor;
+    eps_r = re - (ri+re)/sfactor;
     upperright(1) = eps_r * cosd(c_angle - eps_a) + ref_point(1);
     upperright(2) = eps_r * sind(c_angle - eps_a) + ref_point(2);
     upperleft(1)  = eps_r * cosd(c_angle + eps_a) + ref_point(1);
@@ -91,23 +91,23 @@ else
     ca = c_angle - arc_len/4;
     max_angle_len = round(max_angle_len/2);
     % ---------------------------------------------------------------------
-    xi1 = r_in * cosd(ca - arc_len/4) + ref_point(1);
-    xi2 = r_in * cosd(ca + arc_len/4) + ref_point(1);
-    yi1 = r_in * sind(ca - arc_len/4) + ref_point(2);
-    yi2 = r_in * sind(ca + arc_len/4) + ref_point(2);
+    xi1 = ri * cosd(ca - arc_len/4) + ref_point(1);
+    xi2 = ri * cosd(ca + arc_len/4) + ref_point(1);
+    yi1 = ri * sind(ca - arc_len/4) + ref_point(2);
+    yi2 = ri * sind(ca + arc_len/4) + ref_point(2);
     mi_drawarc(xi1,yi1,xi2,yi2,arc_len/2,max_angle_len);
     % ---------------------------------------------------------------------
-    xe1 = r_ex * cosd(ca - arc_len/4) + ref_point(1);
-    xe2 = r_ex * cosd(ca + arc_len/4) + ref_point(1);
-    ye1 = r_ex * sind(ca - arc_len/4) + ref_point(2);
-    ye2 = r_ex * sind(ca + arc_len/4) + ref_point(2);
+    xe1 = re * cosd(ca - arc_len/4) + ref_point(1);
+    xe2 = re * cosd(ca + arc_len/4) + ref_point(1);
+    ye1 = re * sind(ca - arc_len/4) + ref_point(2);
+    ye2 = re * sind(ca + arc_len/4) + ref_point(2);
     mi_drawarc(xe1,ye1,xe2,ye2,arc_len/2,max_angle_len);
     % ---------------------------------------------------------------------
     ca = c_angle + arc_len/4;
-    xi3 = r_in * cosd(ca + arc_len/4) + ref_point(1);
-    xe3 = r_ex * cosd(ca + arc_len/4) + ref_point(1);
-    yi3 = r_in * sind(ca + arc_len/4) + ref_point(2);
-    ye3 = r_ex * sind(ca + arc_len/4) + ref_point(2);
+    xi3 = ri * cosd(ca + arc_len/4) + ref_point(1);
+    xe3 = re * cosd(ca + arc_len/4) + ref_point(1);
+    yi3 = ri * sind(ca + arc_len/4) + ref_point(2);
+    ye3 = re * sind(ca + arc_len/4) + ref_point(2);
     mi_drawarc(xi2,yi2,xi3,yi3,arc_len/2,max_angle_len);
     mi_drawarc(xe2,ye2,xe3,ye3,arc_len/2,max_angle_len);
     % ---------------------------------------------------------------------
@@ -117,34 +117,34 @@ else
     ca    = c_angle - arc_len/4;
     eps_a = arc_len/4 - arc_len/sfactor;
     % ---
-    eps_r = r_in + (r_in+r_ex)/sfactor;
+    eps_r = ri + (ri+re)/sfactor;
     bottomright(1) = eps_r * cosd(ca - eps_a) + ref_point(1);
     bottomright(2) = eps_r * sind(ca - eps_a) + ref_point(2);
     % ---
-    eps_r = r_ex - (r_in+r_ex)/sfactor;
+    eps_r = re - (ri+re)/sfactor;
     upperright(1) = eps_r * cosd(ca - eps_a) + ref_point(1);
     upperright(2) = eps_r * sind(ca - eps_a) + ref_point(2);
     % ---------------------------------------------------------------------
     ca    = c_angle + arc_len/4;
     eps_a = arc_len/4 - arc_len/sfactor;
     % ---
-    eps_r = r_in + (r_in+r_ex)/sfactor;
+    eps_r = ri + (ri+re)/sfactor;
     bottomleft(1) = eps_r * cosd(ca + eps_a) + ref_point(1);
     bottomleft(2) = eps_r * sind(ca + eps_a) + ref_point(2);
     % ---
-    eps_r = r_ex - (r_in+r_ex)/sfactor;
+    eps_r = re - (ri+re)/sfactor;
     upperleft(1) = eps_r * cosd(ca + eps_a) + ref_point(1);
     upperleft(2) = eps_r * sind(ca + eps_a) + ref_point(2);
     % ---------------------------------------------------------------------
 end
 % -------------------------------------------------------------------------
-center = [(r_in+r_ex)/2 * cosd(c_angle)   (r_in+r_ex)/2 * sind(c_angle)];
+center = [(ri+re)/2 * cosd(c_angle)   (ri+re)/2 * sind(c_angle)];
 % -------------------------------------------------------------------------
 draw2d(lendr).id_draw2d = id_draw2d;
 draw2d(lendr).type = 'curved_rectangle';
 draw2d(lendr).c_angle = c_angle;
-draw2d(lendr).r_in = r_in;
-draw2d(lendr).r_ex = r_ex;
+draw2d(lendr).ri = ri;
+draw2d(lendr).re = re;
 draw2d(lendr).arc_len  = arc_len;
 draw2d(lendr).ref_point  = ref_point;
 draw2d(lendr).center   = center;
