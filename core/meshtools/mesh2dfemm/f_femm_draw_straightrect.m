@@ -21,7 +21,7 @@ function draw2d = f_femm_draw_straightrect(draw2d,varargin)
 %--------------------------------------------------------------------------
 
 % --- valid argument list (to be updated each time modifying function)
-arglist = {'id_draw2d','c_angle','c_r','r_len','theta_len','center','ocenter'};
+arglist = {'id_draw2d','c_angle','c_r','r_len','theta_len','center','ref_point'};
 
 % --- default input value
 r_len      = [];
@@ -30,7 +30,7 @@ center     = [];
 c_r        = [];
 c_angle    = 0;
 id_draw2d  = [];
-ocenter    = [0 0];
+ref_point  = [0 0];
 
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -57,10 +57,10 @@ tsizevec = theta_len/2 .* [cosd(c_angle+90) sind(c_angle+90)];
 diagvec1 = +rsizevec + tsizevec;
 diagvec2 = -rsizevec + tsizevec;
 % ---
-d1 = center - diagvec1 + ocenter;
-d2 = center - diagvec2 + ocenter;
-d3 = center + diagvec1 + ocenter;
-d4 = center + diagvec2 + ocenter;
+d1 = center - diagvec1 + ref_point;
+d2 = center - diagvec2 + ref_point;
+d3 = center + diagvec1 + ref_point;
+d4 = center + diagvec2 + ref_point;
 % ---
 mi_drawline(d1(1),d1(2),d2(1),d2(2));
 mi_drawline(d2(1),d2(2),d3(1),d3(2));
@@ -68,16 +68,16 @@ mi_drawline(d3(1),d3(2),d4(1),d4(2));
 mi_drawline(d4(1),d4(2),d1(1),d1(2));
 % -------------------------------------------------------------------------
 sfactor  = 1e2;
-bottomright = center - diagvec1*(1-1/sfactor) + ocenter;
-upperright  = center - diagvec2*(1-1/sfactor) + ocenter;
-bottomleft  = center + diagvec1*(1-1/sfactor) + ocenter;
-upperleft   = center + diagvec2*(1-1/sfactor) + ocenter;
+bottomright = center - diagvec1*(1-1/sfactor) + ref_point;
+upperright  = center - diagvec2*(1-1/sfactor) + ref_point;
+bottomleft  = center + diagvec1*(1-1/sfactor) + ref_point;
+upperleft   = center + diagvec2*(1-1/sfactor) + ref_point;
 % -------------------------------------------------------------------------
 draw2d(lendr).id_draw2d = id_draw2d;
 draw2d(lendr).type = 'straight_rectangle';
 draw2d(lendr).c_angle = c_angle;
 draw2d(lendr).c_r = c_r;
-draw2d(lendr).ocenter = ocenter;
+draw2d(lendr).ref_point = ref_point;
 draw2d(lendr).center = center;
 draw2d(lendr).r_len = r_len;
 draw2d(lendr).theta_len = theta_len;
