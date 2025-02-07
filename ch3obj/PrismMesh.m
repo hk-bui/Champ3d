@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -19,7 +19,13 @@ classdef PrismMesh < Mesh3d
     properties (Dependent = true)
 
     end
-
+ 
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem'};
+        end
+    end
     % --- Constructors
     methods
         function obj = PrismMesh(args)
@@ -36,8 +42,6 @@ classdef PrismMesh < Mesh3d
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
             % ---
         end
@@ -46,13 +50,7 @@ classdef PrismMesh < Mesh3d
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             obj.elem_type = 'prism';
-            % ---
-            obj.setup_done = 1;
         end
     end
 

@@ -3,12 +3,19 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphits < FEM3dAphi
+
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency'};
+        end
+    end
     % --- Constructor
     methods
         function obj = FEM3dAphits(args)
@@ -25,7 +32,6 @@ classdef FEM3dAphits < FEM3dAphi
             % ---
             obj <= args;
             % ---
-            obj.setup;
         end
     end
     % --- Methods/public

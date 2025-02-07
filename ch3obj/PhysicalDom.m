@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -12,21 +12,14 @@ classdef PhysicalDom < Xhandle
 
     % --- entry
     properties (SetObservable)
-        id
         parent_model
         id_dom2d
         id_dom3d
     end
 
     % --- computed
-    properties
-        parent_mesh
+    properties (SetObservable)
         dom
-    end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
     end
 
     % ---
@@ -34,12 +27,23 @@ classdef PhysicalDom < Xhandle
 
     end
     % ---
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs(fname)
+            if nargin < 1
+                argslist = {'parent_model','id_dom2d','id_dom3d'};
+            elseif ischar(fname)
+                if f_strcmpi(fname,'plot')
+                    argslist = {'edge_color','face_color','alpha'};
+                end
+            end
+        end
+    end
     % --- Contructor
     methods
         function obj = PhysicalDom(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -53,8 +57,6 @@ classdef PhysicalDom < Xhandle
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -62,31 +64,51 @@ classdef PhysicalDom < Xhandle
     % --- Methods
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
+            % ---
             obj.get_geodom;
             % ---
-            obj.setup_done = 1;
+            paramlist = {'sigma','mur','bs','br','r_ht','r_et',...
+                         'i_coil','v_coil','j_coil',...
+                         'rho','cp','lambda','ps','pv'};
+            % ---
+            for i = 1:length(paramlist)
+                param = paramlist{i};
+                if isprop(obj,param)
+                    if isnumeric(obj.(param))
+                        if ~isempty(obj.(param))
+                            obj.(param) = Parameter('f',obj.(param));
+                        end
+                    end
+                end
+            end
+            % ---
         end
     end
     % --- Methods
     methods
         function get_geodom(obj)
-            if ~isempty(obj.parent_model)
-                if ~isempty(obj.parent_model.parent_mesh)
-                    % ---
-                    if ~isempty(obj.id_dom3d)
-                        id_dom_ = f_to_scellargin(obj.id_dom3d);
-                    elseif ~isempty(obj.id_dom2d)
-                        id_dom_ = f_to_scellargin(obj.id_dom2d);
-                    end
-                    % ---
-                    obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
-                    for i = 2:length(id_dom_)
-                        obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
-                    end
-                end
+            if isempty(obj.parent_model)
+                return
+            end
+            if isempty(obj.parent_model.parent_mesh)
+                return
+            end
+            % ---
+            id_dom_ = [];
+            % ---
+            if ~isempty(obj.id_dom3d)
+                id_dom_ = f_to_scellargin(obj.id_dom3d);
+            elseif ~isempty(obj.id_dom2d)
+                id_dom_ = f_to_scellargin(obj.id_dom2d);
+            end
+            % ---
+            if isempty(id_dom_)
+                return
+            end
+            % ---
+            obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
+            for i = 2:length(id_dom_)
+                obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
             end
         end
         % -----------------------------------------------------------------
@@ -149,7 +171,7 @@ classdef PhysicalDom < Xhandle
                 id_face = sdom.gid_face;
                 face = obj.parent_model.parent_mesh.face(:,id_face);
                 node = obj.parent_model.parent_mesh.node;
-                js   = obj.parent_model.fields.js(:,id_face);
+                js   = obj.parent_model.field.js(:,id_face);
                 js   = f_magnitude(js);
                 %--------------------------------------------------------------
                 clear msh;
@@ -227,7 +249,7 @@ classdef PhysicalDom < Xhandle
             % ---
             if isa(obj.dom,'VolumeDom3d')
                 id_elem = obj.dom.gid_elem;
-                fv = obj.parent_model.fields.(args.field_name)(:,id_elem);
+                fv = obj.parent_model.field.(args.field_name)(:,id_elem);
                 no = obj.parent_model.parent_mesh.celem(:,id_elem);
                 if isreal(fv)
                     f_quiver(no,fv);
@@ -252,7 +274,7 @@ classdef PhysicalDom < Xhandle
             end
             % ---
             if any(f_strcmpi(args.field_name,{'pv'}))
-                fs = obj.parent_model.fields.(args.field_name);
+                fs = obj.parent_model.field.(args.field_name);
                 % ---
                 gid_elem = obj.dom.gid_elem;
                 celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
@@ -267,14 +289,14 @@ classdef PhysicalDom < Xhandle
                 elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
                 elem_type = f_elemtype(elem);
                 face = f_boundface(elem,node,'elem_type',elem_type);
-                fs = obj.parent_model.fields.(args.field_name);
+                fs = obj.parent_model.field.(args.field_name);
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end
             % ---
             if isa(obj.dom,'SurfaceDom3d')
                 node = obj.parent_model.parent_mesh.node;
                 face = obj.parent_model.parent_mesh.face(:,obj.dom.gid_face);
-                fs = obj.parent_model.fields.(args.field_name);
+                fs = obj.parent_model.field.(args.field_name);
                 fs = fs(obj.dom.gid_face);
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end

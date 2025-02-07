@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 classdef CloseCoil < Coil
 
     % --- entry
-    properties
+    properties (SetObservable)
         etrode_equation
     end
 
@@ -20,17 +20,23 @@ classdef CloseCoil < Coil
         electrode_dom
         shape_dom
     end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
     
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs(fname)
+            if nargin < 1
+                argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation'};
+            elseif ischar(fname)
+                if f_strcmpi(fname,'plot')
+                    argslist = {'edge_color','face_color','alpha'};
+                end
+            end
+        end
+    end
     % --- Contructor
     methods
         function obj = CloseCoil(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -45,8 +51,6 @@ classdef CloseCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -55,10 +59,6 @@ classdef CloseCoil < Coil
     methods
         function setup(obj)
             % ---
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Coil(obj);
             % ---
             obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
@@ -66,7 +66,6 @@ classdef CloseCoil < Coil
             % ---
             obj.get_electrode;
             % ---
-            obj.setup_done = 1;
         end
     end
     % --- Methods
@@ -77,8 +76,8 @@ classdef CloseCoil < Coil
             args4cv3.parent_mesh = obj.parent_model.parent_mesh;
             args4cv3.id_dom3d = obj.id_dom3d;
             args4cv3.cut_equation = obj.etrode_equation;
-            argu = f_to_namedarg(args4cv3,'with_only',...
-                        {'parent_mesh','id_dom3d','cut_equation'});
+            % ---
+            argu = f_to_namedarg(args4cv3,'for','CutVolumeDom3d');
             % ---
             obj.electrode_dom = CutVolumeDom3d(argu{:});
             % ---

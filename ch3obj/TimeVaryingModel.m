@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef MultiPhysicalModel < Xhandle
+classdef TimeVaryingModel < Xhandle
 
     % --- Properties
     properties
@@ -18,9 +18,20 @@ classdef MultiPhysicalModel < Xhandle
 
     % --- Constructors
     methods
-        function obj = MultiPhysicalModel()
+        function obj = TimeVaryingModel(model)
             obj = obj@Xhandle;
             % ---
+            if nargin > 0
+                if iscell(model)
+                    model = f_to_scellargin(model);
+                    for i = 1:length(model)
+                        mname = ['model_' num2str(i)];
+                        obj.model.(mname) = model{i};
+                    end
+                else
+                    obj.model.mymodel = model;
+                end
+            end
         end
     end
 
@@ -64,7 +75,7 @@ classdef MultiPhysicalModel < Xhandle
             % ---
             idmodel = fieldnames(obj.model);
             % ---
-            while obj.time_system.gtime_now <= obj.time_system.t_end
+            while obj.time_system.gtime_now <= obj.time_system.gt_end
                 for i = 1:length(idmodel)
                     obj.model.(idmodel{i}).solve;
                 end

@@ -3,12 +3,12 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Parameter < Xhandle
+classdef Parameter %< Xhandle
     properties
         f
         depend_on
@@ -17,17 +17,23 @@ classdef Parameter < Xhandle
         fvectorized
         % ---
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'f','depend_on','from','varargin_list','fvectorized'};
+        end
+    end
     % --- Contructor
     methods
         function obj = Parameter(args)
             arguments
                 args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface', ...
+                    {'','celem','cface', ...
                      'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
                      'bs','js','hs','ps','as','phis','ts','omes','temps',...
-                     'ltime'})} = 'celem'
+                     'ltime'})} = ''
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
@@ -373,9 +379,9 @@ classdef Parameter < Xhandle
                 elseif any(f_strcmpi(depon_,{...
                         'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
                         'bs','js','hs','ps','as','phis','ts','omes','temps'}))
-                    fargs{i} = from_.fields.(depon_)(:,id_elem);
+                    fargs{i} = from_.field.(depon_)(:,id_elem);
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
-                    fargs{i} = from_.ltime.ltime_now;
+                    fargs{i} = from_.ltime.t_now;
                 end
             end
         end

@@ -3,12 +3,24 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphijw < FEM3dAphi
+    properties
+        build_done = 0
+        assembly_done = 0
+        solve_done = 0
+    end
+
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency'};
+        end
+    end
     % --- Constructor
     methods
         function obj = FEM3dAphijw(args)
@@ -25,46 +37,38 @@ classdef FEM3dAphijw < FEM3dAphi
             % ---
             obj <= args;
             % ---
-            obj.setup;
         end
     end
+
     % --- Methods/public
     methods (Access = public)
         % -----------------------------------------------------------------
         function build(obj)
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             if obj.build_done
                 return
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             tic;
             f_fprintf(0,'Build',1,class(obj),0,'\n');
             f_fprintf(0,'   ');
             % ---
             parent_mesh = obj.parent_mesh;
             % ---
-            if ~parent_mesh.build_meshds_done
-                parent_mesh.build_meshds;
-            end
-            % ---
-            if ~parent_mesh.build_discrete_done
-                parent_mesh.build_discrete;
-            end
-            % ---
-            if ~parent_mesh.build_intkit_done
-                parent_mesh.build_intkit;
-            end
-            %--------------------------------------------------------------------------
+            parent_mesh.build_meshds;
+            parent_mesh.build_discrete;
+            parent_mesh.build_intkit;
+            %--------------------------------------------------------------
             if isempty(obj.airbox)
                 if ~isfield(obj.parent_mesh.dom,'default_domain')
                     obj.parent_mesh.add_default_domain;
                 end
                 obj.airbox.default_airbox = AirboxAphi('parent_model',obj,'id_dom3d','default_domain');
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                 'bsfield','coil','nomesh','pmagnet','embc'};
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             for i = 1:length(allowed_physical_dom)
                 phydom_type = allowed_physical_dom{i};
                 % ---
@@ -88,9 +92,9 @@ classdef FEM3dAphijw < FEM3dAphi
                     phydom.build;
                 end
             end
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             obj.build_done = 1;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
         function assembly(obj)
@@ -266,17 +270,17 @@ classdef FEM3dAphijw < FEM3dAphi
         end
         % -----------------------------------------------------------------
         function solve(obj)
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             f_fprintf(0,'Solve',1,class(obj),0,'\n');
             f_fprintf(0,'   ');
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             erro0 = 1;
             tole0 = 1e-3;
             maxi0 = 10;
             erro1 = 1;
             tole1 = 1e-6;
             maxi1 = 1e3;
-            %--------------------------------------------------------------------------
+            %--------------------------------------------------------------
             nite0 = 0;
             % ---
             while erro0 > tole0 & nite0 < maxi0
@@ -354,16 +358,16 @@ classdef FEM3dAphijw < FEM3dAphi
             nb_edge = parent_mesh.nb_edge;
             nb_node = parent_mesh.nb_node;
             %--------------------------------------------------------------------------
-            obj.fields.av = obj.parent_mesh.field_we('dof',obj.dof.a);
-            obj.fields.bv = obj.parent_mesh.field_wf('dof',obj.dof.b);
-            obj.fields.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
-            obj.fields.phiv = obj.parent_mesh.field_wn('dof',obj.dof.phi);
-            obj.fields.phi = obj.dof.phi;
+            obj.field.av = obj.parent_mesh.field_we('dof',obj.dof.a);
+            obj.field.bv = obj.parent_mesh.field_wf('dof',obj.dof.b);
+            obj.field.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
+            obj.field.phiv = obj.parent_mesh.field_wn('dof',obj.dof.phi);
+            obj.field.phi = obj.dof.phi;
             % -------------------------------------------------------------------------
-            obj.fields.jv = sparse(3,nb_elem);
-            obj.fields.pv = sparse(1,nb_elem);
-            obj.fields.js = sparse(2,nb_face);
-            obj.fields.ps = sparse(1,nb_face);
+            obj.field.jv = sparse(3,nb_elem);
+            obj.field.pv = sparse(1,nb_elem);
+            obj.field.js = sparse(2,nb_face);
+            obj.field.ps = sparse(1,nb_face);
             %--------------------------------------------------------------------------
             %allowed_physical_dom = {'econductor','sibc','coil'};
             allowed_physical_dom = {'econductor','sibc'};
@@ -399,7 +403,7 @@ classdef FEM3dAphijw < FEM3dAphi
         % -----------------------------------------------------------------
         % -----------------------------------------------------------------
     end
-    % --- Methods/public
+    % --- Methods/private
     methods (Access = private)
         % -----------------------------------------------------------------
         % -----------------------------------------------------------------

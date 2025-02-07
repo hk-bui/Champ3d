@@ -8,44 +8,35 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThPv < PhysicalDom
-
-    properties (SetObservable)
-        pv = 0
+classdef PhysicalModel < Xhandle
+    properties
+        ltime
+        moving_frame
+        matrix
+        field
+        dof
     end
-
+    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','pv'};
+            argslist = {};
         end
     end
-    % --- Contructor
+    % --- Constructor
     methods
-        function obj = ThPv(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-                args.pv
-            end
+        function obj = PhysicalModel()
             % ---
-            obj = obj@PhysicalDom;
+            obj@Xhandle;
             % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            obj.setup;
+            obj.ltime = LTime;
         end
     end
-
-    % --- setup
+    % --- Methods
     methods
-        function setup(obj)
-            setup@PhysicalDom(obj);
+        function solve_all(obj)
+            timemodel = TimeVaryingModel(obj);
+            timemodel.solve;
         end
     end
 end

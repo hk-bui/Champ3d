@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 classdef OpenCoil < Coil
 
     % --- entry
-    properties
+    properties (SetObservable)
         etrode_equation
     end
 
@@ -20,17 +20,17 @@ classdef OpenCoil < Coil
         gid_node_petrode
         gid_node_netrode
     end
-
-    % --- computed
-    properties (Access = private)
-        setup_done = 0
-    end
     
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation'};
+        end
+    end
     % --- Contructor
     methods
         function obj = OpenCoil(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -45,8 +45,6 @@ classdef OpenCoil < Coil
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -54,16 +52,13 @@ classdef OpenCoil < Coil
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Coil(obj);
-                % ---
-                obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
-                % ---
-                obj.get_electrode;
-                % ---
-                obj.setup_done = 1;
-            end
+            % ---
+            setup@Coil(obj);
+            % ---
+            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            % ---
+            obj.get_electrode;
+            % ---
         end
     end
     % --- Methods

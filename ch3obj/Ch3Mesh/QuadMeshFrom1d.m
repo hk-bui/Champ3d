@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -20,7 +20,14 @@ classdef QuadMeshFrom1d < QuadMesh
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem','parent_mesh','id_xline', ...
+                        'id_yline'};
+        end
+    end
     % --- Constructors
     methods
         function obj = QuadMeshFrom1d(args)
@@ -32,9 +39,6 @@ classdef QuadMeshFrom1d < QuadMesh
                 args.parent_mesh
                 args.id_xline
                 args.id_yline
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % ---
             obj@QuadMesh;
@@ -45,8 +49,6 @@ classdef QuadMeshFrom1d < QuadMesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
             % ---
         end
@@ -56,10 +58,6 @@ classdef QuadMeshFrom1d < QuadMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
                     isempty(obj.id_yline)
@@ -153,7 +151,6 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.node = node_;
             obj.elem = elem_;
             obj.elem_code = elem_code_;
-            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
         % -----------------------------------------------------------------

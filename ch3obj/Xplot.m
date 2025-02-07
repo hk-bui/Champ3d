@@ -8,27 +8,23 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FEM3dV < EmModel
-    
-    % --- Valid args list
+classdef Xplot
     methods (Static)
-        function argslist = validargs()
-            argslist = {'parent_mesh','frequency'};
-        end
-    end
-    % --- Contructor
-    methods
-        function obj = FEM3dV(args)
+        function VolumeDom(obj,args)
             arguments
-                args.parent_mesh = []
-                args.frequency = 0
+                obj
+                args.edge_color = [0.4940 0.1840 0.5560]
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
             end
             % ---
-            argu = f_to_namedarg(args,'for','EmModel');
-            obj = obj@EmModel(argu{:});
-            % ---
-            obj <= args;
-            % ---
+            obj.build_submesh;
+            submesh_ = obj.submesh;
+            argu = f_to_namedarg(args);
+            for i = 1:length(submesh_)
+                submesh_{i}.plot(argu{:}); hold on
+            end
         end
     end
 end

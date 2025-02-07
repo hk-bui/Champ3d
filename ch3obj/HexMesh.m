@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -19,7 +19,13 @@ classdef HexMesh < Mesh3d
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem'};
+        end
+    end
     % --- Constructors
     methods
         function obj = HexMesh(args)
@@ -46,13 +52,7 @@ classdef HexMesh < Mesh3d
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             obj.elem_type = 'hexa';
-            % ---
-            obj.setup_done = 1;
         end
     end
 

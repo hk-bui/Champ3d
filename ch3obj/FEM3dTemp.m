@@ -3,27 +3,32 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef FEM3dTemp < ThModel
+
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','Temp0'};
+        end
+    end
     % --- Contructor
     methods
         function obj = FEM3dTemp(args)
             arguments
-                args.id = 'no_id'
                 args.parent_mesh = []
                 args.Temp0 = 0
             end
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','ThModel');
             obj = obj@ThModel(argu{:});
             % ---
             obj <= args;
             % ---
-            obj.setup;
         end
     end
     % --- Methods/public
@@ -216,8 +221,8 @@ classdef FEM3dTemp < ThModel
                 obj.dof.temp = zeros(nb_node,1);
                 obj.dof.temp(id_node_t) = x;
                 %----------------------------------------------------------------------
-                obj.fields.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
-                obj.fields.temp  = obj.dof.temp;
+                obj.field.tempv = obj.parent_mesh.field_wn('dof',obj.dof.temp);
+                obj.field.temp  = obj.dof.temp;
                 Temp_prev = obj.dof.temp;
                 %----------------------------------------------------------------------
                 obj.postpro;

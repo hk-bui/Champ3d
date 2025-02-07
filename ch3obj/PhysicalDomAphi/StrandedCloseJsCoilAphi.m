@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -30,16 +30,22 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation', ...
+                        'connexion','cs_area','nb_turn','fill_factor', ...
+                        'j_coil','coil_mode'};
+        end
+    end
     % --- Contructor
     methods
         function obj = StrandedCloseJsCoilAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -61,9 +67,6 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -71,11 +74,9 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@CloseCoilAphi(obj);
+            setup@StrandedCoilAphi(obj);
+            setup@JsCoilAphi(obj);
             % ---
             if isempty(obj.j_coil)
                 obj.coil_mode = 'rx';
@@ -83,13 +84,8 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
                 if obj.j_coil == 0
                     obj.coil_mode = 'rx';
                 end
-                % ---
-                obj.j_coil = Parameter('f',obj.j_coil);
             end
             % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
         end
     end
 
@@ -105,22 +101,6 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
             % ---
             build@CloseCoilAphi(obj);
             build@JsCoilAphi(obj);
-        end
-    end
-
-    % --- Methods
-    methods
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'k'
-                args.face_color = 'none'
-                args.alpha {mustBeNumeric} = 0.5
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@CloseCoilAphi(obj,argu{:});
-            % ---
         end
     end
 

@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,16 +17,20 @@ classdef PMagnetAphi < PMagnet
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = PMagnet.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = PMagnetAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -41,40 +45,14 @@ classdef PMagnetAphi < PMagnet
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
             obj.setup;
-            % ---
-            addlistener(obj,...
-                {'parent_model','id_dom2d','id_dom3d','br'},...
-                 'PostSet',@obj.reset);
         end
     end
 
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PMagnet(obj);
-            % ---
-            if isnumeric(obj.br)
-                obj.br = Parameter('f',obj.br);
-            end
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-        end
-        % ---
-        function reset(obj,src,evnt)
-            f_fprintf(1,'Reset due to change !');
-            obj.setup_done = 0;
         end
     end
 
@@ -97,6 +75,7 @@ classdef PMagnetAphi < PMagnet
             % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.wfbr = wfbr;
+            obj.matrix.br = br;
             % ---
             obj.build_done = 1;
             obj.assembly_done = 0;
@@ -137,7 +116,7 @@ classdef PMagnetAphi < PMagnet
             rotb = rotb(id_edge_a_unknown,1);
             rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
             %--------------------------------------------------------------
-            a_pmagnet = sparse(nb_edge,1);
+            a_pmagnet = zeros(nb_edge,1);
             a_pmagnet(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
             clear rotb rotrot wfbr
             %--------------------------------------------------------------
@@ -152,18 +131,41 @@ classdef PMagnetAphi < PMagnet
         end
     end
 
+    % --- Methods
+    methods
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = 'k'
+                args.face_color = 'none'
+                args.alpha {mustBeNumeric} = 0.5
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            plot@PMagnet(obj,argu{:});
+            % ---
+            if isfield(obj.matrix,'br')
+                if ~isempty(obj.matrix.br)
+                    hold on;
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                             obj.matrix.br(:,obj.matrix.gid_elem).','sfactor',0.2);
+                end
+            end
+        end
+    end
+
     % --- reset
     methods
-        % function reset(obj)
-        %     if isprop(obj,'setup_done')
-        %         obj.setup_done = 0;
-        %     end
-        %     if isprop(obj,'build_done')
-        %         obj.build_done = 0;
-        %     end
-        %     if isprop(obj,'assembly_done')
-        %         obj.assembly_done = 0;
-        %     end
-        % end
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
+        end
     end
 end

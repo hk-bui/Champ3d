@@ -3,27 +3,27 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef Mconductor < PhysicalDom
     % ---
-    properties
+    properties (SetObservable)
         mur = 1
     end
     
-    % ---
-    properties(Access = private)
-        setup_done = 0
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','id_dom2d','id_dom3d','mur'};
+        end
     end
-
     % --- Contructor
     methods
         function obj = Mconductor(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -38,8 +38,6 @@ classdef Mconductor < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -47,17 +45,7 @@ classdef Mconductor < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            if isnumeric(obj.mur)
-                obj.mur = Parameter('f',obj.mur);
-            end
-            % ---
-            obj.setup_done = 1;
         end
     end
 end

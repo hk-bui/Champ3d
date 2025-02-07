@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -12,7 +12,6 @@ classdef JsCoilAphi < Xhandle
     
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -21,6 +20,12 @@ classdef JsCoilAphi < Xhandle
     methods
         function obj = JsCoilAphi()
             obj@Xhandle;
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
         end
     end
 
@@ -81,7 +86,7 @@ classdef JsCoilAphi < Xhandle
             rotj = rotj(id_edge_t_unknown,1);
             rotrot = rotrot(id_edge_t_unknown,id_edge_t_unknown);
             %--------------------------------------------------------------
-            t_jsfield = sparse(nb_edge,1);
+            t_jsfield = zeros(nb_edge,1);
             t_jsfield(id_edge_t_unknown) = f_solve_axb(rotrot,rotj);
             %--------------------------------------------------------------
             clear rotj rotrot wfjs

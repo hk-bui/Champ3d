@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -12,7 +12,6 @@ classdef Line1d < Xhandle
 
     % --- Properties
     properties
-        id
         len
         dtype = 'lin'
         dnum = 1
@@ -20,21 +19,23 @@ classdef Line1d < Xhandle
         node
         elem_code
     end
-    % ---
-    properties
-        setup_done = 0;
-    end
 
     % --- Dependent Properties
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'id','len','dtype','dnum','flog'};
+        end
+    end
     % --- Constructors
     methods
         function obj = Line1d(args)
             arguments
-                args.id char = '0'
+                args.id char
                 args.len {mustBeNumeric}  = 0
                 args.dtype {mustBeMember(args.dtype,{'lin','log+','log-','log+-','log-+','log='})} = 'lin'
                 args.dnum {mustBeInteger} = 1
@@ -49,8 +50,6 @@ classdef Line1d < Xhandle
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -58,10 +57,6 @@ classdef Line1d < Xhandle
     % --- Methods
     methods
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             if any(f_strcmpi(obj.dtype,{'log+-','log-+','log='}))
                 if mod(obj.dnum,2) ~= 0
@@ -102,7 +97,6 @@ classdef Line1d < Xhandle
             %--------------------------------------------------------------
             obj.node = node_;
             obj.elem_code = f_str2code(obj.id);
-            obj.setup_done = 1;
         end
     end
 end

@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -12,7 +12,6 @@ classdef IsCoilAphi < Xhandle
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
@@ -21,6 +20,12 @@ classdef IsCoilAphi < Xhandle
     methods
         function obj = IsCoilAphi()
             obj@Xhandle;
+        end
+    end
+    
+    % --- setup
+    methods
+        function setup(obj)
         end
     end
 
@@ -56,7 +61,6 @@ classdef IsCoilAphi < Xhandle
             % ---
             obj.assembly_done = 1;
             % ---
-            disp('xxx')
         end
     end
 

@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -11,10 +11,13 @@
 classdef Xhandle < matlab.mixin.Copyable
     %----------------------------------------------------------------------
     properties
-
+        id
     end
     %----------------------------------------------------------------------
     methods
+        function obj = Xhandle()
+            obj.id = char(java.util.UUID.randomUUID.toString);
+        end
         %------------------------------------------------------------------
         function le(obj,objx)
             % ---
@@ -31,6 +34,14 @@ classdef Xhandle < matlab.mixin.Copyable
                     obj.(fname{i}) = objx.(fname{i});
                 end
             end
+        end
+        %------------------------------------------------------------------
+        function objx = uplus(obj)
+            objx = copy(obj);
+        end
+        %------------------------------------------------------------------
+        function objx = ctranspose(obj)
+            objx = copy(obj);
         end
         %------------------------------------------------------------------
     end

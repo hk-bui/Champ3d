@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -19,7 +19,16 @@ classdef LTensor < Xhandle
         rot_axis
         rot_angle
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'main_value','main_dir', ...
+                        'ort1_value','ort1_dir', ....
+                        'ort2_value','ort2_dir', ...
+                        'rot_axis','rot_angle'};
+        end
+    end
     % --- Contructor
     methods
         function obj = LTensor(args)

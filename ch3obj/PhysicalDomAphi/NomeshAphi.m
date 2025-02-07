@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,16 +17,20 @@ classdef NomeshAphi < Nomesh
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Nomesh.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = NomeshAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -40,9 +44,6 @@ classdef NomeshAphi < Nomesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -50,14 +51,7 @@ classdef NomeshAphi < Nomesh
     % --- setup
     methods
         function setup(obj)
-            if ~obj.setup_done
-                % ---
-                setup@Nomesh(obj);
-                % ---
-                obj.setup_done = 1;
-                % ---
-                obj.build_done = 0;
-            end
+            setup@Nomesh(obj);
         end
     end
 
@@ -72,6 +66,7 @@ classdef NomeshAphi < Nomesh
             end
             % ---
             dom = obj.dom;
+            obj.dom.get_gid;
             obj.matrix.gid_elem = dom.gid.gid_elem;
             obj.matrix.gid_inner_edge = dom.gid.gid_inner_edge;
             obj.matrix.gid_inner_node = dom.gid.gid_inner_node;

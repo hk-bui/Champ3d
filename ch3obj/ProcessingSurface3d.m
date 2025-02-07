@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ classdef ProcessingSurface3d < VolumeDom3d
         flog = 1.05;
         % ---
         mesh
-        fields
+        field
         % ---
         cut_equation
         %gid_elem
@@ -35,7 +35,15 @@ classdef ProcessingSurface3d < VolumeDom3d
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_model','parallel_line_1','parallel_line_2', ...
+                        'dtype_parallel','dtype_orthogonal','dnum_parallel', ...
+                        'dnum_orthogonal','flog','id_dom3d'};
+        end
+    end
     % --- Constructors
     methods
         function obj = ProcessingSurface3d(args)
@@ -170,8 +178,8 @@ classdef ProcessingSurface3d < VolumeDom3d
             % ---
             id_field = args.id_field;
             if ~isempty(id_field)
-                if isfield(obj.fields,id_field)
-                    fval = obj.fields.(id_field);
+                if isfield(obj.field,id_field)
+                    fval = obj.field.(id_field);
                 end
             end
             % ---
@@ -321,9 +329,9 @@ classdef ProcessingSurface3d < VolumeDom3d
                     fi = obj.getfieldAphi(fn);
                 end
                 % ---
-                obj.fields.(id_field) = fi;
+                obj.field.(id_field) = fi;
             else
-                obj.fields.(id_field) = args.field_value;
+                obj.field.(id_field) = args.field_value;
             end
             % ---
         end

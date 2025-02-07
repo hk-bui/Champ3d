@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -20,7 +20,13 @@ classdef TriMeshFromFemm < TriMesh
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem','mesh_file'};
+        end
+    end
     % --- Constructors
     methods
         function obj = TriMeshFromFemm(args)
@@ -30,9 +36,6 @@ classdef TriMeshFromFemm < TriMesh
                 args.elem
                 % ---
                 args.mesh_file
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % --- super
             obj@TriMesh;
@@ -42,8 +45,6 @@ classdef TriMeshFromFemm < TriMesh
             end
             % ---
             obj <= args;
-            % ---
-            obj.setup_done = 0;
             % ---
             obj.setup;
         end
@@ -68,7 +69,7 @@ classdef TriMeshFromFemm < TriMesh
             % ----- 2/ mesh and solution data -----
             iData   = find(strcmp(fileDA{1,1}(:,1),'[Solution]'));
             iNoeud  = iData+1;          nb_node = str2double(fileDA{1,1}(iNoeud,1));
-            iElem   = iNoeud+nb_node+1; nb_elem  = str2double(fileDA{1,1}(iElem ,1));
+            iElem   = iNoeud+nb_node+1; nb_elem = str2double(fileDA{1,1}(iElem ,1));
             % 2/a/ points
             node_ = zeros(2,nb_node);
             node_(1,:) = str2double(fileDA{1,1}(iNoeud+1 : iNoeud+nb_node,1));
@@ -89,7 +90,6 @@ classdef TriMeshFromFemm < TriMesh
             obj.elem = elem_;
             obj.elem_code = elem_code_;
             obj.data = data_;
-            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
     end

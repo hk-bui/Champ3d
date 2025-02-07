@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -15,7 +15,13 @@ classdef RotationalMovingFrame < MovingFrame
         rot_axis      % rot around o-->axis
         rot_angle     % deg, counterclockwise convention
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'rot_origin','rot_axis','rot_angle'};
+        end
+    end
     % --- Contructor
     methods
         function obj = RotationalMovingFrame(args)

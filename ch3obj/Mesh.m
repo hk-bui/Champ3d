@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -28,12 +28,6 @@ classdef Mesh < Xhandle
         discrete
         intkit
         prokit
-        % ---
-        setup_done = 0
-        build_meshds_done = 0
-        build_discrete_done = 0
-        build_intkit_done = 0
-        build_prokit_done = 0
         % --- submesh
         parent_mesh
         gid_node
@@ -42,6 +36,14 @@ classdef Mesh < Xhandle
         gid_face
         flat_node
         % ---
+    end
+
+    % --- Dependent Properties
+    properties (Access = private, Hidden)
+        build_meshds_done = 0
+        build_discrete_done = 0
+        build_intkit_done = 0
+        build_prokit_done = 0
     end
 
     % --- Dependent Properties
@@ -343,7 +345,6 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function obj = build_meshds(obj,args)
-
             arguments
                 obj
                 % ---
@@ -662,26 +663,27 @@ classdef Mesh < Xhandle
             f_fprintf(0,'Make #intkit \n');
             fprintf('   ');
             %--------------------------------------------------------------
-            U   = [];
-            V   = [];
-            W   = [];
-            cU  = [];
-            cV  = [];
-            cW  = [];
-            %--------------------------------------------------------------
             refelem_ = obj.refelem;
             U  = refelem_.U;
             V  = refelem_.V;
-            W  = refelem_.W;
+            if isfield(refelem_,'W')
+                W = refelem_.W;
+            else
+                W = [];
+            end
+            % ---
             cU = refelem_.cU;
             cV = refelem_.cV;
-            cW = refelem_.cW;
+            if isfield(refelem_,'cW')
+                cW = refelem_.cW;
+            else
+                cW = [];
+            end
             %--------------------------------------------------------------
             fnmeshds = fieldnames(obj.meshds);
             for i = 1:length(fnmeshds)
                 if isempty(obj.meshds.(fnmeshds{i}))
-                    obj.build_meshds;
-                    break
+                    obj.build_meshds('get',fnmeshds{i});
                 end
             end
             %--------------------------------------------------------------
@@ -715,9 +717,9 @@ classdef Mesh < Xhandle
             if for3d
                 realz = (reshape(obj.node(3,obj.elem),nbNo_inEl,[])).';
             end
-            nb_inode  = length(U);
-            node_g = cell(1,nb_inode);
-            for i = 1:nb_inode
+            nb_gnode  = length(U);
+            node_g = cell(1,nb_gnode);
+            for i = 1:nb_gnode
                 node_g{i} = zeros(obj.nb_elem,dim_);
                 node_g{i}(:,1) = sum(Wn{i} .* realx,2);
                 node_g{i}(:,2) = sum(Wn{i} .* realy,2);
@@ -1476,18 +1478,6 @@ classdef Mesh < Xhandle
             end
         end
         % -----------------------------------------------------------------
-    end
-    % --- Methods - Obj
-    methods (Access = public)
-        % ---
-        function objx = uplus(obj)
-            objx = copy(obj);
-        end
-        % ---
-        function objx = ctranspose(obj)
-            objx = copy(obj);
-        end
-        % ---
     end
     % --- Methods - Obj
     methods (Access = protected)

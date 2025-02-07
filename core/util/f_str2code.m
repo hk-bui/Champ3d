@@ -1,4 +1,4 @@
-function code = f_str2code(str)
+function code = f_str2code(str,args)
 % F_STR2CODE returns the unique code corresponding to the string.
 %--------------------------------------------------------------------------
 % code = F_STR2CODE(str);
@@ -11,6 +11,11 @@ function code = f_str2code(str)
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
+
+arguments
+    str
+    args.code_type {mustBeMember(args.code_type,{'real','integer'})} = 'real'
+end
 
 typestr = class(str);
 mnum = 1.141592653589793;
@@ -35,6 +40,11 @@ switch typestr
         end
 end
 %--------------------------------------------------------------------------
-code = log10(code);
+switch args.code_type
+    case 'real'
+        code = log10(code);
+    case 'integer'
+        code = round(log10(code) * 1e6); % 1e6 adapted to limit of FEMM gr number
+end
 %--------------------------------------------------------------------------
 end

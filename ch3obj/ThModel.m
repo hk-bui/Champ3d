@@ -3,15 +3,13 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThModel < Xhandle
+classdef ThModel < PhysicalModel
     properties
-        id
-        % ---
         parent_mesh
         % ---
         thconductor
@@ -22,30 +20,26 @@ classdef ThModel < Xhandle
         ps
         pv
         % ---
-        ltime
         Temp0 = 0
         % ---
-        matrix
-        fields
-        dof
-        % ---
-        build_done = 0
-        assembly_done = 0
-        solve_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','timesystem','Temp0'};
+        end
+    end
     % --- Constructor
     methods
         function obj = ThModel(args)
             arguments
-                args.id
-                % ---
                 args.parent_mesh
                 args.timesystem
                 args.Temp0
             end
             % ---
-            obj@Xhandle;
+            obj@PhysicalModel;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -53,7 +47,7 @@ classdef ThModel < Xhandle
             % ---
             obj <= args;
             % ---
-            f_initobj(obj,'property_name','fields',...
+            f_initobj(obj,'property_name','field',...
                      'field_name',{'tempv','temps'}, ...
                      'init_value',args.Temp0);
             % ---
@@ -75,7 +69,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Thconductor');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThconductorTemp(argu{:});
@@ -97,7 +91,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Thcapacitor');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThcapacitorTemp(argu{:});
@@ -118,7 +112,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Thconvection');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThconvectionTemp(argu{:});
@@ -139,7 +133,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','ThPs');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThPsTemp(argu{:});
@@ -160,7 +154,7 @@ classdef ThModel < Xhandle
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','ThPv');
             % ---
             if isa(obj,'FEM3dTemp')
                 phydom = ThPvTemp(argu{:});
@@ -179,7 +173,7 @@ classdef ThModel < Xhandle
             nb_elem = obj.parent_mesh.nb_elem;
             nb_face = obj.parent_mesh.nb_face;
             % ---
-            obj.fields.tempv = zeros(1,nb_elem) + obj.Temp0;
+            obj.field.tempv = zeros(1,nb_elem) + obj.Temp0;
         end
     end
 end

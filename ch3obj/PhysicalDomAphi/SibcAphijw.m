@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,16 +17,20 @@ classdef SibcAphijw < Sibc
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Sibc.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = SibcAphijw(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -45,10 +49,6 @@ classdef SibcAphijw < Sibc
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -56,16 +56,7 @@ classdef SibcAphijw < Sibc
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Sibc(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -211,10 +202,10 @@ classdef SibcAphijw < Sibc
                 js(1,lid_face) = sigma_array(lid_face,1).' .* es(1,lid_face);
                 js(2,lid_face) = sigma_array(lid_face,1).' .* es(2,lid_face);
                 %----------------------------------------------------------
-                obj.parent_model.fields.es(:,gid_face) = es(:,lid_face);
-                obj.parent_model.fields.js(:,gid_face) = js(:,lid_face);
+                obj.parent_model.field.es(:,gid_face) = es(:,lid_face);
+                obj.parent_model.field.js(:,gid_face) = js(:,lid_face);
                 %----------------------------------------------------------
-                obj.parent_model.fields.ps(:,gid_face) = ...
+                obj.parent_model.field.ps(:,gid_face) = ...
                     real(1/2 .* skindepth(lid_face,1).' .* ...
                     sum(es(:,lid_face) .* conj(js(:,lid_face))));
                 %----------------------------------------------------------

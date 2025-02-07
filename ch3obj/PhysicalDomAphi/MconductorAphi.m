@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,16 +17,20 @@ classdef MconductorAphi < Mconductor
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Mconductor.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = MconductorAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -41,10 +45,6 @@ classdef MconductorAphi < Mconductor
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,16 +52,7 @@ classdef MconductorAphi < Mconductor
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Mconductor(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 

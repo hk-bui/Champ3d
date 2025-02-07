@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -41,7 +41,7 @@ classdef Mesh1d < Xhandle
                 args.flog {mustBeNumeric} = 1.05
             end
             % --- 
-            argu = f_to_namedarg(args);
+            argu = f_to_namedarg(args,'for','Line1d');
             line = Line1d(argu{:});
             % ---
             obj.dom.(args.id) = line;

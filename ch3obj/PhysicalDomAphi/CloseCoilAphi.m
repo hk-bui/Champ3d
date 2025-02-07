@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,16 +17,20 @@ classdef CloseCoilAphi < CloseCoil
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = CloseCoil.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = CloseCoilAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -41,9 +45,6 @@ classdef CloseCoilAphi < CloseCoil
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -51,20 +52,7 @@ classdef CloseCoilAphi < CloseCoil
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@CloseCoil(obj);
-            % ---
-            obj.parent_mesh = obj.dom.parent_mesh;
-            % ---
-            obj.matrix.gid_elem = [];
-            obj.matrix.unit_current_field = [];
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
         end
     end
 
@@ -164,7 +152,7 @@ classdef CloseCoilAphi < CloseCoil
             if ~isempty(obj.matrix.unit_current_field)
                 hold on;
                 f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem));
+                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
             end
         end
     end

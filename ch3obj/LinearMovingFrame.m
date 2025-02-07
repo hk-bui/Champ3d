@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -14,7 +14,13 @@ classdef LinearMovingFrame < MovingFrame
         lin_dir       % linear mov direction
         lin_step      % linear mov step
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'lin_dir','lin_step'};
+        end
+    end
     % --- Contructor
     methods
         function obj = LinearMovingFrame(args)

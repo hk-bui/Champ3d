@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,16 +17,20 @@ classdef OpenCoilAphi < OpenCoil
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = OpenCoil.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = OpenCoilAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -41,9 +45,6 @@ classdef OpenCoilAphi < OpenCoil
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -51,21 +52,7 @@ classdef OpenCoilAphi < OpenCoil
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@OpenCoil(obj);
-            % ---
-            obj.parent_mesh = obj.dom.parent_mesh;
-            % ---
-            obj.matrix.gid_elem = [];
-            obj.matrix.unit_current_field = [];
-            obj.matrix.alpha = [];
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
         end
     end
 
@@ -124,7 +111,7 @@ classdef OpenCoilAphi < OpenCoil
                 RHS = - gradgrad * V;
                 gradgrad = gradgrad(id_node_v_unknown,id_node_v_unknown);
                 RHS = RHS(id_node_v_unknown,1);
-                V(id_node_v_unknown) = gradgrad \ RHS;
+                V(id_node_v_unknown) = f_solve_axb(gradgrad,RHS);
             end
             % ---
             dofJs = parent_mesh.discrete.grad * V;
@@ -157,10 +144,12 @@ classdef OpenCoilAphi < OpenCoil
             argu = f_to_namedarg(args);
             plot@OpenCoil(obj,argu{:});
             % ---
-            if ~isempty(obj.matrix.unit_current_field)
-                hold on;
-                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem));
+            if isfield(obj.matrix,'unit_current_field')
+                if ~isempty(obj.matrix.unit_current_field)
+                    hold on;
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                end
             end
         end
     end

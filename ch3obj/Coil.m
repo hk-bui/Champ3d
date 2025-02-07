@@ -3,23 +3,29 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef Coil < PhysicalDom
     
-    % --- 
-    properties (Access = private)
-        setup_done = 0
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs(fname)
+            if nargin < 1
+                argslist = {'parent_model','id_dom2d','id_dom3d'};
+            elseif ischar(fname)
+                if f_strcmpi(fname,'plot')
+                    argslist = {'edge_color','face_color','alpha'};
+                end
+            end
+        end
     end
-
     % --- Contructor
     methods
         function obj = Coil(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -33,8 +39,6 @@ classdef Coil < PhysicalDom
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -42,30 +46,8 @@ classdef Coil < PhysicalDom
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@PhysicalDom(obj);
-            % ---
-            obj.setup_done = 1;
         end
     end
 
-    % --- Methods
-    methods
-        % -----------------------------------------------------------------
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'none'
-                args.face_color = 'c'
-                args.alpha {mustBeNumeric} = 0.9
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@PhysicalDom(obj,argu{:}); hold on
-        end
-        % -----------------------------------------------------------------
-    end
 end

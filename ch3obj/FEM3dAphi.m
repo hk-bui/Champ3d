@@ -3,13 +3,19 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef FEM3dAphi < EmModel
     
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','frequency'};
+        end
+    end
     % --- Contructor
     methods
         function obj = FEM3dAphi(args)
@@ -27,9 +33,15 @@ classdef FEM3dAphi < EmModel
             obj <= args;
         end
     end
-
+    
     % --- Methods/public
     methods (Access = public)
+
+    end
+    % --- Methods/protected
+    methods (Access = protected)
+        % -----------------------------------------------------------------
+        
         % -----------------------------------------------------------------
         function base_matrix(obj)
             %--------------------------------------------------------------
@@ -235,7 +247,7 @@ classdef FEM3dAphi < EmModel
                     % ---
                     wewex = sparse(nb_edge,nb_edge);
                     for i = 1:nbEd_inEl
-                        for j = 1:nbEd_inEl
+                        for j = i+1:nbEd_inEl
                             wewex = wewex + ...
                                 sparse(id_edge_in_elem(i,:),id_edge_in_elem(j,:),...
                                 lmatrix(:,i,j),nb_edge,nb_edge);
@@ -306,6 +318,130 @@ classdef FEM3dAphi < EmModel
             obj.matrix.wewfx = wewfx; clear wewfx
             %--------------------------------------------------------------
         end
+        % -----------------------------------------------------------------
+        % function base_matrix(obj)
+        %     %--------------------------------------------------------------
+        %     tic;
+        %     f_fprintf(0,'Base',1,class(obj),0,'\n');
+        %     %--------------------------------------------------------------
+        %     obj.build;
+        %     %--------------------------------------------------------------
+        %     parent_mesh = obj.parent_mesh;
+        %     nb_elem = parent_mesh.nb_elem;
+        %     nb_face = parent_mesh.nb_face;
+        %     nb_edge = parent_mesh.nb_edge;
+        %     nb_node = parent_mesh.nb_node;
+        %     %--------------------------------------------------------------
+        %     obj.matrix.id_edge_a = 1:nb_edge;
+        %     %--------------------------------------------------------------
+        %     refelem = parent_mesh.refelem;
+        %     nbEd_inEl = refelem.nbEd_inEl;
+        %     nbFa_inEl = refelem.nbFa_inEl;
+        %     % ---
+        %     id_edge_in_elem = parent_mesh.meshds.id_edge_in_elem;
+        %     id_edge_in_face = parent_mesh.meshds.id_edge_in_face;
+        %     id_face_in_elem = parent_mesh.meshds.id_face_in_elem;
+        %     % ---
+        %     obj.matrix.id_edge_in_elem = parent_mesh.meshds.id_edge_in_elem;
+        %     obj.matrix.id_edge_in_face = parent_mesh.meshds.id_edge_in_face;
+        %     obj.matrix.id_face_in_elem = parent_mesh.meshds.id_face_in_elem;
+        %     %--------------------------------------------------------------
+        %     id_nomesh__ = {};
+        %     id_airbox__ = {};
+        %     id_mconductor__ = {};
+        %     % ---
+        %     if ~isempty(obj.airbox)
+        %         id_airbox__ = fieldnames(obj.airbox);
+        %     end
+        %     % ---
+        %     if ~isempty(obj.nomesh)
+        %         id_nomesh__ = fieldnames(obj.nomesh);
+        %     end
+        %     % ---
+        %     if ~isempty(obj.mconductor)
+        %         id_mconductor__ = fieldnames(obj.mconductor);
+        %     end
+        %     %--------------------------------------------------------------
+        %     % --- nomesh
+        %     id_elem_nomesh = [];
+        %     id_inner_edge_nomesh = [];
+        %     id_inner_node_nomesh = [];
+        %     for iec = 1:length(id_nomesh__)
+        %         %----------------------------------------------------------
+        %         id_phydom = id_nomesh__{iec};
+        %         %----------------------------------------------------------
+        %         f_fprintf(0,'--- #nomesh',1,id_phydom,0,'\n');
+        %         %----------------------------------------------------------
+        %         id_elem = obj.nomesh.(id_phydom).matrix.gid_elem;
+        %         id_inner_edge = obj.nomesh.(id_phydom).matrix.gid_inner_edge;
+        %         id_inner_node = obj.nomesh.(id_phydom).matrix.gid_inner_node;
+        %         %----------------------------------------------------------
+        %         id_elem_nomesh = [id_elem_nomesh id_elem];
+        %         id_inner_edge_nomesh = [id_inner_edge_nomesh f_torowv(id_inner_edge)];
+        %         id_inner_node_nomesh = [id_inner_node_nomesh f_torowv(id_inner_node)];
+        %     end
+        %     % ---
+        %     id_elem_nomesh = unique(id_elem_nomesh);
+        %     id_inner_edge_nomesh = unique(id_inner_edge_nomesh);
+        %     id_inner_node_nomesh = unique(id_inner_node_nomesh);
+        %     % ---
+        %     obj.matrix.id_elem_nomesh = id_elem_nomesh;
+        %     obj.matrix.id_inner_edge_nomesh = id_inner_edge_nomesh;
+        %     obj.matrix.id_inner_node_nomesh = id_inner_node_nomesh;
+        %     %--------------------------------------------------------------
+        %     % --- mconductor
+        %     id_elem_mcon = [];
+        %     for iec = 1:length(id_mconductor__)
+        %         %----------------------------------------------------------
+        %         id_phydom = id_mconductor__{iec};
+        %         %----------------------------------------------------------------------
+        %         id_elem_mcon = [id_elem_mcon obj.mconductor.(id_phydom).matrix.gid_elem];
+        %         %----------------------------------------------------------
+        %     end
+        %     % ---
+        %     id_elem_mcon = unique(id_elem_mcon);
+        %     % ---
+        %     obj.matrix.id_elem_mcon = id_elem_mcon;
+        %     %--------------------------------------------------------------
+        %     % --- airbox
+        %     id_phydom = id_airbox__{1};
+        %     id_elem_airbox = unique(obj.airbox.(id_phydom).matrix.gid_elem);
+        %     id_inner_edge_airbox = unique(obj.airbox.(id_phydom).matrix.gid_inner_edge);
+        %     %---
+        %     obj.matrix.id_elem_airbox = id_elem_airbox;
+        %     obj.matrix.id_inner_edge_airbox = id_inner_edge_airbox;
+        %     %--------------------------------------------------------------
+        %     % --- wfwf / wfwfx
+        %     lmatrix = parent_mesh.cwfwf;
+        %     % ---
+        %     id_elem_x = [id_elem_nomesh id_elem_mcon];
+        %     % ---
+        %     [obj.matrix.wfwf, obj.matrix.wfwfx] = f_asssparse(lmatrix,...
+        %             id_face_in_elem,id_face_in_elem,...
+        %             [nb_face nb_face],'lid_elem_x',id_elem_x,...
+        %             'lmatrix_type','upper_triangular');
+        %     %--------------------------------------------------------------
+        %     % --- wewe / wewex
+        %     lmatrix = parent_mesh.cwewe;
+        %     % ---
+        %     id_elem_x = id_elem_nomesh;
+        %     % ---
+        %     [obj.matrix.wewe, obj.matrix.wewex] = f_asssparse(lmatrix,...
+        %             id_edge_in_elem,id_edge_in_elem,...
+        %             [nb_edge nb_edge],'lid_elem_x',id_elem_x,...
+        %             'lmatrix_type','upper_triangular');
+        %     %--------------------------------------------------------------
+        %     % --- wewf / wewfx
+        %     lmatrix = parent_mesh.cwewf;
+        %     % ---
+        %     id_elem_x = id_elem_nomesh;
+        %     % ---
+        %     [obj.matrix.wewf, obj.matrix.wewfx] = f_asssparse(lmatrix,...
+        %             id_edge_in_elem,id_face_in_elem,...
+        %             [nb_edge nb_face],'lid_elem_x',id_elem_x,...
+        %             'lmatrix_type','full');
+        %     %--------------------------------------------------------------
+        % end
         % -----------------------------------------------------------------
     end
     % --- Methods/protected

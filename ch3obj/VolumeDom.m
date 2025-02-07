@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,23 +17,31 @@ classdef VolumeDom < Xhandle
         gid_elem
         condition
         submesh
+        gid
     end
 
     % --- Dependent Properties
     properties (Dependent = true)
         
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parent_mesh','elem_code','gid_elem','condition'};
+        end
+    end
     % --- Constructors
     methods
         function obj = VolumeDom(args)
             arguments
-                % ---
                 args.parent_mesh = []
                 args.elem_code = []
                 args.gid_elem = []
                 args.condition = []
             end
+            % ---
+            obj = obj@Xhandle;
             % ---
             obj <= args;
             % ---
@@ -66,7 +74,12 @@ classdef VolumeDom < Xhandle
             obj.submesh = allmeshes;
         end
         % -----------------------------------------------------------------
-        function gid = gid(obj)
+        function gid = get_gid(obj)
+            if ~isempty(obj.gid)
+                gid = obj.gid;
+                return;
+            end
+            %--------------------------------------------------------------
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             elem_type = obj.parent_mesh.elem_type;
@@ -103,6 +116,8 @@ classdef VolumeDom < Xhandle
             gid.gid_inner_node = id_inner_node;
             gid.gid_inner_edge = id_inner_edge;
             gid.gid_inner_face = id_inner_face;
+            %--------------------------------------------------------------
+            obj.gid = gid;
             %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------

@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -21,6 +21,12 @@ classdef StrandedCoilAphi < Xhandle
     methods
         function obj = StrandedCoilAphi()
             obj@Xhandle;
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
         end
     end
 

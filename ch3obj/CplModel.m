@@ -3,28 +3,31 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files for more information.
+% See LICENSE and CREDITS files in champ3d root directory for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef MovingFrame < Xhandle
-    
+classdef CplModel < Xhandle
+
     properties
-        
+        time_system
     end
 
-    % --- Contructor
+    % --- Constructor
     methods
-        function obj = MovingFrame()
+        function obj = CplModel()
             obj = obj@Xhandle;
         end
     end
 
-    % --- Methods
+    % --- Methods - Abst
     methods (Abstract)
-        move(obj)
-        inverse_move(obj)
+        solve
     end
 
+    % --- Methods
+    methods
+        
+    end
 end

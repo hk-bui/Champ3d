@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -17,16 +17,20 @@ classdef BsfieldAphi < Bsfield
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Bsfield.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = BsfieldAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -41,10 +45,6 @@ classdef BsfieldAphi < Bsfield
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,16 +52,7 @@ classdef BsfieldAphi < Bsfield
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Bsfield(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -89,6 +80,15 @@ classdef BsfieldAphi < Bsfield
             % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.wfbs = wfbs;
+            % ---
+            if iscell(obj.bs)
+                bs = 0;
+                for i = 1:length(obj.bs)
+                    bs = bs + obj.bs{i};
+                end
+                bs = bs ./ length(obj.bs);
+            end
+            obj.matrix.bs = bs;
             % ---
             obj.build_done = 1;
             obj.assembly_done = 0;
@@ -129,7 +129,7 @@ classdef BsfieldAphi < Bsfield
             rotb = rotb(id_edge_a_unknown,1);
             rotrot = rotrot(id_edge_a_unknown,id_edge_a_unknown);
             %--------------------------------------------------------------
-            a_bsfield = sparse(nb_edge,1);
+            a_bsfield = zeros(nb_edge,1);
             a_bsfield(id_edge_a_unknown) = f_solve_axb(rotrot,rotb);
             %--------------------------------------------------------------
             clear rotb rotrot wfbs
@@ -142,6 +142,27 @@ classdef BsfieldAphi < Bsfield
             %    obj.parent_model.parent_mesh.discrete.rot * a_bsfield;
             %--------------------------------------------------------------
             obj.assembly_done = 1;
+        end
+    end
+
+    % --- Methods
+    methods
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = 'k'
+                args.face_color = 'none'
+                args.alpha {mustBeNumeric} = 0.5
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            plot@CloseCoil(obj,argu{:});
+            % ---
+            if ~isempty(obj.matrix.bs)
+                hold on;
+                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                         obj.matrix.bs(:,obj.matrix.gid_elem).','sfactor',0.2);
+            end
         end
     end
 

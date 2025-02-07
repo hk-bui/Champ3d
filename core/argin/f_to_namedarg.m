@@ -1,4 +1,4 @@
-function validargs = f_to_namedarg(argsin,fargs)
+function validargs = f_to_namedarg(args_in,fargs)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
 % as a contribution to champ3d code.
@@ -10,80 +10,92 @@ function validargs = f_to_namedarg(argsin,fargs)
 %--------------------------------------------------------------------------
 
 arguments
-    argsin
-    fargs.with_out = [];
-    fargs.with_only = [];
+    args_in
+    fargs.for {mustBeA(fargs.for,'char')} = ''
+    fargs.with_out = []
+    fargs.with_only = []
 end
 % ---
+forname = fargs.for;
 with_out = fargs.with_out;
 with_only = fargs.with_only;
 %--------------------------------------------------------------------------
-if iscell(argsin)
-    argsin = f_to_scellargin(argsin);
+validargslist = {};
+if ~isempty(forname)
     % ---
-    if ~isempty(with_out)
-        k = 0;
-        validargs = [];
-        for i = 1:length(argsin)/2
-            if ~f_strcmpi(lower(argsin{2*i-1}),with_out)
-                k = k + 1;
-                validargs{2*k-1} = lower(argsin{2*i-1});
-                validargs{2*k}   = argsin{2*i};
-            end
-        end
-    elseif ~isempty(with_only)
-        k = 0;
-        validargs = [];
-        for i = 1:length(argsin)/2
-            if any(f_strcmpi(lower(argsin{2*i-1}),with_only))
-                k = k + 1;
-                validargs{2*k-1} = lower(argsin{2*i-1});
-                validargs{2*k}   = argsin{2*i};
-            end
-        end
-    else
-        validargs = argsin;
+    forname = split(forname,'.');
+    cls_name = forname{1};
+    % ---
+    fun_name = [];
+    if length(forname) > 1
+        fun_name = forname{2};
     end
-    %----------------------------------------------------------------------
-elseif isstruct(argsin)
-    %----------------------------------------------------------------------
-    if ~isempty(with_out)
-        validargs = {};
-        arg_name = fieldnames(argsin);
-        nb_arg = length(arg_name);
-        k = 0;
-        for i = 1:nb_arg
-            arg_name_ = arg_name{i};
-            if ~f_strcmpi(lower(arg_name_),with_out)
-                k = k + 1;
-                validargs{2*k - 1} = arg_name_;
-                validargs{2*k}     = argsin.(arg_name_);
+    % ---
+    try
+        metlist = methods(cls_name);
+        if any(f_strcmpi('validargs',metlist))
+            f2 = str2func([cls_name '.validargs']);
+            if isempty(fun_name)
+                validargslist = f2();
+            else
+                validargslist = f2(fun_name);
             end
         end
-    elseif ~isempty(with_only)
-        validargs = {};
-        arg_name = fieldnames(argsin);
-        nb_arg = length(arg_name);
-        k = 0;
-        for i = 1:nb_arg
-            arg_name_ = arg_name{i};
-            if any(f_strcmpi(lower(arg_name_),with_only))
-                k = k + 1;
-                validargs{2*k - 1} = arg_name_;
-                validargs{2*k}     = argsin.(arg_name_);
-            end
-        end
-    else
-        validargs = {};
-        arg_name = fieldnames(argsin);
-        nb_arg = length(arg_name);
-        for i = 1:nb_arg
-            arg_name_ = arg_name{i};
-            validargs{2*i - 1} = arg_name_;
-            validargs{2*i}     = argsin.(arg_name_);
-        end
+    catch
+        % ---
     end
-    %----------------------------------------------------------------------
-else
-    validargs = [];
 end
+%--------------------------------------------------------------------------
+args_in_key   = {};
+args_in_value = {};
+if iscell(args_in)
+    args_in = f_to_scellargin(args_in);
+    nb_arg = length(args_in)/2;
+    % ---
+    args_in_key = cell(nb_arg,1);
+    args_in_value = cell(nb_arg,1);
+    % ---
+    for i = 1:nb_arg
+        args_in_key{i} = lower(args_in{2*i-1});
+        args_in_value{i} = args_in{2*i};
+    end
+elseif isstruct(args_in)
+    arg_name = fieldnames(args_in);
+    nb_arg = length(arg_name);
+    % ---
+    args_in_key = cell(nb_arg,1);
+    args_in_value = cell(nb_arg,1);
+    % ---
+    for i = 1:nb_arg
+        arg_name_ = arg_name{i};
+        args_in_key{i} = arg_name_;
+        args_in_value{i}   = args_in.(arg_name_);
+    end
+end
+%--------------------------------------------------------------------------
+if ~isempty(validargslist)
+    i2rm = 1:length(args_in_key);
+    i2rm = i2rm(~f_strcmpi(args_in_key,validargslist));
+    args_in_key(i2rm) = [];
+    args_in_value(i2rm) = [];
+end
+%--------------------------------------------------------------------------
+if ~isempty(with_out)
+    i2rm = 1:length(args_in_key);
+    i2rm = i2rm(f_strcmpi(args_in_key,with_out));
+    args_in_key(i2rm) = [];
+    args_in_value(i2rm) = [];
+elseif ~isempty(with_only)
+    i2rm = 1:length(args_in_key);
+    i2rm = i2rm(~f_strcmpi(args_in_key,with_only));
+    args_in_key(i2rm) = [];
+    args_in_value(i2rm) = [];
+end
+%--------------------------------------------------------------------------
+nb_arg = length(args_in_key);
+validargs = cell(nb_arg * 2, 1);
+for i = 1:length(args_in_key)
+    validargs{2*i - 1} = args_in_key{i};
+    validargs{2*i}     = args_in_value{i};
+end
+%--------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -21,7 +21,14 @@ classdef PrismMeshFromTriMesh < PrismMesh
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'node','elem','parent_mesh1d','parent_mesh2d', ...
+                        'id_zline'};
+        end
+    end
     % --- Constructors
     methods
         function obj = PrismMeshFromTriMesh(args)
@@ -43,8 +50,6 @@ classdef PrismMeshFromTriMesh < PrismMesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -53,10 +58,6 @@ classdef PrismMeshFromTriMesh < PrismMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             setup@PrismMesh(obj);
             % ---
@@ -154,7 +155,6 @@ classdef PrismMeshFromTriMesh < PrismMesh
             obj.cedge = cedge_;
             obj.cface = cface_;
             % ---
-            obj.setup_done = 1;
         end
     end
 

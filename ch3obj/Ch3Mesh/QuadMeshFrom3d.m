@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -25,7 +25,16 @@ classdef QuadMeshFrom3d < QuadMesh
     properties (Dependent = true)
 
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'parallel_line_1','parallel_line_2', ...
+                        'dtype_parallel','dtype_orthogonal', ...
+                        'dnum_parallel','dnum_orthogonal', ...
+                        'flog'};
+        end
+    end
     % --- Constructors
     methods
         function obj = QuadMeshFrom3d(args)
@@ -38,9 +47,6 @@ classdef QuadMeshFrom3d < QuadMesh
                 args.dnum_parallel
                 args.dnum_orthogonal
                 args.flog
-                % ---
-                args.gcoor_type {mustBeMember(args.gcoor_type,{'cartesian','cylindrical'})}
-                args.gcoor
             end
             % ---
             obj@QuadMesh;
@@ -51,8 +57,6 @@ classdef QuadMeshFrom3d < QuadMesh
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            % ---
             obj.setup;
             % ---
         end
@@ -62,10 +66,6 @@ classdef QuadMeshFrom3d < QuadMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             if isempty(obj.parallel_line_1) || isempty(obj.parallel_line_2)
                 return
@@ -98,8 +98,8 @@ classdef QuadMeshFrom3d < QuadMesh
             vec1 = br - bl;
             vec2 = tr - tl;
             % ---
-            if norm(cross(vec1,vec2)) ~= 0
-                error('Lines are not parallel !')
+            if abs(dot(cross(vec1,vec2),vec1)) < 1e-9
+                error('Lines are not in plane !')
             end
             % ---
             if dot(vec1,vec2) < 0
@@ -140,7 +140,6 @@ classdef QuadMeshFrom3d < QuadMesh
             obj.node = node;
             obj.elem = elem;
             obj.elem_code = elem_code;
-            obj.setup_done = 1;
         end
         % -----------------------------------------------------------------
     end

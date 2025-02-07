@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -12,29 +12,45 @@ classdef LTime < Xhandle
 
     % --- Properties
     properties
-        lit = 0
-        ltime_array
+        it = 0
+        t_array
+    end
+
+    % --- Properties
+    properties (Access = private, Hidden)
+        nbdigit = 10;
     end
 
     % --- Dependent Properties
     properties (Dependent = true)
-        ltime_now
+        it_max
+        t_now
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'time_array','t0','t_end','dnum'};
+        end
+    end
     % --- Constructors
     methods
         function obj = LTime(args)
             arguments
-                args.ltime_array {mustBeNumeric}
+                args.t_array {mustBeNumeric}
                 args.t0 {mustBeNumeric}
                 args.t_end {mustBeNumeric}
                 args.dnum {mustBeNumeric}
             end
             obj = obj@Xhandle;
             % ---
-            if isfield(args,'ltime_array')
-                obj.ltime_array = args.ltime_array;
-            else
+            if isfield(args,'t_array')
+                if ~isempty(args.t_array)
+                    obj.t_array = round(args.t_array,obj.nbdigit); % !!!
+                end
+            end
+            % ---
+            if isempty(obj.t_array)
                 % ---
                 t0 = 0;
                 t_end = 0;
@@ -50,7 +66,11 @@ classdef LTime < Xhandle
                     dnum = args.dnum;
                 end
                 % ---
-                obj.ltime_array = [t0, t0 + cumsum((t_end-t0)/dnum .* ones(1,dnum))];
+                obj.t_array = [t0, t0 + cumsum((t_end-t0)/dnum .* ones(1,dnum))];
+                % ---
+                obj.t_array = round(obj.t_array,obj.nbdigit); % !!!
+                obj.t_array = uniquetol(obj.t_array); % !!!
+                % ---
             end
             % ---
         end
@@ -58,25 +78,16 @@ classdef LTime < Xhandle
 
     % --- Methods
     methods
-        function val = get.ltime_now(obj)
-            if obj.lit > 0
-                val = obj.ltime_array(obj.lit);
+        function val = get.t_now(obj)
+            if obj.it > 0
+                val = obj.t_array(obj.it);
             else
                 val = -inf;
             end
         end
-    end
-
-    % --- Methods
-    methods (Access = public)
         % ---
-        function objx = uplus(obj)
-            objx = copy(obj);
+        function val = get.it_max(obj)
+            val = length(obj.t_array);
         end
-        % ---
-        function objx = ctranspose(obj)
-            objx = copy(obj);
-        end
-        % ---
     end
 end

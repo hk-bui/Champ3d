@@ -3,7 +3,7 @@
 % as a contribution to champ3d code.
 %--------------------------------------------------------------------------
 % champ3d is copyright (c) 2023 H-K. Bui.
-% See LICENSE and CREDITS files in champ3d root directory for more information.
+% See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
@@ -12,21 +12,25 @@ classdef EconductorAphi < Econductor
 
     % --- computed
     properties
-        matrix
+        matrix = struct('gid_elem',[],'gid_node_phi',[],'sigmawewe',[],'sigma_array',[])
     end
 
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
         assembly_done = 0
     end
-
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = Econductor.validargs;
+        end
+    end
     % --- Contructor
     methods
         function obj = EconductorAphi(args)
             arguments
-                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -41,10 +45,6 @@ classdef EconductorAphi < Econductor
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
             obj.setup;
         end
     end
@@ -52,16 +52,7 @@ classdef EconductorAphi < Econductor
     % --- setup
     methods
         function setup(obj)
-            if obj.setup_done
-                return
-            end
-            % ---
             setup@Econductor(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -156,7 +147,7 @@ classdef EconductorAphi < Econductor
             %--------------------------------------------------------------
             [coef, coef_array_type] = f_column_format(sigma_array);
             %--------------------------------------------------------------
-            ev = obj.parent_model.fields.ev(:,gid_elem);
+            ev = obj.parent_model.field.ev(:,gid_elem);
             jv = zeros(3,length(gid_elem));
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
@@ -176,9 +167,9 @@ classdef EconductorAphi < Econductor
                           coef(:,3,3).' .* ev(3,:);
             end
             %--------------------------------------------------------------
-            obj.parent_model.fields.jv(:,gid_elem) = jv;
+            obj.parent_model.field.jv(:,gid_elem) = jv;
             %--------------------------------------------------------------
-            obj.parent_model.fields.pv(:,gid_elem) = ...
+            obj.parent_model.field.pv(:,gid_elem) = ...
                 real(1/2 .* sum(ev .* conj(jv)));
             %--------------------------------------------------------------
         end
