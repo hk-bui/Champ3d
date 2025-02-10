@@ -54,11 +54,6 @@ classdef TriMeshFromFemm < TriMesh
     methods
         % -----------------------------------------------------------------
         function obj = setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
             if isempty(obj.mesh_file)
                 return
             end
