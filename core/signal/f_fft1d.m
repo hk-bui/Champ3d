@@ -15,10 +15,12 @@ arguments
     args.signal {mustBeNumeric}
     args.T {mustBeNumeric}
     args.Fs {mustBeNumeric}
+    args.tolerance {mustBeNumeric} = 1e-9
 end
 
 % ---
 sfac_t_len = 5;
+tol = args.tolerance; % tolerance when compute phase
 %--------------------------------------------------------------------------
 spec.t = [];
 spec.signal = [];
@@ -105,7 +107,25 @@ X(2:NX) = 2/N .* Y(2:NX); % 1/N and 2/N are scale factor
 order = (0:NX-1);
 fr = Fs/(N-1) .* order;
 amplitude = abs(X);
-phase = unwrap(angle(X));
+% ---
+phase = zeros(1,NX); % unwrap ?
+re = real(X);
+im = imag(X);
+% ---
+re(abs(re) < tol) = 0;
+im(abs(im) < tol) = 0;
+% ---
+ire0 = find(re == 0);
+ip90 = ire0(im(ire0) > 0); % phase = +90
+in90 = ire0(im(ire0) < 0); % phase = -90
+i0   = setdiff(ire0,[ip90,in90]); % phase = 0
+ipcn = setdiff(1:NX,ire0); % phase computed normally
+% ---
+phase(ip90) =  90;
+phase(in90) = -90;
+phase(i0)   =   0;
+phase(ipcn) = angle(re(ipcn) + 1j*im(ipcn)) .* (180/pi);
+phase(1) = 0; % DC component
 % ---
 if with_T_given
     harmonic_order = order;
