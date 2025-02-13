@@ -353,8 +353,19 @@ classdef FEMM2dMag < Xhandle
             else
                 acsolver_ = 1;
             end
-            mi_probdef(obj.fr, obj.unit, obj.problem_type, obj.precision, ...
-                obj.depth, obj.min_angle, acsolver_);
+            try 
+                mi_probdef(obj.fr, obj.unit, obj.problem_type, obj.precision, ...
+                    obj.depth, obj.min_angle, acsolver_);
+            catch
+                fprintf(['No FEMM opened. \n']);
+                fprintf(['Load ' obj.femmfile '\n']);
+                % ---
+                closefemm;
+                openfemm;
+                opendocument(obj.femmfile);
+                mi_probdef(obj.fr, obj.unit, obj.problem_type, obj.precision, ...
+                    obj.depth, obj.min_angle, acsolver_);
+            end
             % --- update mesh / dom
             if obj.reset_mesh || obj.reset_dom
                 obj.setup;
@@ -435,7 +446,18 @@ classdef FEMM2dMag < Xhandle
             obj.dof  = dof_;
             obj.field = field_;
         end
-        
+        % -----------------------------------------------------------------
+        function open(obj)
+            % ---
+            closefemm;
+            openfemm;
+            opendocument(obj.femmfile);
+            % ---
+            if isfile(obj.meshfile)
+                mi_loadsolution;
+            end
+        end
+        % -----------------------------------------------------------------
     end
     % --- Methods/protected
     methods (Access = protected)

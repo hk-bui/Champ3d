@@ -41,7 +41,13 @@ classdef FEMM2dCircuit < Xhandle
     % --- Methods/get
     methods
         function val = get.quantity(obj)
-            mi_loadsolution;
+            % ---
+            try
+                mi_loadsolution;
+            catch
+                obj.parent_model.open;
+            end
+            % ---
             val = [];
             cirpro = mo_getcircuitproperties(obj.id_circuit);
             I = cirpro(1);

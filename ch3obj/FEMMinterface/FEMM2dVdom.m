@@ -29,6 +29,9 @@ classdef FEMM2dVdom < Xhandle
         is_pmagnet = 0
         is_coil = 0
     end
+    properties (Dependent)
+        quantity
+    end
     % --- Constructor
     methods
         function obj = FEMM2dVdom()
@@ -126,35 +129,36 @@ classdef FEMM2dVdom < Xhandle
                             obj.parent_model.coil.(obj.id_coil).nb_turn);
             mi_clearselected;
         end
+    end
+    % --- Methods/get
+    methods
         % -----------------------------------------------------------------
-        function val = get_quantity(obj,quantity)
+        function val = get.quantity(obj)
             % get integral quantities
-            arguments
-                obj
-                quantity {mustBeMember(quantity,{...
-                'int_AxJ_ds',...
-                'int_A_ds',...
-                'magnetic_energy',...
-                'magnetic_coenergy',...
-                'lamination_losses',...
-                'resistive_losses',...
-                'cross_section_area',...
-                'total_losses',...
-                'int_J_ds',...
-                'volume'})}
+            try
+                mi_loadsolution;
+            catch
+                obj.parent_model.open;
             end
             % ---
-            if nargin > 1
-                id_quantity = obj.get_id_quantity(quantity);
-                % ---
-                mi_loadsolution;
-                mo_clearblock;
-                mo_groupselectblock(obj.id_group);
-                val = mo_blockintegral(id_quantity);
-                mo_clearblock;
-            else
-                val = 0;
+            mo_clearblock;
+            mo_groupselectblock(obj.id_group);
+            % ---
+            quan_ = {'int_AxJ_ds',...
+                     'int_A_ds',...
+                     'magnetic_energy',...
+                     'magnetic_coenergy',...
+                     'lamination_losses',...
+                     'resistive_losses',...
+                     'area',...
+                     'total_losses',...
+                     'int_J_ds',...
+                     'volume'};
+            for i = 1:length(quan_)
+                val.(quan_{i}) = mo_blockintegral(obj.get_id_quantity(quan_{i}));
             end
+            mo_clearblock;
+            % ---
         end
     end
     % --- Methods/protected
@@ -221,7 +225,7 @@ classdef FEMM2dVdom < Xhandle
                     id_quantity = 3;
                 case 'resistive_losses'
                     id_quantity = 4;
-                case 'cross_section_area'
+                case 'area'
                     id_quantity = 5;
                 case 'total_losses'
                     id_quantity = 6;
