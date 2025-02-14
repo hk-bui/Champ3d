@@ -51,8 +51,10 @@ classdef FEMM2dCircuit < Xhandle
             val = [];
             cirpro = mo_getcircuitproperties(obj.id_circuit);
             I = cirpro(1);
-            V = cirpro(2);
             flux_linkage = cirpro(3);
+            % ---
+            %V = cirpro(2);
+            V = -1j*2*pi*obj.parent_model.fr*flux_linkage;
             % --- TODO
             %if any(f_strcmpi(obj.coil_wire_type,{'insulated_round_section','Litz'}))
             %    V = -1j * V;
