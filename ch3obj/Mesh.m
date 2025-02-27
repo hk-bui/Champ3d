@@ -362,9 +362,9 @@ classdef Mesh < Xhandle
                 return
             end
             %--------------------------------------------------------------
-            tic
-            f_fprintf(0,'Make #meshds \n');
-            fprintf('   ');
+            %tic
+            %f_fprintf(0,'Make #meshds \n');
+            %fprintf('   ');
             % ---
             get = args.get;
             % ---
@@ -484,9 +484,9 @@ classdef Mesh < Xhandle
             end
             %--------------------------------------------------------------
             %--- Log message
-            f_fprintf(0,'--- in',...
-                1,toc, ...
-                0,'s \n');
+            %f_fprintf(0,'--- in',...
+            %    1,toc, ...
+            %    0,'s \n');
         end
         function obj = build_discrete(obj,args)
             arguments
