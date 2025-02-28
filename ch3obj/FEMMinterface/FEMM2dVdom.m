@@ -165,6 +165,9 @@ classdef FEMM2dVdom < Xhandle
             obj.quantity.total_losses = real(obj.quantity.total_losses);
             obj.quantity.loss_density = obj.quantity.total_losses / obj.quantity.volume;
             % ---
+            obj.quantity.skin_losses = obj.quantity.resistive_losses;
+            obj.quantity.prox_losses = obj.quantity.lamination_losses;
+            % ---
         end
     end
     % --- Methods/protected
