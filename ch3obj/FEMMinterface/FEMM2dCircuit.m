@@ -22,7 +22,7 @@ classdef FEMM2dCircuit < Xhandle
     properties (Hidden)
         coil_wire_type;
     end
-    properties (Dependent)
+    properties %(Dependent)
         quantity
     end
     % --- Constructor
@@ -40,7 +40,7 @@ classdef FEMM2dCircuit < Xhandle
     end
     % --- Methods/get
     methods
-        function val = get.quantity(obj)
+        function get_quantity(obj)
             % ---
             try
                 mi_loadsolution;
@@ -48,7 +48,7 @@ classdef FEMM2dCircuit < Xhandle
                 obj.parent_model.open;
             end
             % ---
-            val = [];
+            obj.quantity = [];
             cirpro = mo_getcircuitproperties(obj.id_circuit);
             I = cirpro(1);
             flux_linkage = cirpro(3);
@@ -81,22 +81,22 @@ classdef FEMM2dCircuit < Xhandle
             P = real(R * Irms^2);
             Q = real(X * Irms^2);
             % ---
-            val.I = I;
-            val.V = V;
-            val.phi_I = phi_I/pi*180;
-            val.phi_V = phi_V/pi*180;
-            val.dphi_VI = val.phi_V - val.phi_I;
-            val.Irms = Irms;
-            val.Vrms = Vrms;
-            val.cosPhi = cosPhi;
-            val.Z = Z;
-            val.R = R;
-            val.X = X;
-            val.L = L;
-            val.fr = fr;
-            val.P = P;
-            val.Q = Q;
-            val.flux_linkage = flux_linkage;
+            obj.quantity.I = I;
+            obj.quantity.V = V;
+            obj.quantity.phi_I = phi_I/pi*180;
+            obj.quantity.phi_V = phi_V/pi*180;
+            obj.quantity.dphi_VI = obj.quantity.phi_V - obj.quantity.phi_I;
+            obj.quantity.Irms = Irms;
+            obj.quantity.Vrms = Vrms;
+            obj.quantity.cosPhi = cosPhi;
+            obj.quantity.Z = Z;
+            obj.quantity.R = R;
+            obj.quantity.X = X;
+            obj.quantity.L = L;
+            obj.quantity.fr = fr;
+            obj.quantity.P = P;
+            obj.quantity.Q = Q;
+            obj.quantity.flux_linkage = flux_linkage;
         end
     end
     % --- Methods/public
