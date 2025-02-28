@@ -23,6 +23,8 @@ classdef FEMM2dVdom < Xhandle
         % ---
         id_group = 0
         parent_model
+        % ---
+        id_femm
     end
     properties (Hidden)
         is_material = 0

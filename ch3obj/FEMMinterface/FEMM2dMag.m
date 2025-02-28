@@ -331,6 +331,7 @@ classdef FEMM2dMag < Xhandle
                 id__ = fieldnames(obj.dom);
                 for i = 1:length(id__)
                     obj.dom.(id__{i}).setup(id__{i});
+                    obj.dom.(id__{i}).id_femm = i; % id in femm file
                 end
                 % ---
                 obj.reset_mesh = 0;
@@ -411,10 +412,16 @@ classdef FEMM2dMag < Xhandle
             % --- load mesh and solution of A
             mesh_ = TriMeshFromFemm('mesh_file',obj.meshfile);
             % --- add dom by id number
-            nbdom = length(unique(mesh_.elem_code));
+            id_alldom = fieldnames(obj.dom);
+            nbdom = length(id_alldom);
+            id_femm = zeros(1,nbdom);
             for i = 1:nbdom
-                id_dom = ['d_' num2str(i)];
-                mesh_.add_vdom('id',id_dom,'elem_code',i);
+                id_femm(i) = obj.dom.(id_alldom{i}).id_femm;
+            end
+            % ---
+            for i = 1:nbdom
+                id_dom = id_alldom{i};
+                mesh_.add_vdom('id',id_dom,'elem_code',id_femm(i));
             end
             % ---
             mesh_.build_intkit;
