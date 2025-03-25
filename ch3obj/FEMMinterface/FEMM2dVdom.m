@@ -96,28 +96,6 @@ classdef FEMM2dVdom < Xhandle
                 obj.is_labeled = 1;
             end
             %--------------------------------------------------------------
-%             first_set_groupe = 0;
-%             if ~isempty(obj.id_group)
-%                 if obj.id_group == 0
-%                     first_set_groupe = 1;
-%                 end
-%             else
-%                 first_set_groupe = 1;
-%             end
-%             % ---
-%             if first_set_groupe
-%                 [px, py] = obj.get_original_choosing_point;
-%                 % ---
-%                 id_groupe_ = [id_dom '_dom'];
-%                 obj.id_group = f_str2code(id_groupe_,'code_type','integer');
-%                 %----------------------------------------------------------
-%                 mi_clearselected;
-%                 mi_addblocklabel(px,py);
-%                 mi_selectlabel(px,py);
-%                 mi_setgroup(obj.id_group);
-%                 mi_clearselected;
-%             end
-            %--------------------------------------------------------------
             if obj.is_material
                 obj.setup_material;
             elseif obj.is_pmagnet
@@ -128,11 +106,6 @@ classdef FEMM2dVdom < Xhandle
         end
         % -----------------------------------------------------------------
         function setup_material(obj)
-%             mi_clearselected;
-%             mi_selectgroup(obj.id_group);
-%             mi_setblockprop(obj.id_material,0,obj.mesh_size,[],...
-%                             0,obj.id_group,0);
-%             mi_clearselected;
             % ---
             obj.selectlabel;
             mi_setblockprop(obj.id_material,0,obj.mesh_size,[],...
@@ -144,12 +117,6 @@ classdef FEMM2dVdom < Xhandle
             if ~isempty(obj.auto_pm_direction)
                 obj.pm_direction = obj.orientation + obj.auto_pm_direction;
             end
-%             mi_clearselected;
-%             mi_selectgroup(obj.id_group);
-%             mi_setblockprop(obj.id_material,...
-%                             0,obj.mesh_size,[],...
-%                             obj.pm_direction,obj.id_group,0);
-%             mi_clearselected;
             % ---
             obj.selectlabel;
             mi_setblockprop(obj.id_material,...
@@ -160,14 +127,6 @@ classdef FEMM2dVdom < Xhandle
         end
         % -----------------------------------------------------------------
         function setup_coil(obj)
-%             mi_clearselected;
-%             mi_selectgroup(obj.id_group);
-%             mi_setblockprop(obj.parent_model.coil.(obj.id_coil).id_material,...
-%                             0,obj.mesh_size,...
-%                             obj.parent_model.coil.(obj.id_coil).id_circuit,...
-%                             0,obj.id_group,...
-%                             obj.parent_model.coil.(obj.id_coil).nb_turn);
-%             mi_clearselected;
             % ---
             obj.selectlabel;
             mi_setblockprop(obj.parent_model.coil.(obj.id_coil).id_material,...

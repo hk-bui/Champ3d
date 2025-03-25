@@ -98,10 +98,5 @@ classdef FEMM2dRectMovingFrame < FEMM2dMovingFrame
             end
         end
         % ---
-        function select(obj)
-            obj.setup;
-            mi_clearselected;
-            mi_selectgroup(obj.id_group);
-        end
     end
 end

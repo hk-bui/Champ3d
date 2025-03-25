@@ -16,7 +16,7 @@ classdef FEMM2dCircMovingFrame < FEMM2dMovingFrame
         r
     end
     properties (Access = private)
-        
+        reset_group = 1
     end
 
     % --- Constructor
@@ -47,12 +47,38 @@ classdef FEMM2dCircMovingFrame < FEMM2dMovingFrame
 
     % --- Methods/public
     methods (Access = public)
-        function select(obj)
-            % ---
-            mi_clearselected;
-            % ---
-            mi_seteditmode('group');
-            mi_selectcircle(obj.center(1),obj.center(2),obj.r);
+        function setup(obj)
+            if obj.reset_group
+                % ---
+                mi_clearselected;
+                % ---
+                mi_seteditmode('group');
+                mi_selectcircle(obj.center(1),obj.center(2),obj.r);
+                % ---
+                obj.id_group = f_str2code(['moveframe_' obj.id_moveframe],'code_type','integer');
+                mi_seteditmode('group');
+                mi_setgroup(obj.id_group);
+                % ---
+                id_dom_ = fieldnames(obj.parent_model.dom);
+                nb_dom  = length(id_dom_);
+                k = 0;
+                for i = 1:nb_dom
+                    % ---
+                    vdom = obj.parent_model.dom.(id_dom_{i});
+                    vpt  = [0;0];
+                    vpt(1) = vdom.original_choosing_point.x - obj.center(1);
+                    vpt(2) = vdom.original_choosing_point.y - obj.center(2);
+                    d_r = norm(vpt);
+                    % ---
+                    if (d_r <= obj.r)
+                        k = k + 1;
+                        obj.id_dom{k} = id_dom_{i};
+                    end
+                end
+                % ---
+                obj.reset_group = 0;
+            end
         end
+        % ---
     end
 end

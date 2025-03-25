@@ -544,37 +544,6 @@ classdef FEMM2dMag < Xhandle
             end
         end
         % -----------------------------------------------------------------
-        function selectrectangle(obj,args)
-            arguments
-                obj
-                args.ref_point = [0,0] % must be in Oxy coordinates
-                args.cen_x = []
-                args.cen_y = []
-                args.cen_r = []
-                args.cen_theta = []
-                args.len_x = []
-                args.len_y = []
-                args.len_r = []
-                args.len_theta = []
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            % ---
-            choosewindow = FEMM2dRectangle(argu{:});
-            % ---
-            mi_clearselected;
-            % ---
-            mi_seteditmode('group');
-            mi_selectrectangle(choosewindow.out_topleft(1),choosewindow.out_topleft(2),...
-                               choosewindow.out_bottomright(1),choosewindow.out_bottomright(2));
-            % ---
-            obj.last_move.window = 'rect';
-            obj.last_move.select.out_topleft = choosewindow.out_topleft;
-            obj.last_move.select.out_bottomright = choosewindow.out_bottomright;
-            % ---
-            clear choosewindow;
-            % ---
-        end
         % -----------------------------------------------------------------
         function selectcircle(obj,args)
             arguments
@@ -602,78 +571,6 @@ classdef FEMM2dMag < Xhandle
             obj.last_move.select.r = choosewindow.r;
             % ---
             clear choosewindow;
-            % ---
-        end
-        % -----------------------------------------------------------------
-        function rotate(obj,args)
-            arguments
-                obj
-                args.xbase = 0;   % rot around base point
-                args.ybase = 0;   % rot around base point
-                args.angle = 0;   % deg, counterclockwise convention
-            end
-            % ---
-            obj.last_move.id_move_groupe = f_str2code('_last_move_groupe_','code_type','integer');
-            mi_seteditmode('group');
-            mi_setgroup(obj.last_move.id_move_groupe);
-            % ---
-            mi_clearselected;
-            mi_selectgroup(obj.last_move.id_move_groupe);
-            % ---
-            mi_moverotate(args.xbase,args.ybase,args.angle);
-            % ---
-            obj.reset_mesh = 1;
-            % ---
-            obj.last_move.move_type = 'rotate';
-            % ---
-            %args.angle = - args.angle;
-            obj.last_move.move_args = args;
-        end
-        % -----------------------------------------------------------------
-        function translate(obj,args)
-            arguments
-                obj
-                args.dx = 0;   % x-distance
-                args.dy = 0;   % y-distance
-            end
-            % ---
-            mi_movetranslate(args.dx,args.dy);
-            % ---
-            obj.reset_mesh = 1;
-            % ---
-            obj.last_move.move_type = 'translate';
-            % ---
-            %args.dx = - args.dx;
-            %args.dy = - args.dy;
-            obj.last_move.move_args = args;
-        end
-        % -----------------------------------------------------------------
-        function reset_last_move(obj)
-            % ---
-            if isempty(obj.last_move)
-                return
-            end
-            % --- select
-            mi_clearselected;
-            mi_selectgroup(obj.last_move.id_move_groupe);
-            % --- reset move
-            if f_strcmpi(obj.last_move.move_type,'rotate')
-                % ---
-                obj.rotate('xbase',obj.last_move.move_args.xbase,...
-                           'ybase',obj.last_move.move_args.ybase,...
-                           'angle', - obj.last_move.move_args.angle);
-                obj.reset_mesh = 1;
-                % ---
-            elseif f_strcmpi(obj.last_move.move_type,'translate')
-                % ---
-                obj.translate('dx', - obj.last_move.move_args.dx,...
-                              'dy', - obj.last_move.move_args.dy);
-                obj.reset_mesh = 1;
-                % ---
-            end
-            % ---
-            mi_clearselected;
-            obj.last_move = [];
             % ---
         end
         % -----------------------------------------------------------------
