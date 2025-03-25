@@ -662,9 +662,9 @@ classdef Mesh < Xhandle
                 return
             end
             %--------------------------------------------------------------
-            tic
-            f_fprintf(0,'Make #intkit \n');
-            fprintf('   ');
+            %tic
+            %f_fprintf(0,'Make #intkit \n');
+            %fprintf('   ');
             %--------------------------------------------------------------
             refelem_ = obj.refelem;
             U  = refelem_.U;
@@ -758,9 +758,9 @@ classdef Mesh < Xhandle
             obj.build_intkit_done = 1;
             %--------------------------------------------------------------
             %--- Log message
-            f_fprintf(0,'--- in',...
-                1,toc, ...
-                0,'s \n');
+            %f_fprintf(0,'--- in',...
+            %    1,toc, ...
+            %    0,'s \n');
         end
         % -----------------------------------------------------------------
         function node_g = get_gaussnode(obj,node)
