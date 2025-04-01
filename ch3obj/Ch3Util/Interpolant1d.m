@@ -15,10 +15,7 @@ classdef Interpolant1d < Xhandle
         % ---
         algorithme
         % ---
-        f
-        df
-        ddf
-        dddf
+        form
     end
 
     % --- Constructor
@@ -55,39 +52,31 @@ classdef Interpolant1d < Xhandle
     % --- Methods/public
     methods (Access = public)
         % -----------------------------------------------------------------
-        function val = fx(obj,x)
+        function val = eval(obj,x)
             if nargin < 2
-                val = obj.f;
+                val = obj.form.f;
             else
-                val = ppval(obj.f, x);
+                val = ppval(obj.form.f, x);
             end
         end
         % -----------------------------------------------------------------
-        function val = dfx(obj,x)
+        function val = evaldf(obj,x)
             if nargin < 2
-                val = obj.df;
+                val = obj.form.df;
             else
-                val = ppval(obj.df, x);
+                val = ppval(obj.form.df, x);
             end
         end
         % -----------------------------------------------------------------
-        function val = ddfx(obj,x)
+        function val = evalddf(obj,x)
             if nargin < 2
-                val = obj.ddf;
+                val = obj.form.ddf;
             else
-                val = ppval(obj.ddf, x);
+                val = ppval(obj.form.ddf, x);
             end
         end
         % -----------------------------------------------------------------
-        function val = dddfx(obj,x)
-            if nargin < 2
-                val = obj.dddf;
-            else
-                val = ppval(obj.dddf, x);
-            end
-        end
-        % -----------------------------------------------------------------
-        function fx = build(obj)
+        function build(obj)
             % ---
             if f_strcmpi(obj.algorithme,'makima')
                 fx = makima(obj.xdata,obj.ydata);
@@ -97,10 +86,9 @@ classdef Interpolant1d < Xhandle
                 fx = pchip(obj.xdata,obj.ydata);
             end
             % ---
-            obj.f = fx;
-            obj.df = f_dfpolynomial(obj.f);
-            obj.ddf = f_dfpolynomial(obj.df);
-            obj.dddf = f_dfpolynomial(obj.ddf);
+            obj.form.f = fx;
+            obj.form.df = f_dfpolynomial(obj.form.f);
+            obj.form.ddf = f_dfpolynomial(obj.form.df);
             % ---
         end
     end
