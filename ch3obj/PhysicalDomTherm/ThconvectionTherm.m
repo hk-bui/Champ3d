@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThconvectionTemp < Thconvection
+classdef ThconvectionTherm < Thconvection
 
     % --- computed
     properties
@@ -30,7 +30,7 @@ classdef ThconvectionTemp < Thconvection
     end
     % --- Contructor
     methods
-        function obj = ThconvectionTemp(args)
+        function obj = ThconvectionTherm(args)
             arguments
                 args.id
                 args.parent_model

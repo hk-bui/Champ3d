@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThconductorTemp < Thconductor
+classdef ThconductorTherm < Thconductor
 
     % --- computed
     properties
@@ -30,7 +30,7 @@ classdef ThconductorTemp < Thconductor
     end
     % --- Contructor
     methods
-        function obj = ThconductorTemp(args)
+        function obj = ThconductorTherm(args)
             arguments
                 args.id
                 args.parent_model

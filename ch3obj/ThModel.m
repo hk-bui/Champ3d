@@ -72,7 +72,7 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Thconductor');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThconductorTemp(argu{:});
+                phydom = ThconductorTherm(argu{:});
             end
             % ---
             obj.thconductor.(args.id) = phydom;
@@ -94,7 +94,7 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Thcapacitor');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThcapacitorTemp(argu{:});
+                phydom = ThcapacitorTherm(argu{:});
             end
             % ---
             obj.thcapacitor.(args.id) = phydom;
@@ -115,7 +115,7 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Thconvection');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThconvectionTemp(argu{:});
+                phydom = ThconvectionTherm(argu{:});
             end
             % ---
             obj.convection.(args.id) = phydom;
@@ -136,7 +136,7 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','ThPs');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThPsTemp(argu{:});
+                phydom = ThPsTherm(argu{:});
             end
             % ---
             obj.ps.(args.id) = phydom;
@@ -157,7 +157,7 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','ThPv');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThPvTemp(argu{:});
+                phydom = ThPvTherm(argu{:});
             end
             % ---
             obj.pv.(args.id) = phydom;

@@ -129,12 +129,13 @@ classdef FEM3dTherm < ThModel
             end
             %--------------------------------------------------------------------------
             id_node_t = unique(obj.matrix.id_node_t);
+            obj.matrix.id_node_t = id_node_t;
             %--------------------------------------------------------------------------
             %
             %               MATRIX SYSTEM
             %
             %--------------------------------------------------------------------------
-            Temp_prev = obj.matrix.Temp_prev;
+            Temp_prev = 0;%obj.matrix.Temp_prev;
             delta_t = 1;
             %--------------------------------------------------------------------------
             % --- LSH
@@ -153,7 +154,7 @@ classdef FEM3dTherm < ThModel
             obj.matrix.LHS = LHS;
             obj.matrix.RHS = RHS;
             %--------------------------------------------------------------------------
-            obj.assembly_done = 1;
+%             obj.assembly_done = 1;
             %--------------------------------------------------------------------------
         end
         % -----------------------------------------------------------------
@@ -173,8 +174,8 @@ classdef FEM3dTherm < ThModel
             % ---
             while erro0 > tole0 & nite0 < maxi0
                 % ---
-                obj.build_done = 0;
-                obj.assembly_done = 0;
+                %obj.build_done = 0;
+                %obj.assembly_done = 0;
                 obj.assembly;
                 % ---
                 nite0 = nite0 + 1;
@@ -213,7 +214,7 @@ classdef FEM3dTherm < ThModel
                 obj.field.temp  = obj.dof.temp;
                 Temp_prev = obj.dof.temp;
                 %----------------------------------------------------------------------
-                obj.postpro;
+                %obj.postpro;
                 %----------------------------------------------------------------------
             end
         end

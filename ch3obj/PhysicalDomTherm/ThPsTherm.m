@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThPsTemp < ThPs
+classdef ThPsTherm < ThPs
 
     % --- computed
     properties
@@ -30,7 +30,7 @@ classdef ThPsTemp < ThPs
     end
     % --- Contructor
     methods
-        function obj = ThPsTemp(args)
+        function obj = ThPsTherm(args)
             arguments
                 args.id
                 args.parent_model
