@@ -20,14 +20,14 @@ classdef ThModel < PhysicalModel
         ps
         pv
         % ---
-        Temp0 = 0
+        T0 = 0
         % ---
     end
     
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','timesystem','Temp0'};
+            argslist = {'parent_mesh','timesystem','T0'};
         end
     end
     % --- Constructor
@@ -36,7 +36,7 @@ classdef ThModel < PhysicalModel
             arguments
                 args.parent_mesh
                 args.timesystem
-                args.Temp0
+                args.T0
             end
             % ---
             obj@PhysicalModel;
@@ -49,7 +49,7 @@ classdef ThModel < PhysicalModel
             % ---
             f_initobj(obj,'property_name','field',...
                      'field_name',{'tempv','temps'}, ...
-                     'init_value',args.Temp0);
+                     'init_value',args.T0);
             % ---
         end
     end
@@ -173,7 +173,7 @@ classdef ThModel < PhysicalModel
             nb_elem = obj.parent_mesh.nb_elem;
             nb_face = obj.parent_mesh.nb_face;
             % ---
-            obj.field.tempv = zeros(1,nb_elem) + obj.Temp0;
+            obj.field.tempv = zeros(1,nb_elem) + obj.T0;
         end
     end
 end

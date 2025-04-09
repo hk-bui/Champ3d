@@ -13,7 +13,7 @@ classdef FEM3dTherm < ThModel
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','Temp0'};
+            argslist = {'parent_mesh','T0'};
         end
     end
     % --- Contructor
@@ -21,7 +21,7 @@ classdef FEM3dTherm < ThModel
         function obj = FEM3dTherm(args)
             arguments
                 args.parent_mesh = []
-                args.Temp0 = 0
+                args.T0 = 0
             end
             % ---
             argu = f_to_namedarg(args,'for','ThModel');
@@ -36,9 +36,6 @@ classdef FEM3dTherm < ThModel
         % -----------------------------------------------------------------
         function build(obj)
             %--------------------------------------------------------------------------
-            tic;
-            f_fprintf(0,'Build',1,class(obj),0,'\n');
-            f_fprintf(0,'   ');
             % ---
             parent_mesh = obj.parent_mesh;
             % ---
@@ -79,14 +76,8 @@ classdef FEM3dTherm < ThModel
         %--------------------------------------------------------------------------
         function assembly(obj)
             %--------------------------------------------------------------------------
-            tic;
-            f_fprintf(0,'Assembly',1,class(obj),0,'\n');
             %--------------------------------------------------------------------------
             obj.build;
-            %--------------------------------------------------------------------------
-%             if obj.assembly_done
-%                 return
-%             end
             %--------------------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
             nb_edge = parent_mesh.nb_edge;
@@ -217,6 +208,16 @@ classdef FEM3dTherm < ThModel
                 %obj.postpro;
                 %----------------------------------------------------------------------
             end
+        end
+        %------------------------------------------------------------------
+        function solveone(obj,it = [])
+            if isempty(it)
+                it = obj.ltime.it;
+            end
+            % ---
+            obj.dof{it}.T = NodeDof()
+            obj.field{it}.T.node = 
+            % ---
         end
     end
     % --- Methods/protected
