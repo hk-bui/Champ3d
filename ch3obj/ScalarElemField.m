@@ -12,6 +12,8 @@ classdef ScalarElemField < MeshField
     properties
         parent_mesh
         dof
+        % ---
+        reference_potential = 0
     end
     properties (Dependent)
         value
@@ -23,6 +25,7 @@ classdef ScalarElemField < MeshField
             arguments
                 args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
+                args.reference_potential = 0;
             end
             % ---
             obj = obj@MeshField;
@@ -37,7 +40,8 @@ classdef ScalarElemField < MeshField
     methods
         % -----------------------------------------------------------------
         function val = get.value(obj)
-            val = obj.parent_mesh.field_wn('dof',obj.dof.value,'on','center');
+            val = obj.parent_mesh.field_wn('dof',obj.dof.value,'on','center') ...
+                  + obj.reference_potential;
         end
         % -----------------------------------------------------------------
         function val = get.node(obj)

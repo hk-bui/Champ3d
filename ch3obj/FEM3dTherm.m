@@ -123,9 +123,9 @@ classdef FEM3dTherm < ThModel
             %
             %--------------------------------------------------------------
             if obj.ltime.it <= 1
-                Tprev = obj.T0;
+                Tprev = 0;
             else
-                Tprev = obj.dof{obj.ltime.it - 1}.T.value;
+                Tprev = obj.dof{obj.ltime.it - 1}.T.value - obj.T0;
             end
             delta_t = 1;
             %--------------------------------------------------------------
@@ -186,9 +186,11 @@ classdef FEM3dTherm < ThModel
             end
             % ---
             obj.field{it}.T.elem = ...
-                ScalarElemField('parent_mesh',obj.parent_mesh,'dof',obj.dof{it}.T);
+                ScalarElemField('parent_mesh',obj.parent_mesh,'dof',obj.dof{it}.T,...
+                'reference_potential',obj.T0);
             obj.field{it}.T.node = ...
-                ScalarNodeField('parent_mesh',obj.parent_mesh,'dof',obj.dof{it}.T);
+                ScalarNodeField('parent_mesh',obj.parent_mesh,'dof',obj.dof{it}.T,...
+                'reference_potential',obj.T0);
             % ---
             id_node_t = obj.matrix.id_node_t;
             nb_node = obj.parent_mesh.nb_node;

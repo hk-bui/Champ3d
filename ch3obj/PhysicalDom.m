@@ -203,13 +203,13 @@ classdef PhysicalDom < Xhandle
             end
         end
         % -----------------------------------------------------------------
-        function plottemp(obj,args)
+        function plotT(obj,args)
             arguments
                 obj
                 args.show_dom = 0
             end
             % ---
-            obj.plotscalarfield('show_dom',args.show_dom,'field_name','temp')
+            obj.plotscalarfield('show_dom',args.show_dom,'field_name','T')
         end
         % -----------------------------------------------------------------
         function plotps(obj,args)
@@ -289,7 +289,10 @@ classdef PhysicalDom < Xhandle
                 elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);
                 elem_type = f_elemtype(elem);
                 face = f_boundface(elem,node,'elem_type',elem_type);
-                fs = obj.parent_model.field.(args.field_name);
+                % ---
+                it = obj.parent_model.ltime.it;
+                fs = obj.parent_model.field{it}.(args.field_name).node.value;
+                % ---
                 f_patch(node,face,'defined_on','face','scalar_field',fs);
             end
             % ---
