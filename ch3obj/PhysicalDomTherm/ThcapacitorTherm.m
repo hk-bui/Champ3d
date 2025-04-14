@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThPvTemp < ThPv
+classdef ThcapacitorTherm < Thcapacitor
 
     % --- computed
     properties
@@ -25,21 +25,22 @@ classdef ThPvTemp < ThPv
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = ThPv.validargs;
+            argslist = Thcapacitor.validargs;
         end
     end
     % --- Contructor
     methods
-        function obj = ThPvTemp(args)
+        function obj = ThcapacitorTherm(args)
             arguments
                 args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
-                args.pv
+                args.rho
+                args.cp
             end
             % ---
-            obj = obj@ThPv;
+            obj = obj@Thcapacitor;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -62,7 +63,7 @@ classdef ThPvTemp < ThPv
                 return
             end
             % ---
-            setup@ThPv(obj);
+            setup@Thcapacitor(obj);
             % ---
             obj.setup_done = 1;
             % ---
@@ -89,14 +90,18 @@ classdef ThPvTemp < ThPv
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            pv_array = obj.pv.get('in_dom',dom);
+            rho_array = obj.rho.get('in_dom',dom);
+            cp_array  = obj.cp.get('in_dom',dom);
+            rho_cp_array = rho_array .* cp_array;
             % ---
-            pvwn = parent_mesh.cwn('id_elem',gid_elem,'coefficient',pv_array);
+            rhocpwnwn = parent_mesh.cwnwn('id_elem',gid_elem,'coefficient',rho_cp_array);
             % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;
-            obj.matrix.pvwn = pvwn;
-            obj.matrix.pv_array = pv_array;
+            obj.matrix.rhocpwnwn = rhocpwnwn;
+            obj.matrix.rho_array = rho_array;
+            obj.matrix.cp_array = cp_array;
+            obj.matrix.rho_cp_array = rho_cp_array;
             % ---
             obj.build_done = 1;
             obj.assembly_done = 0;
@@ -119,21 +124,32 @@ classdef ThPvTemp < ThPv
             nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;
-            lmatrix = obj.matrix.pvwn;
+            lmatrix = obj.matrix.rhocpwnwn;
             %--------------------------------------------------------------
             [~,id_] = intersect(gid_elem,id_elem_nomesh);
             gid_elem(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
-            pvwn = sparse(nb_node,1);
+            rhocpwnwn = sparse(nb_node,nb_node);
             %--------------------------------------------------------------
             for i = 1:nbNo_inEl
-                pvwn = pvwn + ...
-                    sparse(elem(i,gid_elem),1,lmatrix(:,i),nb_node,1);
+                for j = i+1 : nbNo_inEl
+                    rhocpwnwn = rhocpwnwn + ...
+                        sparse(elem(i,gid_elem),elem(j,gid_elem),...
+                        lmatrix(:,i,j),nb_node,nb_node);
+                end
+            end
+            % ---
+            rhocpwnwn = rhocpwnwn + rhocpwnwn.';
+            % ---
+            for i = 1:nbNo_inEl
+                rhocpwnwn = rhocpwnwn + ...
+                    sparse(elem(i,gid_elem),elem(i,gid_elem),...
+                    lmatrix(:,i,i),nb_node,nb_node);
             end
             %--------------------------------------------------------------
-            obj.parent_model.matrix.pvwn = ...
-                obj.parent_model.matrix.pvwn + pvwn;
+            obj.parent_model.matrix.rhocpwnwn = ...
+                obj.parent_model.matrix.rhocpwnwn + rhocpwnwn;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];

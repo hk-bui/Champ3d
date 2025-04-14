@@ -34,6 +34,7 @@ classdef FEMM2dMag < Xhandle
         box
         dom
         bound
+        moveframe
         % --- for champ3d
         mesh
         dof
@@ -41,9 +42,11 @@ classdef FEMM2dMag < Xhandle
         matrix
         % ---
     end
-    properties (Access = private)
+    properties (Hidden)
         reset_mesh = 1
         reset_dom = 1;
+        % ---
+        last_move
     end
 
     % --- Constructor
@@ -70,6 +73,8 @@ classdef FEMM2dMag < Xhandle
             % ---
             obj.femmfile  = [obj.id_project '.fem'];
             obj.meshfile  = [obj.id_project '.ans'];
+            % ---
+            obj.add_material('id_material','by_default','material',FEMM2dMaterial());
             % ---
             obj.save;
         end
@@ -223,12 +228,30 @@ classdef FEMM2dMag < Xhandle
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
+        function add_moveframe(obj,args)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                args.id_moveframe = 'undefined';
+                args.moveframe {mustBeA(args.moveframe,'FEMM2dMovingFrame')}
+            end
+            % ---
+            if f_strcmpi(args.id_moveframe,'undefined')
+                warning('id_moveframe undefined');
+            end
+            % ---
+            obj.moveframe.(args.id_moveframe) =+ args.moveframe;
+            obj.moveframe.(args.id_moveframe).parent_model = obj;
+            obj.moveframe.(args.id_moveframe).id_moveframe = args.id_moveframe;
+            % -------------------------------------------------------------
+        end
+        % -----------------------------------------------------------------
         function set_dom(obj,args)
             arguments
                 obj
                 args.id_dom = 'undefined';
                 args.id_draw = 'undefined';
-                args.id_material = '<No Mesh>';
+                args.id_material = 'by_default';
                 args.id_coil
                 args.choosed_by {mustBeMember(args.choosed_by,...
                     {'center','bottomleft','bottomright',...
@@ -245,6 +268,10 @@ classdef FEMM2dMag < Xhandle
             % ---
             if f_strcmpi(args.id_draw,'undefined')
                 warning('id_draw undefined');
+            end
+            % ---
+            if any(f_strcmpi(args.id_material,{'<no mesh>','nomesh','no_mesh','none'}))
+                args.id_material = '<No Mesh>';
             end
             % ---
             obj.dom.(args.id_dom) = FEMM2dVdom;
@@ -517,6 +544,36 @@ classdef FEMM2dMag < Xhandle
             end
         end
         % -----------------------------------------------------------------
+        % -----------------------------------------------------------------
+        function selectcircle(obj,args)
+            arguments
+                obj
+                args.ref_point = [0,0] % must be in Oxy coordinates
+                args.cen_x = 0
+                args.cen_y = 0
+                args.cen_r = 0
+                args.cen_theta = 0
+                args.r = 0
+            end
+            % ---
+            argu = f_to_namedarg(args);
+            % ---
+            choosewindow = FEMM2dCircle(argu{:});
+            % ---
+            mi_clearselected;
+            % ---
+            mi_seteditmode('group');
+            mi_selectcircle(choosewindow.center(1),choosewindow.center(2),...
+                            choosewindow.r);
+            % ---
+            obj.last_move.window = 'circ';
+            obj.last_move.select.center = choosewindow.center;
+            obj.last_move.select.r = choosewindow.r;
+            % ---
+            clear choosewindow;
+            % ---
+        end
+        % -----------------------------------------------------------------
     end
     % --- Methods/protected
     methods (Access = protected)
@@ -534,6 +591,25 @@ classdef FEMM2dMag < Xhandle
                 newdocument(id_doc_);
                 mi_saveas(obj.femmfile);
                 %mi_minimize;
+            end
+        end
+        % -----------------------------------------------------------------
+        function reset_dom_groupe(obj)
+            if ~isempty(obj.dom)
+                id__ = fieldnames(obj.dom);
+                for i = 1:length(id__)
+                    % ---
+                    [px, py] = obj.dom.(id__{i}).get_choosed_point;
+                    % ---
+                    id_groupe_ = [id_dom '_dom'];
+                    obj.dom.(id__{i}).id_group = f_str2code(id_groupe_,'code_type','integer');
+                    %--------------------------------------------------------------
+                    mi_clearselected;
+                    mi_addblocklabel(px,py);
+                    mi_selectlabel(px,py);
+                    mi_setgroup(obj.dom.(id__{i}).id_group);
+                    mi_clearselected;
+                end
             end
         end
         % -----------------------------------------------------------------
