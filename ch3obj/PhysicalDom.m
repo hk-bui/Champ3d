@@ -105,7 +105,7 @@ classdef PhysicalDom < Xhandle
             if isempty(id_dom_)
                 return
             end
-            % ---
+            % --- can define on multiple geo doms
             obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
             for i = 2:length(id_dom_)
                 obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
