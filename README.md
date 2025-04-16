@@ -1,12 +1,12 @@
-# **champ3d**
+# **Champ3d**
 
 _Code for Computational Physics in Electrical Engineering_
 
-**champ3d** aims to 
+**Champ3d** aims to 
 
 ### Supported models
 
-**champ3d** supports, when it's possible, all combinations of the models listed below:
+**Champ3d** supports, when it's possible, all combinations of the models listed below:
 
 + [x] 2D
 - [x] 3D
@@ -39,6 +39,8 @@ _Code for Computational Physics in Electrical Engineering_
   
   - [x] 3D on hexahedral, prismatic and tetrahedral mesh
 
+- [ ] FEM/DDM
+
 - [ ] FEM/BEM
 
 ### Dependency
@@ -50,6 +52,6 @@ _Code for Computational Physics in Electrical Engineering_
 * **FEMM**
   
   If you want to build 2D mesh with FEMM. On Windows, you should have FEMM installed with matlab/octave interface (*femm42\mfiles*).
-  **champ3d** provides also interface tools to build mesh easier, _cf_. *src\meshtools\mesh2dfemm*
+  **Champ3d** provides also an interface to FEMM tools to build mesh much more conveniently.
 
-**champ3d** is copyright (C) 2023 H-K. Bui and distributed under the terms of the GNU GENERAL PUBLIC LICENSE Version 3. See LICENSE and CREDITS files for more information.
+**Champ3d** is copyright (C) 2023 H-K. Bui and distributed under the terms of the GNU GENERAL PUBLIC LICENSE Version 3. See LICENSE and CREDITS files for more information.
