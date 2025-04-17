@@ -69,7 +69,7 @@ classdef SolidOpenIsCoilAphi < OpenCoilAphi & SolidCoilAphi & IsCoilAphi
         function setup(obj)
             setup@OpenCoilAphi(obj);
             setup@SolidCoilAphi(obj);
-            % ---
+            % --- update by-default coil mode
             if isempty(obj.i_coil)
                 obj.coil_mode = 'rx';
             elseif isnumeric(obj.i_coil)

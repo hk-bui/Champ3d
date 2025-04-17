@@ -103,7 +103,7 @@ classdef FEM3dAphijw < FEM3dAphi
             f_fprintf(0,'Assembly',1,class(obj),0,'\n');
             %--------------------------------------------------------------
             obj.build;
-            obj.base_matrix;
+            obj.build_base_matrix;
             %--------------------------------------------------------------
             if obj.assembly_done
                 return
