@@ -20,6 +20,9 @@ arglist = {'position','by','get'};
 position = 1; % index of the dimension
 get = []; % 'group' = 'groupsort' = 'gr'
 by  = []; % 'strict' = 'strict_value' = 'strictvalue'
+% --- default output value
+imat = [];
+ibygroupe = [];
 %--------------------------------------------------------------------------
 % --- check and update input
 for i = 1:length(varargin)/2
@@ -28,6 +31,29 @@ for i = 1:length(varargin)/2
     else
         error([mfilename ': #' varargin{2*i-1} ' argument is not valid. Function arguments list : ' strjoin(arglist,', ') ' !']);
     end
+end
+%--------------------------------------------------------------------------
+if isobject(mat)
+    return
+elseif iscell(mat)
+    % --- work with obj references
+    if length(mat) == 1
+        return
+    else
+        i = 1;
+        while i <= length(mat)
+            j = i+1;
+            while j <= length(mat)
+                if mat{j} == mat{i}
+                    mat(j) = [];
+                end
+                j = j+1;
+            end
+            % ---
+            i = i+1;
+        end
+    end
+    return
 end
 %--------------------------------------------------------------------------
 mnum = 1.141592653589793;
