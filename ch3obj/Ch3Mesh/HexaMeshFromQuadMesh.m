@@ -85,6 +85,9 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 end
             end
             % ---
+            obj.parent_mesh1d.is_defining_obj_of(obj);
+            obj.parent_mesh2d.is_defining_obj_of(obj);
+            % ---
             obj.setup_done = 1;
             % ---
         end

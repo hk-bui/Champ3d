@@ -76,15 +76,14 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
             setup@SurfaceDom(obj);
             % ---
-            if ~isempty(obj.gid_face)
-                obj.build_from_gid_face
-            else
-                switch lower(obj.defined_on)
-                    case {'bound_face','bound'}
-                        obj.build_from_boundface;
-                    case {'interface'}
-                        obj.build_from_interface;
-                end
+            % if ~isempty(obj.gid_face)
+            %     obj.build_from_gid_face
+            % else
+            switch lower(obj.defined_on)
+                case {'bound_face','bound'}
+                    obj.build_from_boundface;
+                case {'interface'}
+                    obj.build_from_interface;
             end
             % ---
             obj.setup_done = 1;

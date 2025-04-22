@@ -214,16 +214,25 @@ classdef SurfaceDom < Xhandle
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_face = [f_torowv(obj.gid_face) f_torowv(objx.gid_face)];
             objy.build_from_gid_face;
+            % ---
+            obj.transfer_dep_def(objx,objy);
+            % ---
         end
         function objy = minus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_face = setdiff(f_torowv(obj.gid_face),f_torowv(objx.gid_face));
             objy.build_from_gid_face;
+            % ---
+            obj.transfer_dep_def(objx,objy);
+            % ---
         end
         function objy = mpower(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_face = intersect(f_torowv(obj.gid_face),f_torowv(objx.gid_face));
             objy.build_from_gid_face;
+            % ---
+            obj.transfer_dep_def(objx,objy);
+            % ---
         end
     end
 

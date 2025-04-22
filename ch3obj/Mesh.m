@@ -44,16 +44,21 @@ classdef Mesh < Xhandle
     end
 
     % ---
-    properties (Access = private, Hidden)
+    properties (Access = private)
         build_meshds_done = 0
         build_discrete_done = 0
         build_intkit_done = 0
         build_prokit_done = 0
     end
+    
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
+    end
+
+    properties
+        dependent_obj = []
+        defining_obj = []
     end
 
     % --- Dependent Properties
@@ -72,16 +77,13 @@ classdef Mesh < Xhandle
     methods
         function obj = Mesh()
             % ---
-            obj@Xhandle;
+            obj = obj@Xhandle;
             % ---
             % call setup in constructor
             % ,,, for direct verification
             % ,,, setup must be static
             Mesh.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     % --- setup/reset/build/assembly
@@ -132,16 +134,17 @@ classdef Mesh < Xhandle
             obj.prokit.node = {};
             % ---
             obj.setup_done = 1;
-            % ---
+            % must reset build+assembly
+            obj.build_done = 0;
         end
     end
     methods (Access = public)
         function reset(obj)
             % ---
-            % must reset setup+build+assembly
             obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
+            Mesh.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
     end
     methods
@@ -153,18 +156,11 @@ classdef Mesh < Xhandle
                 return
             end
             % ---
-            %obj.callsubfieldbuild('field_name',{'dom'});
+            obj.build_meshds;
+            obj.build_discrete;
+            obj.build_intkit;
             % ---
             obj.build_done = 1;
-            % ---
-        end
-    end
-    methods
-        function assembly(obj)
-            % ---
-            % may return to build of subclass obj
-            % ... subclass build must call superclass build
-            obj.build;
             % ---
         end
     end

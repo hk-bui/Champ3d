@@ -10,10 +10,62 @@
 
 classdef Mesh2d < Mesh
 
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Constructors
     methods
         function obj = Mesh2d()
             obj = obj@Mesh;
+            Mesh2d.setup(obj);
+        end
+    end
+
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@Mesh(obj);
+            % ---
+            
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+
+    methods (Access = public)
+        function reset(obj)
+            % reset super class
+            reset@Mesh(obj);
+            % ---
+            obj.setup_done = 0;
+            Mesh2d.setup(obj);
+            % --- reset dependent objs
+            obj.reset_dependent_obj;
+        end
+    end
+    
+    methods
+        function build(obj)
+            % ---
+            Mesh2d.setup(obj);
+            % ---
+            build@Mesh(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            
+            % ---
+            obj.build_done = 1;
         end
     end
 
@@ -37,8 +89,10 @@ classdef Mesh2d < Mesh
             args.parent_mesh = obj;
             % ---
             argu = f_to_namedarg(args,'for','VolumeDom2d');
-            vdom = VolumeDom2d(argu{:});
-            obj.dom.(args.id) = vdom;
+            dom = VolumeDom2d(argu{:});
+            obj.dom.(args.id) = dom;
+            % ---
+            obj.is_defining_obj_of(dom);
             % ---
         end
         % --- XTODO
@@ -61,8 +115,10 @@ classdef Mesh2d < Mesh
             args.parent_mesh = obj;
             % ---
             argu = f_to_namedarg(args,'for','SurfaceDom2d');
-            vdom = SurfaceDom2d(argu{:});
-            obj.dom.(args.id) = vdom;
+            dom = SurfaceDom2d(argu{:});
+            obj.dom.(args.id) = dom;
+            % ---
+            obj.is_defining_obj_of(dom);
             % ---
         end
     end

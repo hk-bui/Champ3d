@@ -138,6 +138,42 @@ classdef Xhandle < matlab.mixin.Copyable
         % ---
     end
     %----------------------------------------------------------------------
+    methods
+        function transfer_dep_def(obj,objx,objy)
+            % ---
+            k = 0;
+            for i = 1:length(obj.dependent_obj)
+                k = k + 1;
+                objy.dependent_obj{k} = obj.dependent_obj{i};
+            end
+            for i = 1:length(objx.dependent_obj)
+                k = k + 1;
+                objy.dependent_obj{k} = objx.dependent_obj{i};
+            end
+            % ---
+            objy.dependent_obj = f_unique(objy.dependent_obj);
+            for i = 1:length(objy.dependent_obj)
+                objy.is_defining_obj_of(objy.dependent_obj{i});
+            end
+            % ---
+            k = 0;
+            for i = 1:length(obj.defining_obj)
+                k = k + 1;
+                objy.defining_obj{k} = obj.defining_obj{i};
+            end
+            for i = 1:length(objx.defining_obj)
+                k = k + 1;
+                objy.defining_obj{k} = objx.defining_obj{i};
+            end
+            % ---
+            objy.defining_obj = f_unique(objy.defining_obj);
+            for i = 1:length(objy.defining_obj)
+                objy.defining_obj{i}.is_defining_obj_of(objy);
+            end
+            % ---
+        end
+    end
+    %----------------------------------------------------------------------
     % setup/build/assembly scheme
     methods
         function callsubfieldbuild(obj,args)
