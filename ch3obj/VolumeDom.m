@@ -433,24 +433,30 @@ classdef VolumeDom < Xhandle
             objy.gid_elem = [f_torowv(obj.gid_elem) f_torowv(objx.gid_elem)];
             objy.build_from_gid_elem;
             % ---
-            obj.transfer_dep_def(objx,objy);
+            % obj.transfer_dep_def(objx,objy);
             % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
         end
         function objy = minus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_elem = setdiff(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
             objy.build_from_gid_elem;
             % ---
-            obj.transfer_dep_def(objx,objy);
+            % obj.transfer_dep_def(objx,objy);
             % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
         end
         function objy = mpower(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_elem = intersect(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
             objy.build_from_gid_elem;
             % ---
-            obj.transfer_dep_def(objx,objy);
+            % obj.transfer_dep_def(objx,objy);
             % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
         end
     end
 end
