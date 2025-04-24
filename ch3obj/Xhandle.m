@@ -50,7 +50,7 @@ classdef Xhandle < matlab.mixin.Copyable
         %------------------------------------------------------------------
     end
     %----------------------------------------------------------------------
-    % setup/build/assembly scheme
+    % reset/setup scheme
     methods
         function is_defining_obj_of(obj,dependent_obj)
             % ---
@@ -174,7 +174,7 @@ classdef Xhandle < matlab.mixin.Copyable
         end
     end
     %----------------------------------------------------------------------
-    % setup/build/assembly scheme
+    % build/assembly scheme
     methods
         function callsubfieldbuild(obj,args)
             arguments

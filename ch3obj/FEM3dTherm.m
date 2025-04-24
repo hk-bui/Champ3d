@@ -9,11 +9,7 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dTherm < ThModel
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
-    end
+
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -28,92 +24,35 @@ classdef FEM3dTherm < ThModel
                 args.T0 = 0
             end
             % ---
-            argu = f_to_namedarg(args,'for','ThModel');
-            obj = obj@ThModel(argu{:});
+            % argu = f_to_namedarg(args,'for','ThModel');
+            obj = obj@ThModel;
             % ---
             obj <= args;
             % ---
-            FEM3dTherm.setup(obj);
-            % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@ThModel(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@ThModel(obj);
-        end
-    end
+
     % --- Methods/public
-    methods (Access = public)
-        % -----------------------------------------------------------------
-        function build(obj)
-            % ---
-            FEM3dTherm.setup(obj);
-            % ---
-            build@ThModel(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            parent_mesh = obj.parent_mesh;
-            % ---
-            %parent_mesh.build_meshds;
-            %parent_mesh.build_discrete;
-            %parent_mesh.build_intkit;
-            %--------------------------------------------------------------
-            allowed_physical_dom = {'thconductor','thcapacitor','convection',...
-                'ps','pv'};
-            obj.callsubfieldbuild('field_name',allowed_physical_dom);
-            %--------------------------------------------------------------
-            obj.build_done = 1;
-            % ---
-        end
+    methods
         %------------------------------------------------------------------
         function assembly(obj)
-            % ---
-            obj.build;
-            assembly@ThModel(obj);
             %--------------------------------------------------------------
+            % Preparation : /!\ init all matrix
             parent_mesh = obj.parent_mesh;
             nb_edge = parent_mesh.nb_edge;
             nb_node = parent_mesh.nb_node;
-            %--------------------------------------------------------------
+            %---
             obj.matrix.id_node_t  = [];
             obj.matrix.lambdawewe = sparse(nb_edge,nb_edge);
             obj.matrix.rhocpwnwn  = sparse(nb_node,nb_node);
             obj.matrix.hwnwn      = sparse(nb_node,nb_node);
             obj.matrix.pswn       = sparse(nb_node,1);
             obj.matrix.pvwn       = sparse(nb_node,1);
-            %--------------------------------------------------------------
+            %---
             obj.matrix.id_elem_nomesh = [];
             %--------------------------------------------------------------
-            allowed_physical_dom = {'thconductor','thcapacitor','convection',...
-                'ps','pv'};
+            allowed_physical_dom = ...
+                {'thconductor','thcapacitor','convection','ps','pv'};
             %--------------------------------------------------------------
             obj.callsubfieldassembly('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
@@ -130,7 +69,6 @@ classdef FEM3dTherm < ThModel
                 Tprev = obj.dof{obj.ltime.it - 1}.T.value;
                 delta_t = obj.ltime.t_array(obj.ltime.it) - obj.ltime.t_array(obj.ltime.it - 1);
             end
-            %delta_t = 1;
             %--------------------------------------------------------------
             % --- LSH
             LHS = (1./delta_t) .* obj.matrix.rhocpwnwn + ...

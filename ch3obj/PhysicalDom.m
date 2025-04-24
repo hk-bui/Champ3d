@@ -22,64 +22,20 @@ classdef PhysicalDom < Xhandle
         dom
     end
 
-    % ---
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
-    end
-    % ---
-    
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs(fname)
-            if nargin < 1
-                argslist = {'parent_model','id_dom2d','id_dom3d'};
-            elseif ischar(fname)
-                if f_strcmpi(fname,'plot')
-                    argslist = {'edge_color','face_color','alpha'};
-                end
-            end
-        end
-    end
     % --- Contructor
     methods
-        function obj = PhysicalDom(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-            end
+        function obj = PhysicalDom()
             % ---
             obj@Xhandle;
             % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
-            PhysicalDom.setup(obj);
-            % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
     
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            obj.get_geodom;
-            % ---
+    % --- Utility Methods
+    methods
+        function set_parameter(obj)
+            % --- XTODO
+            % should put list in config file ?
             paramlist = {'sigma','mur','bs','br','r_ht','r_et',...
                          'i_coil','v_coil','j_coil',...
                          'rho','cp','lambda','h','ps','pv'};
@@ -94,46 +50,7 @@ classdef PhysicalDom < Xhandle
                     end
                 end
             end
-            % ---
-            obj.setup_done = 1;
-            % ---
         end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            PhysicalDom.setup(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.callsubfieldbuild('field_name','dom');
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-    methods
-        function assembly(obj)
-            % ---
-            % may return to build of subclass obj
-            % ... subclass build must call superclass build
-            obj.build;
-            % ---
-        end
-    end
-    % --- Methods
-    methods
         function get_geodom(obj)
             if isempty(obj.parent_model)
                 return
