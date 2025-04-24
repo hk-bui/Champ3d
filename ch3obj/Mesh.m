@@ -136,6 +136,10 @@ classdef Mesh < Xhandle
             obj.setup_done = 1;
             % must reset build+assembly
             obj.build_done = 0;
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
         end
     end
     methods (Access = public)

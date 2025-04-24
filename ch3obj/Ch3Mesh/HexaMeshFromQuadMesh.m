@@ -205,7 +205,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 return
             end
             %--------------------------------------------------------------
-            obj.build_defining_obj;
+            % obj.build_defining_obj;
             %--------------------------------------------------------------
             obj.build_done = 1;
             % ---
