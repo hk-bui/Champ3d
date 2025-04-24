@@ -70,11 +70,14 @@ classdef PhysicalDom < Xhandle
             if isempty(id_dom_)
                 return
             end
-            % --- can define on multiple geo doms
+            % ---
             obj.dom = obj.parent_model.parent_mesh.dom.(id_dom_{1});
-            for i = 2:length(id_dom_)
-                obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
-            end
+            % ---
+            % --- can define on multiple geo doms
+            % --- but better if define dom in mesh
+            % for i = 2:length(id_dom_)
+            %     obj.dom = obj.dom + obj.parent_model.parent_mesh.dom.(id_dom_{i});
+            % end
         end
         % -----------------------------------------------------------------
     end
@@ -88,8 +91,6 @@ classdef PhysicalDom < Xhandle
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
             end
-            % ---
-            obj.build;
             % ---
             argu = f_to_namedarg(args);
             obj.dom.plot(argu{:});

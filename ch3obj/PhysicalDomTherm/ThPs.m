@@ -8,10 +8,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThPsTherm < ThPs
+classdef ThPs < PhysicalDom
 
     % --- computed
     properties
+        ps = 0
         matrix
     end
 
@@ -19,18 +20,17 @@ classdef ThPsTherm < ThPs
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = ThPs.validargs;
+            argslist = {'parent_model','id_dom2d','id_dom3d','ps'};
         end
     end
     % --- Contructor
     methods
-        function obj = ThPsTherm(args)
+        function obj = ThPs(args)
             arguments
                 args.id
                 args.parent_model
@@ -39,7 +39,7 @@ classdef ThPsTherm < ThPs
                 args.ps
             end
             % ---
-            obj = obj@ThPs;
+            obj = obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -47,11 +47,8 @@ classdef ThPsTherm < ThPs
             % ---
             obj <= args;
             % ---
-            ThPsTherm.setup(obj);
+            ThPs.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -62,34 +59,26 @@ classdef ThPsTherm < ThPs
             if obj.setup_done
                 return
             end
-            % ---
-            setup@ThPs(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            % must reset setup+build+assembly
             obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@ThPs(obj);
+            ThPs.setup(obj);
         end
     end
 
     % --- build
     methods
         function build(obj)
-            % ---
-            ThPsTherm.setup(obj);
-            % ---
-            build@ThPs(obj);
             % ---
             if obj.build_done
                 return
@@ -104,44 +93,41 @@ classdef ThPsTherm < ThPs
             % ---
             ps_array = obj.ps.get('in_dom',dom);
             ps_array = f_column_array(ps_array,'nb_elem',nb_face);
-            % ---
+            %--------------------------------------------------------------
+            % local surface mesh
             dom.build_submesh;
             submesh = dom.submesh;
+            %--------------------------------------------------------------
+            for k = 1:length(submesh)
+                sm = submesh{k};
+                % ---
+                gid_face_{k} = sm.gid_face;
+            end
+            % --- check changes
+
+            %--------------------------------------------------------------
+            obj.matrix.gid_face = gid_face_;
+            obj.matrix.gid_node_t = gid_node_t;
+            obj.matrix.ps_array = ps_array;
+            %--------------------------------------------------------------
+            % local pswn matrix
             for k = 1:length(submesh)
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
                 lid_face_  = sm.lid_face;
                 ps_sm = ps_array(lid_face_);
-                pswn{k} = sm.cwn('coefficient',ps_sm);
+                lmatrix{k} = sm.cwn('coefficient',ps_sm);
                 % ---
-                gid_face_{k} = sm.gid_face;
             end
-            % ---
-            obj.matrix.gid_node_t = gid_node_t;
-            % ---
-            obj.matrix.pswn = pswn;
-            obj.matrix.gid_face = gid_face_;
-            obj.matrix.ps_array = ps_array;
-            % ---
-            obj.build_done = 1;
-        end
-    end
-
-    % --- assembly
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@ThPs(obj);
             %--------------------------------------------------------------
             face = obj.parent_model.parent_mesh.face;
             nb_node = obj.parent_model.parent_mesh.nb_node;
             %--------------------------------------------------------------
+            % global elementary pswn matrix
             pswn = sparse(nb_node,1);
             %--------------------------------------------------------------
             gid_face = obj.matrix.gid_face;
-            lmatrix  = obj.matrix.pswn;
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
                 nbNo_inFa = size(lmatrix{igr},2);
@@ -152,8 +138,20 @@ classdef ThPsTherm < ThPs
                 end
             end
             %--------------------------------------------------------------
+            obj.matrix.pswn = pswn;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            %--------------------------------------------------------------
             obj.parent_model.matrix.pswn = ...
-                obj.parent_model.matrix.pswn + pswn;
+                obj.parent_model.matrix.pswn + obj.matrix.pswn;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];

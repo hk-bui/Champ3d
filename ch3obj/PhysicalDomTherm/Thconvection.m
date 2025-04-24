@@ -8,10 +8,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThconvectionTherm < Thconvection
+classdef Thconvection < PhysicalDom
 
     % --- computed
     properties
+        h = 0
         matrix
     end
 
@@ -25,12 +26,12 @@ classdef ThconvectionTherm < Thconvection
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = Thconvection.validargs;
+            argslist = {'parent_model','id_dom2d','id_dom3d','h'};
         end
     end
     % --- Contructor
     methods
-        function obj = ThconvectionTherm(args)
+        function obj = Thconvection(args)
             arguments
                 args.id
                 args.parent_model
@@ -39,7 +40,7 @@ classdef ThconvectionTherm < Thconvection
                 args.h
             end
             % ---
-            obj = obj@Thconvection;
+            obj = obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -47,11 +48,8 @@ classdef ThconvectionTherm < Thconvection
             % ---
             obj <= args;
             % ---
-            ThconvectionTherm.setup(obj);
+            Thconvection.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -62,34 +60,26 @@ classdef ThconvectionTherm < Thconvection
             if obj.setup_done
                 return
             end
-            % ---
-            setup@Thconvection(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            % must reset setup+build+assembly
             obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@Thconvection(obj);
+            Thconvection.setup(obj);
         end
     end
 
     % --- build
     methods
         function build(obj)
-            % ---
-            ThconvectionTherm.setup(obj);
-            % ---
-            build@Thconvection(obj);
             % ---
             if obj.build_done
                 return
@@ -104,44 +94,41 @@ classdef ThconvectionTherm < Thconvection
             % ---
             h_array = obj.h.get('in_dom',dom);
             h_array = f_column_array(h_array,'nb_elem',nb_face);
-            % ---
+            %--------------------------------------------------------------
+            % local surface mesh
             dom.build_submesh;
             submesh = dom.submesh;
+            %--------------------------------------------------------------
+            for k = 1:length(submesh)
+                sm = submesh{k};
+                % ---
+                gid_face_{k} = sm.gid_face;
+            end
+            % --- check changes
+
+            %--------------------------------------------------------------
+            obj.matrix.gid_face = gid_face_;
+            obj.matrix.gid_node_t = gid_node_t;
+            obj.matrix.h_array = h_array;
+            %--------------------------------------------------------------
+            % local hwnwn matrix
             for k = 1:length(submesh)
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
                 lid_face_  = sm.lid_face;
                 h_sm = h_array(lid_face_);
-                hwnwn{k} = sm.cwnwn('coefficient',h_sm);
+                lmatrix{k} = sm.cwnwn('coefficient',h_sm);
                 % ---
-                gid_face_{k} = sm.gid_face;
             end
-            % ---
-            obj.matrix.gid_node_t = gid_node_t;
-            % ---
-            obj.matrix.hwnwn = hwnwn;
-            obj.matrix.gid_face = gid_face_;
-            obj.matrix.h_array = h_array;
-            % ---
-            obj.build_done = 1;
-        end
-    end
-
-    % --- assembly
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@Thconvection(obj);
             %--------------------------------------------------------------
             face = obj.parent_model.parent_mesh.face;
             nb_node = obj.parent_model.parent_mesh.nb_node;
             %--------------------------------------------------------------
+            % global elementary hwnwn matrix
             hwnwn = sparse(nb_node,nb_node);
             %--------------------------------------------------------------
             gid_face = obj.matrix.gid_face;
-            lmatrix  = obj.matrix.hwnwn;
             %--------------------------------------------------------------
             for igr = 1:length(lmatrix)
                 nbNo_inFa = size(lmatrix{igr},2);
@@ -167,8 +154,20 @@ classdef ThconvectionTherm < Thconvection
                 end
             end
             %--------------------------------------------------------------
+            obj.matrix.hwnwn = hwnwn;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            %--------------------------------------------------------------
             obj.parent_model.matrix.hwnwn = ...
-                obj.parent_model.matrix.hwnwn + hwnwn;
+                obj.parent_model.matrix.hwnwn + obj.matrix.hwnwn;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
