@@ -240,7 +240,7 @@ classdef PhysicalDom < Xhandle
             if args.show_dom
                 obj.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
-            % ---
+            % --- for ScalarElemField
             if any(f_strcmpi(args.field_name,{'pv'}))
                 fs = obj.parent_model.field.(args.field_name);
                 % ---
@@ -251,7 +251,7 @@ classdef PhysicalDom < Xhandle
                 f_colormap;
                 return
             end
-            % ---
+            % --- for ScalarNodeField
             if isa(obj.dom,'VolumeDom3d')
                 node = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,obj.dom.gid_elem);

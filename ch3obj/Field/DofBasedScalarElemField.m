@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ScalarElemField < MeshField
+classdef DofBasedScalarElemField < MeshField
     properties
         parent_mesh
         dof
@@ -21,8 +21,9 @@ classdef ScalarElemField < MeshField
     end
     % --- Contructor
     methods
-        function obj = ScalarElemField(args)
+        function obj = DofBasedScalarElemField(args)
             arguments
+                args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
                 args.reference_potential = 0;
