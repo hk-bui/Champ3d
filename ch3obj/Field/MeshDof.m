@@ -10,7 +10,7 @@
 
 classdef MeshDof < Xhandle
     properties
-        parent_mesh
+        parent_model
         % ---
         value
     end

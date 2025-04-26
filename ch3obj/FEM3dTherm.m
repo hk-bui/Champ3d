@@ -119,22 +119,22 @@ classdef FEM3dTherm < ThModel
             if it == 1
                 % ---
                 obj.dof{it}.T = ...
-                    NodeDof('parent_mesh',obj.parent_mesh,'value',0);
+                    NodeDof('parent_model',obj,'value',0);
                 % ---
                 x0 = obj.dof{it}.T.value;
             else
                 % ---
                 obj.dof{it}.T = ...
-                    NodeDof('parent_mesh',obj.parent_mesh);
+                    NodeDof('parent_model',obj);
                 % ---
                 x0 = obj.dof{it-1}.T.value;
             end
             % ---
             obj.field{it}.T.elem = ...
-                ScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...
+                DofBasedScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...
                 'reference_potential',obj.T0);
             obj.field{it}.T.node = ...
-                ScalarNodeField('parent_model',obj,'dof',obj.dof{it}.T,...
+                DofBasedScalarNodeField('parent_model',obj,'dof',obj.dof{it}.T,...
                 'reference_potential',obj.T0);
             %--------------------------------------------------------------
             if it > 1

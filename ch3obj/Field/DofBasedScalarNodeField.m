@@ -8,11 +8,8 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef DofBasedScalarNodeField < MeshField
+classdef DofBasedScalarNodeField < DofBaseMeshField
     properties
-        parent_mesh
-        dof
-        % ---
         reference_potential = 0
     end
     properties (Dependent)
@@ -24,15 +21,14 @@ classdef DofBasedScalarNodeField < MeshField
         function obj = DofBasedScalarNodeField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
                 args.reference_potential = 0;
             end
             % ---
-            obj = obj@MeshField;
+            obj = obj@DofBaseMeshField;
             % ---
-            if ~isfield(args,'parent_mesh') || ~isfield(args,'dof')
-                error('#parent_mesh and #dof must be given !');
+            if ~isfield(args,'parent_model') || ~isfield(args,'dof')
+                error('#parent_model and #dof must be given !');
             end
             obj <= args;
         end
@@ -45,7 +41,7 @@ classdef DofBasedScalarNodeField < MeshField
         end
         % -----------------------------------------------------------------
         function val = get.node(obj)
-            val = obj.parent_mesh.node;
+            val = obj.parent_model.parent_mesh.node;
         end
     end
     % --- Plot
@@ -68,8 +64,8 @@ classdef DofBasedScalarNodeField < MeshField
             end
             % ---
             if isa(dom,'VolumeDom3d')
-                node = obj.parent_mesh.node;
-                elem = obj.parent_mesh.elem(:,dom.gid_elem);
+                node = obj.parent_model.parent_mesh.node;
+                elem = obj.parent_model.parent_mesh.elem(:,dom.gid_elem);
                 elem_type = f_elemtype(elem);
                 face = f_boundface(elem,node,'elem_type',elem_type);
                 % ---

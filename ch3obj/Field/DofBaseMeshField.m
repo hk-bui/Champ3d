@@ -8,16 +8,15 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef MeshField < Xhandle
+classdef DofBaseMeshField < Xhandle
     properties
-        %parent_mesh
-        % ---
-        %dof
+        parent_mesh
+        dof
     end
     
     % --- Contructor
     methods
-        function obj = MeshField()
+        function obj = DofBaseMeshField()
             % ---
             obj = obj@Xhandle;
             % ---

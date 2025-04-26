@@ -8,11 +8,8 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef DofBasedScalarElemField < MeshField
+classdef DofBasedScalarElemField < DofBaseMeshField
     properties
-        parent_mesh
-        dof
-        % ---
         reference_potential = 0
     end
     properties (Dependent)
@@ -24,15 +21,14 @@ classdef DofBasedScalarElemField < MeshField
         function obj = DofBasedScalarElemField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
                 args.reference_potential = 0;
             end
             % ---
-            obj = obj@MeshField;
+            obj = obj@DofBaseMeshField;
             % ---
-            if ~isfield(args,'parent_mesh') || ~isfield(args,'dof')
-                error('#parent_mesh and #dof must be given !');
+            if ~isfield(args,'parent_model') || ~isfield(args,'dof')
+                error('#parent_model and #dof must be given !');
             end
             obj <= args;
         end
@@ -41,12 +37,12 @@ classdef DofBasedScalarElemField < MeshField
     methods
         % -----------------------------------------------------------------
         function val = get.value(obj)
-            val = obj.parent_mesh.field_wn('dof',obj.dof.value,'on','center') ...
+            val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,'on','center') ...
                   + obj.reference_potential;
         end
         % -----------------------------------------------------------------
         function val = get.node(obj)
-            val = obj.parent_mesh.celem;
+            val = obj.parent_model.parent_mesh.celem;
         end
     end
 end

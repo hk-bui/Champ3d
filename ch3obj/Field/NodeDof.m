@@ -16,7 +16,7 @@ classdef NodeDof < MeshDof
     methods
         function obj = NodeDof(args)
             arguments
-                args.parent_mesh {mustBeA(args.parent_mesh,'Mesh')}
+                args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.value = []
             end
             % ---
@@ -24,7 +24,7 @@ classdef NodeDof < MeshDof
             % ---
             obj <= args;
             % ---
-            if isfield(args,'parent_mesh') && isfield(args,'value')
+            if isfield(args,'parent_model') && isfield(args,'value')
                 if ~isempty(args.value)
                     obj.setup;
                 end
@@ -36,7 +36,7 @@ classdef NodeDof < MeshDof
     methods
         % -----------------------------------------------------------------
         function setup(obj)
-            nb_node = obj.parent_mesh.nb_node;
+            nb_node = obj.parent_model.parent_mesh.nb_node;
             if numel(obj.value) == 1
                 obj.value = obj.value .* ones(nb_node,1);
             else
