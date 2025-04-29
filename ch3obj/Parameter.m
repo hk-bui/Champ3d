@@ -378,13 +378,16 @@ classdef Parameter %< Xhandle
             for i = 1:length(depon__)
                 depon_ = depon__{i};
                 from_  = from__{i};
-                if any(f_strcmpi(depon_,{'celem','cface'}))
+                if any(f_strcmpi(depon_,{'celem','cface','cedge','velem','sface','ledge'}))
+                    % should take from the same parent model as dom
                     fargs{i} = from_.parent_mesh.(depon_)(:,id_elem);
                 elseif any(f_strcmpi(depon_,{...
                         'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
                         'bs','js','hs','ps','as','phis','ts','omes','temps'}))
+                    % may need take from other model with different ltime, mesh/dom
                     fargs{i} = from_.field.(depon_)(:,id_elem);
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
+                    % should take from the same parent model as dom
                     fargs{i} = from_.ltime.t_now;
                 end
             end
