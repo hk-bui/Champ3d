@@ -1,4 +1,4 @@
-function [bound_face, lid_bound_face, info] = f_boundface(elem,node,varargin)
+function [bound_face, id_elem_of_face, lid_bound_face, info] = f_boundface(elem,node,varargin)
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2023
 % as a contribution to champ3d code.
@@ -66,6 +66,9 @@ ibO = find(dom_left_of_face  == 1 & dom_right_of_face == 0);
 ibI = find(dom_right_of_face == 1 & dom_left_of_face  == 0);
 ibO = unique(ibO);
 ibI = unique(ibI);
+%--------------------------------------------------------------------------
+% --- id_elem_of_face
+id_elem_of_face = [elem_left_of_face(ibO), dom_right_of_face(ibI)];
 %--------------------------------------------------------------------------
 switch n_direction
     case {'o','out','outward'}

@@ -109,9 +109,9 @@ classdef TelemField < Xhandle
                 node = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
                 elem_type = f_elemtype(elem);
-                face = f_boundface(elem,node,'elem_type',elem_type);
+                [face, id_elem_of_face] = f_boundface(elem,node,'elem_type',elem_type);
                 % ---
-                f_patch(node,face,'defined_on','face','scalar_field',obj.cvalue);
+                f_patch(node,face,'defined_on','face','scalar_field',obj.cvalue(id_elem_of_face));
             end
             % ---
             if isa(dom,'SurfaceDom3d')
