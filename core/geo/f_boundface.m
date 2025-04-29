@@ -68,7 +68,7 @@ ibO = unique(ibO);
 ibI = unique(ibI);
 %--------------------------------------------------------------------------
 % --- id_elem_of_face
-id_elem_of_face = [elem_left_of_face(ibO), dom_right_of_face(ibI)];
+id_elem_of_face = [elem_left_of_face(ibO), elem_right_of_face(ibI)];
 %--------------------------------------------------------------------------
 switch n_direction
     case {'o','out','outward'}
