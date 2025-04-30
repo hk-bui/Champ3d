@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FaceDofBasedVectorElemField < VectorElemField
+classdef EdgeDofBasedVectorFaceField < VectorElemField
     properties
         parent_model
         dof
@@ -24,10 +24,10 @@ classdef FaceDofBasedVectorElemField < VectorElemField
     end
     % --- Contructor
     methods
-        function obj = FaceDofBasedVectorElemField(args)
+        function obj = EdgeDofBasedVectorFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.dof {mustBeA(args.dof,'FaceDof')}
+                args.dof {mustBeA(args.dof,'EdgeDof')}
                 args.reference_potential = 0
             end
             % ---
@@ -47,7 +47,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
     methods
         % -----------------------------------------------------------------
         function val = get.cvalue(obj)
-            val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,'on','center') ...
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','center') ...
                   + obj.reference_potential;
         end
         % -----------------------------------------------------------------
@@ -56,7 +56,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
         end
         % -----------------------------------------------------------------
         function val = get.ivalue(obj)
-            val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,'on','interpolation_points') ...
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','interpolation_points') ...
                   + obj.reference_potential;
         end
         % -----------------------------------------------------------------
@@ -65,7 +65,7 @@ classdef FaceDofBasedVectorElemField < VectorElemField
         end
         % -----------------------------------------------------------------
         function val = get.gvalue(obj)
-            val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,'on','gauss_points') ...
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','gauss_points') ...
                   + obj.reference_potential;
         end
         % -----------------------------------------------------------------

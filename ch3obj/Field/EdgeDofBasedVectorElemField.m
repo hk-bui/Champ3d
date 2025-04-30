@@ -16,9 +16,11 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
     end
     properties (Dependent)
         cvalue
+        cnode
         ivalue
+        inode
         gvalue
-        node
+        gnode
     end
     % --- Contructor
     methods
@@ -49,8 +51,27 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
                   + obj.reference_potential;
         end
         % -----------------------------------------------------------------
-        function val = get.node(obj)
+        function val = get.cnode(obj)
             val = obj.parent_model.parent_mesh.celem;
         end
+        % -----------------------------------------------------------------
+        function val = get.ivalue(obj)
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','interpolation_points') ...
+                  + obj.reference_potential;
+        end
+        % -----------------------------------------------------------------
+        function val = get.inode(obj)
+            val = obj.parent_model.parent_mesh.prokit.node;
+        end
+        % -----------------------------------------------------------------
+        function val = get.gvalue(obj)
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','gauss_points') ...
+                  + obj.reference_potential;
+        end
+        % -----------------------------------------------------------------
+        function val = get.gnode(obj)
+            val = obj.parent_model.parent_mesh.intkit.node;
+        end
+        % -----------------------------------------------------------------
     end
 end
