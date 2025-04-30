@@ -8,8 +8,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef DofBasedScalarNodeField < DofBaseMeshField
+classdef NodeDofBasedScalarNodeField < Xhandle
     properties
+        parent_model
+        dof
+        % ---
         reference_potential = 0
     end
     properties (Dependent)
@@ -18,18 +21,21 @@ classdef DofBasedScalarNodeField < DofBaseMeshField
     end
     % --- Contructor
     methods
-        function obj = DofBasedScalarNodeField(args)
+        function obj = NodeDofBasedScalarNodeField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.dof {mustBeA(args.dof,'NodeDof')}
                 args.reference_potential = 0
             end
             % ---
-            obj = obj@DofBaseMeshField;
+            obj = obj@Xhandle;
             % ---
-            if ~isfield(args,'parent_model') || ~isfield(args,'dof')
-                error('#parent_model and #dof must be given !');
+            if nargin > 1
+                if ~isfield(args,'parent_model') || ~isfield(args,'dof')
+                    error('#parent_model and #dof must be given !');
+                end
             end
+            % ---
             obj <= args;
         end
     end
@@ -44,7 +50,7 @@ classdef DofBasedScalarNodeField < DofBaseMeshField
             val = obj.parent_model.parent_mesh.node;
         end
     end
-    % --- Plot
+    % --- plot
     methods
         % -----------------------------------------------------------------
         function plot(obj,args)
@@ -101,19 +107,17 @@ classdef DofBasedScalarNodeField < DofBaseMeshField
             end
             % ---
             if isa(dom,'VolumeDom3d')
-                node = obj.parent_model.parent_mesh.node;
+                node_ = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                elem_type = f_elemtype(elem);
-                face = f_boundface(elem,node,'elem_type',elem_type);
                 % ---
-                f_patch(node,face,'defined_on','face','scalar_field',obj.value);
+                f_patch('node',node_,'elem',elem,'node_field',obj.value);
             end
             % ---
             if isa(dom,'SurfaceDom3d')
-                node = obj.parent_model.parent_mesh.node;
+                node_ = obj.parent_model.parent_mesh.node;
                 face = obj.parent_model.parent_mesh.face(:,gid_face);
                 % ---
-                f_patch(node,face,'defined_on','face','scalar_field',obj.value);
+                f_patch('node',node_,'face',face,'node_field',obj.value);
             end
         end
         % -----------------------------------------------------------------

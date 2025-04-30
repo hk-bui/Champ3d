@@ -8,17 +8,22 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef DofBaseMeshField < Xhandle
-    properties
-        parent_model
-        dof
-    end
-    
+classdef PhinodeField < NodeDofBasedScalarNodeField
     % --- Contructor
     methods
-        function obj = DofBaseMeshField()
+        function obj = PhinodeField(args)
+            arguments
+                args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
+                args.dof {mustBeA(args.dof,'NodeDof')}
+                args.reference_potential = 0
+            end
             % ---
-            obj = obj@Xhandle;
+            obj = obj@NodeDofBasedScalarNodeField;
+            % ---
+            if ~isfield(args,'parent_model') || ~isfield(args,'dof')
+                error('#parent_model and #dof must be given !');
+            end
+            obj <= args;
             % ---
         end
     end

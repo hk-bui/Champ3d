@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef NodeDof < Xhandle
+classdef FaceDof < Xhandle
     properties
         parent_model
         % ---
@@ -16,7 +16,7 @@ classdef NodeDof < Xhandle
     end
     % --- Contructor
     methods
-        function obj = NodeDof(args)
+        function obj = FaceDof(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.value = []
@@ -37,14 +37,14 @@ classdef NodeDof < Xhandle
     methods
         % -----------------------------------------------------------------
         function set.value(obj,value)
-            nb_node = obj.parent_model.parent_mesh.nb_node;
+            nb_face = obj.parent_model.parent_mesh.nb_face;
             if isempty(value)
-                obj.value = zeros(nb_node,1);
+                obj.value = zeros(nb_face,1);
             elseif numel(value) == 1
-                obj.value = value .* ones(nb_node,1);
+                obj.value = value .* ones(nb_face,1);
             else
-                if numel(value) ~= nb_node
-                    error('#value must correspond to mesh node, check size !');
+                if numel(value) ~= nb_face
+                    error('#value must correspond to mesh face, check size !');
                 else
                     obj.value = f_tocolv(value);
                 end

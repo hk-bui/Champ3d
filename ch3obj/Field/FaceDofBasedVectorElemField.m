@@ -8,36 +8,44 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef DofBasedScalarElemField < DofBaseMeshField
+classdef FaceDofBasedVectorElemField < VectorElemField
     properties
+        parent_model
+        dof
         reference_potential = 0
     end
     properties (Dependent)
-        value
+        cvalue
+        ivalue
+        gvalue
         node
     end
     % --- Contructor
     methods
-        function obj = DofBasedScalarElemField(args)
+        function obj = FaceDofBasedVectorElemField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.dof {mustBeA(args.dof,'NodeDof')}
+                args.dof {mustBeA(args.dof,'FaceDof')}
                 args.reference_potential = 0
             end
             % ---
-            obj = obj@DofBaseMeshField;
+            obj = obj@VectorElemField;
             % ---
-            if ~isfield(args,'parent_model') || ~isfield(args,'dof')
-                error('#parent_model and #dof must be given !');
+            if nargin >1
+                if ~isfield(args,'parent_model') || ~isfield(args,'dof')
+                    error('#parent_model and #dof must be given !');
+                end
             end
+            % ---
             obj <= args;
+            % ---
         end
     end
-    % --- Methods/public
+    % --- get
     methods
         % -----------------------------------------------------------------
-        function val = get.value(obj)
-            val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,'on','center') ...
+        function val = get.cvalue(obj)
+            val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,'on','center') ...
                   + obj.reference_potential;
         end
         % -----------------------------------------------------------------
