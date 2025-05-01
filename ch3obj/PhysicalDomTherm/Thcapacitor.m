@@ -94,8 +94,8 @@ classdef Thcapacitor < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            rho_array = obj.rho.get('in_dom',dom);
-            cp_array  = obj.cp.get('in_dom',dom);
+            rho_array = obj.rho.getvalue('in_dom',dom);
+            cp_array  = obj.cp.getvalue('in_dom',dom);
             rho_cp_array = rho_array .* cp_array;
             % --- check changes
 

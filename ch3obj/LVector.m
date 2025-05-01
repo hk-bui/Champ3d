@@ -32,13 +32,22 @@ classdef LVector < Xhandle
                 args.rot_angle = []
             end
             % ---
+            obj = obj@Xhandle;
+            % ---
             obj <= args;
+            % ---
         end
     end
 
     % --- Methods
     methods
-        function gvector = get_on(obj,dom)
+        function gvector = getvalue(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
+            % ---
+            dom = args.in_dom;
             % ---
             if isa(dom,'VolumeDom')
                 id_elem = dom.gid_elem;
@@ -62,7 +71,7 @@ classdef LVector < Xhandle
                     if isnumeric(lvfield)
                         lvector.(fn) = repmat(lvfield,nb_elem,1);
                     elseif isa(lvfield,'Parameter')
-                        lvector.(fn) = lvfield.get('in_dom',dom);
+                        lvector.(fn) = lvfield.getvalue('in_dom',dom);
                     end
                 end
             end
@@ -82,8 +91,15 @@ classdef LVector < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
-        function ginv = get_inverse_on(obj,dom)
-            gvector = obj.get('in_dom',dom);
+        function ginv = get_inverse(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
+            % ---
+            dom = args.in_dom;
+            % ---
+            gvector = obj.getvalue('in_dom',dom);
             ginv = - gvector;
         end
         % -----------------------------------------------------------------

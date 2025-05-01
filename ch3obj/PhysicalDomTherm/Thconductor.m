@@ -91,7 +91,7 @@ classdef Thconductor < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            lambda_array = obj.lambda.get('in_dom',dom);
+            lambda_array = obj.lambda.getvalue('in_dom',dom);
             % --- check changes
 
             %--------------------------------------------------------------

@@ -8,8 +8,9 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Parameter %< Xhandle
+classdef Parameter < Xhandle
     properties
+        parent_model
         f
         depend_on
         from
@@ -21,22 +22,28 @@ classdef Parameter %< Xhandle
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'f','depend_on','from','varargin_list','fvectorized'};
+            argslist = {'parent_model','f','depend_on','from','varargin_list','fvectorized'};
         end
     end
     % --- Contructor
     methods
         function obj = Parameter(args)
             arguments
+                args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
                     {'celem','cface', ...
-                     'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
-                     'bs','js','hs','ps','as','phis','ts','omes','temps',...
+                     'T',...
                      'ltime'})}
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
+            end
+            % ---
+            obj = obj@Xhandle;
+            % ---
+            if ~isfield(args,'parent_model')
+                error('#parent_model must be given !');
             end
             % ---
             if isempty(args.f)
@@ -60,6 +67,7 @@ classdef Parameter %< Xhandle
                 error('#f must be function handle or numeric value');
             end
             % ---
+            obj.parent_model = args.parent_model;
             obj.f = args.f;
             obj.depend_on = f_to_scellargin(args.depend_on);
             obj.from = f_to_scellargin(args.from);
@@ -83,7 +91,7 @@ classdef Parameter %< Xhandle
     % --- Methods
     methods
         %------------------------------------------------------------------
-        function vout = get(obj,args)
+        function vout = getvalue(obj,args)
             arguments
                 obj
                 args.in_dom = []
@@ -111,7 +119,7 @@ classdef Parameter %< Xhandle
             parameter_type = args.parameter_type;
             % ---
             vout = [];
-            vin  = obj.get('in_dom',dom);
+            vin  = obj.getvalue('in_dom',dom);
             sizev = size(vin);
             lensv = length(sizev);
             % ---
@@ -373,22 +381,72 @@ classdef Parameter %< Xhandle
             % ---
             fargs = cell(1,length(obj.depend_on));
             % ---
+            parent_model_ = obj.parent_model;
+            % ---
             depon__ = obj.depend_on;
             from__  = obj.from;
             for i = 1:length(depon__)
                 depon_ = depon__{i};
                 from_  = from__{i};
                 if any(f_strcmpi(depon_,{'celem','cface','cedge','velem','sface','ledge'}))
-                    % should take from the same parent model as dom
-                    fargs{i} = from_.parent_mesh.(depon_)(:,id_elem);
+                    % take from paramater parent_model
+                    fargs{i} = parent_model_.parent_mesh.(depon_)(:,id_elem);
                 elseif any(f_strcmpi(depon_,{...
-                        'bv','jv','hv','pv','av','phiv','tv','omev','tempv',...
-                        'bs','js','hs','ps','as','phis','ts','omes','temps'}))
-                    % may need take from other model with different ltime, mesh/dom
-                    fargs{i} = from_.field.(depon_)(:,id_elem);
+                        'T','B',}))
+                    % physical quantities
+                    % must be able to take from other model with different ltime, mesh/dom
+                    % ---
+                    if from_ == parent_model_
+                        % no interpolation
+                        try
+                            fargs{i} = from_.field{parent_model_.ltime.it}.(depon_).elem.cvalue(:,id_elem);
+                        catch
+                            fargs{i} = from_.field{parent_model_.ltime.it}.(depon_).elem.cvalue(id_elem);
+                        end
+                    else
+                        if from_.parent_mesh == parent_model_.parent_mesh
+                            if all(from_.ltime.t_array == parent_model_.ltime.t_array)
+                                % no interpolation
+                                try
+                                    fargs{i} = from_.field{parent_model_.ltime.it}.(depon_).elem.cvalue(:,id_elem);
+                                catch
+                                    fargs{i} = from_.field{parent_model_.ltime.it}.(depon_).elem.cvalue(id_elem);
+                                end
+                            else
+                                % get by time interpolation
+                                next_it = from_.ltime.next_it(parent_model_.ltime.t_now);
+                                back_it = from_.ltime.back_it(parent_model_.ltime.t_now);
+                                if next_it == back_it
+                                    try
+                                        fargs{i} = from_.field{back_it}.(depon_).elem.cvalue(:,id_elem);
+                                    catch
+                                        fargs{i} = from_.field{back_it}.(depon_).elem.cvalue(id_elem);
+                                    end
+                                else
+                                    % ---
+                                    try
+                                        val01 = from_.field{back_it}.(depon_).elem.cvalue(:,id_elem);
+                                        val02 = from_.field{next_it}.(depon_).elem.cvalue(:,id_elem);
+                                    catch
+                                        val01 = from_.field{back_it}.(depon_).elem.cvalue(id_elem);
+                                        val02 = from_.field{next_it}.(depon_).elem.cvalue(id_elem);
+                                    end
+                                    % ---
+                                    delta_v = val02 - val01;
+                                    % ---
+                                    delta_t = from_.ltime.t_array(next_it) - from_.ltime.t_array(back_it);
+                                    % ---
+                                    dt = parent_model_.ltime.t_now - from_.ltime.t_array(back_it);
+                                    fargs{i} = val01 + delta_v./delta_t .* dt;
+                                end
+                            end
+                        else
+                            % get by time/mesh interpolation
+                        end
+                    end
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
-                    % should take from the same parent model as dom
-                    fargs{i} = from_.ltime.t_now;
+                    % take from paramater parent_model
+                    fargs{i} = parent_model_.ltime.t_now;
                 end
             end
         end

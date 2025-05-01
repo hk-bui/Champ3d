@@ -92,7 +92,7 @@ classdef ThPv < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            pv_array = obj.pv.get('in_dom',dom);
+            pv_array = obj.pv.getvalue('in_dom',dom);
             % --- save
             it = obj.parent_model.ltime.it;
             %obj.field{it}.pv.elem = FreeScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...

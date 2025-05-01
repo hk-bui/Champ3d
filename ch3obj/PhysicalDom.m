@@ -45,7 +45,7 @@ classdef PhysicalDom < Xhandle
                 if isprop(obj,param)
                     if isnumeric(obj.(param))
                         if ~isempty(obj.(param))
-                            obj.(param) = Parameter('f',obj.(param));
+                            obj.(param) = Parameter('parent_model',obj.parent_model,'f',obj.(param));
                         end
                     end
                 end

@@ -43,14 +43,23 @@ classdef LTensor < Xhandle
                 args.rot_angle = []
             end
             % ---
+            obj = obj@Xhandle;
+            % ---
             obj <= args;
+            % ---
         end
     end
 
     % --- Methods
     methods
         % -----------------------------------------------------------------
-        function gtensor = get_on(obj,dom)
+        function gtensor = getvalue(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
+            % ---
+            dom = args.in_dom;
             % ---
             if isa(dom,'VolumeDom')
                 id_elem = dom.gid_elem;
@@ -75,7 +84,7 @@ classdef LTensor < Xhandle
                     if isnumeric(ltfield)
                         ltensor.(fn) = repmat(ltfield,nb_elem,1);
                     elseif isa(ltfield,'Parameter')
-                        ltensor.(fn) = ltfield.get('in_dom',dom);
+                        ltensor.(fn) = ltfield.getvalue('in_dom',dom);
                     end
                 end
             end
@@ -97,9 +106,16 @@ classdef LTensor < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
-        function ginv = get_inverse_on(obj,dom)
+        function ginv = get_inverse(obj,args)
+            arguments
+                obj
+                args.in_dom = [] %{mustBeA(args.in_dom,{'VolumeDom','SurfaceDom'})}
+            end
+            % ---
+            dom = args.in_dom;
+            % ---
             ginv = [];
-            gtensor  = obj.get('in_dom',dom);
+            gtensor  = obj.getvalue('in_dom',dom);
             sizeg = size(gtensor);
             lensg = length(sizeg); 
             if lensg == 3
