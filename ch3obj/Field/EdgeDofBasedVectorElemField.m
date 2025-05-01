@@ -12,23 +12,21 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
     properties
         parent_model
         dof
-        reference_potential = 0
     end
-    properties (Dependent)
-        cvalue
-        cnode
-        ivalue
-        inode
-        gvalue
-        gnode
-    end
+    % properties (Dependent)
+    %     cvalue
+    %     cnode
+    %     ivalue
+    %     inode
+    %     gvalue
+    %     gnode
+    % end
     % --- Contructor
     methods
         function obj = EdgeDofBasedVectorElemField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.dof {mustBeA(args.dof,'EdgeDof')}
-                args.reference_potential = 0
             end
             % ---
             obj = obj@VectorElemField;
@@ -46,31 +44,50 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = get.cvalue(obj)
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','center') ...
-                  + obj.reference_potential;
+        function val = cvalue(obj,id_elem)
+            % ---
+            if nargin <= 1
+                id_elem = obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
+                  'on','center','id_elem',id_elem);
+            val = val(:,id_elem);
         end
         % -----------------------------------------------------------------
-        function val = get.cnode(obj)
-            val = obj.parent_model.parent_mesh.celem;
+        function val = ivalue(obj,id_elem)
+            % ---
+            if nargin <= 1
+                id_elem = obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
+                  'on','interpolation_points','id_elem',id_elem);
+            % ---
+            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
+                for i = 1:length(val)
+                    val{i} = val{i}(:,id_elem);
+                end
+            end
+            % ---
+
         end
         % -----------------------------------------------------------------
-        function val = get.ivalue(obj)
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','interpolation_points') ...
-                  + obj.reference_potential;
-        end
-        % -----------------------------------------------------------------
-        function val = get.inode(obj)
-            val = obj.parent_model.parent_mesh.prokit.node;
-        end
-        % -----------------------------------------------------------------
-        function val = get.gvalue(obj)
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','gauss_points') ...
-                  + obj.reference_potential;
-        end
-        % -----------------------------------------------------------------
-        function val = get.gnode(obj)
-            val = obj.parent_model.parent_mesh.intkit.node;
+        function val = gvalue(obj,id_elem)
+            % ---
+            if nargin <= 1
+                id_elem = obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,...
+                  'on','gauss_points','id_elem',id_elem);
+            % ---
+            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
+                for i = 1:length(val)
+                    val{i} = val{i}(:,id_elem);
+                end
+            end
+            % ---
         end
         % -----------------------------------------------------------------
     end

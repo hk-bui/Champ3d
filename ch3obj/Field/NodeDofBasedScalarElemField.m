@@ -14,12 +14,12 @@ classdef NodeDofBasedScalarElemField < Xhandle
         dof
         reference_potential = 0
     end
-    properties (Dependent)
-        cvalue
-        ivalue
-        gvalue
-        node
-    end
+    % properties (Dependent)
+    %     cvalue
+    %     ivalue
+    %     gvalue
+    %     node
+    % end
     % --- Contructor
     methods
         function obj = NodeDofBasedScalarElemField(args)
@@ -44,13 +44,24 @@ classdef NodeDofBasedScalarElemField < Xhandle
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = get.cvalue(obj)
-            val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,'on','center') ...
-                  + obj.reference_potential;
+        function val = cvalue(obj,id_elem)
+            % ---
+            if nargin <= 1
+                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            val = obj.parent_model.parent_mesh.field_wn('dof',obj.dof.value,...
+                  'on','center','id_elem',id_elem);
+            val = val(id_elem) + obj.reference_potential;
         end
         % -----------------------------------------------------------------
-        function val = get.node(obj)
-            val = obj.parent_model.parent_mesh.celem;
+        function val = node(obj,id_elem)
+            % ---
+            if nargin <= 1
+                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            val = obj.parent_model.parent_mesh.celem(:,id_elem);
         end
     end
     % --- plot

@@ -8,30 +8,28 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef EdgeDofBasedVectorFaceField < VectorElemField
+classdef EdgeDofBasedVectorFaceField < VectorFaceField
     properties
         parent_model
         dof
-        reference_potential = 0
     end
-    properties (Dependent)
-        cvalue
-        cnode
-        ivalue
-        inode
-        gvalue
-        gnode
-    end
+    % properties (Dependent)
+    %     cvalue
+    %     cnode
+    %     ivalue
+    %     inode
+    %     gvalue
+    %     gnode
+    % end
     % --- Contructor
     methods
         function obj = EdgeDofBasedVectorFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.dof {mustBeA(args.dof,'EdgeDof')}
-                args.reference_potential = 0
             end
             % ---
-            obj = obj@VectorElemField;
+            obj = obj@VectorFaceField;
             % ---
             if nargin >1
                 if ~isfield(args,'parent_model') || ~isfield(args,'dof')
@@ -46,31 +44,42 @@ classdef EdgeDofBasedVectorFaceField < VectorElemField
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = get.cvalue(obj)
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','center') ...
-                  + obj.reference_potential;
-        end
-        % -----------------------------------------------------------------
-        function val = get.cnode(obj)
-            val = obj.parent_model.parent_mesh.celem;
-        end
-        % -----------------------------------------------------------------
-        function val = get.ivalue(obj)
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','interpolation_points') ...
-                  + obj.reference_potential;
-        end
-        % -----------------------------------------------------------------
-        function val = get.inode(obj)
-            val = obj.parent_model.parent_mesh.prokit.node;
-        end
-        % -----------------------------------------------------------------
-        function val = get.gvalue(obj)
-            val = obj.parent_model.parent_mesh.field_we('dof',obj.dof.value,'on','gauss_points') ...
-                  + obj.reference_potential;
-        end
-        % -----------------------------------------------------------------
-        function val = get.gnode(obj)
-            val = obj.parent_model.parent_mesh.intkit.node;
+        function val = cvalue(obj,id_face)
+            % ---
+            if nargin <= 1
+                id_face = obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            % ---
+            id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
+            lnb_face = length(dom.gid_face);
+            % ---
+            val = zeros(2,lnb_face);
+            %--------------------------------------------------------------
+            dom.build_submesh;
+            submesh = dom.submesh;
+            for k = 1:length(submesh)
+                sm = submesh{k};
+                sm.build_intkit;
+                % ---
+                lid_face = sm.lid_face;
+                gid_face = sm.gid_face;
+                cWes = sm.intkit.cWe{1};
+                % ---
+                if any(f_strcmpi(sm.elem_type,'tri'))
+                    dofe = obj.dof.value(id_edge_in_face(1:3,gid_face)).';
+                elseif any(f_strcmpi(sm.elem_type,'quad'))
+                    dofe = obj.dof.value(id_edge_in_face(1:4,gid_face)).';
+                end
+                %----------------------------------------------------------
+                val(1,lid_face) = val(1,lid_face) + sum(squeeze(cWes(:,1,:)) .* dofe,2).';
+                val(2,lid_face) = val(2,lid_face) + sum(squeeze(cWes(:,2,:)) .* dofe,2).';
+                %----------------------------------------------------------
+            end
+            %--------------------------------------------------------------
+            delete(dom);
+            %--------------------------------------------------------------
         end
         % -----------------------------------------------------------------
     end
