@@ -442,6 +442,9 @@ classdef Parameter < Xhandle
                             end
                         else
                             % get by time/mesh interpolation
+                            % --- take just what needed
+                            id_elem_i = f_findelem(from_.parent_mesh.node,from_.parent_mesh.elem,...
+                                        'in_box',parent_model_.parent_mesh.localbox(id_elem));
                             % --- time interpolated data
                             next_it = from_.ltime.next_it(parent_model_.ltime.t_now);
                             back_it = from_.ltime.back_it(parent_model_.ltime.t_now);
@@ -468,16 +471,16 @@ classdef Parameter < Xhandle
                             end
                             % --- space interpolation
                             nbINoinEl = from_.parent_mesh.refelem.nbI;
-                            nb_elem   = length(id_elem);
+                            nb_elem   = length(id_elem_i);
                             % ---
                             node_i = zeros(nbINoinEl * nb_elem, 3);
                             % ---
-                            interp_node = from_.parent_mesh.get_interpnode;
+                            interp_node = from_.parent_mesh.prokit.node;
                             % ---
                             id0 = 1:nb_elem;
                             for k = 1:nbINoinEl
                                 idn = id0 + (k - 1) * nb_elem;
-                                node_i(idn,:) = interp_node{k}(id_elem,:);
+                                node_i(idn,:) = interp_node{k}(id_elem_i,:);
                             end
                             % ---
                             dim_ = size(valcell{1},1);
@@ -487,12 +490,12 @@ classdef Parameter < Xhandle
                                 id0 = 1:nb_elem;
                                 for k = 1:nbINoinEl
                                     idn = id0 + (k - 1) * nb_elem;
-                                    valx(idn) = valcell{k}(1,id_elem);
+                                    valx(idn) = valcell{k}(1,id_elem_i);
                                 end
                                 % ---
                                 fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                 % ---
-                                cnode_ = from_.parent_mesh.celem(:,id_elem);
+                                cnode_ = parent_model_.parent_mesh.celem(:,id_elem);
                                 fargs{i} = fxi(cnode_.');
                                 % ---
                             elseif dim_ == 2
@@ -502,15 +505,15 @@ classdef Parameter < Xhandle
                                 id0 = 1:nb_elem;
                                 for k = 1:nbINoinEl
                                     idn = id0 + (k - 1) * nb_elem;
-                                    valx(idn) = valcell{k}(1,id_elem);
-                                    valy(idn) = valcell{k}(2,id_elem);
+                                    valx(idn) = valcell{k}(1,id_elem_i);
+                                    valy(idn) = valcell{k}(2,id_elem_i);
                                 end
                                 % ---
                                 fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                 fyi = fxi;
                                 fyi.Values = valy;
                                 % ---
-                                cnode_ = from_.parent_mesh.celem(:,id_elem);
+                                cnode_ = parent_model_.parent_mesh.celem(:,id_elem);
                                 vx_ = fxi(cnode_.');
                                 vy_ = fyi(cnode_.');
                                 fargs{i} = [vx_ vy_];
@@ -523,9 +526,9 @@ classdef Parameter < Xhandle
                                 id0 = 1:nb_elem;
                                 for k = 1:nbINoinEl
                                     idn = id0 + (k - 1) * nb_elem;
-                                    valx(idn) = valcell{k}(1,id_elem);
-                                    valy(idn) = valcell{k}(2,id_elem);
-                                    valz(idn) = valcell{k}(3,id_elem);
+                                    valx(idn) = valcell{k}(1,id_elem_i);
+                                    valy(idn) = valcell{k}(2,id_elem_i);
+                                    valz(idn) = valcell{k}(3,id_elem_i);
                                 end
                                 % ---
                                 fxi = scatteredInterpolant(node_i,valx,'linear','none');
@@ -534,7 +537,7 @@ classdef Parameter < Xhandle
                                 fzi = fxi;
                                 fzi.Values = valz;
                                 % ---
-                                cnode_ = from_.parent_mesh.celem(:,id_elem);
+                                cnode_ = parent_model_.parent_mesh.celem(:,id_elem);
                                 vx_ = fxi(cnode_.');
                                 vy_ = fyi(cnode_.');
                                 vz_ = fzi(cnode_.');

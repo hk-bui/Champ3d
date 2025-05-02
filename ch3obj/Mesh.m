@@ -214,14 +214,19 @@ classdef Mesh < Xhandle
     % --- Methods - Geo
     methods
         % -----------------------------------------------------------------
-        function lbox = localbox(obj)
-            lbox.xmin = min(obj.node(1,:));
-            lbox.xmax = max(obj.node(1,:));
-            lbox.ymin = min(obj.node(2,:));
-            lbox.ymax = max(obj.node(2,:));
+        function lbox = localbox(obj,id_elem)
+            if nargin <= 1
+                id_node_ = 1:obj.nb_node;
+            else
+                id_node_ = f_uniquenode(obj.elem(:,id_elem));
+            end
+            lbox.xmin = min(obj.node(1,id_node_));
+            lbox.xmax = max(obj.node(1,id_node_));
+            lbox.ymin = min(obj.node(2,id_node_));
+            lbox.ymax = max(obj.node(2,id_node_));
             if size(obj.node,1) == 3
-                lbox.zmin = min(obj.node(3,:));
-                lbox.zmax = max(obj.node(3,:));
+                lbox.zmin = min(obj.node(3,id_node_));
+                lbox.zmax = max(obj.node(3,id_node_));
             end
         end
         % -----------------------------------------------------------------
@@ -944,7 +949,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
         function node_i = get_interpnode(obj,node)
-            %--------------------------------------------------------------
+            %--- can provide node after move
             if nargin <= 1
                 node = obj.node;
             end

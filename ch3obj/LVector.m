@@ -10,6 +10,7 @@
 
 classdef LVector < Xhandle
     properties
+        parent_model
         main_value
         main_dir
         rot_axis
@@ -19,13 +20,14 @@ classdef LVector < Xhandle
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'main_value','main_dir','rot_axis','rot_angle'};
+            argslist = {'parent_model','main_value','main_dir','rot_axis','rot_angle'};
         end
     end
     % --- Contructor
     methods
         function obj = LVector(args)
             arguments
+                args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.main_value = []
                 args.main_dir = []
                 args.rot_axis = []
@@ -33,6 +35,10 @@ classdef LVector < Xhandle
             end
             % ---
             obj = obj@Xhandle;
+            % ---
+            if ~isfield(args,'parent_model')
+                error('#parent_model must be given !');
+            end
             % ---
             obj <= args;
             % ---
@@ -71,10 +77,16 @@ classdef LVector < Xhandle
                     if isnumeric(lvfield)
                         lvector.(fn) = repmat(lvfield,nb_elem,1);
                     elseif isa(lvfield,'Parameter')
-                        lvector.(fn) = lvfield.getvalue('in_dom',dom);
+                        if isequal(obj.parent_model,lvfield.parent_model)
+                            lvector.(fn) = lvfield.getvalue('in_dom',dom);
+                        else
+                            error(['#parent_model of LVector must be the same as ' fn ' Parameter !']);
+                        end
                     end
                 end
             end
+            % --- normalize
+            lvector.main_dir = f_normalize(lvector.main_dir,2);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
