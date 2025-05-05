@@ -10,7 +10,6 @@
 
 classdef ThModel < PhysicalModel
     properties
-        parent_mesh
         % ---
         thconductor
         thcapacitor
@@ -22,6 +21,11 @@ classdef ThModel < PhysicalModel
         % ---
         T0 = 0
         % ---
+    end
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+        assembly_done = 0
     end
     
     % --- Valid args list
@@ -47,14 +51,10 @@ classdef ThModel < PhysicalModel
             % ---
             obj <= args;
             % ---
-            %f_initobj(obj,'property_name','field',...
-            %         'field_name',{'tempv','temps'}, ...
-            %         'init_value',args.T0);
-            % ---
         end
     end
 
-    % --- Methods
+    % --- Utility Methods
     methods
         % -----------------------------------------------------------------
         function add_thconductor(obj,args)
@@ -72,10 +72,11 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Thconductor');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThconductorTherm(argu{:});
+                phydom = Thconductor(argu{:});
             end
             % ---
             obj.thconductor.(args.id) = phydom;
+            % ---
         end
         % -----------------------------------------------------------------
         function add_thcapacitor(obj,args)
@@ -94,10 +95,11 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Thcapacitor');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThcapacitorTherm(argu{:});
+                phydom = Thcapacitor(argu{:});
             end
             % ---
             obj.thcapacitor.(args.id) = phydom;
+            % ---
         end
         % -----------------------------------------------------------------
         function add_convection(obj,args)
@@ -115,10 +117,11 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Thconvection');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThconvectionTherm(argu{:});
+                phydom = Thconvection(argu{:});
             end
             % ---
             obj.convection.(args.id) = phydom;
+            % ---
         end
         % -----------------------------------------------------------------
         function add_ps(obj,args)
@@ -136,10 +139,11 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','ThPs');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThPsTherm(argu{:});
+                phydom = ThPs(argu{:});
             end
             % ---
             obj.ps.(args.id) = phydom;
+            % ---
         end
         % -----------------------------------------------------------------
         function add_pv(obj,args)
@@ -157,23 +161,12 @@ classdef ThModel < PhysicalModel
             argu = f_to_namedarg(args,'for','ThPv');
             % ---
             if isa(obj,'FEM3dTherm')
-                phydom = ThPvTherm(argu{:});
+                phydom = ThPv(argu{:});
             end
             % ---
             obj.pv.(args.id) = phydom;
+            % ---
         end
         % -----------------------------------------------------------------
-        %function add_thbc(obj)
-        %end
-    end
-
-    % --- Methods
-    methods
-        function setup(obj)
-            nb_elem = obj.parent_mesh.nb_elem;
-            nb_face = obj.parent_mesh.nb_face;
-            % ---
-            obj.field.tempv = zeros(1,nb_elem) + obj.T0;
-        end
     end
 end

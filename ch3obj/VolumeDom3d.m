@@ -10,10 +10,14 @@
 
 classdef VolumeDom3d < VolumeDom
 
-    % --- Properties
     properties
         id_dom2d
         id_zline
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
     end
 
     % --- Dependent Properties
@@ -24,7 +28,7 @@ classdef VolumeDom3d < VolumeDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','id_dom2d','id_zline','elem_code', ...
+            argslist = {'id','parent_mesh','id_dom2d','id_zline','elem_code', ...
                         'gid_elem','condition'};
         end
     end
@@ -33,6 +37,7 @@ classdef VolumeDom3d < VolumeDom
         function obj = VolumeDom3d(args)
             arguments
                 % ---
+                args.id = []
                 args.parent_mesh = []
                 args.id_dom2d = []
                 args.id_zline = []
@@ -43,21 +48,66 @@ classdef VolumeDom3d < VolumeDom
             % ---
             obj = obj@VolumeDom;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
             % ---
-            if ~isempty(obj.elem_code)
-                obj.build_from_elem_code;
-            elseif ~isempty(obj.gid_elem)
-                obj.build_from_gid_elem;
-            elseif ~isempty(obj.id_zline)
+            VolumeDom3d.setup(obj);
+            % ---
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@VolumeDom(obj);
+            % ---
+            if ~isempty(obj.id_zline)
                 obj.build_from_idmesh1d2d;
             end
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % reset super
+            reset@VolumeDom(obj);
+            % ---
+            obj.setup_done = 0;
+            VolumeDom3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            VolumeDom3d.setup(obj);
+            % ---
+            build@VolumeDom(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_defining_obj;
+            % ---
+            obj.build_done = 1;
             % ---
         end
     end
 
     % --- Methods
-    methods (Access = private, Hidden)
+    methods (Access = private)
         % -----------------------------------------------------------------
         function build_from_idmesh1d2d(obj)
             id_dom2d_ = f_to_dcellargin(obj.id_dom2d);
@@ -78,14 +128,23 @@ classdef VolumeDom3d < VolumeDom
                     valid_iddom2d = f_validid(iddom2d,all_id_dom2d);
                     % ---
                     for m = 1:length(valid_iddom2d)
-                        codedom2d = obj.parent_mesh.parent_mesh2d.dom.(valid_iddom2d{m}).elem_code;
+                        % ---
+                        dom2d = obj.parent_mesh.parent_mesh2d.dom.(valid_iddom2d{m});
+                        dom2d.is_defining_obj_of(obj);
+                        % ---
+                        codedom2d = dom2d.elem_code;
+                        % ---
                         for o = 1:length(codedom2d)
                             for k = 1:length(id_zline_{i})
                                 idz = id_zline_{i}{k};
                                 valid_idz = f_validid(idz,all_id_mesh1d);
                                 % ---
                                 for l = 1:length(valid_idz)
-                                    codeidz = obj.parent_mesh.parent_mesh1d.dom.(valid_idz{l}).elem_code;
+                                    % ---
+                                    zline = obj.parent_mesh.parent_mesh1d.dom.(valid_idz{l});
+                                    % zline.is_defining_obj_of(obj);
+                                    % ---
+                                    codeidz = zline.elem_code;
                                     % ---
                                     given_elem_code = codedom2d(o) .* codeidz;
                                     gid_elem_ = [gid_elem_ ...
@@ -117,7 +176,6 @@ classdef VolumeDom3d < VolumeDom
             % -------------------------------------------------------------
         end
     end
-
 end
 
 

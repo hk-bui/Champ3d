@@ -10,11 +10,15 @@
 
 classdef HexaMeshFromQuadMesh < HexMesh
 
-    % --- Properties
     properties
         parent_mesh1d
         parent_mesh2d
         id_zline
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
     end
 
     % --- Dependent Properties
@@ -42,7 +46,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 args.id_zline
             end
             % ---
-            obj@HexMesh;
+            obj = obj@HexMesh;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -50,15 +54,18 @@ classdef HexaMeshFromQuadMesh < HexMesh
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            HexaMeshFromQuadMesh.setup(obj);
             % ---
         end
     end
 
-    % --- setup
-    methods
-        % -----------------------------------------------------------------
-        function obj = setup(obj)
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             setup@HexMesh(obj);
             % ---
@@ -72,6 +79,11 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 end
             end
             % ---
+            obj.parent_mesh2d.is_defining_obj_of(obj);
+            if obj.parent_mesh2d.parent_mesh ~= obj.parent_mesh1d
+                obj.parent_mesh1d.is_defining_obj_of(obj);
+            end
+            %--------------------------------------------------------------
             obj.id_zline = f_to_scellargin(obj.id_zline);
             % ---
             all_id_line = fieldnames(obj.parent_mesh1d.dom);
@@ -81,7 +93,11 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 id = obj.id_zline{i};
                 valid_id = f_validid(id,all_id_line);
                 for j = 1:length(valid_id)
-                    zline = [zline obj.parent_mesh1d.dom.(valid_id{j})];
+                    % ---
+                    dom1d = obj.parent_mesh1d.dom.(valid_id{j});
+                    % dom1d.is_defining_obj_of(obj);
+                    % ---
+                    zline = [zline dom1d];
                 end
             end
             % ---
@@ -92,9 +108,8 @@ classdef HexaMeshFromQuadMesh < HexMesh
                 %-----
                 zl = zline(i);
                 %-----
-                zl.setup;
                 z = zl.node;
-                zdiv   = [zdiv z];
+                zdiv = [zdiv z];
                 %-----
                 nbz = length(z);
                 nb_layer = nb_layer + nbz;
@@ -160,9 +175,43 @@ classdef HexaMeshFromQuadMesh < HexMesh
             obj.cedge = cedge_;
             obj.cface = cface_;
             % ---
+            obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
+            obj.sface = f_area(node_,face_);
+            obj.ledge = f_ledge(node_,edge_);
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            % reset super
+            reset@HexMesh(obj);
+            % ---
+            obj.setup_done = 0;
+            HexaMeshFromQuadMesh.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            HexaMeshFromQuadMesh.setup(obj);
+            % ---
+            build@HexMesh(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            %--------------------------------------------------------------
+            % obj.build_defining_obj;
+            %--------------------------------------------------------------
+            obj.build_done = 1;
+            % ---
+        end
+    end
 end
 
 

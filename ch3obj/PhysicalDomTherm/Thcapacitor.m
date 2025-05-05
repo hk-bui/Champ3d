@@ -8,10 +8,12 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThcapacitorTherm < Thcapacitor
+classdef Thcapacitor < PhysicalDom
 
     % --- computed
     properties
+        rho = 0
+        cp  = 0
         matrix
     end
 
@@ -19,18 +21,17 @@ classdef ThcapacitorTherm < Thcapacitor
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = Thcapacitor.validargs;
+            argslist = {'parent_model','id_dom2d','id_dom3d','rho','cp','parameter_dependency_search'};
         end
     end
     % --- Contructor
     methods
-        function obj = ThcapacitorTherm(args)
+        function obj = Thcapacitor(args)
             arguments
                 args.id
                 args.parent_model
@@ -38,9 +39,12 @@ classdef ThcapacitorTherm < Thcapacitor
                 args.id_dom3d
                 args.rho
                 args.cp
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
-            obj = obj@Thcapacitor;
+            obj = obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -48,39 +52,45 @@ classdef ThcapacitorTherm < Thcapacitor
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
+            Thcapacitor.setup(obj);
             % ---
-            obj.setup;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
             if obj.setup_done
                 return
             end
-            % ---
-            setup@Thcapacitor(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_node_t = [];
+            obj.matrix.rho_array = [];
+            obj.matrix.cp_array = [];
+            obj.matrix.rho_cp_array = [];
+            obj.matrix.rhocpwnwn = [];
             % ---
             obj.setup_done = 1;
-            % ---
             obj.build_done = 0;
-            obj.assembly_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            Thcapacitor.setup(obj);
         end
     end
 
     % --- build
     methods
         function build(obj)
-            % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -90,33 +100,28 @@ classdef ThcapacitorTherm < Thcapacitor
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            rho_array = obj.rho.get('in_dom',dom);
-            cp_array  = obj.cp.get('in_dom',dom);
+            rho_array = obj.rho.getvalue('in_dom',obj);
+            cp_array  = obj.cp.getvalue('in_dom',obj);
             rho_cp_array = rho_array .* cp_array;
-            % ---
-            rhocpwnwn = parent_mesh.cwnwn('id_elem',gid_elem,'coefficient',rho_cp_array);
-            % ---
+            % --- check changes
+            is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;
-            obj.matrix.rhocpwnwn = rhocpwnwn;
+            % ---
             obj.matrix.rho_array = rho_array;
             obj.matrix.cp_array = cp_array;
             obj.matrix.rho_cp_array = rho_cp_array;
-            % ---
-            obj.build_done = 1;
-            obj.assembly_done = 0;
-        end
-    end
-
-    % --- assembly
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
+            %--------------------------------------------------------------
+            % local rhocpwnwn matrix
+            lmatrix = parent_mesh.cwnwn('id_elem',gid_elem,'coefficient',rho_cp_array);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             elem = obj.parent_model.parent_mesh.elem;
@@ -124,12 +129,12 @@ classdef ThcapacitorTherm < Thcapacitor
             nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;
-            lmatrix = obj.matrix.rhocpwnwn;
             %--------------------------------------------------------------
             [~,id_] = intersect(gid_elem,id_elem_nomesh);
             gid_elem(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
+            % global elementary rhocpwnwn matrix
             rhocpwnwn = sparse(nb_node,nb_node);
             %--------------------------------------------------------------
             for i = 1:nbNo_inEl
@@ -148,28 +153,25 @@ classdef ThcapacitorTherm < Thcapacitor
                     lmatrix(:,i,i),nb_node,nb_node);
             end
             %--------------------------------------------------------------
+            obj.matrix.rhocpwnwn = rhocpwnwn;
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            %--------------------------------------------------------------
             obj.parent_model.matrix.rhocpwnwn = ...
-                obj.parent_model.matrix.rhocpwnwn + rhocpwnwn;
+                obj.parent_model.matrix.rhocpwnwn + obj.matrix.rhocpwnwn;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

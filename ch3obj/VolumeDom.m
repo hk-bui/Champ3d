@@ -8,16 +8,29 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VolumeDom < Xhandle
+classdef VolumeDom < MeshDom
 
     % --- Properties
     properties
-        parent_mesh
         elem_code
         gid_elem
         condition
-        submesh
         gid
+    end
+
+    % --- subfields to build
+    properties
+        parent_mesh
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
+    properties
+        dependent_obj = []
+        defining_obj = []
     end
 
     % --- Dependent Properties
@@ -28,57 +41,95 @@ classdef VolumeDom < Xhandle
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','elem_code','gid_elem','condition'};
+            argslist = {'id','parent_mesh','elem_code','gid_elem','condition'};
         end
     end
     % --- Constructors
     methods
         function obj = VolumeDom(args)
             arguments
+                args.id = []
                 args.parent_mesh = []
                 args.elem_code = []
                 args.gid_elem = []
                 args.condition = []
             end
             % ---
-            obj = obj@Xhandle;
+            obj = obj@MeshDom;
             % ---
-            obj <= args;
-            % ---
-            if ~isempty(obj.gid_elem)
-                obj.build_from_gid_elem;
-            elseif ~isempty(obj.elem_code)
-                obj.build_from_elem_code;
-            end
-        end
-    end
-
-    % --- Methods
-    methods
-        % -----------------------------------------------------------------
-        function allmeshes = build_submesh(obj)
-            % ---
-            if ~isempty(obj.submesh)
-                allmeshes = obj.submesh;
-                allmeshes{1}.node = obj.parent_mesh.node;
+            if isempty(fieldnames(args))
                 return
             end
             % ---
+            obj <= args;
+            % ---
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            VolumeDom.setup(obj);
+            % ---
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            % must try elem_code first
+            if ~isempty(obj.elem_code)
+                obj.build_from_elem_code;
+            elseif ~isempty(obj.gid_elem)
+                obj.build_from_gid_elem;
+            end
+            % ---
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            obj.setup_done = 0;
+            VolumeDom.setup(obj);
+            % --- reset dependent obj
+            % obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            VolumeDom.setup(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % --- 
+            % obj.build_defining_obj;
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
+    % --- Methods
+    methods
+        % -----------------------------------------------------------------
+        function sm = submesh(obj)
+            % --- need parent_mesh
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
             % -------------------------------------------------------------
-            allmeshes{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
-            allmeshes{1}.gid_elem = obj.gid_elem;
-            allmeshes{1}.parent_mesh = obj.parent_mesh;
+            sm{1} = feval(class(obj.parent_mesh),'node',node,'elem',elem);
+            sm{1}.gid_elem = obj.gid_elem;
+            sm{1}.parent_mesh = obj.parent_mesh;
             % ---
-            obj.submesh = allmeshes;
         end
         % -----------------------------------------------------------------
         function gid = get_gid(obj)
-            if ~isempty(obj.gid)
-                gid = obj.gid;
-                return;
-            end
             %--------------------------------------------------------------
             node = obj.parent_mesh.node;
             elem = obj.parent_mesh.elem(:,obj.gid_elem);
@@ -257,7 +308,7 @@ classdef VolumeDom < Xhandle
     end
 
     % --- Methods
-    methods (Access = protected, Hidden)
+    methods (Access = protected)
         % -----------------------------------------------------------------
         function build_from_elem_code(obj)
             % ---
@@ -325,6 +376,9 @@ classdef VolumeDom < Xhandle
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
                 args.id = ''
             end
+            % ---
+            % obj.build;
+            % obj.parent_mesh.build;
             % --- id-info
             elcode = [];
             if ~isempty(obj.elem_code)
@@ -339,7 +393,6 @@ classdef VolumeDom < Xhandle
                 elcode = [args.id ':' elcode];
             end
             % ---
-            obj.build_submesh;
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args,'with_out','id');
             for i = 1:length(submesh_)
@@ -360,21 +413,38 @@ classdef VolumeDom < Xhandle
 
     % --- Methods
     methods
+        % XTODO
+        % take care of passing dependent_obj, defining_obj
+        % must call reset
         function objy = plus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_elem = [f_torowv(obj.gid_elem) f_torowv(objx.gid_elem)];
             objy.build_from_gid_elem;
+            % ---
+            % obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
         end
         function objy = minus(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_elem = setdiff(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
             objy.build_from_gid_elem;
+            % ---
+            % obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
         end
         function objy = mpower(obj,objx)
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gid_elem = intersect(f_torowv(obj.gid_elem),f_torowv(objx.gid_elem));
             objy.build_from_gid_elem;
+            % ---
+            % obj.transfer_dep_def(objx,objy);
+            % ---
+            obj.is_defining_obj_of(objy);
+            objx.is_defining_obj_of(objy);
         end
     end
-
 end

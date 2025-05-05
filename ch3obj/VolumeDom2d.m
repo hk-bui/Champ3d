@@ -16,6 +16,16 @@ classdef VolumeDom2d < VolumeDom
         id_yline
     end
 
+    % --- subfields to build
+    properties
+        
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Dependent Properties
     properties (Dependent = true)
         
@@ -24,7 +34,7 @@ classdef VolumeDom2d < VolumeDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','id_xline','id_yline','elem_code', ...
+            argslist = {'id','parent_mesh','id_xline','id_yline','elem_code', ...
                         'gid_elem','condition'};
         end
     end
@@ -33,6 +43,7 @@ classdef VolumeDom2d < VolumeDom
         function obj = VolumeDom2d(args)
             arguments
                 % ---
+                args.id = []
                 args.parent_mesh = []
                 args.id_xline = []
                 args.id_yline = []
@@ -43,15 +54,44 @@ classdef VolumeDom2d < VolumeDom
             % ---
             obj = obj@VolumeDom;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
             % ---
-            if ~isempty(obj.elem_code)
-                obj.build_from_elem_code;
-            elseif ~isempty(obj.gid_elem)
-                obj.build_from_gid_elem
-            elseif ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
+            VolumeDom2d.setup(obj);
+            % ---
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@VolumeDom(obj);
+            % ---
+            if ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
                 obj.build_from_idmesh1d;
             end
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % reset super class
+            reset@VolumeDom(obj);
+            % ---
+            obj.setup_done = 0;
+            VolumeDom2d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
         end
     end
 
@@ -74,13 +114,24 @@ classdef VolumeDom2d < VolumeDom
                     valid_idx = f_validid(idx,all_id_mesh1d);
                     % ---
                     for m = 1:length(valid_idx)
-                        codeidx = obj.parent_mesh.parent_mesh.dom.(valid_idx{m}).elem_code;
+                        % ---
+                        xlineobj = obj.parent_mesh.parent_mesh.dom.(valid_idx{m});
+                        % ---
+                        % xlineobj.is_defining_obj_of(obj);
+                        % ---
+                        codeidx = xlineobj.elem_code;
+                        % ---
                         for k = 1:length(id_yline_{i})
                             idy = id_yline_{i}{k};
                             valid_idy = f_validid(idy,all_id_mesh1d);
                             % ---
                             for l = 1:length(valid_idy)
-                                codeidy = obj.parent_mesh.parent_mesh.dom.(valid_idy{l}).elem_code;
+                                % ---
+                                ylineobj = obj.parent_mesh.parent_mesh.dom.(valid_idy{l});
+                                % ---
+                                % ylineobj.is_defining_obj_of(obj);
+                                % ---
+                                codeidy = ylineobj.elem_code;
                                 % ---
                                 given_elem_code = codeidx * codeidy;
                                 gid_elem_ = [gid_elem_ ...
@@ -108,7 +159,6 @@ classdef VolumeDom2d < VolumeDom
             % -------------------------------------------------------------
         end
     end
-
 end
 
 

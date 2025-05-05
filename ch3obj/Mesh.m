@@ -22,10 +22,9 @@ classdef Mesh < Xhandle
         cface
         cedge
         % ---
-        selem
+        ledge
+        sface
         velem
-        % ---
-        dom
         % ---
         meshds
         discrete
@@ -40,13 +39,27 @@ classdef Mesh < Xhandle
         flat_node
         % ---
     end
+    % --- subfields to build
+    properties
+        dom
+    end
 
-    % --- Dependent Properties
-    properties (Access = private, Hidden)
+    % ---
+    properties (Access = private)
         build_meshds_done = 0
         build_discrete_done = 0
         build_intkit_done = 0
         build_prokit_done = 0
+    end
+    
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
+    properties
+        dependent_obj = []
+        defining_obj = []
     end
 
     % --- Dependent Properties
@@ -64,6 +77,23 @@ classdef Mesh < Xhandle
     % --- Constructors
     methods
         function obj = Mesh()
+            % ---
+            obj = obj@Xhandle;
+            % ---
+            % call setup in constructor
+            % ,,, for direct verification
+            % ,,, setup must be static
+            Mesh.setup(obj);
+            % ---
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
             % ---
             obj.meshds.id_edge_in_elem = [];
             obj.meshds.ori_edge_in_elem = [];
@@ -103,6 +133,39 @@ classdef Mesh < Xhandle
             obj.prokit.Wf = {};
             obj.prokit.Wn = {};
             obj.prokit.node = {};
+            % ---
+            obj.setup_done = 1;
+            % must reset build+assembly
+            obj.build_done = 0;
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % ---
+            obj.setup_done = 0;
+            Mesh.setup(obj);
+            % --- reset dependent obj
+            % obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            Mesh.setup(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_meshds;
+            obj.build_discrete;
+            obj.build_intkit;
+            % ---
+            obj.build_done = 1;
             % ---
         end
     end
@@ -151,14 +214,19 @@ classdef Mesh < Xhandle
     % --- Methods - Geo
     methods
         % -----------------------------------------------------------------
-        function lbox = localbox(obj)
-            lbox.xmin = min(obj.node(1,:));
-            lbox.xmax = max(obj.node(1,:));
-            lbox.ymin = min(obj.node(2,:));
-            lbox.ymax = max(obj.node(2,:));
+        function lbox = localbox(obj,id_elem)
+            if nargin <= 1
+                id_node_ = 1:obj.nb_node;
+            else
+                id_node_ = f_uniquenode(obj.elem(:,id_elem));
+            end
+            lbox.xmin = min(obj.node(1,id_node_));
+            lbox.xmax = max(obj.node(1,id_node_));
+            lbox.ymin = min(obj.node(2,id_node_));
+            lbox.ymax = max(obj.node(2,id_node_));
             if size(obj.node,1) == 3
-                lbox.zmin = min(obj.node(3,:));
-                lbox.zmax = max(obj.node(3,:));
+                lbox.zmin = min(obj.node(3,id_node_));
+                lbox.zmax = max(obj.node(3,id_node_));
             end
         end
         % -----------------------------------------------------------------
@@ -705,11 +773,12 @@ classdef Mesh < Xhandle
             cWf = obj.wf('u',cU,'v',cV,'w',cW,'wn',cWn,'gradf',cgradF,'jinv',cJinv);
             cWv = obj.wv('cdetJ',cdetJ);
             %--------------------------------------------------------------
-            if any(f_strcmpi(obj.elem_type,{'tri','triangle','quad'}))
-                obj.selem = 1./cWv{1};
-            elseif any(f_strcmpi(obj.elem_type,{'tet','tetra','prism','hex','hexa'}))
-                obj.velem = 1./cWv{1};
-            end
+            % if any(f_strcmpi(obj.elem_type,{'tri','triangle','quad'}))
+            %     obj.selem = 1./cWv{1};
+            %     obj.velem = 0;
+            % elseif any(f_strcmpi(obj.elem_type,{'tet','tetra','prism','hex','hexa'}))
+            %     obj.velem = 1./cWv{1};
+            % end
             %--------------------------------------------------------------
             obj.build_meshds('get','celem');
             %--------------------------------------------------------------
@@ -772,7 +841,11 @@ classdef Mesh < Xhandle
             refelem_ = obj.refelem;
             U = refelem_.U;
             V = refelem_.V;
-            W = refelem_.W;
+            if isfield(refelem_,'W')
+                W = refelem_.W;
+            else
+                W = [];
+            end
             %--------------------------------------------------------------
             obj.build_meshds;
             %--------------------------------------------------------------
@@ -822,7 +895,11 @@ classdef Mesh < Xhandle
             refelem_ = obj.refelem;
             U = refelem_.iU;
             V = refelem_.iV;
-            W = refelem_.iW;
+            if isfield(refelem_,'iW')
+                W = refelem_.iW;
+            else
+                W = [];
+            end
             %--------------------------------------------------------------
             fnmeshds = fieldnames(obj.meshds);
             for i = 1:length(fnmeshds)
@@ -880,7 +957,7 @@ classdef Mesh < Xhandle
         end
         % -----------------------------------------------------------------
         function node_i = get_interpnode(obj,node)
-            %--------------------------------------------------------------
+            %--- can provide node after move
             if nargin <= 1
                 node = obj.node;
             end
@@ -888,7 +965,11 @@ classdef Mesh < Xhandle
             refelem_ = obj.refelem;
             U = refelem_.iU;
             V = refelem_.iV;
-            W = refelem_.iW;
+            if isfield(refelem_,'iW')
+                W = refelem_.iW;
+            else
+                W = [];
+            end
             %--------------------------------------------------------------
             obj.build_meshds;
             %--------------------------------------------------------------

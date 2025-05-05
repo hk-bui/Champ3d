@@ -8,10 +8,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ThconductorTherm < Thconductor
+classdef ThPv < PhysicalDom
 
     % --- computed
     properties
+        pv = 0
         matrix
     end
 
@@ -19,27 +20,29 @@ classdef ThconductorTherm < Thconductor
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = Thconductor.validargs;
+            argslist = {'parent_model','id_dom2d','id_dom3d','pv','parameter_dependency_search'};
         end
     end
     % --- Contructor
     methods
-        function obj = ThconductorTherm(args)
+        function obj = ThPv(args)
             arguments
                 args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
-                args.lambda
+                args.pv
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
-            obj = obj@Thconductor;
+            obj = obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -47,39 +50,43 @@ classdef ThconductorTherm < Thconductor
             % ---
             obj <= args;
             % ---
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
+            ThPv.setup(obj);
             % ---
-            obj.setup;
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
             if obj.setup_done
                 return
             end
-            % ---
-            setup@Thconductor(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_node_t = [];
+            obj.matrix.pv_array = [];
+            obj.matrix.pvwn = [];
             % ---
             obj.setup_done = 1;
-            % ---
             obj.build_done = 0;
-            obj.assembly_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            ThPv.setup(obj);
         end
     end
 
     % --- build
     methods
         function build(obj)
-            % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -89,17 +96,53 @@ classdef ThconductorTherm < Thconductor
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            lambda_array = obj.lambda.get('in_dom',dom);
-            % ---
-            lambdawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',lambda_array);
-            % ---
+            pv_array = obj.pv.getvalue('in_dom',obj);
+            % --- save
+            % it = obj.parent_model.ltime.it;
+            %obj.field{it}.pv.elem = FreeScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...
+            %    'reference_potential',obj.T0);
+            %pv_array;
+            % --- check changes
+            is_changed = 1;
+            if isequal(pv_array,obj.matrix.pv_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_t = gid_node_t;
-            obj.matrix.lambdawewe = lambdawewe;
-            obj.matrix.lambda_array = lambda_array;
+            obj.matrix.pv_array = pv_array;
+            %--------------------------------------------------------------
+            % local pvwn matrix
+            % ---
+            lmatrix = parent_mesh.cwn('id_elem',gid_elem,'coefficient',pv_array);
+            %--------------------------------------------------------------
+            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
+            elem = obj.parent_model.parent_mesh.elem;
+            nb_node = obj.parent_model.parent_mesh.nb_node;
+            nbNo_inEl = obj.parent_model.parent_mesh.refelem.nbNo_inEl;
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            %--------------------------------------------------------------
+            [~,id_] = intersect(gid_elem,id_elem_nomesh);
+            gid_elem(id_) = [];
+            lmatrix(id_,:,:) = [];
+            %--------------------------------------------------------------
+            % global elementary pvwn matrix
+            pvwn = sparse(nb_node,1);
+            %--------------------------------------------------------------
+            for i = 1:nbNo_inEl
+                pvwn = pvwn + ...
+                    sparse(elem(i,gid_elem),1,lmatrix(:,i),nb_node,1);
+            end
+            %--------------------------------------------------------------
+            obj.matrix.pvwn = pvwn;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
+            % ---
         end
     end
 
@@ -108,63 +151,13 @@ classdef ThconductorTherm < Thconductor
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
             %--------------------------------------------------------------
-            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
-            id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
-            nb_edge = obj.parent_model.parent_mesh.nb_edge;
-            nbEd_inEl = obj.parent_model.parent_mesh.refelem.nbEd_inEl;
-            %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
-            lmatrix = obj.matrix.lambdawewe;
-            %--------------------------------------------------------------
-            [~,id_] = intersect(gid_elem,id_elem_nomesh);
-            gid_elem(id_) = [];
-            lmatrix(id_,:,:) = [];
-            %--------------------------------------------------------------
-            lambdawewe = sparse(nb_edge,nb_edge);
-            %--------------------------------------------------------------
-            for i = 1:nbEd_inEl
-                for j = i+1 : nbEd_inEl
-                    lambdawewe = lambdawewe + ...
-                        sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(j,gid_elem),...
-                        lmatrix(:,i,j),nb_edge,nb_edge);
-                end
-            end
-            % ---
-            lambdawewe = lambdawewe + lambdawewe.';
-            % ---
-            for i = 1:nbEd_inEl
-                lambdawewe = lambdawewe + ...
-                    sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(i,gid_elem),...
-                    lmatrix(:,i,i),nb_edge,nb_edge);
-            end
-            %--------------------------------------------------------------
-            obj.parent_model.matrix.lambdawewe = ...
-                obj.parent_model.matrix.lambdawewe + lambdawewe;
+            obj.parent_model.matrix.pvwn = ...
+                obj.parent_model.matrix.pvwn + obj.matrix.pvwn;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_t = ...
                 [obj.parent_model.matrix.id_node_t obj.matrix.gid_node_t];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

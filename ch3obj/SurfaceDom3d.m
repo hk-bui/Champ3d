@@ -15,6 +15,16 @@ classdef SurfaceDom3d < SurfaceDom
         id_dom3d
     end
 
+    % --- subfields to build
+    properties
+        
+    end
+
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Dependent Properties
     properties (Dependent = true)
         
@@ -23,7 +33,7 @@ classdef SurfaceDom3d < SurfaceDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','gid_face','condition', ...
+            argslist = {'id','parent_mesh','gid_face','condition', ...
                         'defined_on','id_dom3d'};
         end
     end
@@ -32,6 +42,7 @@ classdef SurfaceDom3d < SurfaceDom
         function obj = SurfaceDom3d(args)
             arguments
                 % ---
+                args.id = []
                 args.parent_mesh = []
                 args.gid_face = []
                 args.condition = []
@@ -42,18 +53,67 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
             obj = obj@SurfaceDom;
             % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
             obj <= args;
             % ---
-            if ~isempty(obj.gid_face)
-                obj.build_from_gid_face
-            else
-                switch lower(obj.defined_on)
-                    case {'bound_face','bound'}
-                        obj.build_from_boundface;
-                    case {'interface'}
-                        obj.build_from_interface;
-                end
+            SurfaceDom3d.setup(obj);
+            % ---
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
             end
+            % ---
+            setup@SurfaceDom(obj);
+            % ---
+            % if ~isempty(obj.gid_face)
+            %     obj.build_from_gid_face
+            % else
+            switch lower(obj.defined_on)
+                case {'bound_face','bound'}
+                    obj.build_from_boundface;
+                case {'interface'}
+                    obj.build_from_interface;
+            end
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % reset super
+            reset@SurfaceDom(obj);
+            % ---
+            obj.setup_done = 0;
+            SurfaceDom3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            SurfaceDom3d.setup(obj);
+            % ---
+            build@SurfaceDom(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_defining_obj;
+            % ---
+            obj.build_done = 1;
+            % ---
         end
     end
 
@@ -72,7 +132,11 @@ classdef SurfaceDom3d < SurfaceDom
                 valid3 = f_validid(id3,all_id3);
                 % ---
                 for j = 1:length(valid3)
-                    elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
+                    % ---
+                    dom3d = obj.parent_mesh.dom.(valid3{j});
+                    dom3d.is_defining_obj_of(obj);
+                    % ---
+                    elem = [elem  obj.parent_mesh.elem(:,dom3d.gid_elem)];
                 end
             end
             %--------------------------------------------------------------
@@ -108,6 +172,10 @@ classdef SurfaceDom3d < SurfaceDom
                     id3 = id_dom3d_{i}{j};
                     valid3 = f_validid(id3,all_id3);
                     for j = 1:length(valid3)
+                        % ---
+                        dom3d = obj.parent_mesh.dom.(valid3{j});
+                        dom3d.is_defining_obj_of(obj);
+                        % ---
                         elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
                     end
                 end
@@ -142,10 +210,8 @@ classdef SurfaceDom3d < SurfaceDom
             %--------------------------------------------------------------
             obj.gid_face = gid_face_;
             % -------------------------------------------------------------
-
         end
     end
-
 end
 
 

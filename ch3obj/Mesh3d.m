@@ -10,10 +10,59 @@
 
 classdef Mesh3d < Mesh
 
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+
     % --- Constructors
     methods
         function obj = Mesh3d()
-            obj@Mesh;
+            obj = obj@Mesh;
+            % ---
+            Mesh3d.setup(obj);
+            % ---
+        end
+    end
+    % --- setup/reset/build/assembly
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % ---
+            setup@Mesh(obj);
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            % reset super
+            reset@Mesh(obj);
+            % ---
+            obj.setup_done = 0;
+            Mesh3d.setup(obj);
+            % --- reset dependent obj
+            % obj.reset_dependent_obj;
+        end
+    end
+    methods
+        function build(obj)
+            % ---
+            Mesh3d.setup(obj);
+            % --- call super
+            build@Mesh(obj);
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
         end
     end
 
@@ -24,7 +73,7 @@ classdef Mesh3d < Mesh
             arguments
                 obj
                 % ---
-                args.id char
+                args.id char = []
                 % ---
                 args.id_dom2d = []
                 args.id_zline = []
@@ -34,26 +83,41 @@ classdef Mesh3d < Mesh
                 % ---
                 args.id_dom3d = [];
                 args.cut_equation = [];
+                % ---
+                args.dom_obj {mustBeA(args.dom_obj,{'VolumeDom3d','CutVolumeDom3d'})}
             end
             % ---
-            args.parent_mesh = obj;
+            if isempty(args.id)
+                error('#id must be given !');
+            end
             % ---
-            if isempty(args.id_dom3d) && isempty(args.cut_equation)
-                argu = f_to_namedarg(args,'for','VolumeDom3d');
-                vdom = VolumeDom3d(argu{:});
+            if ~isfield(args,'dom_obj')
+                args.parent_mesh = obj;
+                % ---
+                if isempty(args.id_dom3d) && isempty(args.cut_equation)
+                    argu = f_to_namedarg(args,'for','VolumeDom3d');
+                    dom = VolumeDom3d(argu{:});
+                else
+                    argu = f_to_namedarg(args,'for','CutVolumeDom3d');
+                    dom = CutVolumeDom3d(argu{:});
+                end
+                obj.dom.(args.id) = dom;
+                % ---
+                obj.is_defining_obj_of(dom);
+                % ---
             else
-                argu = f_to_namedarg(args,'for','CutVolumeDom3d');
-                vdom = CutVolumeDom3d(argu{:});
+                dom = args.dom_obj;
+                dom.id = args.id;
+                obj.dom.(args.id) = dom;
+                % obj.is_defining_obj_of(dom);
             end
-            obj.dom.(args.id) = vdom;
-            % ---
         end
         % -----------------------------------------------------------------
         function add_sdom(obj,args)
             arguments
                 obj
                 % ---
-                args.id char
+                args.id char = []
                 % ---
                 args.defined_on char = []
                 args.id_dom3d = []
@@ -61,13 +125,28 @@ classdef Mesh3d < Mesh
                 args.elem_code = []
                 args.gid_face = []
                 args.condition char = []
+                % ---
+                args.dom_obj {mustBeA(args.dom_obj,{'SurfaceDom3d'})}
             end
             % ---
-            args.parent_mesh = obj;
+            if isempty(args.id)
+                error('#id must be given !');
+            end
             % ---
-            argu = f_to_namedarg(args,'for','SurfaceDom3d');
-            sdom = SurfaceDom3d(argu{:});
-            obj.dom.(args.id) = sdom;
+            if ~isfield(args,'dom_obj')
+                % ---
+                args.parent_mesh = obj;
+                % ---
+                argu = f_to_namedarg(args,'for','SurfaceDom3d');
+                dom = SurfaceDom3d(argu{:});
+                obj.dom.(args.id) = dom;
+            else
+                dom = args.dom_obj;
+                dom.id = args.id;
+                obj.dom.(args.id) = dom;
+            end
+            % ---
+            % obj.is_defining_obj_of(dom);
             % ---
         end
     end

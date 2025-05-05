@@ -9,34 +9,67 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalModel < Xhandle
+
     properties
+        parent_mesh
         ltime
         moving_frame
+        % ---
+        visualdom
+        % ---
         matrix
         field
         dof
     end
-    
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {};
-        end
-    end
+
     % --- Constructor
     methods
         function obj = PhysicalModel()
             % ---
             obj@Xhandle;
-            % ---
+            % --- initialization
             obj.ltime = LTime;
         end
     end
-    % --- Methods
+    % --- Utility Methods
+    % --- build
     methods
-        function solve_all(obj)
-            timemodel = TimeVaryingModel(obj);
-            timemodel.solve;
+        % ---
+        function build(obj)
+            obj.parent_mesh.build;
+        end
+        % ---
+    end
+    % --- ltime + visualization
+    methods
+        % ---
+        function add_ltime(obj,ltime_obj)
+            arguments
+                obj
+                % ---
+                ltime_obj {mustBeA(ltime_obj,'LTime')}
+            end
+            % ---
+            obj.ltime = ltime_obj;
+            % ---
+        end
+        % ---
+        function add_visualdom(obj,args)
+            arguments
+                obj
+                % ---
+                args.id = 'no_id'
+                args.id_dom2d = []
+                args.id_dom3d = []
+            end
+            % ---
+            dom = PhysicalDom;
+            dom.id_dom2d = args.id_dom2d;
+            dom.id_dom3d = args.id_dom3d;
+            dom.parent_model = obj;
+            dom.get_geodom;
+            % ---
+            obj.visualdom.(args.id) = dom;
         end
     end
 end
