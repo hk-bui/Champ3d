@@ -89,10 +89,59 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 end
             end
             % ---
+            for i = 1:nbNodeI
+                val{i} = val{i} + obj.reference_potential;
+            end
+            % ---
         end
         % -----------------------------------------------------------------
         function val = gvalue(obj,id_face)
-            % --- XTODO
+            % ---
+            if nargin <= 1
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            face_ = obj.parent_model.parent_mesh.face;
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            % ---
+            lnb_face = length(dom.gid_face);
+            % ---
+            submesh = dom.submesh;
+            % ---
+            nbNodeG = submesh{1}.refelem.nbG;
+            for i = 1:nbNodeG
+                val{i} = zeros(1,lnb_face);
+            end
+            % ---
+            for k = 1:length(submesh)
+                sm = submesh{k};
+                sm.build_intkit;
+                % ---
+                lid_face = sm.lid_face;
+                gid_face = sm.gid_face;
+                Wx = sm.intkit.Wn;
+                % ---
+                if any(f_strcmpi(sm.elem_type,'tri'))
+                    dof_ = obj.dof.value(face_(1:3,gid_face)).';
+                elseif any(f_strcmpi(sm.elem_type,'quad'))
+                    dof_ = obj.dof.value(face_(1:4,gid_face)).';
+                end
+                % ---
+                for m = 1:nbNodeG
+                    vi = zeros(length(lid_face),1);
+                    for l = 1:sm.refelem.nbNo_inEl
+                        wi = Wx{m}(:,l);
+                        vi = vi + wi .* dof_(:,l);
+                    end
+                    % ---
+                    val{m}(1,lid_face) = vi.';
+                end
+            end
+            % ---
+            for i = 1:nbNodeG
+                val{i} = val{i} + obj.reference_potential;
+            end
+            % ---
         end
         % -----------------------------------------------------------------
     end

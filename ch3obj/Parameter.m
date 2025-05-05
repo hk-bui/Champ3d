@@ -614,17 +614,17 @@ classdef Parameter < Xhandle
                                     % ---
                                 end
                                 % --- space interpolation
-                                nbINoinEl = source_model.parent_mesh.refelem.nbI;
+                                % --- take interp_node from Field
+                                interp_node = source_model.field{back_it}.(depon_).face.inode(id_face_source);
+                                nbINoinEl = length(interp_node);
                                 nb_face   = length(id_face_source);
                                 % ---
                                 node_i = zeros(nbINoinEl * nb_face, 3);
                                 % ---
-                                interp_node = source_model.parent_mesh.prokit.node;
-                                % ---
                                 id0 = 1:nb_face;
                                 for k = 1:nbINoinEl
                                     idn = id0 + (k - 1) * nb_face;
-                                    node_i(idn,:) = interp_node{k}(id_face_source,:);
+                                    node_i(idn,:) = interp_node{k};
                                 end
                                 % ---
                                 dim_ = size(valcell{1},1);
@@ -634,12 +634,12 @@ classdef Parameter < Xhandle
                                     id0 = 1:nb_face;
                                     for k = 1:nbINoinEl
                                         idn = id0 + (k - 1) * nb_face;
-                                        valx(idn) = valcell{k}(1,id_face_source);
+                                        valx(idn) = valcell{k}(1,:);
                                     end
                                     % ---
                                     fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                     % ---
-                                    cnode_ = target_model.parent_mesh.celem(:,id_face_target);
+                                    cnode_ = target_model.parent_mesh.cface(:,id_face_target);
                                     fargs{i} = fxi(cnode_.');
                                     % ---
                                 elseif dim_ == 2
@@ -649,8 +649,8 @@ classdef Parameter < Xhandle
                                     id0 = 1:nb_face;
                                     for k = 1:nbINoinEl
                                         idn = id0 + (k - 1) * nb_face;
-                                        valx(idn) = valcell{k}(1,id_face_source);
-                                        valy(idn) = valcell{k}(2,id_face_source);
+                                        valx(idn) = valcell{k}(1,:);
+                                        valy(idn) = valcell{k}(2,:);
                                     end
                                     % ---
                                     fxi = scatteredInterpolant(node_i,valx,'linear','none');
@@ -670,9 +670,9 @@ classdef Parameter < Xhandle
                                     id0 = 1:nb_face;
                                     for k = 1:nbINoinEl
                                         idn = id0 + (k - 1) * nb_face;
-                                        valx(idn) = valcell{k}(1,id_face_source);
-                                        valy(idn) = valcell{k}(2,id_face_source);
-                                        valz(idn) = valcell{k}(3,id_face_source);
+                                        valx(idn) = valcell{k}(1,:);
+                                        valy(idn) = valcell{k}(2,:);
+                                        valz(idn) = valcell{k}(3,:);
                                     end
                                     % ---
                                     fxi = scatteredInterpolant(node_i,valx,'linear','none');
