@@ -466,12 +466,13 @@ classdef Parameter < Xhandle
                                     id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                     for ids = 1:length(id_dom_source)
                                         if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                            id_elem_source = source_model.parent_mesh.dom.gid_elem;
-                                        else
-                                            f_fprintf(0,'dom',1,target_dom.id,0,'not found !',0,'champ3d performs #dom_search by_coordinates \n');
+                                            id_elem_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_elem;
+                                        end
+                                    end
+                                    if isempty(id_elem_source)
+                                        f_fprintf(0,'dom',1,target_dom.id,0,'not found !',0,'champ3d performs #dom_search by_coordinates \n');
                                             id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
                                                 'in_box',target_model.parent_mesh.localbox(id_elem_target));
-                                        end
                                     end
                                 end
                                 % --- time interpolated data
