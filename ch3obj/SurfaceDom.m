@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SurfaceDom < GeoDom
+classdef SurfaceDom < MeshDom
 
     % --- Properties
     properties
@@ -59,7 +59,7 @@ classdef SurfaceDom < GeoDom
                 args.condition = []
             end
             % ---
-            obj = obj@GeoDom;
+            obj = obj@MeshDom;
             % ---
             if isempty(fieldnames(args))
                 return

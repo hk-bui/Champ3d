@@ -16,8 +16,6 @@ classdef Parameter < Xhandle
         from
         varargin_list
         fvectorized
-        % ---
-        dom_search
     end
     
     % --- Valid args list
@@ -39,7 +37,6 @@ classdef Parameter < Xhandle
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
-                args.dom_search {mustBeMember(args.dom_search,{'by_coordinates','by_id'})} = 'by_coordinates'
             end
             % ---
             obj = obj@Xhandle;
@@ -75,7 +72,6 @@ classdef Parameter < Xhandle
             obj.from = f_to_scellargin(args.from);
             obj.varargin_list = f_to_scellargin(args.varargin_list);
             obj.fvectorized = args.fvectorized;
-            obj.dom_search = args.dom_search;
             % --- check
             nb_fargin = f_nargin(obj.f);
             if nb_fargin > 0
@@ -372,25 +368,37 @@ classdef Parameter < Xhandle
                 return
             end
             % ---
-            if isa(dom,'VolumeDom')
+            parameter_dependency_search = [];
+            if isa(dom,'PhysicalDom')
+                meshdom = dom.dom;
+                parameter_dependency_search = dom.parameter_dependency_search;
+            else
+                meshdom = dom;
+            end
+            % ---
+            if isempty(parameter_dependency_search)
+                parameter_dependency_search = 'by_coordinates';
+            end
+            % ---
+            if isa(meshdom,'VolumeDom')
                 place = 'elem';
-                id_place_target = dom.gid_elem;
-            elseif isa(dom,'SurfaceDom')
+                id_place_target = meshdom.gid_elem;
+            elseif isa(meshdom,'SurfaceDom')
                 place = 'face';
-                id_place_target = dom.gid_face;
-            elseif isprop(dom,'gid_elem')
+                id_place_target = meshdom.gid_face;
+            elseif isprop(meshdom,'gid_elem')
                 place = 'elem';
-                id_place_target = dom.gid_elem;
-            elseif isprop(dom,'gid_face')
+                id_place_target = meshdom.gid_elem;
+            elseif isprop(meshdom,'gid_face')
                 place = 'face';
-                id_place_target = dom.gid_face;
+                id_place_target = meshdom.gid_face;
             else
                 error('must give #dom with .gid_elem or .gid_face !');
             end
             % ---
             fargs = cell(1,length(obj.depend_on));
             % ---
-            target_dom   = dom;
+            target_dom   = meshdom;
             target_model = obj.parent_model;
             % ---
             depon__ = obj.depend_on;
@@ -442,10 +450,11 @@ classdef Parameter < Xhandle
                                 % ---
                                 id_elem_target = id_place_target;
                                 % --- take just what needed
-                                if f_strcmpi(obj.dom_search,'by_coordinates')
+                                if f_strcmpi(parameter_dependency_search,'by_coordinates')
                                     id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
                                                 'in_box',target_model.parent_mesh.localbox(id_elem_target));
-                                elseif f_strcmpi(obj.dom_search,'by_id')
+                                elseif f_strcmpi(parameter_dependency_search,'by_id_dom')
+                                    id_elem_source = [];
                                     id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                     for ids = 1:length(id_dom_source)
                                         if f_strcmpi(id_dom_source{ids},target_dom.id)
@@ -453,7 +462,8 @@ classdef Parameter < Xhandle
                                         end
                                     end
                                     if isempty(id_elem_source)
-                                        f_fprintf(0,'dom',1,target_dom.id,0,'not found !',0,'champ3d performs #dom_search by_coordinates \n');
+                                        f_fprintf(0,'volumedom',1,target_dom.id,0,'not found on source model !',...
+                                            0,'champ3d performs #parameter_dependency_search by_coordinates \n');
                                             id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
                                                 'in_box',target_model.parent_mesh.localbox(id_elem_target));
                                     end
@@ -561,116 +571,230 @@ classdef Parameter < Xhandle
                                 % ---
                                 id_face_target = id_place_target;
                                 % --- take just what needed
-                                % --- XTODO dom_search = 'by_coordinates'
-                                id_dom_source = fieldnames(source_model.parent_mesh.dom);
-                                for ids = 1:length(id_dom_source)
-                                    if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                        id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_face;
+                                id_face_source = [];
+                                id_elem_source = [];
+                                if f_strcmpi(parameter_dependency_search,'by_coordinates')
+                                    id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
+                                                'in_box',target_model.parent_mesh.localbox);
+                                elseif f_strcmpi(parameter_dependency_search,'by_id_dom')
+                                    id_dom_source = fieldnames(source_model.parent_mesh.dom);
+                                    for ids = 1:length(id_dom_source)
+                                        if f_strcmpi(id_dom_source{ids},target_dom.id)
+                                            id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_face;
+                                        end
+                                    end
+                                    if isempty(id_face_source)
+                                        f_fprintf(0,'surfacedom',1,target_dom.id,0,'not found on source model !',...
+                                            0,'champ3d performs #parameter_dependency_search by_coordinates \n');
+                                            id_elem_source = f_findelem(source_model.parent_mesh.node,source_model.parent_mesh.elem,...
+                                                'in_box',target_model.parent_mesh.localbox);
                                     end
                                 end
-                                if isempty(id_face_source)
-                                    error(['dom ' target_dom.id ' not found on source model !']);
-                                end
-                                % ---
-                                % --- time interpolated data
-                                next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                back_it = source_model.ltime.back_it(target_model.ltime.t_now);
-                                if next_it == back_it
-                                    valcell = source_model.field{back_it}.(depon_).face.ivalue(id_face_source);
-                                else
-                                    % ---
-                                    val01 = source_model.field{back_it}.(depon_).face.ivalue(id_face_source);
-                                    val02 = source_model.field{next_it}.(depon_).face.ivalue(id_face_source);
-                                    % ---
-                                    delta_v = [];
-                                    for k = 1:length(val01)
-                                        delta_v{k} = val02{k} - val01{k};
+                                % ------------------------------------------------------------------
+                                if ~isempty(id_face_source)
+                                    % --- time interpolated data
+                                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
+                                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                    if next_it == back_it
+                                        valcell = source_model.field{back_it}.(depon_).face.ivalue(id_face_source);
+                                    else
+                                        % ---
+                                        val01 = source_model.field{back_it}.(depon_).face.ivalue(id_face_source);
+                                        val02 = source_model.field{next_it}.(depon_).face.ivalue(id_face_source);
+                                        % ---
+                                        delta_v = [];
+                                        for k = 1:length(val01)
+                                            delta_v{k} = val02{k} - val01{k};
+                                        end
+                                        % ---
+                                        delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
+                                        % ---
+                                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                        % ---
+                                        for k = 1:length(val01)
+                                            valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
+                                        end
+                                        % ---
                                     end
+                                    % --- space interpolation
+                                    % --- take interp_node from Field
+                                    interp_node = source_model.field{back_it}.(depon_).face.inode(id_face_source);
+                                    nbINoinEl = length(interp_node);
+                                    nb_face   = length(id_face_source);
                                     % ---
-                                    delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
-                                    % ---
-                                    dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
-                                    % ---
-                                    for k = 1:length(val01)
-                                        valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
-                                    end
-                                    % ---
-                                end
-                                % --- space interpolation
-                                % --- take interp_node from Field
-                                interp_node = source_model.field{back_it}.(depon_).face.inode(id_face_source);
-                                nbINoinEl = length(interp_node);
-                                nb_face   = length(id_face_source);
-                                % ---
-                                node_i = zeros(nbINoinEl * nb_face, 3);
-                                % ---
-                                id0 = 1:nb_face;
-                                for k = 1:nbINoinEl
-                                    idn = id0 + (k - 1) * nb_face;
-                                    node_i(idn,:) = interp_node{k};
-                                end
-                                % ---
-                                dim_ = size(valcell{1},1);
-                                if dim_ == 1
-                                    valx = zeros(nbINoinEl * nb_face, 1);
+                                    node_i = zeros(nbINoinEl * nb_face, 3);
                                     % ---
                                     id0 = 1:nb_face;
                                     for k = 1:nbINoinEl
                                         idn = id0 + (k - 1) * nb_face;
-                                        valx(idn) = valcell{k}(1,:);
+                                        node_i(idn,:) = interp_node{k};
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                    dim_ = size(valcell{1},1);
+                                    if dim_ == 1
+                                        valx = zeros(nbINoinEl * nb_face, 1);
+                                        % ---
+                                        id0 = 1:nb_face;
+                                        for k = 1:nbINoinEl
+                                            idn = id0 + (k - 1) * nb_face;
+                                            valx(idn) = valcell{k}(1,:);
+                                        end
+                                        % ---
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        % ---
+                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                        fargs{i} = fxi(cnode_.');
+                                        % ---
+                                    elseif dim_ == 2
+                                        valx = zeros(nbINoinEl * nb_face, 1);
+                                        valy = zeros(nbINoinEl * nb_face, 1);
+                                        % ---
+                                        id0 = 1:nb_face;
+                                        for k = 1:nbINoinEl
+                                            idn = id0 + (k - 1) * nb_face;
+                                            valx(idn) = valcell{k}(1,:);
+                                            valy(idn) = valcell{k}(2,:);
+                                        end
+                                        % ---
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fyi = fxi;
+                                        fyi.Values = valy;
+                                        % ---
+                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                        vx_ = fxi(cnode_.');
+                                        vy_ = fyi(cnode_.');
+                                        fargs{i} = [vx_ vy_];
+                                        % ---
+                                    elseif dim_ == 3
+                                        valx = zeros(nbINoinEl * nb_face, 1);
+                                        valy = zeros(nbINoinEl * nb_face, 1);
+                                        valz = zeros(nbINoinEl * nb_face, 1);
+                                        % ---
+                                        id0 = 1:nb_face;
+                                        for k = 1:nbINoinEl
+                                            idn = id0 + (k - 1) * nb_face;
+                                            valx(idn) = valcell{k}(1,:);
+                                            valy(idn) = valcell{k}(2,:);
+                                            valz(idn) = valcell{k}(3,:);
+                                        end
+                                        % ---
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fyi = fxi;
+                                        fyi.Values = valy;
+                                        fzi = fxi;
+                                        fzi.Values = valz;
+                                        % ---
+                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                        vx_ = fxi(cnode_.');
+                                        vy_ = fyi(cnode_.');
+                                        vz_ = fzi(cnode_.');
+                                        fargs{i} = [vx_ vy_ vz_];
+                                        % ---
+                                    end
+                                    % --------------------------------------------------------------
+                                elseif ~isempty(id_elem_source)
+                                    % --- XTODO : not optimat code writing/organization
+                                    % --- time interpolated data
+                                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
+                                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                    if next_it == back_it
+                                        valcell = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
+                                    else
+                                        % ---
+                                        val01 = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
+                                        val02 = source_model.field{next_it}.(depon_).elem.ivalue(id_elem_source);
+                                        % ---
+                                        delta_v = [];
+                                        for k = 1:length(val01)
+                                            delta_v{k} = val02{k} - val01{k};
+                                        end
+                                        % ---
+                                        delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
+                                        % ---
+                                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                        % ---
+                                        for k = 1:length(val01)
+                                            valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
+                                        end
+                                        % ---
+                                    end
+                                    % --- space interpolation
+                                    nbINoinEl = source_model.parent_mesh.refelem.nbI;
+                                    nb_elem   = length(id_elem_source);
                                     % ---
-                                    cnode_ = target_model.parent_mesh.cface(:,id_face_target);
-                                    fargs{i} = fxi(cnode_.');
+                                    node_i = zeros(nbINoinEl * nb_elem, 3);
                                     % ---
-                                elseif dim_ == 2
-                                    valx = zeros(nbINoinEl * nb_face, 1);
-                                    valy = zeros(nbINoinEl * nb_face, 1);
+                                    interp_node = source_model.parent_mesh.prokit.node;
                                     % ---
-                                    id0 = 1:nb_face;
+                                    id0 = 1:nb_elem;
                                     for k = 1:nbINoinEl
-                                        idn = id0 + (k - 1) * nb_face;
-                                        valx(idn) = valcell{k}(1,:);
-                                        valy(idn) = valcell{k}(2,:);
+                                        idn = id0 + (k - 1) * nb_elem;
+                                        node_i(idn,:) = interp_node{k}(id_elem_source,:);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
-                                    fyi = fxi;
-                                    fyi.Values = valy;
-                                    % ---
-                                    cnode_ = target_model.parent_mesh.cface(:,id_face_target);
-                                    vx_ = fxi(cnode_.');
-                                    vy_ = fyi(cnode_.');
-                                    fargs{i} = [vx_ vy_];
-                                    % ---
-                                elseif dim_ == 3
-                                    valx = zeros(nbINoinEl * nb_face, 1);
-                                    valy = zeros(nbINoinEl * nb_face, 1);
-                                    valz = zeros(nbINoinEl * nb_face, 1);
-                                    % ---
-                                    id0 = 1:nb_face;
-                                    for k = 1:nbINoinEl
-                                        idn = id0 + (k - 1) * nb_face;
-                                        valx(idn) = valcell{k}(1,:);
-                                        valy(idn) = valcell{k}(2,:);
-                                        valz(idn) = valcell{k}(3,:);
+                                    dim_ = size(valcell{1},1);
+                                    if dim_ == 1
+                                        valx = zeros(nbINoinEl * nb_elem, 1);
+                                        % ---
+                                        id0 = 1:nb_elem;
+                                        for k = 1:nbINoinEl
+                                            idn = id0 + (k - 1) * nb_elem;
+                                            valx(idn) = valcell{k}(1,:);
+                                        end
+                                        % ---
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        % ---
+                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                        fargs{i} = fxi(cnode_.');
+                                        % ---
+                                    elseif dim_ == 2
+                                        valx = zeros(nbINoinEl * nb_elem, 1);
+                                        valy = zeros(nbINoinEl * nb_elem, 1);
+                                        % ---
+                                        id0 = 1:nb_elem;
+                                        for k = 1:nbINoinEl
+                                            idn = id0 + (k - 1) * nb_elem;
+                                            valx(idn) = valcell{k}(1,:);
+                                            valy(idn) = valcell{k}(2,:);
+                                        end
+                                        % ---
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fyi = fxi;
+                                        fyi.Values = valy;
+                                        % ---
+                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                        vx_ = fxi(cnode_.');
+                                        vy_ = fyi(cnode_.');
+                                        fargs{i} = [vx_ vy_];
+                                        % ---
+                                    elseif dim_ == 3
+                                        valx = zeros(nbINoinEl * nb_elem, 1);
+                                        valy = zeros(nbINoinEl * nb_elem, 1);
+                                        valz = zeros(nbINoinEl * nb_elem, 1);
+                                        % ---
+                                        id0 = 1:nb_elem;
+                                        for k = 1:nbINoinEl
+                                            idn = id0 + (k - 1) * nb_elem;
+                                            valx(idn) = valcell{k}(1,:);
+                                            valy(idn) = valcell{k}(2,:);
+                                            valz(idn) = valcell{k}(3,:);
+                                        end
+                                        % ---
+                                        fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                        fyi = fxi;
+                                        fyi.Values = valy;
+                                        fzi = fxi;
+                                        fzi.Values = valz;
+                                        % ---
+                                        cnode_ = target_model.parent_mesh.cface(:,id_face_target);
+                                        vx_ = fxi(cnode_.');
+                                        vy_ = fyi(cnode_.');
+                                        vz_ = fzi(cnode_.');
+                                        fargs{i} = [vx_ vy_ vz_];
+                                        % ---
                                     end
-                                    % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
-                                    fyi = fxi;
-                                    fyi.Values = valy;
-                                    fzi = fxi;
-                                    fzi.Values = valz;
-                                    % ---
-                                    cnode_ = target_model.parent_mesh.cface(:,id_face_target);
-                                    vx_ = fxi(cnode_.');
-                                    vy_ = fyi(cnode_.');
-                                    vz_ = fzi(cnode_.');
-                                    fargs{i} = [vx_ vy_ vz_];
-                                    % ---
                                 end
+                                % ------------------------------------------------------------------
                             end
                         end
                     end

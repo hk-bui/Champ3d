@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef GeoDom < Xhandle
+classdef MeshDom < Xhandle
 
     % --- Dependent Properties
     properties (Dependent = true)
@@ -17,7 +17,7 @@ classdef GeoDom < Xhandle
     
     % --- Constructors
     methods
-        function obj = GeoDom()
+        function obj = MeshDom()
             obj = obj@Xhandle;
         end
     end

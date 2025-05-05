@@ -26,7 +26,7 @@ classdef Thconvection < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','h'};
+            argslist = {'parent_model','id_dom2d','id_dom3d','h','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -38,6 +38,9 @@ classdef Thconvection < PhysicalDom
                 args.id_dom2d
                 args.id_dom3d
                 args.h
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@PhysicalDom;
@@ -93,7 +96,7 @@ classdef Thconvection < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
-            h_array = obj.h.getvalue('in_dom',dom);
+            h_array = obj.h.getvalue('in_dom',obj);
             h_array = f_column_array(h_array,'nb_elem',nb_face);
             %--------------------------------------------------------------
             % local surface mesh

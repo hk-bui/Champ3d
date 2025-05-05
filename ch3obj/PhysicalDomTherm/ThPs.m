@@ -25,7 +25,7 @@ classdef ThPs < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','ps'};
+            argslist = {'parent_model','id_dom2d','id_dom3d','ps','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -37,6 +37,9 @@ classdef ThPs < PhysicalDom
                 args.id_dom2d
                 args.id_dom3d
                 args.ps
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@PhysicalDom;
@@ -92,7 +95,7 @@ classdef ThPs < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
-            ps_array = obj.ps.getvalue('in_dom',dom);
+            ps_array = obj.ps.getvalue('in_dom',obj);
             ps_array = f_column_array(ps_array,'nb_elem',nb_face);
             %--------------------------------------------------------------
             % local surface mesh

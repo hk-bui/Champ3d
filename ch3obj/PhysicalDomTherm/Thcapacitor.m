@@ -26,7 +26,7 @@ classdef Thcapacitor < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','rho','cp'};
+            argslist = {'parent_model','id_dom2d','id_dom3d','rho','cp','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -39,6 +39,9 @@ classdef Thcapacitor < PhysicalDom
                 args.id_dom3d
                 args.rho
                 args.cp
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@PhysicalDom;
@@ -97,8 +100,8 @@ classdef Thcapacitor < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            rho_array = obj.rho.getvalue('in_dom',dom);
-            cp_array  = obj.cp.getvalue('in_dom',dom);
+            rho_array = obj.rho.getvalue('in_dom',obj);
+            cp_array  = obj.cp.getvalue('in_dom',obj);
             rho_cp_array = rho_array .* cp_array;
             % --- check changes
             is_changed = 1;

@@ -25,7 +25,7 @@ classdef Thconductor < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','lambda'};
+            argslist = {'parent_model','id_dom2d','id_dom3d','lambda','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -37,6 +37,9 @@ classdef Thconductor < PhysicalDom
                 args.id_dom2d
                 args.id_dom3d
                 args.lambda
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@PhysicalDom;
@@ -92,7 +95,7 @@ classdef Thconductor < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            lambda_array = obj.lambda.getvalue('in_dom',dom);
+            lambda_array = obj.lambda.getvalue('in_dom',obj);
             % --- check changes
             is_changed = 1;
             if isequal(lambda_array,obj.matrix.lambda_array)

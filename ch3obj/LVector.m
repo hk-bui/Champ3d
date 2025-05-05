@@ -55,14 +55,20 @@ classdef LVector < Xhandle
             % ---
             dom = args.in_dom;
             % ---
-            if isa(dom,'VolumeDom')
-                id_elem = dom.gid_elem;
-            elseif isa(dom,'SurfaceDom')
-                id_elem = dom.gid_face;
-            elseif isprop(dom,'gid_elem')
-                id_elem = dom.gid_elem;
-            elseif isprop(dom,'gid_face')
-                id_elem = dom.gid_face;
+            if isa(dom,'PhysicalDom')
+                meshdom = dom.dom;
+            else
+                meshdom = dom;
+            end
+            % ---
+            if isa(meshdom,'VolumeDom')
+                id_elem = meshdom.gid_elem;
+            elseif isa(meshdom,'SurfaceDom')
+                id_elem = meshdom.gid_face;
+            elseif isprop(meshdom,'gid_elem')
+                id_elem = meshdom.gid_elem;
+            elseif isprop(meshdom,'gid_face')
+                id_elem = meshdom.gid_face;
             end
             % ---
             nb_elem = length(id_elem);

@@ -8,7 +8,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VolumeDom < GeoDom
+classdef VolumeDom < MeshDom
 
     % --- Properties
     properties
@@ -55,7 +55,7 @@ classdef VolumeDom < GeoDom
                 args.condition = []
             end
             % ---
-            obj = obj@GeoDom;
+            obj = obj@MeshDom;
             % ---
             if isempty(fieldnames(args))
                 return

@@ -25,7 +25,7 @@ classdef ThPv < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','pv'};
+            argslist = {'parent_model','id_dom2d','id_dom3d','pv','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -37,6 +37,9 @@ classdef ThPv < PhysicalDom
                 args.id_dom2d
                 args.id_dom3d
                 args.pv
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@PhysicalDom;
@@ -93,7 +96,7 @@ classdef ThPv < PhysicalDom
             % ---
             gid_node_t = f_uniquenode(elem);
             % ---
-            pv_array = obj.pv.getvalue('in_dom',dom);
+            pv_array = obj.pv.getvalue('in_dom',obj);
             % --- save
             % it = obj.parent_model.ltime.it;
             %obj.field{it}.pv.elem = FreeScalarElemField('parent_model',obj,'dof',obj.dof{it}.T,...
