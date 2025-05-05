@@ -581,12 +581,13 @@ classdef Parameter < Xhandle
                                 id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                 for ids = 1:length(id_dom_source)
                                     if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                        id_face_source = source_model.parent_mesh.dom.gid_face;
-                                    else
-                                        % f_fprintf(0,'dom',1,c,0,'not found !\n');
-                                        error(['dom ' target_dom ' not found on source model !\n']);
+                                        id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_face;
                                     end
                                 end
+                                if isempty(id_face_source)
+                                    error(['dom ' target_dom.id ' not found on source model !']);
+                                end
+                                % ---
                                 % --- time interpolated data
                                 next_it = source_model.ltime.next_it(target_model.ltime.t_now);
                                 back_it = source_model.ltime.back_it(target_model.ltime.t_now);
