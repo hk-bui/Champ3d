@@ -102,7 +102,7 @@ classdef Thconductor < PhysicalDom
                 is_changed = 0;
             end
             %--------------------------------------------------------------
-            if ~is_changed
+            if ~is_changed && obj.build_done == 1
                 return
             end
             %--------------------------------------------------------------
@@ -144,6 +144,8 @@ classdef Thconductor < PhysicalDom
             end
             %--------------------------------------------------------------
             obj.matrix.lambdawewe = lambdawewe;
+            % ---
+            obj.build_done = 1;
             % ---
         end
     end

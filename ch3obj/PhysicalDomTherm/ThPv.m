@@ -108,7 +108,7 @@ classdef ThPv < PhysicalDom
                 is_changed = 0;
             end
             %--------------------------------------------------------------
-            if ~is_changed
+            if ~is_changed && obj.build_done == 1
                 return
             end
             %--------------------------------------------------------------
@@ -140,6 +140,8 @@ classdef ThPv < PhysicalDom
             end
             %--------------------------------------------------------------
             obj.matrix.pvwn = pvwn;
+            % ---
+            obj.build_done = 1;
             % ---
         end
     end

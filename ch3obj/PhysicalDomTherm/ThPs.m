@@ -112,7 +112,7 @@ classdef ThPs < PhysicalDom
                 is_changed = 0;
             end
             %--------------------------------------------------------------
-            if ~is_changed
+            if ~is_changed && obj.build_done == 1
                 return
             end
             %--------------------------------------------------------------
@@ -149,6 +149,8 @@ classdef ThPs < PhysicalDom
             end
             %--------------------------------------------------------------
             obj.matrix.pswn = pswn;
+            % ---
+            obj.build_done = 1;
             % ---
         end
     end

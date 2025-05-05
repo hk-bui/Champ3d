@@ -113,7 +113,7 @@ classdef Thconvection < PhysicalDom
                 is_changed = 0;
             end
             %--------------------------------------------------------------
-            if ~is_changed
+            if ~is_changed && obj.build_done == 1
                 return
             end
             %--------------------------------------------------------------
@@ -165,6 +165,8 @@ classdef Thconvection < PhysicalDom
             end
             %--------------------------------------------------------------
             obj.matrix.hwnwn = hwnwn;
+            % ---
+            obj.build_done = 1;
             % ---
         end
     end
