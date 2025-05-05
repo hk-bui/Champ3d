@@ -519,7 +519,7 @@ classdef Parameter < Xhandle
                                     id0 = 1:nb_elem;
                                     for k = 1:nbINoinEl
                                         idn = id0 + (k - 1) * nb_elem;
-                                        valx(idn) = valcell{k}(1,id_elem_source);
+                                        valx(idn) = valcell{k}(1,:);
                                     end
                                     % ---
                                     fxi = scatteredInterpolant(node_i,valx,'linear','none');
@@ -534,8 +534,8 @@ classdef Parameter < Xhandle
                                     id0 = 1:nb_elem;
                                     for k = 1:nbINoinEl
                                         idn = id0 + (k - 1) * nb_elem;
-                                        valx(idn) = valcell{k}(1,id_elem_source);
-                                        valy(idn) = valcell{k}(2,id_elem_source);
+                                        valx(idn) = valcell{k}(1,:);
+                                        valy(idn) = valcell{k}(2,:);
                                     end
                                     % ---
                                     fxi = scatteredInterpolant(node_i,valx,'linear','none');
@@ -555,9 +555,9 @@ classdef Parameter < Xhandle
                                     id0 = 1:nb_elem;
                                     for k = 1:nbINoinEl
                                         idn = id0 + (k - 1) * nb_elem;
-                                        valx(idn) = valcell{k}(1,id_elem_source);
-                                        valy(idn) = valcell{k}(2,id_elem_source);
-                                        valz(idn) = valcell{k}(3,id_elem_source);
+                                        valx(idn) = valcell{k}(1,:);
+                                        valy(idn) = valcell{k}(2,:);
+                                        valz(idn) = valcell{k}(3,:);
                                     end
                                     % ---
                                     fxi = scatteredInterpolant(node_i,valx,'linear','none');

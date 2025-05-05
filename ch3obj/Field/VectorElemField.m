@@ -57,7 +57,7 @@ classdef VectorElemField < ElemField
                 dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
             % ---
-            celem = obj.parent_model.parent_mesh.celem;
+            celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
             if isreal(obj.cvalue(gid_elem(1)))
                 f_quiver(celem,obj.cvalue(gid_elem));
             else
