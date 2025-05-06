@@ -30,16 +30,10 @@ classdef ThModel < PhysicalModel
         T0 = 0
         % ---
     end
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','timesystem','T0'};
+            argslist = {'parent_mesh','T0'};
         end
     end
     % --- Constructor
@@ -47,7 +41,6 @@ classdef ThModel < PhysicalModel
         function obj = ThModel(args)
             arguments
                 args.parent_mesh
-                args.timesystem
                 args.T0
             end
             % ---
@@ -61,7 +54,6 @@ classdef ThModel < PhysicalModel
             % ---
         end
     end
-
     % --- Utility Methods
     methods
         % -----------------------------------------------------------------

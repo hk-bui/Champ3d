@@ -114,10 +114,11 @@ classdef Mesh3d < Mesh
                 obj.is_defining_obj_of(dom);
                 % ---
             else
+                % for dom created by dom operation
+                % no more need to def defining_obj
                 dom = args.dom_obj;
                 dom.id = args.id;
                 obj.dom.(args.id) = dom;
-                % obj.is_defining_obj_of(dom);
             end
         end
         % -----------------------------------------------------------------
@@ -140,7 +141,8 @@ classdef Mesh3d < Mesh
             if isempty(args.id)
                 error('#id must be given !');
             end
-            % ---
+            % --- surface dom is always created from vdom
+            % no more need to def defining_obj
             if ~isfield(args,'dom_obj')
                 % ---
                 args.parent_mesh = obj;
@@ -153,9 +155,6 @@ classdef Mesh3d < Mesh
                 dom.id = args.id;
                 obj.dom.(args.id) = dom;
             end
-            % ---
-            % obj.is_defining_obj_of(dom);
-            % ---
         end
     end
     

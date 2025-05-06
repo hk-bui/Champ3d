@@ -28,13 +28,14 @@ classdef AirboxAphi < Airbox
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d'};
+            argslist = {'id','parent_model','id_dom3d'};
         end
     end
     % --- Contructor
     methods
         function obj = AirboxAphi(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom3d
             end

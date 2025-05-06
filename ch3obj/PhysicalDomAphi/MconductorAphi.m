@@ -30,13 +30,14 @@ classdef MconductorAphi < Mconductor
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','mur','parameter_dependency_search'};
+            argslist = {'id','parent_model','id_dom3d','mur','parameter_dependency_search'};
         end
     end
     % --- Contructor
     methods
         function obj = MconductorAphi(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom3d
                 args.mur
@@ -111,8 +112,7 @@ classdef MconductorAphi < Mconductor
                 return
             end
             %--------------------------------------------------------------
-            
-            % ---
+            % local nu0nurwfwf matrix
             nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
             % ---
             obj.matrix.gid_elem = gid_elem;
@@ -142,6 +142,7 @@ classdef MconductorAphi < Mconductor
             gid_elem(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
+            % global elementary nu0nurwfwf matrix
             nu0nurwfwf = sparse(nb_face,nb_face);
             %--------------------------------------------------------------
             for i = 1:nbFa_inEl

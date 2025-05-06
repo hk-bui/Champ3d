@@ -30,7 +30,7 @@ classdef ThPs < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','ps','parameter_dependency_search'};
+            argslist = {'id','parent_model','id_dom3d','ps','parameter_dependency_search'};
         end
     end
     % --- Contructor

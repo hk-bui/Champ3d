@@ -29,13 +29,14 @@ classdef PMagnetAphi < PMagnet
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','br'};
+            argslist = {'id','parent_model','id_dom3d','br'};
         end
     end
     % --- Contructor
     methods
         function obj = PMagnetAphi(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom3d
                 args.br
@@ -154,21 +155,6 @@ classdef PMagnetAphi < PMagnet
                     f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
                              obj.matrix.br(:,obj.matrix.gid_elem).','sfactor',0.2);
                 end
-            end
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
             end
         end
     end

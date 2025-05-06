@@ -41,7 +41,7 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation', ...
+            argslist = {'id','parent_model','id_dom2d','id_dom3d','etrode_equation', ...
                         'sigma','i_coil','coil_mode'};
         end
     end
@@ -49,6 +49,7 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
     methods
         function obj = SolidOpenVsCoilAphi(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d

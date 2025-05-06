@@ -34,7 +34,7 @@ classdef SibcAphijw < Sibc
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','sigma','mur', ...
+            argslist = {'id','parent_model','id_dom3d','sigma','mur', ...
                         'r_ht','r_et','cparam','parameter_dependency_search'};
         end
     end
@@ -42,6 +42,7 @@ classdef SibcAphijw < Sibc
     methods
         function obj = SibcAphijw(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom3d
                 args.sigma
@@ -144,8 +145,7 @@ classdef SibcAphijw < Sibc
                 return
             end
             %--------------------------------------------------------------
-            
-            % ---
+            % local gsibcwewe matrix
             submesh = dom.submesh;
             for k = 1:length(submesh)
                 sm = submesh{k};
@@ -180,6 +180,7 @@ classdef SibcAphijw < Sibc
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             %--------------------------------------------------------------
+            % global elementary gsibcwewe matrix
             gsibcwewe = sparse(nb_edge,nb_edge);
             %--------------------------------------------------------------
             gid_face = obj.matrix.gid_face;
@@ -258,21 +259,6 @@ classdef SibcAphijw < Sibc
                     real(1/2 .* skindepth(lid_face,1).' .* ...
                     sum(es(:,lid_face) .* conj(js(:,lid_face))));
                 %----------------------------------------------------------
-            end
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
             end
         end
     end

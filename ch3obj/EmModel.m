@@ -19,7 +19,6 @@
 classdef EmModel < PhysicalModel
     properties
         frequency = 0
-        jome
         % ---
         econductor
         mconductor
@@ -32,16 +31,13 @@ classdef EmModel < PhysicalModel
         embc
         % ---
     end
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
+    properties (Dependent)
+        jome
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','frequency','ltime'};
+            argslist = {'parent_mesh','frequency'};
         end
     end
     % --- Constructor
@@ -49,8 +45,7 @@ classdef EmModel < PhysicalModel
         function obj = EmModel(args)
             arguments
                 args.parent_mesh
-                args.frequency
-                args.ltime {mustBeMember(args.ltime,'LTime')}
+                args.frequency = 0
             end
             % ---
             obj@PhysicalModel;
@@ -61,85 +56,15 @@ classdef EmModel < PhysicalModel
             % ---
             obj <= args;
             % ---
-            EmModel.setup(obj);
-            % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@PhysicalModel(obj);
-            % ---
-            obj.jome = 1j*2*pi*obj.frequency;
-            % ---
-            nb_elem = obj.parent_mesh.nb_elem;
-            nb_face = obj.parent_mesh.nb_face;
-            % ---
-            obj.field.av = sparse(3,nb_elem);
-            obj.field.bv = sparse(3,nb_elem);
-            obj.field.ev = sparse(3,nb_elem);
-            obj.field.phiv = sparse(3,nb_elem);
-            obj.field.phi = [];
-            obj.field.jv = sparse(3,nb_elem);
-            obj.field.pv = sparse(1,nb_elem);
-            obj.field.js = sparse(2,nb_face);
-            obj.field.ps = sparse(1,nb_face);
-            % ---
-            obj.setup_done = 1;
-            % ---
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@PhysicalModel(obj);
-        end
-    end
+    % --- get
     methods
-        function build(obj)
-            % ---
-            EmModel.setup(obj);
-            % ---
-            build@PhysicalModel(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_done = 1;
-            % ---
+        function val = get.jome(obj)
+            val = 1j*2*pi*obj.frequency;
         end
     end
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@PhysicalModel(obj);
-            % ---
-            if obj.assembly_done
-                return
-            end
-            % ---
-            obj.assembly_done = 1;
-            % ---
-        end
-    end
-    % --- Methods
+    % --- Utility Methods
     methods
         % -----------------------------------------------------------------
         function add_ltime(obj,args)
@@ -203,7 +128,7 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Econductor');
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 phydom = EconductorAphi(argu{:});
             end
             % ---
@@ -223,7 +148,7 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Airbox');
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 phydom = AirboxAphi(argu{:});
             end
             % ---
@@ -243,7 +168,7 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Nomesh');
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 phydom = NomeshAphi(argu{:});
             end
             % ---
@@ -267,7 +192,7 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Sibc');
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 phydom = SibcAphijw(argu{:});
                 %nomsh  = NomeshAphi('parent_model',args.parent_model, ...
                 %                    'id_dom2d',args.id_dom2d,...
@@ -299,7 +224,7 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Bsfield');
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 phydom = BsfieldAphi(argu{:});
             end
             % ---
@@ -307,6 +232,7 @@ classdef EmModel < PhysicalModel
         end
         % -----------------------------------------------------------------
         function add_embc(obj,args)
+            % --- XTODO - other bc types
         end
         % -----------------------------------------------------------------
         function add_coil(obj,args)
@@ -387,7 +313,7 @@ classdef EmModel < PhysicalModel
             % ---
             %argu = f_to_namedarg(args,'with_only',validargs);
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 % ---
                 coil_model = [coil_model 'Aphi'];
                 % ---
@@ -413,7 +339,7 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Mconductor');
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 phydom = MconductorAphi(argu{:});
             end
             % ---
@@ -434,7 +360,7 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','PMagnet');
             % ---
-            if isa(obj,'FEM3dAphijw')
+            if isa(obj,'FEM3dAphi')
                 phydom = PMagnetAphi(argu{:});
             end
             % ---

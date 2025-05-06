@@ -30,13 +30,14 @@ classdef BsfieldAphi < Bsfield
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','bs','parameter_dependency_search'};
+            argslist = {'id','parent_model','id_dom3d','bs','parameter_dependency_search'};
         end
     end
     % --- Contructor
     methods
         function obj = BsfieldAphi(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom3d
                 args.bs
@@ -112,8 +113,7 @@ classdef BsfieldAphi < Bsfield
                 return
             end
             %--------------------------------------------------------------
-            
-            % ---
+            % local wfbs matrix
             wfbs = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs_array);
             % ---
             obj.matrix.gid_elem = gid_elem;
@@ -143,6 +143,7 @@ classdef BsfieldAphi < Bsfield
             id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
             nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
             %--------------------------------------------------------------
+            % global elementary wfbs matrix
             wfbs = sparse(nb_face,1);
             %--------------------------------------------------------------
             gid_elem = obj.matrix.gid_elem;

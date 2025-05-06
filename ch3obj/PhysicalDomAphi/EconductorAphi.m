@@ -30,13 +30,14 @@ classdef EconductorAphi < Econductor
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','sigma','parameter_dependency_search'};
+            argslist = {'id','parent_model','id_dom3d','sigma','parameter_dependency_search'};
         end
     end
     % --- Contructor
     methods
         function obj = EconductorAphi(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom3d
                 args.sigma
@@ -110,6 +111,7 @@ classdef EconductorAphi < Econductor
                 return
             end
             %--------------------------------------------------------------
+            % local sigmawewe matrix
             sigmawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
             % ---
             obj.matrix.gid_elem = gid_elem;
@@ -139,6 +141,7 @@ classdef EconductorAphi < Econductor
             gid_elem(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
+            % global elementary sigmawewe matrix
             sigmawewe = sparse(nb_edge,nb_edge);
             %--------------------------------------------------------------
             for i = 1:nbEd_inEl

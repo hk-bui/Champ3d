@@ -17,7 +17,6 @@
 %--------------------------------------------------------------------------
 
 classdef FEM3dTherm < ThModel
-
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -39,7 +38,6 @@ classdef FEM3dTherm < ThModel
             % ---
         end
     end
-
     % --- Methods/public
     methods
         %------------------------------------------------------------------
@@ -195,7 +193,6 @@ classdef FEM3dTherm < ThModel
                         x0 = x;
                     else
                         erro = 0;
-                        %x = x0;
                     end
                     % ---
                     f_fprintf(0,'e',1,erro,0,'\n');
