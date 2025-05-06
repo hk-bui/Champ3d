@@ -24,8 +24,8 @@ classdef BsfieldAphi < Bsfield
     end
     % ---
     properties (Access = private)
+        setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     % --- Valid args list
     methods (Static)
@@ -53,58 +53,82 @@ classdef BsfieldAphi < Bsfield
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            BsfieldAphi.setup(obj);
         end
     end
 
-    % --- setup
-    methods
+    % --- setup/reset/build/assembly
+    methods (Static)
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % --- special case
             if isempty(obj.id_dom3d)
                 if ~isfield(obj.parent_model.parent_mesh.dom,'default_domain')
                     obj.parent_model.parent_mesh.add_default_domain;
                 end
                 obj.id_dom3d = 'default_domain';
             end
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            BsfieldAphi.setup(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
-            % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
             gid_elem = dom.gid_elem;
             % ---
             if isa(obj.bs,'Parameter')
-                bs = obj.bs.getvalue('in_dom',dom);
+                bs_array = obj.bs.getvalue('in_dom',dom);
             elseif iscell(obj.bs)
-                bs = obj.bs;
+                bs_array = obj.bs;
             end
+            % --- check changes
+            is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
+            
             % ---
-            wfbs = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs);
+            wfbs = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs_array);
             % ---
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.wfbs = wfbs;
             % ---
             if iscell(obj.bs)
-                bs = 0;
+                bs_array = 0;
                 for i = 1:length(obj.bs)
-                    bs = bs + obj.bs{i};
+                    bs_array = bs_array + obj.bs{i};
                 end
-                bs = bs ./ length(obj.bs);
+                bs_array = bs_array ./ length(obj.bs);
             end
-            obj.matrix.bs = bs;
+            obj.matrix.bs = bs_array;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -113,10 +137,6 @@ classdef BsfieldAphi < Bsfield
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
             %--------------------------------------------------------------
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             nb_face = obj.parent_model.parent_mesh.nb_face;
@@ -154,7 +174,6 @@ classdef BsfieldAphi < Bsfield
             %    obj.parent_model.dof.bs + ...
             %    obj.parent_model.parent_mesh.discrete.rot * a_bsfield;
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
         end
     end
 
@@ -175,21 +194,6 @@ classdef BsfieldAphi < Bsfield
                 hold on;
                 f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
                          obj.matrix.bs(:,obj.matrix.gid_elem).','sfactor',0.2);
-            end
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
             end
         end
     end

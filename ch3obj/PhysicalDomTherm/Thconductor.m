@@ -17,19 +17,16 @@
 %--------------------------------------------------------------------------
 
 classdef Thconductor < PhysicalDom
-
-    % --- computed
     properties
         lambda = 0
+        % ---
         matrix
     end
-
-    % --- computed
+    % --- 
     properties (Access = private)
         setup_done = 0
         build_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()

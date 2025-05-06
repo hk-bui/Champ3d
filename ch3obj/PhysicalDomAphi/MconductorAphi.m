@@ -24,13 +24,13 @@ classdef MconductorAphi < Mconductor
     end
     % ---
     properties (Access = private)
+        setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','mur'};
+            argslist = {'parent_model','id_dom3d','mur','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -40,6 +40,9 @@ classdef MconductorAphi < Mconductor
                 args.parent_model
                 args.id_dom3d
                 args.mur
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@Mconductor;
@@ -50,26 +53,43 @@ classdef MconductorAphi < Mconductor
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            MconductorAphi.setup(obj);
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
-            setup@Mconductor(obj);
+            % ---
+            if obj.setup_done
+                return
+            end
+            % --- special case
+            
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.nu0nurwfwf = [];
+            obj.matrix.nur_array = [];
+            obj.matrix.mur_array = [];
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            MconductorAphi.setup(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
-            % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -81,6 +101,17 @@ classdef MconductorAphi < Mconductor
             mur_array = obj.mur.getvalue('in_dom',dom);
             nur_array = obj.mur.get_inverse('in_dom',dom);
             nu0nur = nu0 .* nur_array;
+            % --- check changes
+            is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
+            
             % ---
             nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
             % ---
@@ -90,7 +121,6 @@ classdef MconductorAphi < Mconductor
             obj.matrix.mur_array = mur_array;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -99,10 +129,6 @@ classdef MconductorAphi < Mconductor
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
@@ -140,22 +166,6 @@ classdef MconductorAphi < Mconductor
             obj.parent_model.matrix.id_elem_mcon = ...
                 [obj.parent_model.matrix.id_elem_mcon obj.matrix.gid_elem];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
         end
     end
 end

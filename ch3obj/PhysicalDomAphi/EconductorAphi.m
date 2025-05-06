@@ -20,18 +20,17 @@ classdef EconductorAphi < Econductor
     properties
         sigma
         % ---
-        matrix = struct('gid_elem',[],'gid_node_phi',[],'sigmawewe',[],'sigma_array',[])
+        matrix
     end
     % ---
     properties (Access = private)
         setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom3d','sigma'};
+            argslist = {'parent_model','id_dom3d','sigma','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -41,6 +40,9 @@ classdef EconductorAphi < Econductor
                 args.parent_model
                 args.id_dom3d
                 args.sigma
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@Econductor;
@@ -53,9 +55,6 @@ classdef EconductorAphi < Econductor
             % ---
             EconductorAphi.setup(obj);
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
 
@@ -66,38 +65,31 @@ classdef EconductorAphi < Econductor
             if obj.setup_done
                 return
             end
-            % ---
-            setup@Econductor(obj);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_node_phi = [];
+            obj.matrix.sigmawewe = [];
+            obj.matrix.sigma_array = [];
             % ---
             obj.setup_done = 1;
+            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            % must reset setup+build+assembly
             obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@Econductor(obj);
+            EconductorAphi.setup(obj);
         end
     end
 
     % --- build
     methods
         function build(obj)
-            % ---
-            EconductorAphi.setup(obj);
-            % ---
-            build@Econductor(obj);
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -108,7 +100,16 @@ classdef EconductorAphi < Econductor
             gid_node_phi = f_uniquenode(elem);
             % ---
             sigma_array = obj.sigma.getvalue('in_dom',dom);
-            % ---
+            % --- check changes
+            is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
             sigmawewe = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
             % ---
             obj.matrix.gid_elem = gid_elem;
@@ -125,11 +126,6 @@ classdef EconductorAphi < Econductor
         function assembly(obj)
             % ---
             obj.build;
-            assembly@Econductor(obj);
-            % ---
-            if obj.assembly_done
-                return
-            end
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
@@ -167,7 +163,6 @@ classdef EconductorAphi < Econductor
             obj.parent_model.matrix.id_node_phi = ...
                 [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
         end
     end
 

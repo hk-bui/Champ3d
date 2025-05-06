@@ -34,8 +34,8 @@ classdef SolidOpenVsCoilAphi < OpenCoilAphi & SolidCoilAphi & VsCoilAphi
 
     % --- computed
     properties (Access = private)
+        setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     
     % --- Valid args list

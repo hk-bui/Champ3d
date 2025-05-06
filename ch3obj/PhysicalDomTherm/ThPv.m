@@ -17,19 +17,16 @@
 %--------------------------------------------------------------------------
 
 classdef ThPv < PhysicalDom
-
-    % --- computed
     properties
         pv = 0
+        % ---
         matrix
     end
-
-    % --- computed
+    % --- 
     properties (Access = private)
         setup_done = 0
         build_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()

@@ -28,14 +28,14 @@ classdef SibcAphijw < Sibc
     end
     % --- 
     properties (Access = private)
+        setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
             argslist = {'parent_model','id_dom3d','sigma','mur', ...
-                        'r_ht','r_et','cparam'};
+                        'r_ht','r_et','cparam','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -49,6 +49,9 @@ classdef SibcAphijw < Sibc
                 args.r_ht
                 args.r_et
                 args.cparam
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
             end
             % ---
             obj = obj@Sibc;
@@ -59,13 +62,36 @@ classdef SibcAphijw < Sibc
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            SibcAphijw.setup(obj);
+            % ---
         end
     end
 
     % --- setup
     methods
         function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % --- special case
+            
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_node_phi = [];
+            obj.matrix.gsibcwewe = [];
+            obj.matrix.gid_face = [];
+            obj.matrix.sigma_array = [];
+            obj.matrix.mur_array = [];
+            obj.matrix.cparam_array = [];
+            obj.matrix.skindepth = [];
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
             % ---
             cparam_ = 0;
             if ~isempty(obj.r_ht) && ~isempty(obj.r_et)
@@ -80,16 +106,15 @@ classdef SibcAphijw < Sibc
             % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            SibcAphijw.setup(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
-            % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
             % ---
             dom = obj.dom;
             % ---
@@ -109,6 +134,17 @@ classdef SibcAphijw < Sibc
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
             z_sibc = f_column_array(z_sibc,'nb_elem',lnb_face);
+            % --- check changes
+            is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
+            
             % ---
             submesh = dom.submesh;
             for k = 1:length(submesh)
@@ -132,7 +168,6 @@ classdef SibcAphijw < Sibc
             obj.matrix.skindepth = skindepth;
             % ---
             obj.build_done = 1;
-            obj.assembly_done = 0;
         end
     end
 
@@ -141,10 +176,6 @@ classdef SibcAphijw < Sibc
         function assembly(obj)
             % ---
             obj.build;
-            % ---
-            if obj.assembly_done
-                return
-            end
             %--------------------------------------------------------------
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
@@ -184,7 +215,6 @@ classdef SibcAphijw < Sibc
             obj.parent_model.matrix.id_node_phi = ...
                 [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];
             %--------------------------------------------------------------
-            obj.assembly_done = 1;
         end
     end
 

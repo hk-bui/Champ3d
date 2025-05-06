@@ -22,8 +22,8 @@ classdef AirboxAphi < Airbox
     end
     % ---
     properties (Access = private)
+        setup_done = 0
         build_done = 0
-        assembly_done = 0
     end
     % --- Valid args list
     methods (Static)
@@ -47,22 +47,40 @@ classdef AirboxAphi < Airbox
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            AirboxAphi.setup(obj);
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
-            setup@Airbox(obj);
+            % ---
+            if obj.setup_done
+                return
+            end
+            % --- special case
+            
+            % --- call utility methods
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.gid_inner_edge = [];
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            AirboxAphi.setup(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
-            % ---
-            obj.setup;
             % ---
             if obj.build_done
                 return
@@ -76,26 +94,10 @@ classdef AirboxAphi < Airbox
             obj.build_done = 1;
         end
     end
-
     % --- assembly
     methods
         function assembly(obj)
-
-        end
-    end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
+            obj.build;
         end
     end
 end
