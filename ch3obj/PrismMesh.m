@@ -17,32 +17,31 @@
 %--------------------------------------------------------------------------
 
 classdef PrismMesh < Mesh3d
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
- 
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = PrismMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
             % ---
             obj = obj@Mesh3d;
+            obj.elem_type = 'prism';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -58,26 +57,16 @@ classdef PrismMesh < Mesh3d
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@Mesh3d(obj);
-            % ---
-            obj.elem_type = 'prism';
-            % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@Mesh3d(obj);
-            % ---
-            obj.setup_done = 0;
             PrismMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
@@ -86,12 +75,21 @@ classdef PrismMesh < Mesh3d
     methods
         function build(obj)
             % ---
-            PrismMesh.setup(obj);
-            % --- call super
-            build@Mesh3d(obj);
-            % ---
             if obj.build_done
                 return
+            end
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+                obj.build_meshds_done = 1;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+                obj.build_discrete_done = 1;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+                obj.build_intkit_done = 1;
             end
             % ---
             obj.build_done = 1;
@@ -211,6 +209,3 @@ classdef PrismMesh < Mesh3d
         end
     end
 end
-
-
-

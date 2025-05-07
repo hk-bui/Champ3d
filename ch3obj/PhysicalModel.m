@@ -17,7 +17,6 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalModel < Xhandle
-
     properties
         parent_mesh
         ltime
@@ -29,7 +28,6 @@ classdef PhysicalModel < Xhandle
         field
         dof
     end
-
     % --- Constructor
     methods
         function obj = PhysicalModel()
@@ -40,14 +38,6 @@ classdef PhysicalModel < Xhandle
         end
     end
     % --- Utility Methods
-    % --- build
-    methods
-        % ---
-        function build(obj)
-            obj.parent_mesh.build;
-        end
-        % ---
-    end
     % --- ltime + visualization
     methods
         % ---

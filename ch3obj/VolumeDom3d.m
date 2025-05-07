@@ -146,6 +146,3 @@ classdef VolumeDom3d < VolumeDom
         end
     end
 end
-
-
-

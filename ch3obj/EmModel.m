@@ -34,28 +34,10 @@ classdef EmModel < PhysicalModel
     properties (Dependent)
         jome
     end
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'parent_mesh','frequency'};
-        end
-    end
     % --- Constructor
     methods
-        function obj = EmModel(args)
-            arguments
-                args.parent_mesh
-                args.frequency = 0
-            end
-            % ---
+        function obj = EmModel()
             obj@PhysicalModel;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
         end
     end
     % --- get

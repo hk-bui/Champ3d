@@ -27,11 +27,10 @@ classdef FEM3dTherm < ThModel
     methods
         function obj = FEM3dTherm(args)
             arguments
-                args.parent_mesh = []
+                args.parent_mesh {mustBeA(args.parent_mesh,'Mesh3d')}
                 args.T0 = 0
             end
             % ---
-            % argu = f_to_namedarg(args,'for','ThModel');
             obj = obj@ThModel;
             % ---
             obj <= args;
@@ -41,9 +40,13 @@ classdef FEM3dTherm < ThModel
     % --- Methods/public
     methods
         %------------------------------------------------------------------
+        function build(obj)
+            obj.parent_mesh.build;
+        end
+        %------------------------------------------------------------------
         function assembly(obj)
             %--------------------------------------------------------------
-            obj.parent_mesh.build;
+            obj.build;
             %--------------------------------------------------------------
             % Preparation
             % /!\ init all matrix since always re-assembly

@@ -18,9 +18,8 @@
 
 classdef FEM3dAphijw < FEM3dAphi
     properties (Access = private)
-        setup_done = 0
         build_done = 0
-        assembly_done = 0
+        base_matrix_done = 0
     end
     % --- Valid args list
     methods (Static)
@@ -32,65 +31,42 @@ classdef FEM3dAphijw < FEM3dAphi
     methods
         function obj = FEM3dAphijw(args)
             arguments
-                args.parent_mesh = []
+                args.parent_mesh {mustBeA(args.parent_mesh,'Mesh3d')}
                 args.frequency = 0
             end
             % ---
             obj@FEM3dAphi;
             % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
             obj <= args;
             % ---
-            FEM3dAphijw.setup(obj);
+            
             % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@FEM3dAphi(obj);
-            % ---
-            obj.setup_done = 1;
-            % ---
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
             obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@FEM3dAphi(obj);
+            obj.base_matrix_done = 0;
+            obj.parent_mesh.is_defining_obj_of(obj);
         end
     end
+    % --- build
     methods
+        %------------------------------------------------------------------
         function build(obj)
-            % ---
-            FEM3dAphijw.setup(obj);
-            % ---
-            build@FEM3dAphi(obj);
             % ---
             if obj.build_done
                 return
             end
-            %--------------------------------------------------------------
-            tic;
-            f_fprintf(0,'Build',1,class(obj),0,'\n');
+            % ---
+            obj.parent_mesh.build;
+            % ---
+            if ~obj.base_matrix_done
+                obj.build_base_matrix;
+                obj.base_matrix_done = 1;
+            end
+            % ---
             %--------------------------------------------------------------
             if isempty(obj.airbox)
                 if ~isfield(obj.parent_mesh.dom,'default_domain')
@@ -107,8 +83,7 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.build_done = 1;
             % ---
         end
-    end
-    methods
+        %------------------------------------------------------------------
         function assembly(obj)
             % ---
             obj.build;
@@ -118,7 +93,6 @@ classdef FEM3dAphijw < FEM3dAphi
                 return
             end
             %--------------------------------------------------------------
-            tic;
             f_fprintf(0,'Assembly',1,class(obj),0,'\n');
             %--------------------------------------------------------------
             parent_mesh = obj.parent_mesh;
@@ -340,10 +314,9 @@ classdef FEM3dAphijw < FEM3dAphi
                 %----------------------------------------------------------------------
             end
         end
-        % -----------------------------------------------------------------
+        % -----------------------------------------------------------------------------
         function postpro(obj)
             %--------------------------------------------------------------------------
-            tic;
             f_fprintf(0,'Postprocessing',1,class(obj),0,'\n');
             f_fprintf(0,'   ');
             %--------------------------------------------------------------------------

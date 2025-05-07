@@ -79,12 +79,15 @@ classdef TriMesh < Mesh2d
             % ---
             if ~obj.build_meshds_done
                 obj.build_meshds;
+                obj.build_meshds_done = 1;
             end
             if ~obj.build_discrete_done
                 obj.build_discrete;
+                obj.build_discrete_done = 1;
             end
             if ~obj.build_intkit_done
                 obj.build_intkit;
+                obj.build_intkit_done = 1;
             end
             % ---
             obj.build_done = 1;
@@ -185,8 +188,4 @@ classdef TriMesh < Mesh2d
             % ---
         end
     end
-
 end
-
-
-
