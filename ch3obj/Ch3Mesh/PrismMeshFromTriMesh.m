@@ -17,27 +17,23 @@
 %--------------------------------------------------------------------------
 
 classdef PrismMeshFromTriMesh < PrismMesh
-
     properties
         parent_mesh1d
         parent_mesh2d
         id_zline
     end
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem','parent_mesh1d','parent_mesh2d', ...
+            argslist = {'id','node','elem','parent_mesh1d','parent_mesh2d', ...
                         'id_zline'};
         end
     end
@@ -46,6 +42,7 @@ classdef PrismMeshFromTriMesh < PrismMesh
         function obj = PrismMeshFromTriMesh(args)
             arguments
                 % --- super
+                args.id
                 args.node
                 args.elem
                 % --- sub
@@ -67,20 +64,24 @@ classdef PrismMeshFromTriMesh < PrismMesh
         end
     end
 
-    % --- setup/reset/build/assembly
+    % --- setup/reset/build/
     methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
             % ---
-            if obj.setup_done
-                return
-            end
+            obj.build_done = 0;
             % ---
-            setup@PrismMesh(obj);
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
             % ---
             if isempty(obj.parent_mesh2d) || isempty(obj.id_zline)
                 return
             end
+            % ---
+            obj.parent_mesh2d.is_defining_obj_of(obj);
+            obj.parent_mesh1d.is_defining_obj_of(obj);
             % ---
             obj.id_zline = f_to_scellargin(obj.id_zline);
             % ---
@@ -176,17 +177,10 @@ classdef PrismMeshFromTriMesh < PrismMesh
             obj.sface = f_area(node_,face_);
             obj.ledge = f_ledge(node_,edge_);
             % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@PrismMesh(obj);
-            % ---
-            obj.setup_done = 0;
             PrismMeshFromTriMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
@@ -195,22 +189,22 @@ classdef PrismMeshFromTriMesh < PrismMesh
     methods
         function build(obj)
             % ---
-            PrismMeshFromTriMesh.setup(obj);
-            % ---
-            build@PrismMesh(obj);
-            % ---
             if obj.build_done
                 return
             end
-            %--------------------------------------------------------------
-            % obj.build_defining_obj;
-            %--------------------------------------------------------------
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+            end
+            % ---
             obj.build_done = 1;
             % ---
         end
     end
-
 end
-
-
-

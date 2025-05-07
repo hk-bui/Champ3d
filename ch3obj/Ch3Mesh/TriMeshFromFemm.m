@@ -17,27 +17,22 @@
 %--------------------------------------------------------------------------
 
 classdef TriMeshFromFemm < TriMesh
-
-    % --- Properties
     properties
         mesh_file
         data
     end
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem','mesh_file'};
+            argslist = {'id','node','elem','mesh_file'};
         end
     end
     % --- Constructors
@@ -45,6 +40,7 @@ classdef TriMeshFromFemm < TriMesh
         function obj = TriMeshFromFemm(args)
             arguments
                 % --- super
+                args.id
                 args.node
                 args.elem
                 % ---
@@ -64,16 +60,17 @@ classdef TriMeshFromFemm < TriMesh
         end
     end
 
-    % --- setup/reset/build/assembly
+    % --- setup/reset/build
     methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
             % ---
-            if obj.setup_done
-                return
-            end
+            obj.build_done = 0;
             % ---
-            setup@TriMesh(obj);
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
             % ---
             if isempty(obj.mesh_file)
                 return
@@ -121,20 +118,14 @@ classdef TriMeshFromFemm < TriMesh
             % --- 2d elem surface
             obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
             % --- edge length
-            % obj.sface = f_area(node_,face_);
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
+            % obj.sface = f_ledge(node_,edge_);
+            % obj.ledge = obj.sface;
             % ---
         end
         % -----------------------------------------------------------------
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@TriMesh(obj);
-            % ---
-            obj.setup_done = 0;
             TriMeshFromFemm.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
@@ -143,16 +134,20 @@ classdef TriMeshFromFemm < TriMesh
     methods
         function build(obj)
             % ---
-            TriMeshFromFemm.setup(obj);
-            % ---
-            build@TriMesh(obj);
-            % ---
             if obj.build_done
                 return
             end
-            %--------------------------------------------------------------
-            % obj.build_defining_obj;
-            %--------------------------------------------------------------
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+            end
+            % ---
             obj.build_done = 1;
             % ---
         end
