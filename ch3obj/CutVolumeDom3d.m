@@ -47,10 +47,10 @@ classdef CutVolumeDom3d < VolumeDom3d
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
-            obj.build;
+            obj.build_from_cutequation;
         end
     end
     methods (Access = public)
@@ -63,7 +63,7 @@ classdef CutVolumeDom3d < VolumeDom3d
     % --- Methods
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------
-        function build(obj)
+        function build_from_cutequation(obj)
             % ---
             gid_elem_ = [];
             gid_side_node_1_ = [];
@@ -110,6 +110,3 @@ classdef CutVolumeDom3d < VolumeDom3d
         end
     end
 end
-
-
-

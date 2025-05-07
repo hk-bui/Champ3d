@@ -44,7 +44,7 @@ classdef SurfaceDom2d < SurfaceDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
             % --- XTODO

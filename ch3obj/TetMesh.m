@@ -17,32 +17,31 @@
 %--------------------------------------------------------------------------
 
 classdef TetMesh < Mesh3d
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = TetMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
             % ---
             obj@Mesh3d;
+            obj.elem_type = 'tetra';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -55,50 +54,46 @@ classdef TetMesh < Mesh3d
         end
     end
 
-    % --- setup/reset/build/assembly
+    % --- setup
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@Mesh3d(obj);
-            % ---
-            obj.elem_type = 'tetra';
-            % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@Mesh3d(obj);
-            % ---
-            obj.setup_done = 0;
             TetMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
+    % --- build
     methods
         function build(obj)
             % ---
-            TetMesh.setup(obj);
-            % --- call super
-            build@Mesh3d(obj);
-            % ---
             if obj.build_done
                 return
+            end
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
             end
             % ---
             obj.build_done = 1;
             % ---
         end
     end
-
     % --- Methods
     methods
         % -----------------------------------------------------------------
@@ -149,7 +144,6 @@ classdef TetMesh < Mesh3d
         end
         % -----------------------------------------------------------------
     end
-
     % --- Methods
     methods (Static)
         function refelem = reference(obj)

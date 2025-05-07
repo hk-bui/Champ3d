@@ -31,13 +31,14 @@ classdef QuadMesh < Mesh2d
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = QuadMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
@@ -54,7 +55,6 @@ classdef QuadMesh < Mesh2d
             QuadMesh.setup(obj);
         end
     end
-
     % --- setup
     methods (Static)
         function setup(obj)
@@ -69,7 +69,6 @@ classdef QuadMesh < Mesh2d
             % ---
         end
     end
-
     methods (Access = public)
         function reset(obj)
             QuadMesh.setup(obj);
@@ -77,7 +76,7 @@ classdef QuadMesh < Mesh2d
             obj.reset_dependent_obj;
         end
     end
-    
+    % --- build
     methods
         function build(obj)
             % ---
@@ -99,7 +98,6 @@ classdef QuadMesh < Mesh2d
             % ---
         end
     end
-
     % --- Methods
     methods
         % -----------------------------------------------------------------

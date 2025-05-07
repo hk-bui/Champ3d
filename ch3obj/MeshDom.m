@@ -17,10 +17,6 @@
 %--------------------------------------------------------------------------
 
 classdef MeshDom < Xhandle
-    properties
-        dependent_obj = []
-        defining_obj = []
-    end
     % --- Dependent Properties
     properties (Dependent = true)
         geoextension

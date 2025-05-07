@@ -17,8 +17,6 @@
 %--------------------------------------------------------------------------
 
 classdef Mesh < Xhandle
-
-    % --- Properties
     properties
         node
         elem
@@ -48,10 +46,6 @@ classdef Mesh < Xhandle
         % ---
         dom
     end
-    properties
-        dependent_obj = []
-        defining_obj = []
-    end
     % --- Dependent Properties
     properties (Dependent = true)
         nb_node
@@ -63,7 +57,6 @@ classdef Mesh < Xhandle
         % ---
         dim
     end
-
     % --- Constructors
     methods
         function obj = Mesh()

@@ -54,7 +54,7 @@ classdef VolumeDom2d < VolumeDom
             % ---
         end
     end
-    % --- setup
+    % --- setup/reset
     methods (Static)
         function setup(obj)
             % ---
@@ -75,7 +75,6 @@ classdef VolumeDom2d < VolumeDom
             obj.reset_dependent_obj;
         end
     end
-
     % --- Methods
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------

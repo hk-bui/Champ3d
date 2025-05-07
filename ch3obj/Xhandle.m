@@ -21,6 +21,10 @@ classdef Xhandle < matlab.mixin.Copyable
     properties
         id
     end
+    properties
+        dependent_obj = []
+        defining_obj = []
+    end
     %----------------------------------------------------------------------
     methods
         function obj = Xhandle()

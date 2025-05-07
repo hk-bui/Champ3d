@@ -32,7 +32,7 @@ classdef QuadMeshFrom1d < QuadMesh
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem','parent_mesh','id_xline', ...
+            argslist = {'id','node','elem','parent_mesh','id_xline', ...
                         'id_yline'};
         end
     end
@@ -40,6 +40,7 @@ classdef QuadMeshFrom1d < QuadMesh
     methods
         function obj = QuadMeshFrom1d(args)
             arguments
+                args.id
                 % --- super
                 args.node
                 args.elem
@@ -61,8 +62,7 @@ classdef QuadMeshFrom1d < QuadMesh
             % ---
         end
     end
-
-    % --- Methods
+    % --- setup
     methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
@@ -76,7 +76,7 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.cal_flatnode;
             % ---
             if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
-                    isempty(obj.id_yline)
+               isempty(obj.id_yline)
                 return
             end
             % ---
@@ -174,7 +174,6 @@ classdef QuadMeshFrom1d < QuadMesh
             % ---
         end
     end
-
     methods (Access = public)
         function reset(obj)
             QuadMeshFrom1d.setup(obj);
@@ -182,7 +181,7 @@ classdef QuadMeshFrom1d < QuadMesh
             obj.reset_dependent_obj;
         end
     end
-
+    % --- build
     methods
         function build(obj)
             % ---
@@ -204,7 +203,6 @@ classdef QuadMeshFrom1d < QuadMesh
             % ---
         end
     end
-    
 end
 
 

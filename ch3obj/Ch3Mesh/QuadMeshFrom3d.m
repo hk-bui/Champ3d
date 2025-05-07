@@ -37,7 +37,7 @@ classdef QuadMeshFrom3d < QuadMesh
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parallel_line_1','parallel_line_2', ...
+            argslist = {'id','parallel_line_1','parallel_line_2', ...
                         'dtype_parallel','dtype_orthogonal', ...
                         'dnum_parallel','dnum_orthogonal', ...
                         'flog'};
@@ -48,6 +48,7 @@ classdef QuadMeshFrom3d < QuadMesh
         function obj = QuadMeshFrom3d(args)
             arguments
                 % --- super
+                args.id
                 args.parallel_line_1
                 args.parallel_line_2
                 args.dtype_parallel {mustBeMember(args.dtype_parallel,{'lin','log+','log-','log+-','log-+','log='})}
@@ -69,8 +70,7 @@ classdef QuadMeshFrom3d < QuadMesh
             % ---
         end
     end
-
-    % --- Methods
+    % --- setup
     methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
@@ -164,7 +164,7 @@ classdef QuadMeshFrom3d < QuadMesh
         end
         % -----------------------------------------------------------------
     end
-
+    % --- reset
     methods (Access = public)
         function reset(obj)
             QuadMeshFrom3d.setup(obj);
@@ -172,7 +172,7 @@ classdef QuadMeshFrom3d < QuadMesh
             obj.reset_dependent_obj;
         end
     end
-
+    % --- build
     methods
         function build(obj)
             % ---
@@ -195,6 +195,3 @@ classdef QuadMeshFrom3d < QuadMesh
         end
     end
 end
-
-
-

@@ -17,27 +17,9 @@
 %--------------------------------------------------------------------------
 
 classdef SurfaceDom3d < SurfaceDom
-
-    % --- Properties
     properties
         id_dom3d
     end
-
-    % --- subfields to build
-    properties
-        
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -71,7 +53,7 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
         end
     end
-    % --- setup
+    % --- setup/reset
     methods (Static)
         function setup(obj)
             % --- XTODO : which come first

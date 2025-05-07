@@ -54,7 +54,7 @@ classdef VolumeDom3d < VolumeDom
             % ---
         end
     end
-    % --- setup
+    % --- setup/reset
     methods (Static)
         function setup(obj)
             % must try id_zline first -> elem_code

@@ -53,7 +53,7 @@ classdef VolumeDom < MeshDom
             % ---
         end
     end
-    % --- setup
+    % --- setup/reset
     methods (Static)
         function setup(obj)
             % ---

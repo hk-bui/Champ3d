@@ -17,27 +17,28 @@
 %--------------------------------------------------------------------------
 
 classdef TriMesh < Mesh2d
-
-    % --- Properties
     properties
         lid_face
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
+    properties (Access = private)
+        build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = TriMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
@@ -51,17 +52,45 @@ classdef TriMesh < Mesh2d
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            TriMesh.setup(obj);
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
+            obj.build_done = 0;
+            % ---
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
+            % ---
             obj.cal_flatnode;
         end
     end
-
+    % --- build
+    methods
+        function build(obj)
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
     % --- Methods
     methods
         % -----------------------------------------------------------------

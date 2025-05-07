@@ -17,22 +17,16 @@
 %--------------------------------------------------------------------------
 
 classdef PhysicalDom < Xhandle
-
-    % --- entry
     properties
         parent_model
         id_dom2d
         id_dom3d
         % ---
+        dom
+        % ---
         % 'by_coordinates', 'by_id_dom'[by default]
         parameter_dependency_search = 'by_id_dom'
     end
-
-    % --- computed
-    properties
-        dom
-    end
-
     % --- Contructor
     methods
         function obj = PhysicalDom()
@@ -41,7 +35,6 @@ classdef PhysicalDom < Xhandle
             % ---
         end
     end
-    
     % --- Utility Methods
     methods
         function set_parameter(obj)
@@ -92,7 +85,6 @@ classdef PhysicalDom < Xhandle
         end
         % -----------------------------------------------------------------
     end
-
     % --- Methods
     methods
         function plot(obj,args)

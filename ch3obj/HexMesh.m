@@ -28,13 +28,14 @@ classdef HexMesh < Mesh3d
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = HexMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
@@ -71,6 +72,7 @@ classdef HexMesh < Mesh3d
             obj.reset_dependent_obj;
         end
     end
+    % --- build
     methods
         function build(obj)
             % ---
@@ -92,7 +94,6 @@ classdef HexMesh < Mesh3d
             % ---
         end
     end
-
     % --- Methods
     methods
         % -----------------------------------------------------------------

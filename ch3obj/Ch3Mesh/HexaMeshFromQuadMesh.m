@@ -33,7 +33,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem','parent_mesh1d','parent_mesh2d', ...
+            argslist = {'id','node','elem','parent_mesh1d','parent_mesh2d', ...
                         'id_zline'};
         end
     end
@@ -41,6 +41,7 @@ classdef HexaMeshFromQuadMesh < HexMesh
     methods
         function obj = HexaMeshFromQuadMesh(args)
             arguments
+                args.id
                 % --- super
                 args.node
                 args.elem
@@ -215,6 +216,3 @@ classdef HexaMeshFromQuadMesh < HexMesh
         end
     end
 end
-
-
-

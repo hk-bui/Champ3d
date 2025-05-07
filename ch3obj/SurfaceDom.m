@@ -54,7 +54,7 @@ classdef SurfaceDom < MeshDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
             % ---
@@ -109,7 +109,6 @@ classdef SurfaceDom < MeshDom
             % ---
         end
     end
-
     % --- Methods
     methods (Access = protected)
         % -----------------------------------------------------------------
@@ -261,5 +260,4 @@ classdef SurfaceDom < MeshDom
             % ---
         end
     end
-
 end
