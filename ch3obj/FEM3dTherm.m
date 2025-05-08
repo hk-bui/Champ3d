@@ -105,7 +105,7 @@ classdef FEM3dTherm < ThModel
                 obj
                 args.tol_out = 1e-3; % tolerance of outer loop
                 args.tol_in  = 1e-6; % tolerance of inner loop
-                args.maxniter_out = 3; % maximum iteration of outer loop
+                args.maxniter_out = 5; % maximum iteration of outer loop
                 args.maxniter_in = 1e3; % maximum iteration of inner loop
             end
             % ---
@@ -121,9 +121,9 @@ classdef FEM3dTherm < ThModel
             arguments
                 obj
                 args.it = []
-                args.tol_out = 1e-3; % tolerance of outer loop
-                args.tol_in  = 1e-6; % tolerance of inner loop
-                args.maxniter_out = 3; % maximum iteration of outer loop
+                args.tol_out = 1e-3;    % tolerance of outer loop
+                args.tol_in  = 1e-6;    % tolerance of inner loop
+                args.maxniter_out = 5;  % maximum iteration of outer loop
                 args.maxniter_in = 1e3; % maximum iteration of inner loop
             end
             % --- which it
@@ -167,10 +167,10 @@ classdef FEM3dTherm < ThModel
                 tol_in = args.tol_in;
                 maxniter_in = args.maxniter_in;
                 %----------------------------------------------------------
-                erro = 1;
+                improvement = 1;
                 niter_out = 0;
                 % ---
-                while erro > tol_out && niter_out < maxniter_out
+                while improvement > tol_out && niter_out < maxniter_out
                     % ---
                     obj.assembly;
                     % ---
@@ -188,17 +188,21 @@ classdef FEM3dTherm < ThModel
                     % ---
                     if niter_out == 1
                         % out-loop one more time
-                        erro = 1;
+                        if any(x0)
+                            improvement = norm(x0 - x)/norm(x0);
+                        else
+                            improvement = 1;
+                        end
                         x0 = x;
                     elseif niter > 1
                         % for linear prob, niter = 0 for 2nd out-loop
-                        erro = norm(x0 - x)/norm(x0);
+                        improvement = norm(x0 - x)/norm(x0);
                         x0 = x;
                     else
-                        erro = 0;
+                        improvement = 0;
                     end
                     % ---
-                    f_fprintf(0,'e',1,erro,0,'\n');
+                    f_fprintf(0,'improvement',1,improvement*100,0,'%% \n');
                     f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
                     %------------------------------------------------------
                     % --- update now, for assembly
