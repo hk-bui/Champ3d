@@ -71,7 +71,6 @@ classdef ThPv < PhysicalDom
             obj.matrix.pv_array = [];
             obj.matrix.pvwn = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end

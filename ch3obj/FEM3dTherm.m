@@ -177,9 +177,9 @@ classdef FEM3dTherm < ThModel
                     niter_out = niter_out + 1;
                     f_fprintf(0,'--- iter-out',1,niter_out);
                     % ---
-                    if niter_out == 1
-                        x0 = [];
-                    end
+                    % if niter_out == 1
+                    %     x0 = [];
+                    % end
                     % --- qmr + jacobi
                     M = sqrt(diag(diag(obj.matrix.LHS)));
                     [x,flag,relres,niter,resvec] = ...
