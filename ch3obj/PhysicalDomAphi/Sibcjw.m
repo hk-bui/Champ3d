@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SibcAphijw < Sibc
+classdef Sibcjw < PhysicalDom
     properties
         sigma = 0
         mur = 1
@@ -40,7 +40,7 @@ classdef SibcAphijw < Sibc
     end
     % --- Contructor
     methods
-        function obj = SibcAphijw(args)
+        function obj = Sibcjw(args)
             arguments
                 args.id
                 args.parent_model
@@ -55,7 +55,7 @@ classdef SibcAphijw < Sibc
                     = 'by_id_dom'
             end
             % ---
-            obj = obj@Sibc;
+            obj = obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -63,7 +63,7 @@ classdef SibcAphijw < Sibc
             % ---
             obj <= args;
             % ---
-            SibcAphijw.setup(obj);
+            Sibcjw.setup(obj);
             % ---
         end
     end
@@ -110,7 +110,7 @@ classdef SibcAphijw < Sibc
     methods (Access = public)
         function reset(obj)
             obj.setup_done = 0;
-            SibcAphijw.setup(obj);
+            Sibcjw.setup(obj);
         end
     end
     % --- build

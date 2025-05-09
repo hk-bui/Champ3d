@@ -17,10 +17,156 @@
 %--------------------------------------------------------------------------
 
 classdef Mconductor < PhysicalDom
+    properties
+        mur
+        % ---
+        matrix
+    end
+    % ---
+    properties (Access = private)
+        setup_done = 0
+        build_done = 0
+    end
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'id','parent_model','id_dom3d','mur','parameter_dependency_search'};
+        end
+    end
     % --- Contructor
     methods
-        function obj = Mconductor()
+        function obj = Mconductor(args)
+            arguments
+                args.id
+                args.parent_model
+                args.id_dom3d
+                args.mur
+                args.parameter_dependency_search ...
+                    {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
+                    = 'by_id_dom'
+            end
+            % ---
             obj = obj@PhysicalDom;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
+            obj <= args;
+            % ---
+            Mconductor.setup(obj);
+        end
+    end
+
+    % --- setup
+    methods (Static)
+        function setup(obj)
+            % ---
+            if obj.setup_done
+                return
+            end
+            % --- special case
+            
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.nu0nurwfwf = [];
+            obj.matrix.nur_array = [];
+            obj.matrix.mur_array = [];
+            % ---
+            obj.setup_done = 1;
+            obj.build_done = 0;
+            % ---
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            obj.setup_done = 0;
+            Mconductor.setup(obj);
+        end
+    end
+    % --- build
+    methods
+        function build(obj)
+            % ---
+            dom = obj.dom;
+            parent_mesh = dom.parent_mesh;
+            gid_elem = dom.gid_elem;
+            % ---
+            mu0 = 4 * pi * 1e-7;
+            nu0 = 1/mu0;
+            % ---
+            mur_array = obj.mur.getvalue('in_dom',dom);
+            nur_array = obj.mur.get_inverse('in_dom',dom);
+            nu0nur = nu0 .* nur_array;
+            % --- check changes
+            is_changed = 1;
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
+                return
+            end
+            %--------------------------------------------------------------
+            % local nu0nurwfwf matrix
+            nu0nurwfwf = parent_mesh.cwfwf('id_elem',gid_elem,'coefficient',nu0nur);
+            % ---
+            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.nu0nurwfwf = nu0nurwfwf;
+            obj.matrix.nur_array = nur_array;
+            obj.matrix.mur_array = mur_array;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+            % ---
+            obj.build;
+            %--------------------------------------------------------------
+            id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
+            id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
+            nb_face = obj.parent_model.parent_mesh.nb_face;
+            nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
+            %--------------------------------------------------------------
+            gid_elem = obj.matrix.gid_elem;
+            lmatrix = obj.matrix.nu0nurwfwf;
+            %--------------------------------------------------------------
+            [~,id_] = intersect(gid_elem,id_elem_nomesh);
+            gid_elem(id_) = [];
+            lmatrix(id_,:,:) = [];
+            %--------------------------------------------------------------
+            % global elementary nu0nurwfwf matrix
+            nu0nurwfwf = sparse(nb_face,nb_face);
+            %--------------------------------------------------------------
+            for i = 1:nbFa_inEl
+                for j = i+1 : nbFa_inEl
+                    nu0nurwfwf = nu0nurwfwf + ...
+                        sparse(id_face_in_elem(i,gid_elem),id_face_in_elem(j,gid_elem),...
+                        lmatrix(:,i,j),nb_face,nb_face);
+                end
+            end
+            % ---
+            nu0nurwfwf = nu0nurwfwf + nu0nurwfwf.';
+            % ---
+            for i = 1:nbFa_inEl
+                nu0nurwfwf = nu0nurwfwf + ...
+                    sparse(id_face_in_elem(i,gid_elem),id_face_in_elem(i,gid_elem),...
+                    lmatrix(:,i,i),nb_face,nb_face);
+            end
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.nu0nurwfwf = ...
+                obj.parent_model.matrix.nu0nurwfwf + nu0nurwfwf;
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.id_elem_mcon = ...
+                [obj.parent_model.matrix.id_elem_mcon obj.matrix.gid_elem];
+            %--------------------------------------------------------------
         end
     end
 end

@@ -17,10 +17,91 @@
 %--------------------------------------------------------------------------
 
 classdef Nomesh < PhysicalDom
+
+    % --- computed
+    properties
+        matrix
+    end
+
+    % --- computed
+    properties (Access = private)
+        build_done = 0
+        assembly_done = 0
+    end
+    
+    % --- Valid args list
+    methods (Static)
+        function argslist = validargs()
+            argslist = {'id','parent_model','id_dom3d'};
+        end
+    end
     % --- Contructor
     methods
-        function obj = Nomesh()
+        function obj = Nomesh(args)
+            arguments
+                args.parent_model
+                args.id_dom2d
+                args.id_dom3d
+            end
+            % ---
             obj = obj@PhysicalDom;
+            % ---
+            if isempty(fieldnames(args))
+                return
+            end
+            % ---
+            obj <= args;
+            % ---
+            obj.setup;
+        end
+    end
+
+    % --- setup
+    methods
+        function setup(obj)
+            setup@Nomesh(obj);
+        end
+    end
+
+    % --- build
+    methods
+        function build(obj)
+            % ---
+            obj.setup;
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            dom = obj.dom;
+            obj.dom.get_gid;
+            obj.matrix.gid_elem = dom.gid.gid_elem;
+            obj.matrix.gid_inner_edge = dom.gid.gid_inner_edge;
+            obj.matrix.gid_inner_node = dom.gid.gid_inner_node;
+            % ---
+            obj.build_done = 1;
+        end
+    end
+
+    % --- assembly
+    methods
+        function assembly(obj)
+
+        end
+    end
+
+    % --- reset
+    methods
+        function reset(obj)
+            if isprop(obj,'setup_done')
+                obj.setup_done = 0;
+            end
+            if isprop(obj,'build_done')
+                obj.build_done = 0;
+            end
+            if isprop(obj,'assembly_done')
+                obj.assembly_done = 0;
+            end
         end
     end
 end
