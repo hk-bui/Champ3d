@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef AirboxAphi < Airbox
+classdef Airbox < PhysicalDom
     properties
         matrix
     end
@@ -33,14 +33,14 @@ classdef AirboxAphi < Airbox
     end
     % --- Contructor
     methods
-        function obj = AirboxAphi(args)
+        function obj = Airbox(args)
             arguments
                 args.id
                 args.parent_model
                 args.id_dom3d
             end
             % ---
-            obj = obj@Airbox;
+            obj = obj@PhysicalDom;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -48,7 +48,7 @@ classdef AirboxAphi < Airbox
             % ---
             obj <= args;
             % ---
-            AirboxAphi.setup(obj);
+            Airbox.setup(obj);
         end
     end
 
@@ -76,7 +76,7 @@ classdef AirboxAphi < Airbox
     methods (Access = public)
         function reset(obj)
             obj.setup_done = 0;
-            AirboxAphi.setup(obj);
+            Airbox.setup(obj);
         end
     end
     % --- build
