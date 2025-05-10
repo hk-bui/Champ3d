@@ -95,7 +95,7 @@ classdef PMagnet < PhysicalDom
             obj.matrix.br_array = br_array;
             %--------------------------------------------------------------
             % local wfbs matrix
-            lmatrix = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',bs_array);
+            lmatrix = parent_mesh.cwfvf('id_elem',gid_elem,'vector_field',br_array);
             %--------------------------------------------------------------
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             nb_face = obj.parent_model.parent_mesh.nb_face;
@@ -124,7 +124,7 @@ classdef PMagnet < PhysicalDom
             %--------------------------------------------------------------
             % --- qmr + jacobi
             M = sqrt(diag(diag(rotrot)));
-            a_pm = qmr(rotrot, rotb, 1e-6, 5e3, M.', M);
+            [a_pm,flag,relres,niter,resvec] = qmr(rotrot, rotb, 1e-6, 5e3, M.', M);
             %--------------------------------------------------------------
             obj.matrix.wfbr = wfbr;
             obj.matrix.a_pm = a_pm;

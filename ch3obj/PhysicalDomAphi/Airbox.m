@@ -87,6 +87,11 @@ classdef Airbox < PhysicalDom
     methods
         function assembly(obj)
             obj.build;
+            % ---
+            obj.parent_model.matrix.id_elem_airbox = ...
+                [obj.parent_model.matrix.id_elem_airbox obj.matrix.gid_elem];
+            obj.parent_model.matrix.id_inner_edge_airbox = ...
+                [obj.parent_model.matrix.id_inner_edge_airbox obj.matrix.gid_inner_edge];
         end
     end
 end

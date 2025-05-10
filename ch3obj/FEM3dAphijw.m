@@ -61,7 +61,15 @@ classdef FEM3dAphijw < FEM3dAphi
             end
             % ---
             obj.parent_mesh.build;
-            % ---
+            %--------------------------------------------------------------
+            if isempty(obj.airbox)
+                if ~isfield(obj.parent_mesh.dom,'whole_mesh_dom')
+                    obj.parent_mesh.add_whole_mesh_dom;
+                end
+                obj.airbox.by_default_airbox = ...
+                    Airbox('parent_model',obj,'id_dom3d','whole_mesh_dom');
+            end
+            %--------------------------------------------------------------
             if ~obj.base_matrix_done
                 obj.build_base_matrix;
                 obj.base_matrix_done = 1;
@@ -94,14 +102,6 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.t_js = zeros(nb_edge,1);
             obj.matrix.a_bs = zeros(nb_edge,1);
             obj.matrix.a_pm = zeros(nb_edge,1);
-            %--------------------------------------------------------------
-            if isempty(obj.airbox)
-                if ~isfield(obj.parent_mesh.dom,'whole_mesh_dom')
-                    obj.parent_mesh.add_whole_mesh_dom;
-                end
-                obj.airbox.by_default_airbox = ...
-                    AirboxAphi('parent_model',obj,'id_dom3d','whole_mesh_dom');
-            end
             %--------------------------------------------------------------
             allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
                 'bsfield','coil','nomesh','pmagnet','embc'};
@@ -281,9 +281,13 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.dof{it}.V = GlobalQuantityDof('parent_model',obj);
             %--------------------------------------------------------------
             obj.field{it}.A.elem = ...
-                AelemField('parent_model',obj,'dof',obj.dof{it}.A);
-            obj.field{it}.A.face = ...
-                AfaceField('parent_model',obj,'dof',obj.dof{it}.A);
+                EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.A);
+            obj.field{it}.B.elem = ...
+                FaceDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.B);
+            obj.field{it}.E.elem = ...
+                EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.E);
+            obj.field{it}.E.face = ...
+                EdgeDofBasedVectorFaceField('parent_model',obj,'dof',obj.dof{it}.E);
             %--------------------------------------------------------------
             f_fprintf(0,'Solveone',1,class(obj),0,'it ---',1,num2str(it),0,'\n');
             %----------------------------------------------------------
@@ -347,7 +351,7 @@ classdef FEM3dAphijw < FEM3dAphi
                     improvement = 0;
                 end
                 % ---
-                f_fprintf(0,'improvement',1,improvement*100,0,'\% \n');
+                f_fprintf(0,'improvement',1,improvement*100,0,'%% \n');
                 f_fprintf(0,'--- iter-in',1,niter,0,'relres',1,relres,0,'\n');
                 %------------------------------------------------------
                 % --- update now, for assembly

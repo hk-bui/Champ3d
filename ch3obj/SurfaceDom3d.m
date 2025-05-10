@@ -102,6 +102,10 @@ classdef SurfaceDom3d < SurfaceDom
                 id3 = id_dom3d_{i};
                 valid3 = f_validid(id3,all_id3);
                 % ---
+                if isempty(valid3)
+                    error(['dom3d ' id3 ' not found !']);
+                end
+                % ---
                 for j = 1:length(valid3)
                     % ---
                     dom3d = obj.parent_mesh.dom.(valid3{j});
@@ -142,12 +146,17 @@ classdef SurfaceDom3d < SurfaceDom
                 for j = 1:length(id_dom3d_{i})
                     id3 = id_dom3d_{i}{j};
                     valid3 = f_validid(id3,all_id3);
-                    for j = 1:length(valid3)
+                    % ---
+                    if isempty(valid3)
+                        error(['dom3d ' id3 ' not found !']);
+                    end
+                    % ---
+                    for k = 1:length(valid3)
                         % ---
-                        dom3d = obj.parent_mesh.dom.(valid3{j});
+                        dom3d = obj.parent_mesh.dom.(valid3{k});
                         dom3d.is_defining_obj_of(obj);
                         % ---
-                        elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
+                        elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{k}).gid_elem)];
                     end
                 end
                 %--------------------------------------------------------------

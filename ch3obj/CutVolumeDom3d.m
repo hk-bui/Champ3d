@@ -69,8 +69,16 @@ classdef CutVolumeDom3d < VolumeDom3d
             gid_side_node_1_ = [];
             gid_side_node_2_ = [];
             iddom3 = f_to_scellargin(obj.id_dom3d);
+            all_id3 = fieldnames(obj.parent_mesh.dom);
             for i = 1:length(iddom3)
-                dom2cut = obj.parent_mesh.dom.(iddom3{i});
+                id3 = iddom3{i};
+                valid3 = f_validid(id3,all_id3);
+                % ---
+                if isempty(valid3)
+                    error(['dom3d ' id3 ' not found !']);
+                end
+                % ---
+                dom2cut = obj.parent_mesh.dom.(id3);
                 cut_dom = dom2cut.get_cutdom('cut_equation',obj.cut_equation);
                 gid_elem_ = [gid_elem_ cut_dom.gid_elem];
                 gid_side_node_1_ = [gid_side_node_1_ cut_dom.gid_side_node_1];

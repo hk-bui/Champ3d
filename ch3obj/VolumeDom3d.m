@@ -96,6 +96,10 @@ classdef VolumeDom3d < VolumeDom
                     iddom2d = id_dom2d_{i}{j};
                     valid_iddom2d = f_validid(iddom2d,all_id_dom2d);
                     % ---
+                    if isempty(valid_iddom2d)
+                        error(['dom2d ' iddom2d ' not found !']);
+                    end
+                    % ---
                     for m = 1:length(valid_iddom2d)
                         % ---
                         dom2d = obj.parent_mesh.parent_mesh2d.dom.(valid_iddom2d{m});
@@ -107,6 +111,10 @@ classdef VolumeDom3d < VolumeDom
                             for k = 1:length(id_zline_{i})
                                 idz = id_zline_{i}{k};
                                 valid_idz = f_validid(idz,all_id_mesh1d);
+                                % ---
+                                if isempty(valid_idz)
+                                    error(['zline ' idz ' not found !']);
+                                end
                                 % ---
                                 for l = 1:length(valid_idz)
                                     % ---

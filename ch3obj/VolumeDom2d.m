@@ -93,6 +93,10 @@ classdef VolumeDom2d < VolumeDom
                     idx = id_xline_{i}{j};
                     valid_idx = f_validid(idx,all_id_mesh1d);
                     % ---
+                    if isempty(valid_idx)
+                        error(['xline ' idx ' not found !']);
+                    end
+                    % ---
                     for m = 1:length(valid_idx)
                         % ---
                         xlineobj = obj.parent_mesh.parent_mesh.dom.(valid_idx{m});
@@ -104,6 +108,10 @@ classdef VolumeDom2d < VolumeDom
                         for k = 1:length(id_yline_{i})
                             idy = id_yline_{i}{k};
                             valid_idy = f_validid(idy,all_id_mesh1d);
+                            % ---
+                            if isempty(valid_idy)
+                                error(['yline ' idy ' not found !']);
+                            end
                             % ---
                             for l = 1:length(valid_idy)
                                 % ---

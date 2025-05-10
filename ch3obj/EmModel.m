@@ -111,7 +111,7 @@ classdef EmModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Econductor');
             % ---
             if isa(obj,'FEM3dAphi')
-                phydom = EconductorAphi(argu{:});
+                phydom = Econductor(argu{:});
             end
             % ---
             obj.econductor.(args.id) = phydom;
@@ -131,7 +131,7 @@ classdef EmModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Airbox');
             % ---
             if isa(obj,'FEM3dAphi')
-                phydom = AirboxAphi(argu{:});
+                phydom = Airbox(argu{:});
             end
             % ---
             obj.airbox.(args.id) = phydom;
@@ -151,7 +151,7 @@ classdef EmModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Nomesh');
             % ---
             if isa(obj,'FEM3dAphi')
-                phydom = NomeshAphi(argu{:});
+                phydom = Nomesh(argu{:});
             end
             % ---
             obj.nomesh.(args.id) = phydom;
@@ -204,7 +204,7 @@ classdef EmModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Bsfield');
             % ---
             if isa(obj,'FEM3dAphi')
-                phydom = BsfieldAphi(argu{:});
+                phydom = Bsfield(argu{:});
             end
             % ---
             obj.bsfield.(args.id) = phydom;
@@ -319,7 +319,7 @@ classdef EmModel < PhysicalModel
             argu = f_to_namedarg(args,'for','Mconductor');
             % ---
             if isa(obj,'FEM3dAphi')
-                phydom = MconductorAphi(argu{:});
+                phydom = Mconductor(argu{:});
             end
             % ---
             obj.mconductor.(args.id) = phydom;
@@ -340,7 +340,7 @@ classdef EmModel < PhysicalModel
             argu = f_to_namedarg(args,'for','PMagnet');
             % ---
             if isa(obj,'FEM3dAphi')
-                phydom = PMagnetAphi(argu{:});
+                phydom = PMagnet(argu{:});
             end
             % ---
             obj.pmagnet.(args.id) = phydom;
