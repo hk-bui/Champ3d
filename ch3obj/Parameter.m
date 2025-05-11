@@ -132,7 +132,7 @@ classdef Parameter < Xhandle
             % ---
             if lensv == 2
                 if sizev(2) == 1
-                    if any(sizev(1) == [1 2 3])
+                    if any(sizev(1) == [2 3])
                         if f_strcmpi(parameter_type,'vector')
                             vout = - vin;
                         else

@@ -70,11 +70,11 @@ classdef FEM3dAphijw < FEM3dAphi
                     Airbox('parent_model',obj,'id_dom3d','whole_mesh_dom');
             end
             %--------------------------------------------------------------
-            if ~obj.base_matrix_done
-                obj.build_base_matrix;
-                obj.base_matrix_done = 1;
-            end
-            %---
+            % if ~obj.base_matrix_done
+            %     obj.build_base_matrix;
+            %     obj.base_matrix_done = 1;
+            % end
+            %--------------------------------------------------------------
             obj.build_done = 1;
             % ---
         end
@@ -93,18 +93,33 @@ classdef FEM3dAphijw < FEM3dAphi
             nb_node = parent_mesh.nb_node;
             %--------------------------------------------------------------
             obj.matrix.id_edge_a = 1:nb_edge;
+            obj.matrix.id_elem_nomesh = [];
+            obj.matrix.id_inner_edge_nomesh = [];
+            obj.matrix.id_inner_node_nomesh = [];
+            obj.matrix.id_elem_airbox = [];
+            obj.matrix.id_inner_edge_airbox = [];
             obj.matrix.id_node_phi = [];
             obj.matrix.id_elem_mcon = [];
             obj.matrix.id_node_petrode = [];
             obj.matrix.id_node_netrode = [];
+            %--------------------------------------------------------------
             obj.matrix.sigmawewe = sparse(nb_edge,nb_edge);
             obj.matrix.nu0nurwfwf = sparse(nb_face,nb_face);
+            %--------------------------------------------------------------
             obj.matrix.t_js = zeros(nb_edge,1);
             obj.matrix.a_bs = zeros(nb_edge,1);
             obj.matrix.a_pm = zeros(nb_edge,1);
             %--------------------------------------------------------------
-            allowed_physical_dom = {'econductor','mconductor','airbox','sibc',...
-                'bsfield','coil','nomesh','pmagnet','embc'};
+            allowed_physical_dom = {'nomesh','airbox','mconductor'};
+            %--------------------------------------------------------------
+            obj.callsubfieldassembly('field_name',allowed_physical_dom);
+            %--------------------------------------------------------------
+            if ~obj.base_matrix_done
+                obj.build_base_matrix;
+                obj.base_matrix_done = 1;
+            end
+            %--------------------------------------------------------------
+            allowed_physical_dom = {'econductor','sibc','bsfield','coil','pmagnet','embc'};
             %--------------------------------------------------------------
             obj.callsubfieldassembly('field_name',allowed_physical_dom);
             %--------------------------------------------------------------
@@ -138,6 +153,7 @@ classdef FEM3dAphijw < FEM3dAphi
             id_face_in_elem_air = f_uniquenode(id_face_in_elem(:,id_elem_air));
             mu0 = 4 * pi * 1e-7;
             nu0wfwf = (1/mu0) .* obj.matrix.wfwfx;
+            nu0nurwfwf0 = obj.matrix.nu0nurwfwf;
             % ---
             obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) = ...
                 obj.matrix.nu0nurwfwf(id_face_in_elem_air,id_face_in_elem_air) + ...
@@ -160,12 +176,20 @@ classdef FEM3dAphijw < FEM3dAphi
             LHS = [LHS; S12.' S22]; clear S12 S22;
             %--------------------------------------------------------------
             % --- RHS
-            % bsfieldRHS = - obj.parent_mesh.discrete.rot.' * ...
+            % bsfieldRHS = obj.parent_mesh.discrete.rot.' * ...
             %     obj.matrix.nu0nurwfwf * ...
             %     obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
             % ---
-            bsfieldRHS = - obj.parent_mesh.discrete.rot.' * ...
-                ((1/mu0).* obj.matrix.wfwf) * ...
+            % bsfieldRHS =   obj.parent_mesh.discrete.rot.' * ...
+            %     ((1/mu0).* obj.matrix.wfwf) * ...
+            %     obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
+            % ---
+            % bsfieldRHS =   obj.parent_mesh.discrete.rot.' * ...
+            %     ((1/mu0).* obj.matrix.wfwfx) * ...
+            %     obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
+            % ---
+            bsfieldRHS =   obj.parent_mesh.discrete.rot.' * ...
+                ((1/mu0).* obj.matrix.wfwf - nu0nurwfwf0) * ...
                 obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
             % ---
             pmagnetRHS =   obj.parent_mesh.discrete.rot.' * ...

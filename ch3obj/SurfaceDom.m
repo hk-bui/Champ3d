@@ -183,6 +183,17 @@ classdef SurfaceDom < MeshDom
             argu = f_to_namedarg(args);
             for i = 1:length(submesh_)
                 submesh_{i}.plot(argu{:}); hold on
+                % ---
+                celem = submesh_{i}.cal_celem;
+                celem = celem(:,1);
+                id = replace(obj.id,'_','-');
+                if length(celem) == 2
+                    t = text(celem(1),celem(2),id);
+                    t.FontWeight = 'bold';
+                elseif length(celem) == 3
+                    t = text(celem(1),celem(2),celem(3),id);
+                    t.FontWeight = 'bold';
+                end
             end
             % ---
         end

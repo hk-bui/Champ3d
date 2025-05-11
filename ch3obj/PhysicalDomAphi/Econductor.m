@@ -159,7 +159,7 @@ classdef Econductor < PhysicalDom
                 obj.parent_model.matrix.sigmawewe + obj.matrix.sigmawewe;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_phi = ...
-                [obj.parent_model.matrix.id_node_phi obj.matrix.gid_node_phi];
+                unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);
             %--------------------------------------------------------------
         end
     end

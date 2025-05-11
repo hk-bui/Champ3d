@@ -333,38 +333,53 @@ classdef VolumeDom < MeshDom
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
                 args.id = ''
             end
+            % --- elem_code-info
+            % elcode = [];
+            % if ~isempty(obj.elem_code)
+            %     codemin = min(obj.elem_code);
+            %     codemax = max(obj.elem_code);
+            %     if codemax == codemin
+            %         elcode = num2str(codemax);
+            %     else
+            %         elcode = [num2str(codemin) '-' num2str(codemax)];
+            %     end
+            %     % ---
+            %     elcode = [args.id ':' elcode];
+            % end
             % ---
-            % obj.build;
-            % obj.parent_mesh.build;
-            % --- id-info
-            elcode = [];
-            if ~isempty(obj.elem_code)
-                codemin = min(obj.elem_code);
-                codemax = max(obj.elem_code);
-                if codemax == codemin
-                    elcode = num2str(codemax);
-                else
-                    elcode = [num2str(codemin) '-' num2str(codemax)];
-                end
-                % ---
-                elcode = [args.id ':' elcode];
-            end
-            % ---
+            % submesh_ = obj.submesh;
+            % argu = f_to_namedarg(args,'with_out','id');
+            % for i = 1:length(submesh_)
+            %     submesh_{i}.plot(argu{:}); hold on
+            %     % ---
+            %     submesh_{i}.build_meshds('get','celem');
+            %     cnode = submesh_{i}.celem(:,1);
+            %     if length(cnode) == 2
+            %         t = text(cnode(1),cnode(2),obj.id);
+            %         t.FontWeight = 'bold';
+            %     elseif length(cnode) == 3
+            %         t = text(cnode(1),cnode(2),cnode(3),obj.id);
+            %         t.FontWeight = 'bold';
+            %     end
+            % end
+            % ----------------------------------------------------
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args,'with_out','id');
             for i = 1:length(submesh_)
                 submesh_{i}.plot(argu{:}); hold on
                 % ---
-                submesh_{i}.build_meshds('get','celem');
-                cnode = submesh_{i}.celem(:,1);
-                if length(cnode) == 2
-                    t = text(cnode(1),cnode(2),elcode);
+                celem = submesh_{i}.cal_celem;
+                celem = celem(:,1);
+                id = replace(obj.id,'_','-');
+                if length(celem) == 2
+                    t = text(celem(1),celem(2),id);
                     t.FontWeight = 'bold';
-                elseif length(cnode) == 3
-                    t = text(cnode(1),cnode(2),cnode(3),elcode);
+                elseif length(celem) == 3
+                    t = text(celem(1),celem(2),celem(3),id);
                     t.FontWeight = 'bold';
                 end
             end
+            % ----------------------------------------------------
         end
     end
 

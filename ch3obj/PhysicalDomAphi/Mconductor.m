@@ -159,7 +159,7 @@ classdef Mconductor < PhysicalDom
                 obj.parent_model.matrix.nu0nurwfwf + obj.matrix.nu0nurwfwf;
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_elem_mcon = ...
-                [obj.parent_model.matrix.id_elem_mcon obj.matrix.gid_elem];
+                unique([obj.parent_model.matrix.id_elem_mcon, obj.matrix.gid_elem]);
             %--------------------------------------------------------------
         end
     end

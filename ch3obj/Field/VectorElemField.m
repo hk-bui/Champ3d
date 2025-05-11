@@ -67,7 +67,14 @@ classdef VectorElemField < ElemField
             % ---
             celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
             if isreal(obj.cvalue(gid_elem(1)))
+                % ---
+                subplot(121)
                 f_quiver(celem,obj.cvalue(gid_elem));
+                % ---
+                subplot(122)
+                node_ = obj.parent_model.parent_mesh.node;
+                elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
+                f_patch('node',node_,'elem',elem,'elem_field',f_magnitude(obj.cvalue(gid_elem)));
             else
                 for i = 1:3
                     % ---
