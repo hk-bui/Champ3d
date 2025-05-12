@@ -32,12 +32,12 @@ classdef SurfaceDom3d < SurfaceDom
         function obj = SurfaceDom3d(args)
             arguments
                 % ---
-                args.id = []
-                args.parent_mesh = []
-                args.gid_face = []
-                args.condition = []
+                args.id
+                args.parent_mesh
+                args.gid_face
+                args.condition
                 % ---
-                args.defined_on char = []
+                args.defined_on char
                 args.id_dom3d
             end
             % ---
@@ -71,11 +71,13 @@ classdef SurfaceDom3d < SurfaceDom
                     obj.build_from_formular;
                 end
             else
-                switch lower(obj.defined_on)
-                    case {'bound_face','bound'}
-                        obj.build_from_boundface;
-                    case {'interface'}
-                        obj.build_from_interface;
+                if ~isempty(obj.defined_on)
+                    switch lower(obj.defined_on)
+                        case {'bound_face','bound'}
+                            obj.build_from_boundface;
+                        case {'interface'}
+                            obj.build_from_interface;
+                    end
                 end
             end
             % ---

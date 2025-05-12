@@ -18,12 +18,12 @@
 
 classdef SurfaceDom < MeshDom
     properties
-        parent_mesh
-        gid_face
-        defined_on
-        condition
+        parent_mesh = []
+        gid_face = []
+        defined_on = []
+        condition = []
         % ---
-        building_formular
+        building_formular = []
     end
     % --- Valid args list
     methods (Static)

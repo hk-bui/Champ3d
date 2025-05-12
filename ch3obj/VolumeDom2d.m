@@ -33,13 +33,13 @@ classdef VolumeDom2d < VolumeDom
         function obj = VolumeDom2d(args)
             arguments
                 % ---
-                args.id = []
-                args.parent_mesh = []
-                args.id_xline = []
-                args.id_yline = []
-                args.elem_code = []
-                args.gid_elem = []
-                args.condition char = []
+                args.id
+                args.parent_mesh
+                args.id_xline
+                args.id_yline
+                args.elem_code
+                args.gid_elem
+                args.condition char
             end
             % ---
             obj = obj@VolumeDom;

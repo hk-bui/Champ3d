@@ -97,6 +97,7 @@ classdef CloseCoil < Coil
                 % --- XTODO
                 alpha = [];
             end
+            unit_current_field = f_normalize(unit_current_field);
         end
     end
     % --- Utility Methods
