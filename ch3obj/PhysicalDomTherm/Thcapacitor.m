@@ -1,32 +1,36 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef Thcapacitor < PhysicalDom
-
-    % --- computed
     properties
         rho = 0
         cp  = 0
+        % ---
         matrix
     end
-
-    % --- computed
+    % --- 
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','rho','cp','parameter_dependency_search'};
+            argslist = {'id','parent_model','id_dom3d','rho','cp','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -35,7 +39,6 @@ classdef Thcapacitor < PhysicalDom
             arguments
                 args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.rho
                 args.cp
@@ -60,10 +63,6 @@ classdef Thcapacitor < PhysicalDom
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -76,14 +75,12 @@ classdef Thcapacitor < PhysicalDom
             obj.matrix.rho_cp_array = [];
             obj.matrix.rhocpwnwn = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             Thcapacitor.setup(obj);
         end
     end
@@ -105,7 +102,9 @@ classdef Thcapacitor < PhysicalDom
             rho_cp_array = rho_array .* cp_array;
             % --- check changes
             is_changed = 1;
-            if isequal(rho_cp_array,obj.matrix.rho_cp_array)
+            if isequal(rho_cp_array,obj.matrix.rho_cp_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem) && ...
+               isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
             %--------------------------------------------------------------

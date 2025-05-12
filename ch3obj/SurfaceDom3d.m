@@ -1,35 +1,25 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef SurfaceDom3d < SurfaceDom
-
-    % --- Properties
     properties
         id_dom3d
     end
-
-    % --- subfields to build
-    properties
-        
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -42,12 +32,12 @@ classdef SurfaceDom3d < SurfaceDom
         function obj = SurfaceDom3d(args)
             arguments
                 % ---
-                args.id = []
-                args.parent_mesh = []
-                args.gid_face = []
-                args.condition = []
+                args.id
+                args.parent_mesh
+                args.gid_face
+                args.condition
                 % ---
-                args.defined_on char = []
+                args.defined_on char
                 args.id_dom3d
             end
             % ---
@@ -63,60 +53,43 @@ classdef SurfaceDom3d < SurfaceDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@SurfaceDom(obj);
-            % ---
+            % --- XTODO : which come first
+            % build_from_boundface
+            % build_from_interface
+            % build_from_gid_face
             % if ~isempty(obj.gid_face)
-            %     obj.build_from_gid_face
-            % else
-            switch lower(obj.defined_on)
-                case {'bound_face','bound'}
-                    obj.build_from_boundface;
-                case {'interface'}
-                    obj.build_from_interface;
-            end
+            %     obj.build_from_gid_face;
+            % end
             % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
+            if ~isempty(obj.building_formular)
+                if ~isempty(obj.building_formular.arg1) && ...
+                   ~isempty(obj.building_formular.arg2) && ...
+                   ~isempty(obj.building_formular.operation)
+                    obj.build_from_formular;
+                end
+            else
+                if ~isempty(obj.defined_on)
+                    switch lower(obj.defined_on)
+                        case {'bound_face','bound'}
+                            obj.build_from_boundface;
+                        case {'interface'}
+                            obj.build_from_interface;
+                    end
+                end
+            end
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@SurfaceDom(obj);
-            % ---
-            obj.setup_done = 0;
             SurfaceDom3d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
-    methods
-        function build(obj)
-            % ---
-            SurfaceDom3d.setup(obj);
-            % ---
-            build@SurfaceDom(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_defining_obj;
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods
     methods (Access = protected, Hidden)
         % -----------------------------------------------------------------
@@ -130,6 +103,10 @@ classdef SurfaceDom3d < SurfaceDom
             for i = 1:length(id_dom3d_)
                 id3 = id_dom3d_{i};
                 valid3 = f_validid(id3,all_id3);
+                % ---
+                if isempty(valid3)
+                    error(['dom3d ' id3 ' not found !']);
+                end
                 % ---
                 for j = 1:length(valid3)
                     % ---
@@ -171,12 +148,17 @@ classdef SurfaceDom3d < SurfaceDom
                 for j = 1:length(id_dom3d_{i})
                     id3 = id_dom3d_{i}{j};
                     valid3 = f_validid(id3,all_id3);
-                    for j = 1:length(valid3)
+                    % ---
+                    if isempty(valid3)
+                        error(['dom3d ' id3 ' not found !']);
+                    end
+                    % ---
+                    for k = 1:length(valid3)
                         % ---
-                        dom3d = obj.parent_mesh.dom.(valid3{j});
+                        dom3d = obj.parent_mesh.dom.(valid3{k});
                         dom3d.is_defining_obj_of(obj);
                         % ---
-                        elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{j}).gid_elem)];
+                        elem = [elem  obj.parent_mesh.elem(:,obj.parent_mesh.dom.(valid3{k}).gid_elem)];
                     end
                 end
                 %--------------------------------------------------------------

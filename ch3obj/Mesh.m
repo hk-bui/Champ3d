@@ -1,16 +1,22 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef Mesh < Xhandle
-
-    % --- Properties
     properties
         node
         elem
@@ -38,30 +44,8 @@ classdef Mesh < Xhandle
         gid_face
         flat_node
         % ---
-    end
-    % --- subfields to build
-    properties
         dom
     end
-
-    % ---
-    properties (Access = private)
-        build_meshds_done = 0
-        build_discrete_done = 0
-        build_intkit_done = 0
-        build_prokit_done = 0
-    end
-    
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    properties
-        dependent_obj = []
-        defining_obj = []
-    end
-
     % --- Dependent Properties
     properties (Dependent = true)
         nb_node
@@ -73,27 +57,11 @@ classdef Mesh < Xhandle
         % ---
         dim
     end
-
     % --- Constructors
     methods
         function obj = Mesh()
             % ---
             obj = obj@Xhandle;
-            % ---
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
-            Mesh.setup(obj);
-            % ---
-        end
-    end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             obj.meshds.id_edge_in_elem = [];
             obj.meshds.ori_edge_in_elem = [];
@@ -134,42 +102,8 @@ classdef Mesh < Xhandle
             obj.prokit.Wn = {};
             obj.prokit.node = {};
             % ---
-            obj.setup_done = 1;
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.build_meshds_done = 0;
-            obj.build_discrete_done = 0;
-            obj.build_intkit_done = 0;
-            obj.build_prokit_done = 0;
         end
     end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            obj.setup_done = 0;
-            Mesh.setup(obj);
-            % --- reset dependent obj
-            % obj.reset_dependent_obj;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            Mesh.setup(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_meshds;
-            obj.build_discrete;
-            obj.build_intkit;
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods - Get
     methods
         % ---
@@ -201,13 +135,16 @@ classdef Mesh < Xhandle
     % --- Methode - Add
     methods
         % -----------------------------------------------------------------
-        function add_default_domain(obj,varargin)
+        function add_whole_mesh_dom(obj,varargin)
             gid_elem_ = 1:obj.nb_elem;
             if isa(obj,'Mesh2d')
-                obj.dom.default_domain = VolumeDom2d('parent_mesh',obj,'gid_elem',gid_elem_);
+                obj.dom.whole_mesh_dom = VolumeDom2d('parent_mesh',obj,'gid_elem',gid_elem_);
             elseif isa(obj,'Mesh3d')
-                obj.dom.default_domain = VolumeDom3d('parent_mesh',obj,'gid_elem',gid_elem_);
+                obj.dom.whole_mesh_dom = VolumeDom3d('parent_mesh',obj,'gid_elem',gid_elem_);
             end
+            % ---
+            obj.dom.whole_mesh_dom.id = 'whole_mesh_dom';
+            % ---
         end
         % -----------------------------------------------------------------
     end
@@ -426,10 +363,6 @@ classdef Mesh < Xhandle
                     'ori_edge_in_face','sign_edge_in_face'})} = 'all'
             end
             %--------------------------------------------------------------
-            if obj.build_meshds_done
-                return
-            end
-            %--------------------------------------------------------------
             %tic
             %f_fprintf(0,'Make #meshds \n');
             %fprintf('   ');
@@ -546,11 +479,6 @@ classdef Mesh < Xhandle
                 % ---
             end
             %--------------------------------------------------------------
-            all_get = {'all'};
-            if any(f_strcmpi(get,all_get))
-                obj.build_meshds_done = 1;
-            end
-            %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...
             %    1,toc, ...
@@ -562,10 +490,6 @@ classdef Mesh < Xhandle
                 % ---
                 args.get {mustBeMember(args.get,...
                     {'all','div','grad','curl'})} = 'all'
-            end
-            %--------------------------------------------------------------
-            if obj.build_discrete_done
-                return
             end
             %--------------------------------------------------------------
             %tic
@@ -709,11 +633,6 @@ classdef Mesh < Xhandle
                 end
             end
             %--------------------------------------------------------------
-            all_get = {'all'};
-            if any(f_strcmpi(get,all_get))
-                obj.build_discrete_done = 1;
-            end
-            %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...
             %    1,toc, ...
@@ -725,10 +644,6 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function obj = build_intkit(obj)
-            %--------------------------------------------------------------
-            if obj.build_intkit_done
-                return
-            end
             %--------------------------------------------------------------
             %tic
             %f_fprintf(0,'Make #intkit \n');
@@ -824,8 +739,6 @@ classdef Mesh < Xhandle
             obj.intkit.Wf = Wf;
             obj.intkit.node = node_g;
             %--------------------------------------------------------------
-            obj.build_intkit_done = 1;
-            %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...
             %    1,toc, ...
@@ -883,10 +796,6 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function obj = build_prokit(obj)
-            %--------------------------------------------------------------
-            if obj.build_prokit_done
-                return
-            end
             %--------------------------------------------------------------
             %tic
             %f_fprintf(0,'Make #prokit \n');
@@ -947,8 +856,6 @@ classdef Mesh < Xhandle
             obj.prokit.We = We;
             obj.prokit.Wf = Wf;
             obj.prokit.node = node_i;
-            %--------------------------------------------------------------
-            obj.build_prokit_done = 1;
             %--------------------------------------------------------------
             %--- Log message
             %f_fprintf(0,'--- in',...

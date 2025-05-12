@@ -1,62 +1,45 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef SurfaceDom < MeshDom
-
-    % --- Properties
     properties
-        gid_face
-        defined_on
-        condition
+        parent_mesh = []
+        gid_face = []
+        defined_on = []
+        condition = []
+        % ---
+        building_formular = []
     end
-
-    % --- subfields to build
-    properties
-        parent_mesh
-    end
-
-    % --- subfields to build
-    properties
-        building_formular
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    properties
-        dependent_obj = []
-        defining_obj = []
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_mesh','gid_face','defined_on','condition'};
+            argslist = {'id','parent_mesh','gid_face','defined_on','condition'};
         end
     end
     % --- Constructors
     methods
         function obj = SurfaceDom(args)
             arguments
-                % ---
-                args.parent_mesh = []
-                args.gid_face = []
-                args.defined_on = []
-                args.condition = []
+                args.id
+                args.parent_mesh
+                args.gid_face
+                args.defined_on
+                args.condition
             end
             % ---
             obj = obj@MeshDom;
@@ -71,20 +54,9 @@ classdef SurfaceDom < MeshDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % --- XTODO : which come first
-            % build_from_boundface
-            % build_from_interface
-            % build_from_gid_face
-            % if ~isempty(obj.gid_face)
-            %     obj.build_from_gid_face;
-            % end
             % ---
             if ~isempty(obj.building_formular)
                 if ~isempty(obj.building_formular.arg1) && ...
@@ -94,36 +66,15 @@ classdef SurfaceDom < MeshDom
                 end
             end
             % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            obj.setup_done = 0;
             SurfaceDom.setup(obj);
             % --- reset dependent obj
-            % obj.reset_dependent_obj;
+            obj.reset_dependent_obj;
         end
     end
-    methods
-        function build(obj)
-            % ---
-            SurfaceDom.setup(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_defining_obj;
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods
     methods
         function sm = submesh(obj)
@@ -158,7 +109,6 @@ classdef SurfaceDom < MeshDom
             % ---
         end
     end
-
     % --- Methods
     methods (Access = protected)
         % -----------------------------------------------------------------
@@ -233,6 +183,17 @@ classdef SurfaceDom < MeshDom
             argu = f_to_namedarg(args);
             for i = 1:length(submesh_)
                 submesh_{i}.plot(argu{:}); hold on
+                % ---
+                celem = submesh_{i}.cal_celem;
+                celem = celem(:,1);
+                id = replace(obj.id,'_','-');
+                if length(celem) == 2
+                    t = text(celem(1),celem(2),id);
+                    t.FontWeight = 'bold';
+                elseif length(celem) == 3
+                    t = text(celem(1),celem(2),celem(3),id);
+                    t.FontWeight = 'bold';
+                end
             end
             % ---
         end
@@ -310,5 +271,4 @@ classdef SurfaceDom < MeshDom
             % ---
         end
     end
-
 end

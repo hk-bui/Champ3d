@@ -1,36 +1,26 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef VolumeDom2d < VolumeDom
-
-    % --- Properties
     properties
         id_xline
         id_yline
     end
-
-    % --- subfields to build
-    properties
-        
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -43,13 +33,13 @@ classdef VolumeDom2d < VolumeDom
         function obj = VolumeDom2d(args)
             arguments
                 % ---
-                args.id = []
-                args.parent_mesh = []
-                args.id_xline = []
-                args.id_yline = []
-                args.elem_code = []
-                args.gid_elem = []
-                args.condition char = []
+                args.id
+                args.parent_mesh
+                args.id_xline
+                args.id_yline
+                args.elem_code
+                args.gid_elem
+                args.condition char
             end
             % ---
             obj = obj@VolumeDom;
@@ -64,37 +54,27 @@ classdef VolumeDom2d < VolumeDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
             % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@VolumeDom(obj);
-            % ---
             if ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
                 obj.build_from_idmesh1d;
+            elseif ~isempty(obj.elem_code)
+                obj.build_from_elem_code;
+            elseif ~isempty(obj.gid_elem)
+                obj.build_from_gid_elem;
             end
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super class
-            reset@VolumeDom(obj);
-            % ---
-            obj.setup_done = 0;
             VolumeDom2d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
-
     % --- Methods
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------
@@ -113,6 +93,10 @@ classdef VolumeDom2d < VolumeDom
                     idx = id_xline_{i}{j};
                     valid_idx = f_validid(idx,all_id_mesh1d);
                     % ---
+                    if isempty(valid_idx)
+                        error(['xline ' idx ' not found !']);
+                    end
+                    % ---
                     for m = 1:length(valid_idx)
                         % ---
                         xlineobj = obj.parent_mesh.parent_mesh.dom.(valid_idx{m});
@@ -124,6 +108,10 @@ classdef VolumeDom2d < VolumeDom
                         for k = 1:length(id_yline_{i})
                             idy = id_yline_{i}{k};
                             valid_idy = f_validid(idy,all_id_mesh1d);
+                            % ---
+                            if isempty(valid_idy)
+                                error(['yline ' idy ' not found !']);
+                            end
                             % ---
                             for l = 1:length(valid_idy)
                                 % ---
@@ -160,6 +148,3 @@ classdef VolumeDom2d < VolumeDom
         end
     end
 end
-
-
-

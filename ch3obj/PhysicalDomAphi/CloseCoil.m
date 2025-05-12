@@ -1,77 +1,47 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef CloseCoilAphi < CloseCoil
-
-    % --- computed
+classdef CloseCoil < Coil
     properties
-        matrix
+        etrode_equation
+        % ---
+        electrode_dom
+        shape_dom
     end
-
-    % --- computed
-    properties (Access = private)
-        build_done = 0
-        assembly_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = CloseCoil.validargs;
+            argslist = {'parent_model','id_dom3d','etrode_equation'};
         end
     end
     % --- Contructor
     methods
-        function obj = CloseCoilAphi(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-                args.etrode_equation
-            end
-            % ---
-            obj@CloseCoil;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            obj.setup;
+        function obj = CloseCoil()
+            obj@Coil;
         end
     end
-
-    % --- setup
+    % --- Utility Methods
     methods
-        function setup(obj)
-            setup@CloseCoil(obj);
-        end
-    end
-
-    % --- build
-    methods
-        function build(obj)
+        function [unit_current_field,alpha] = get_uj_alpha(obj)
             % ---
-            obj.setup;
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            parent_mesh = obj.dom.parent_mesh;
-            parent_mesh.build_meshds;
-            parent_mesh.build_discrete;
-            parent_mesh.build_intkit;
+            parent_mesh = obj.parent_model.parent_mesh;
             % --- current field
-            unit_current_field = sparse(3,parent_mesh.nb_elem);
+            unit_current_field = zeros(3,parent_mesh.nb_elem);
             % ---
             nbEd_inEl = parent_mesh.refelem.nbEd_inEl;
             % ---
@@ -124,52 +94,47 @@ classdef CloseCoilAphi < CloseCoil
                 vJs = f_normalize(vJs);
                 % ---
                 unit_current_field = unit_current_field + vJs;
+                % --- XTODO
+                alpha = [];
             end
-            % ---
-            % current turn density vector field
-            % current_turn_density  = current_field .* nb_turn ./ cs_area;
-            % ---
-            obj.matrix.gid_elem = obj.dom.gid_elem;
-            obj.matrix.unit_current_field = unit_current_field;
-            % ---
-            obj.build_done = 1;
+            unit_current_field = f_normalize(unit_current_field);
         end
     end
-
-    % --- Methods
+    % --- Utility Methods
     methods
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'k'
-                args.face_color = 'none'
-                args.alpha {mustBeNumeric} = 0.5
-            end
+        % -----------------------------------------------------------------
+        function get_electrode(obj)
             % ---
-            argu = f_to_namedarg(args);
-            plot@CloseCoil(obj,argu{:});
+            args4cv3.parent_mesh = obj.parent_model.parent_mesh;
+            args4cv3.id_dom3d = obj.id_dom3d;
+            args4cv3.cut_equation = obj.etrode_equation;
             % ---
-            if ~isempty(obj.matrix.unit_current_field)
-                hold on;
-                f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                         obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+            argu = f_to_namedarg(args4cv3,'for','CutVolumeDom3d');
+            % ---
+            obj.electrode_dom = CutVolumeDom3d(argu{:});
+            % ---
+            coilshape = obj.dom - obj.electrode_dom;
+            % ---
+            % obj.shape_dom = eval(class(obj.electrode_dom));
+            % obj.shape_dom <= coilshape;
+            obj.shape_dom = obj.electrode_dom.';
+            obj.shape_dom <= coilshape;
+            % ---
+            obj.shape_dom.gid_side_node_1 = obj.electrode_dom.gid_side_node_2;
+            obj.shape_dom.gid_side_node_2 = obj.electrode_dom.gid_side_node_1;
+        end
+        % -----------------------------------------------------------------
+        function plot(obj)
+            % ---
+            obj.electrode_dom.plot('face_color',f_color(100),'alpha',0.5); hold on;
+            % ---
+            if isfield(obj.matrix,'unit_current_field')
+                if ~isempty(obj.matrix.unit_current_field)
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                end
             end
         end
+        % -----------------------------------------------------------------
     end
-
-    % --- reset
-    methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
-        end
-    end
-
 end

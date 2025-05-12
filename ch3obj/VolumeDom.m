@@ -1,43 +1,29 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef VolumeDom < MeshDom
-
-    % --- Properties
     properties
+        parent_mesh
         elem_code
         gid_elem
         condition
         gid
     end
-
-    % --- subfields to build
-    properties
-        parent_mesh
-    end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    properties
-        dependent_obj = []
-        defining_obj = []
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -48,11 +34,11 @@ classdef VolumeDom < MeshDom
     methods
         function obj = VolumeDom(args)
             arguments
-                args.id = []
-                args.parent_mesh = []
-                args.elem_code = []
-                args.gid_elem = []
-                args.condition = []
+                args.id
+                args.parent_mesh
+                args.elem_code
+                args.gid_elem
+                args.condition
             end
             % ---
             obj = obj@MeshDom;
@@ -63,20 +49,13 @@ classdef VolumeDom < MeshDom
             % ---
             obj <= args;
             % ---
-            % call setup in constructor
-            % ,,, for direct verification
-            % ,,, setup must be static
             VolumeDom.setup(obj);
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % ---
             % must try elem_code first
             if ~isempty(obj.elem_code)
@@ -84,35 +63,13 @@ classdef VolumeDom < MeshDom
             elseif ~isempty(obj.gid_elem)
                 obj.build_from_gid_elem;
             end
-            % ---
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % ---
-            obj.setup_done = 0;
             VolumeDom.setup(obj);
             % --- reset dependent obj
-            % obj.reset_dependent_obj;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            VolumeDom.setup(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % --- 
-            % obj.build_defining_obj;
-            % ---
-            obj.build_done = 1;
-            % ---
+            obj.reset_dependent_obj;
         end
     end
     % --- Methods
@@ -376,38 +333,53 @@ classdef VolumeDom < MeshDom
                 args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'global'
                 args.id = ''
             end
+            % --- elem_code-info
+            % elcode = [];
+            % if ~isempty(obj.elem_code)
+            %     codemin = min(obj.elem_code);
+            %     codemax = max(obj.elem_code);
+            %     if codemax == codemin
+            %         elcode = num2str(codemax);
+            %     else
+            %         elcode = [num2str(codemin) '-' num2str(codemax)];
+            %     end
+            %     % ---
+            %     elcode = [args.id ':' elcode];
+            % end
             % ---
-            % obj.build;
-            % obj.parent_mesh.build;
-            % --- id-info
-            elcode = [];
-            if ~isempty(obj.elem_code)
-                codemin = min(obj.elem_code);
-                codemax = max(obj.elem_code);
-                if codemax == codemin
-                    elcode = num2str(codemax);
-                else
-                    elcode = [num2str(codemin) '-' num2str(codemax)];
-                end
-                % ---
-                elcode = [args.id ':' elcode];
-            end
-            % ---
+            % submesh_ = obj.submesh;
+            % argu = f_to_namedarg(args,'with_out','id');
+            % for i = 1:length(submesh_)
+            %     submesh_{i}.plot(argu{:}); hold on
+            %     % ---
+            %     submesh_{i}.build_meshds('get','celem');
+            %     cnode = submesh_{i}.celem(:,1);
+            %     if length(cnode) == 2
+            %         t = text(cnode(1),cnode(2),obj.id);
+            %         t.FontWeight = 'bold';
+            %     elseif length(cnode) == 3
+            %         t = text(cnode(1),cnode(2),cnode(3),obj.id);
+            %         t.FontWeight = 'bold';
+            %     end
+            % end
+            % ----------------------------------------------------
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args,'with_out','id');
             for i = 1:length(submesh_)
                 submesh_{i}.plot(argu{:}); hold on
                 % ---
-                submesh_{i}.build_meshds('get','celem');
-                cnode = submesh_{i}.celem(:,1);
-                if length(cnode) == 2
-                    t = text(cnode(1),cnode(2),elcode);
+                celem = submesh_{i}.cal_celem;
+                celem = celem(:,1);
+                id = replace(obj.id,'_','-');
+                if length(celem) == 2
+                    t = text(celem(1),celem(2),id);
                     t.FontWeight = 'bold';
-                elseif length(cnode) == 3
-                    t = text(cnode(1),cnode(2),cnode(3),elcode);
+                elseif length(celem) == 3
+                    t = text(celem(1),celem(2),celem(3),id);
                     t.FontWeight = 'bold';
                 end
             end
+            % ----------------------------------------------------
         end
     end
 

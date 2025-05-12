@@ -1,30 +1,32 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef PhysicalDom < Xhandle
-
-    % --- entry
     properties
         parent_model
         id_dom2d
         id_dom3d
         % ---
+        dom
+        % ---
         % 'by_coordinates', 'by_id_dom'[by default]
         parameter_dependency_search = 'by_id_dom'
     end
-
-    % --- computed
-    properties
-        dom
-    end
-
     % --- Contructor
     methods
         function obj = PhysicalDom()
@@ -33,14 +35,13 @@ classdef PhysicalDom < Xhandle
             % ---
         end
     end
-    
     % --- Utility Methods
     methods
         function set_parameter(obj)
             % --- XTODO
             % should put list in config file ?
             paramlist = {'sigma','mur','bs','br','r_ht','r_et',...
-                         'i_coil','v_coil','j_coil',...
+                         'Is','Vs','Js',...
                          'rho','cp','lambda','h','ps','pv'};
             % ---
             for i = 1:length(paramlist)
@@ -84,7 +85,6 @@ classdef PhysicalDom < Xhandle
         end
         % -----------------------------------------------------------------
     end
-
     % --- Methods
     methods
         function plot(obj,args)

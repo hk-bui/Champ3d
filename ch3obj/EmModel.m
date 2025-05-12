@@ -1,8 +1,16 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
@@ -11,7 +19,6 @@
 classdef EmModel < PhysicalModel
     properties
         frequency = 0
-        jome
         % ---
         econductor
         mconductor
@@ -24,114 +31,22 @@ classdef EmModel < PhysicalModel
         embc
         % ---
     end
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
-    end
-    
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'parent_mesh','frequency','ltime'};
-        end
+    properties (Dependent)
+        jome
     end
     % --- Constructor
     methods
-        function obj = EmModel(args)
-            arguments
-                args.parent_mesh
-                args.frequency
-                args.ltime {mustBeMember(args.ltime,'LTime')}
-            end
-            % ---
+        function obj = EmModel()
             obj@PhysicalModel;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            EmModel.setup(obj);
-            % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@PhysicalModel(obj);
-            % ---
-            obj.jome = 1j*2*pi*obj.frequency;
-            % ---
-            nb_elem = obj.parent_mesh.nb_elem;
-            nb_face = obj.parent_mesh.nb_face;
-            % ---
-            obj.field.av = sparse(3,nb_elem);
-            obj.field.bv = sparse(3,nb_elem);
-            obj.field.ev = sparse(3,nb_elem);
-            obj.field.phiv = sparse(3,nb_elem);
-            obj.field.phi = [];
-            obj.field.jv = sparse(3,nb_elem);
-            obj.field.pv = sparse(1,nb_elem);
-            obj.field.js = sparse(2,nb_face);
-            obj.field.ps = sparse(1,nb_face);
-            % ---
-            obj.setup_done = 1;
-            % ---
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@PhysicalModel(obj);
-        end
-    end
+    % --- get
     methods
-        function build(obj)
-            % ---
-            EmModel.setup(obj);
-            % ---
-            build@PhysicalModel(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_done = 1;
-            % ---
+        function val = get.jome(obj)
+            val = 1j*2*pi*obj.frequency;
         end
     end
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@PhysicalModel(obj);
-            % ---
-            if obj.assembly_done
-                return
-            end
-            % ---
-            obj.assembly_done = 1;
-            % ---
-        end
-    end
-    % --- Methods
+    % --- Utility Methods
     methods
         % -----------------------------------------------------------------
         function add_ltime(obj,args)
@@ -195,8 +110,8 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Econductor');
             % ---
-            if isa(obj,'FEM3dAphijw')
-                phydom = EconductorAphi(argu{:});
+            if isa(obj,'FEM3dAphi')
+                phydom = Econductor(argu{:});
             end
             % ---
             obj.econductor.(args.id) = phydom;
@@ -215,8 +130,8 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Airbox');
             % ---
-            if isa(obj,'FEM3dAphijw')
-                phydom = AirboxAphi(argu{:});
+            if isa(obj,'FEM3dAphi')
+                phydom = Airbox(argu{:});
             end
             % ---
             obj.airbox.(args.id) = phydom;
@@ -235,8 +150,8 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Nomesh');
             % ---
-            if isa(obj,'FEM3dAphijw')
-                phydom = NomeshAphi(argu{:});
+            if isa(obj,'FEM3dAphi')
+                phydom = Nomesh(argu{:});
             end
             % ---
             obj.nomesh.(args.id) = phydom;
@@ -247,27 +162,24 @@ classdef EmModel < PhysicalModel
                 obj
                 % ---
                 args.id = 'no_id'
-                args.id_dom2d = []
-                args.id_dom3d = []
-                args.sigma = 0
-                args.mur = 1
-                args.r_ht = []
-                args.r_et = []
+                args.id_dom2d 
+                args.id_dom3d
+                args.sigma
+                args.mur
+                args.r_ht
+                args.r_et
             end
             % ---
             args.parent_model = obj;
             % ---
-            argu = f_to_namedarg(args,'for','Sibc');
+            argu = f_to_namedarg(args,'for','Sibcjw');
             % ---
             if isa(obj,'FEM3dAphijw')
-                phydom = SibcAphijw(argu{:});
-                %nomsh  = NomeshAphi('parent_model',args.parent_model, ...
-                %                    'id_dom2d',args.id_dom2d,...
-                %                    'id_dom3d',args.id_dom3d);
+                phydom = Sibcjw(argu{:});
+                obj.sibc.(args.id) = phydom;
+            else
+                f_fprintf(1,'Sibc',0,'is only supported with',1,'FEM3dAphijw',0,'(<ver.2025.05) ! \n');
             end
-            % ---
-            obj.sibc.(args.id) = phydom;
-            %obj.nomesh.(['nomesh_for_sibc_' args.id]) = nomsh;
         end
         % -----------------------------------------------------------------
         function add_bsfield(obj,args)
@@ -283,22 +195,23 @@ classdef EmModel < PhysicalModel
             args.parent_model = obj;
             % ---
             if isempty(args.id_dom3d)
-                if ~isfield(obj.parent_mesh.dom,'default_domain')
-                    obj.parent_mesh.add_default_domain;
+                if ~isfield(obj.parent_mesh.dom,'whole_mesh_dom')
+                    obj.parent_mesh.add_whole_mesh_dom;
                 end
-                args.id_dom3d = 'default_domain';
+                args.id_dom3d = 'whole_mesh_dom';
             end
             % ---
             argu = f_to_namedarg(args,'for','Bsfield');
             % ---
-            if isa(obj,'FEM3dAphijw')
-                phydom = BsfieldAphi(argu{:});
+            if isa(obj,'FEM3dAphi')
+                phydom = Bsfield(argu{:});
             end
             % ---
             obj.bsfield.(args.id) = phydom;
         end
         % -----------------------------------------------------------------
         function add_embc(obj,args)
+            % --- XTODO - other bc types
         end
         % -----------------------------------------------------------------
         function add_coil(obj,args)
@@ -306,89 +219,11 @@ classdef EmModel < PhysicalModel
                 obj
                 % ---
                 args.id = 'no_id'
-                args.id_dom2d = []
-                args.id_dom3d = []
-                args.etrode_equation = []
-                args.coil_type {mustBeMember(args.coil_type,{'stranded','solid'})}
-                args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})} = 'tx'
-                args.source_type {mustBeMember(args.source_type,{'current_fed','voltage_fed','current_density_fed'})}
-                args.connexion {mustBeMember(args.connexion,{'serial','parallel'})}
-                args.fill_factor = 1
-                args.j_coil = 0
-                args.i_coil = 0
-                args.v_coil = 0
-                args.nb_turn = 1
-                args.cs_area = 1
+                args.coil_obj {mustBeA(args.coil_obj,'Coil')}
             end
             % ---
-            args.parent_model = obj;
-            % ---
-            coil_model = [];
-            % ---
-            if f_strcmpi(args.coil_type,'stranded')
-                coil_model = [coil_model 'Stranded'];
-            elseif f_strcmpi(args.coil_type,'solid')
-                coil_model = [coil_model 'Solid'];
-            end
-            % ---
-            if length(f_to_scellargin(args.etrode_equation)) == 1
-                coil_model = [coil_model 'Close'];
-            else
-                coil_model = [coil_model 'Open'];
-            end
-            % ---
-            if f_strcmpi(args.source_type,'current_fed')
-                coil_model = [coil_model 'Is'];
-                if f_strcmpi(args.coil_mode,'tx')
-                    if isempty(args.i_coil)
-                        error('#i_coil must be given !');
-                    end
-                end
-            elseif f_strcmpi(args.source_type,'voltage_fed')
-                coil_model = [coil_model 'Vs'];
-                if f_strcmpi(args.coil_mode,'tx')
-                    if isempty(args.v_coil)
-                        error('#v_coil must be given !');
-                    end
-                end
-            elseif f_strcmpi(args.source_type,'current_density_fed')
-                coil_model = [coil_model 'Js'];
-                if f_strcmpi(args.coil_mode,'tx')
-                    if isempty(args.j_coil)
-                        error('#j_coil must be given !');
-                    end
-                end
-            end
-            % ---
-            coil_model = [coil_model 'Coil'];
-            % ---
-            if any(f_strcmpi(coil_model,{'StrandedOpenJsCoil','StrandedCloseJsCoil'}))
-                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
-                             'etrode_equation','connexion', ...
-                             'cs_area','nb_turn','fill_factor',...
-                             'j_coil','coil_mode'};
-            elseif f_strcmpi(coil_model,'SolidOpenVsCoil')
-                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
-                             'etrode_equation',...
-                             'v_coil','coil_mode'};
-            elseif f_strcmpi(coil_model,'SolidOpenIsCoil')
-                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
-                             'etrode_equation',...
-                             'i_coil','coil_mode'};
-            end
-            % ---
-            %argu = f_to_namedarg(args,'with_only',validargs);
-            % ---
-            if isa(obj,'FEM3dAphijw')
-                % ---
-                coil_model = [coil_model 'Aphi'];
-                % ---
-                argu = f_to_namedarg(args,'for',coil_model);
-                % ---
-                phydom = feval(coil_model,argu{:});
-            end
-            % ---
-            obj.coil.(args.id) = phydom;
+            obj.coil.(args.id) = args.coil_obj;
+            obj.coil.(args.id).id = args.id;
         end
         % -----------------------------------------------------------------
         function add_mconductor(obj,args)
@@ -405,8 +240,8 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','Mconductor');
             % ---
-            if isa(obj,'FEM3dAphijw')
-                phydom = MconductorAphi(argu{:});
+            if isa(obj,'FEM3dAphi')
+                phydom = Mconductor(argu{:});
             end
             % ---
             obj.mconductor.(args.id) = phydom;
@@ -426,8 +261,8 @@ classdef EmModel < PhysicalModel
             % ---
             argu = f_to_namedarg(args,'for','PMagnet');
             % ---
-            if isa(obj,'FEM3dAphijw')
-                phydom = PMagnetAphi(argu{:});
+            if isa(obj,'FEM3dAphi')
+                phydom = PMagnet(argu{:});
             end
             % ---
             obj.pmagnet.(args.id) = phydom;

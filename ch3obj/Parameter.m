@@ -1,8 +1,16 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
@@ -32,7 +40,7 @@ classdef Parameter < Xhandle
                 args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
                     {'celem','cface','velem','sface','ledge',...
-                     'J','V','T','B','E','H','A','P','Phi',...
+                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
                      'ltime'})}
                 args.from = []
                 args.varargin_list = []
@@ -124,7 +132,7 @@ classdef Parameter < Xhandle
             % ---
             if lensv == 2
                 if sizev(2) == 1
-                    if any(sizev(1) == [1 2 3])
+                    if any(sizev(1) == [2 3])
                         if f_strcmpi(parameter_type,'vector')
                             vout = - vin;
                         else
@@ -412,8 +420,27 @@ classdef Parameter < Xhandle
                 elseif any(f_strcmpi(depon_,{'ltime','time'}))
                     % take from parent_model of paramater object
                     fargs{i} = target_model.ltime.t_now;
+                elseif any(f_strcmpi(depon_,{'fr'}))
+                    % take from parent_model of paramater object
+                    fargs{i} = target_model.fr;
+                elseif contains(depon_,{'V.','I.','Z.'})
+                    % --- id_coil
+                    depon_ = split(depon_,'.');
+                    quantity = depon_{1};
+                    id_coil = depon_{2};
+                    % ---
+                    if ~isprop(source_model,'coil')
+                        error('no coil in source model !');
+                    else
+                        if ~isfield(source_model.coil,id_coil)
+                            error(['no #coil ' id_coil ' in source model !'])
+                        end
+                    end
+                    % ---
+                    fargs{i} = source_model.coil.(id_coil).(quantity);
+                    % ---
                 elseif any(f_strcmpi(depon_,{...
-                        'J','V','T','B','E','H','A','P','Phi'}))
+                        'J','T','B','E','H','A','P','Phi'}))
                     % physical quantities
                     % must be able to take from other model with different ltime, mesh/dom
                     % ---

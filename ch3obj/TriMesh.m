@@ -1,35 +1,44 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef TriMesh < Mesh2d
-
-    % --- Properties
     properties
         lid_face
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
+    properties (Access = private)
+        build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = TriMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
@@ -43,17 +52,48 @@ classdef TriMesh < Mesh2d
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            TriMesh.setup(obj);
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
+            obj.build_done = 0;
+            % ---
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
+            % ---
             obj.cal_flatnode;
         end
     end
-
+    % --- build
+    methods
+        function build(obj)
+            % ---
+            if obj.build_done
+                return
+            end
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+                obj.build_meshds_done = 1;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+                obj.build_discrete_done = 1;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+                obj.build_intkit_done = 1;
+            end
+            % ---
+            obj.build_done = 1;
+            % ---
+        end
+    end
     % --- Methods
     methods
         % -----------------------------------------------------------------
@@ -100,7 +140,7 @@ classdef TriMesh < Mesh2d
             refelem.nbNo_inEl = 3;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 3; 2 3];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = refelem.EdNo_inEl; % face as edge
             %-----
             refelem.NoFa_ofEd = [2 3; 1 3; 1 2]; % !!! F(i,~j) - circular
@@ -148,8 +188,4 @@ classdef TriMesh < Mesh2d
             % ---
         end
     end
-
 end
-
-
-

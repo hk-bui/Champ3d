@@ -1,40 +1,47 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef HexMesh < Mesh3d
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = HexMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
             % ---
             obj = obj@Mesh3d;
+            obj.elem_type = 'hexa';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -47,50 +54,49 @@ classdef HexMesh < Mesh3d
         end
     end
 
-    % --- setup/reset/build/assembly
+    % --- setup
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@Mesh3d(obj);
-            % ---
-            obj.elem_type = 'hexa';
-            % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@Mesh3d(obj);
-            % ---
-            obj.setup_done = 0;
             HexMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
+    % --- build
     methods
         function build(obj)
             % ---
-            HexMesh.setup(obj);
-            % --- call super
-            build@Mesh3d(obj);
-            % ---
             if obj.build_done
                 return
+            end
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+                obj.build_meshds_done = 1;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+                obj.build_discrete_done = 1;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+                obj.build_intkit_done = 1;
             end
             % ---
             obj.build_done = 1;
             % ---
         end
     end
-
     % --- Methods
     methods
         % -----------------------------------------------------------------
@@ -148,7 +154,7 @@ classdef HexMesh < Mesh3d
             refelem.nbNo_inEl = 8;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 4; 1 5; 2 3; 2 6; 3 4; 3 7; 4 8; 5 6; 5 8; 6 7; 7 8];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = [1 2 3 4; 5 6 7 8; 1 2 6 5; 2 3 7 6; 3 4 8 7; 1 4 8 5]; %
             % ---
             refelem.NoFa_ofEd = [6 4; 3 5; 1 2; 3 5; 1 2; 4 6; 1 2; 1 2; 6 4; 3 5; 3 5; 4 6]; % !!! F(i,~j) - circular

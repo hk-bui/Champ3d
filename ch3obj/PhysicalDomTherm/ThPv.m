@@ -1,31 +1,35 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef ThPv < PhysicalDom
-
-    % --- computed
     properties
         pv = 0
+        % ---
         matrix
     end
-
-    % --- computed
+    % --- 
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','pv','parameter_dependency_search'};
+            argslist = {'id','parent_model','id_dom3d','pv','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -34,7 +38,6 @@ classdef ThPv < PhysicalDom
             arguments
                 args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.pv
                 args.parameter_dependency_search ...
@@ -58,10 +61,6 @@ classdef ThPv < PhysicalDom
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -72,14 +71,12 @@ classdef ThPv < PhysicalDom
             obj.matrix.pv_array = [];
             obj.matrix.pvwn = [];
             % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup_done = 0;
             ThPv.setup(obj);
         end
     end
@@ -104,7 +101,9 @@ classdef ThPv < PhysicalDom
             %pv_array;
             % --- check changes
             is_changed = 1;
-            if isequal(pv_array,obj.matrix.pv_array)
+            if isequal(pv_array,obj.matrix.pv_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem) && ...
+               isequal(gid_node_t,obj.matrix.gid_node_t)
                 is_changed = 0;
             end
             %--------------------------------------------------------------

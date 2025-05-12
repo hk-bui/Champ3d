@@ -1,30 +1,26 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef VolumeDom3d < VolumeDom
-
     properties
         id_dom2d
         id_zline
     end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -37,13 +33,13 @@ classdef VolumeDom3d < VolumeDom
         function obj = VolumeDom3d(args)
             arguments
                 % ---
-                args.id = []
-                args.parent_mesh = []
-                args.id_dom2d = []
-                args.id_zline = []
-                args.elem_code = []
-                args.gid_elem = []
-                args.condition = []
+                args.id
+                args.parent_mesh
+                args.id_dom2d
+                args.id_zline
+                args.elem_code
+                args.gid_elem
+                args.condition
             end
             % ---
             obj = obj@VolumeDom;
@@ -58,54 +54,27 @@ classdef VolumeDom3d < VolumeDom
             % ---
         end
     end
-    % --- setup/reset/build/assembly
+    % --- setup/reset
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@VolumeDom(obj);
-            % ---
+            % must try id_zline first -> elem_code
             if ~isempty(obj.id_zline)
                 obj.build_from_idmesh1d2d;
+            elseif ~isempty(obj.elem_code)
+                obj.build_from_elem_code;
+            elseif ~isempty(obj.gid_elem)
+                obj.build_from_gid_elem;
             end
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@VolumeDom(obj);
-            % ---
-            obj.setup_done = 0;
             VolumeDom3d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
-    methods
-        function build(obj)
-            % ---
-            VolumeDom3d.setup(obj);
-            % ---
-            build@VolumeDom(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_defining_obj;
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods
     methods (Access = private)
         % -----------------------------------------------------------------
@@ -127,6 +96,10 @@ classdef VolumeDom3d < VolumeDom
                     iddom2d = id_dom2d_{i}{j};
                     valid_iddom2d = f_validid(iddom2d,all_id_dom2d);
                     % ---
+                    if isempty(valid_iddom2d)
+                        error(['dom2d ' iddom2d ' not found !']);
+                    end
+                    % ---
                     for m = 1:length(valid_iddom2d)
                         % ---
                         dom2d = obj.parent_mesh.parent_mesh2d.dom.(valid_iddom2d{m});
@@ -138,6 +111,10 @@ classdef VolumeDom3d < VolumeDom
                             for k = 1:length(id_zline_{i})
                                 idz = id_zline_{i}{k};
                                 valid_idz = f_validid(idz,all_id_mesh1d);
+                                % ---
+                                if isempty(valid_idz)
+                                    error(['zline ' idz ' not found !']);
+                                end
                                 % ---
                                 for l = 1:length(valid_idz)
                                     % ---
@@ -177,6 +154,3 @@ classdef VolumeDom3d < VolumeDom
         end
     end
 end
-
-
-

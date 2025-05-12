@@ -1,74 +1,28 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef Mesh2d < Mesh
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
     % --- Constructors
     methods
         function obj = Mesh2d()
             obj = obj@Mesh;
-            Mesh2d.setup(obj);
         end
     end
-
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@Mesh(obj);
-            % ---
-            
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
-        end
-    end
-
-    methods (Access = public)
-        function reset(obj)
-            % reset super class
-            reset@Mesh(obj);
-            % ---
-            obj.setup_done = 0;
-            Mesh2d.setup(obj);
-            % --- reset dependent objs
-            % obj.reset_dependent_obj;
-        end
-    end
-    
-    methods
-        function build(obj)
-            % ---
-            Mesh2d.setup(obj);
-            % ---
-            build@Mesh(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            
-            % ---
-            obj.build_done = 1;
-        end
-    end
-
     % --- Methods - Add dom
     methods
         % ---

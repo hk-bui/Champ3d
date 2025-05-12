@@ -1,40 +1,47 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef PrismMesh < Mesh3d
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
- 
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem'};
+            argslist = {'id','node','elem'};
         end
     end
     % --- Constructors
     methods
         function obj = PrismMesh(args)
             arguments
+                args.id
                 args.node
                 args.elem
             end
             % ---
             obj = obj@Mesh3d;
+            obj.elem_type = 'prism';
             % ---
             if isempty(fieldnames(args))
                 return
@@ -50,26 +57,16 @@ classdef PrismMesh < Mesh3d
     % --- setup/reset/build/assembly
     methods (Static)
         function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@Mesh3d(obj);
-            % ---
-            obj.elem_type = 'prism';
-            % ---
-            obj.setup_done = 1;
             obj.build_done = 0;
             % ---
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
         end
     end
     methods (Access = public)
         function reset(obj)
-            % reset super
-            reset@Mesh3d(obj);
-            % ---
-            obj.setup_done = 0;
             PrismMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
@@ -78,12 +75,21 @@ classdef PrismMesh < Mesh3d
     methods
         function build(obj)
             % ---
-            PrismMesh.setup(obj);
-            % --- call super
-            build@Mesh3d(obj);
-            % ---
             if obj.build_done
                 return
+            end
+            % ---
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+                obj.build_meshds_done = 1;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+                obj.build_discrete_done = 1;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+                obj.build_intkit_done = 1;
             end
             % ---
             obj.build_done = 1;
@@ -150,7 +156,7 @@ classdef PrismMesh < Mesh3d
             refelem.nbNo_inEl = 6;
             refelem.nbNo_inEd = 2;
             refelem.EdNo_inEl = [1 2; 1 3; 1 4; 2 3; 2 5; 3 6; 4 5; 4 6; 5 6];
-            refelem.siNo_inEd = [+1, -1]; % w.r.t edge
+            refelem.siNo_inEd = [-1, +1]; % w.r.t edge
             refelem.FaNo_inEl = [1 2 3 0; 4 5 6 0; 1 2 5 4; 1 3 6 4; 2 3 6 5]; % tri first then quad
             %-----
             refelem.NoFa_ofEd = [4 5; 3 5; 1 2; 3 4; 1 2; 1 2; 4 5; 3 5; 3 4]; % !!! F(i,~j) - circular
@@ -203,6 +209,3 @@ classdef PrismMesh < Mesh3d
         end
     end
 end
-
-
-

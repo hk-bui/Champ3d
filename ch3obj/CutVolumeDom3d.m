@@ -1,28 +1,28 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef CutVolumeDom3d < VolumeDom3d
-
-    % --- Properties
     properties
         id_dom3d
         cut_equation
         gid_side_node_1
         gid_side_node_2
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-        
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -43,24 +43,42 @@ classdef CutVolumeDom3d < VolumeDom3d
             % ---
             obj <= args;
             % ---
-            if ~isempty(obj.id_dom3d) && ~isempty(obj.cut_equation)
-                obj.build;
-            end
+            CutVolumeDom3d.setup(obj);
             % ---
         end
     end
-
+    % --- setup/reset
+    methods (Static)
+        function setup(obj)
+            obj.build_from_cutequation;
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            CutVolumeDom3d.setup(obj);
+            % --- reset dependent obj
+            obj.reset_dependent_obj;
+        end
+    end
     % --- Methods
     methods (Access = private, Hidden)
         % -----------------------------------------------------------------
-        function build(obj)
+        function build_from_cutequation(obj)
             % ---
             gid_elem_ = [];
             gid_side_node_1_ = [];
             gid_side_node_2_ = [];
             iddom3 = f_to_scellargin(obj.id_dom3d);
+            all_id3 = fieldnames(obj.parent_mesh.dom);
             for i = 1:length(iddom3)
-                dom2cut = obj.parent_mesh.dom.(iddom3{i});
+                id3 = iddom3{i};
+                valid3 = f_validid(id3,all_id3);
+                % ---
+                if isempty(valid3)
+                    error(['dom3d ' id3 ' not found !']);
+                end
+                % ---
+                dom2cut = obj.parent_mesh.dom.(id3);
                 cut_dom = dom2cut.get_cutdom('cut_equation',obj.cut_equation);
                 gid_elem_ = [gid_elem_ cut_dom.gid_elem];
                 gid_side_node_1_ = [gid_side_node_1_ cut_dom.gid_side_node_1];
@@ -74,7 +92,6 @@ classdef CutVolumeDom3d < VolumeDom3d
         end
         % -----------------------------------------------------------------
     end
-
     % ---
     methods
         function plot(obj,args)
@@ -100,8 +117,4 @@ classdef CutVolumeDom3d < VolumeDom3d
             % -------------------------------------------------------------
         end
     end
-
 end
-
-
-

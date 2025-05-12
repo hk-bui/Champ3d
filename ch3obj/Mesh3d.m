@@ -1,71 +1,28 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef Mesh3d < Mesh
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-    end
-
     % --- Constructors
     methods
         function obj = Mesh3d()
             obj = obj@Mesh;
-            % ---
-            Mesh3d.setup(obj);
-            % ---
         end
     end
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@Mesh(obj);
-            % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
-            % ---
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % reset super
-            reset@Mesh(obj);
-            % ---
-            obj.setup_done = 0;
-            Mesh3d.setup(obj);
-            % --- reset dependent obj
-            % obj.reset_dependent_obj;
-        end
-    end
-    methods
-        function build(obj)
-            % ---
-            Mesh3d.setup(obj);
-            % --- call super
-            build@Mesh(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            obj.build_done = 1;
-            % ---
-        end
-    end
-
     % --- Methods - Add dom
     methods
         % ---
@@ -106,10 +63,11 @@ classdef Mesh3d < Mesh
                 obj.is_defining_obj_of(dom);
                 % ---
             else
+                % for dom created by dom operation
+                % no more need to def defining_obj
                 dom = args.dom_obj;
                 dom.id = args.id;
                 obj.dom.(args.id) = dom;
-                % obj.is_defining_obj_of(dom);
             end
         end
         % -----------------------------------------------------------------
@@ -132,7 +90,8 @@ classdef Mesh3d < Mesh
             if isempty(args.id)
                 error('#id must be given !');
             end
-            % ---
+            % --- surface dom is always created from vdom
+            % no more need to def defining_obj
             if ~isfield(args,'dom_obj')
                 % ---
                 args.parent_mesh = obj;
@@ -145,9 +104,6 @@ classdef Mesh3d < Mesh
                 dom.id = args.id;
                 obj.dom.(args.id) = dom;
             end
-            % ---
-            % obj.is_defining_obj_of(dom);
-            % ---
         end
     end
     

@@ -1,34 +1,38 @@
 %--------------------------------------------------------------------------
 % This code is written by: H-K. Bui, 2024
-% as a contribution to champ3d code.
+% as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
-% champ3d is copyright (c) 2023 H-K. Bui.
+% Champ3d is copyright (c) 2023-2025 H-K. Bui.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
 % See LICENSE and CREDITS files for more information.
 % Huu-Kien.Bui@univ-nantes.fr
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
 classdef QuadMeshFrom1d < QuadMesh
-
     properties
         id_xline
         id_yline
     end
-
     properties (Access = private)
-        setup_done = 0
         build_done = 0
+        % ---
+        build_meshds_done = 0;
+        build_discrete_done = 0;
+        build_intkit_done = 0;
+        build_prokit_done = 0;
     end
-
-    % --- Dependent Properties
-    properties (Dependent = true)
-
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'node','elem','parent_mesh','id_xline', ...
+            argslist = {'id','node','elem','parent_mesh','id_xline', ...
                         'id_yline'};
         end
     end
@@ -36,6 +40,7 @@ classdef QuadMeshFrom1d < QuadMesh
     methods
         function obj = QuadMeshFrom1d(args)
             arguments
+                args.id
                 % --- super
                 args.node
                 args.elem
@@ -57,20 +62,21 @@ classdef QuadMeshFrom1d < QuadMesh
             % ---
         end
     end
-
-    % --- Methods
+    % --- setup
     methods (Static)
         % -----------------------------------------------------------------
         function obj = setup(obj)
+            obj.build_done = 0;
             % ---
-            if obj.setup_done
-                return
-            end
+            obj.build_meshds_done = 0;
+            obj.build_discrete_done = 0;
+            obj.build_intkit_done = 0;
+            obj.build_prokit_done = 0;
             % ---
-            setup@QuadMesh(obj);
+            obj.cal_flatnode;
             % ---
             if isempty(obj.parent_mesh) || isempty(obj.id_xline) || ...
-                    isempty(obj.id_yline)
+               isempty(obj.id_yline)
                 return
             end
             % ---
@@ -166,41 +172,38 @@ classdef QuadMeshFrom1d < QuadMesh
             % --- edge length
             % obj.sface = f_area(node_,face_);
             % ---
-            obj.setup_done = 1;
-            obj.build_done = 0;
         end
     end
-
     methods (Access = public)
         function reset(obj)
-            % reset super class
-            reset@QuadMesh(obj);
-            % ---
-            obj.setup_done = 0;
             QuadMeshFrom1d.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
-
+    % --- build
     methods
         function build(obj)
-            % ---
-            QuadMeshFrom1d.setup(obj);
-            % ---
-            build@QuadMesh(obj);
             % ---
             if obj.build_done
                 return
             end
             % ---
-            
+            if ~obj.build_meshds_done
+                obj.build_meshds;
+                obj.build_meshds_done = 1;
+            end
+            if ~obj.build_discrete_done
+                obj.build_discrete;
+                obj.build_discrete_done = 1;
+            end
+            if ~obj.build_intkit_done
+                obj.build_intkit;
+                obj.build_intkit_done = 1;
+            end
             % ---
             obj.build_done = 1;
+            % ---
         end
     end
-    
 end
-
-
-
