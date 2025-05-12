@@ -182,11 +182,11 @@ classdef FEM3dAphijw < FEM3dAphi
                 obj.matrix.nu0nurwfwf * ...
                 obj.parent_mesh.discrete.rot * obj.matrix.a_bs;
             % ---
-            pmagnetRHS =   obj.parent_mesh.discrete.rot.' * ...
+            pmagnetRHS = obj.parent_mesh.discrete.rot.' * ...
                 ((1/mu0).* obj.matrix.wfwf) * ...
                 obj.parent_mesh.discrete.rot * obj.matrix.a_pm;
             % ---
-            jscoilRHS  =   obj.parent_mesh.discrete.rot.' * obj.matrix.wewf.' * obj.matrix.t_js;
+            jscoilRHS = obj.parent_mesh.discrete.rot.' * obj.matrix.wewf.' * obj.matrix.t_js;
             %--------------------------------------------------------------
             RHS = bsfieldRHS + pmagnetRHS + jscoilRHS;
             RHS = RHS(id_edge_a_unknown,1);
@@ -243,9 +243,11 @@ classdef FEM3dAphijw < FEM3dAphi
                     i_coil = coil.matrix.is_array;
                     alpha  = coil.matrix.alpha;
                     %------------------------------------------------------
-                    S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    S13 = (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    S23 = (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     S33 = alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha;
+                    % S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    % S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     % S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     % ---
                     S13 = S13(id_edge_a_unknown,1);
@@ -428,7 +430,7 @@ classdef FEM3dAphijw < FEM3dAphi
                 freq = obj.frequency;
                 jome = 1j*2*pi*freq;
                 %----------------------------------------------------------------------
-                obj.dof{it}.Phi.value = obj.dof{it}.Phi.value + 1/jome .* alphaV;
+                obj.dof{it}.Phi.value = obj.dof{it}.Phi.value;% + 1/jome .* alphaV;
                 %----------------------------------------------------------------------
                 obj.dof{it}.B.value = obj.parent_mesh.discrete.rot * obj.dof{it}.A.value;
                 obj.dof{it}.E.value = ...
