@@ -219,89 +219,11 @@ classdef EmModel < PhysicalModel
                 obj
                 % ---
                 args.id = 'no_id'
-                args.id_dom2d = []
-                args.id_dom3d = []
-                args.etrode_equation = []
-                args.coil_type {mustBeMember(args.coil_type,{'stranded','solid'})}
-                args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})} = 'tx'
-                args.source_type {mustBeMember(args.source_type,{'current_fed','voltage_fed','current_density_fed'})}
-                args.connexion {mustBeMember(args.connexion,{'serial','parallel'})}
-                args.fill_factor = 1
-                args.j_coil = 0
-                args.i_coil = 0
-                args.v_coil = 0
-                args.nb_turn = 1
-                args.cs_area = 1
+                args.coil_obj {mustBeA(args.coil_obj,'Coil')}
             end
             % ---
-            args.parent_model = obj;
-            % ---
-            coil_model = [];
-            % ---
-            if f_strcmpi(args.coil_type,'stranded')
-                coil_model = [coil_model 'Stranded'];
-            elseif f_strcmpi(args.coil_type,'solid')
-                coil_model = [coil_model 'Solid'];
-            end
-            % ---
-            if length(f_to_scellargin(args.etrode_equation)) == 1
-                coil_model = [coil_model 'Close'];
-            else
-                coil_model = [coil_model 'Open'];
-            end
-            % ---
-            if f_strcmpi(args.source_type,'current_fed')
-                coil_model = [coil_model 'Is'];
-                if f_strcmpi(args.coil_mode,'tx')
-                    if isempty(args.i_coil)
-                        error('#i_coil must be given !');
-                    end
-                end
-            elseif f_strcmpi(args.source_type,'voltage_fed')
-                coil_model = [coil_model 'Vs'];
-                if f_strcmpi(args.coil_mode,'tx')
-                    if isempty(args.v_coil)
-                        error('#v_coil must be given !');
-                    end
-                end
-            elseif f_strcmpi(args.source_type,'current_density_fed')
-                coil_model = [coil_model 'Js'];
-                if f_strcmpi(args.coil_mode,'tx')
-                    if isempty(args.j_coil)
-                        error('#j_coil must be given !');
-                    end
-                end
-            end
-            % ---
-            coil_model = [coil_model 'Coil'];
-            % ---
-            if any(f_strcmpi(coil_model,{'StrandedOpenJsCoil','StrandedCloseJsCoil'}))
-                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
-                             'etrode_equation','connexion', ...
-                             'cs_area','nb_turn','fill_factor',...
-                             'j_coil','coil_mode'};
-            elseif f_strcmpi(coil_model,'SolidOpenVsCoil')
-                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
-                             'etrode_equation',...
-                             'v_coil','coil_mode'};
-            elseif f_strcmpi(coil_model,'SolidOpenIsCoil')
-                validargs = {'id','parent_model','id_dom2d','id_dom3d',...
-                             'etrode_equation',...
-                             'i_coil','coil_mode'};
-            end
-            % ---
-            %argu = f_to_namedarg(args,'with_only',validargs);
-            % ---
-            if isa(obj,'FEM3dAphi')
-                % ---
-                coil_model = [coil_model 'Aphi'];
-                % ---
-                argu = f_to_namedarg(args,'for',coil_model);
-                % ---
-                phydom = feval(coil_model,argu{:});
-            end
-            % ---
-            obj.coil.(args.id) = phydom;
+            obj.coil.(args.id) = args.coil_obj;
+            obj.coil.(args.id).id = args.id;
         end
         % -----------------------------------------------------------------
         function add_mconductor(obj,args)

@@ -33,13 +33,13 @@ classdef VolumeDom3d < VolumeDom
         function obj = VolumeDom3d(args)
             arguments
                 % ---
-                args.id = []
-                args.parent_mesh = []
-                args.id_dom2d = []
-                args.id_zline = []
-                args.elem_code = []
-                args.gid_elem = []
-                args.condition = []
+                args.id
+                args.parent_mesh
+                args.id_dom2d
+                args.id_zline
+                args.elem_code
+                args.gid_elem
+                args.condition
             end
             % ---
             obj = obj@VolumeDom;

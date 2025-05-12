@@ -19,7 +19,7 @@
 classdef Xhandle < matlab.mixin.Copyable
     %----------------------------------------------------------------------
     properties
-        id
+        id = '-'
     end
     properties
         dependent_obj = []
