@@ -16,11 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef IsCoil < Xhandle
+classdef IsCoil < Coil
     % --- Contructor
     methods
         function obj = IsCoil()
-            obj@Xhandle;
+            obj@Coil;
         end
     end
 end

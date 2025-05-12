@@ -17,32 +17,27 @@
 %--------------------------------------------------------------------------
 
 classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
-    
-    % --- entry
     properties
-        v_coil = 0
+        V = 0
         coil_mode = 'tx'
+        % ---
+        matrix
     end
-
     % --- computed
     properties
-        j_coil
-        i_coil
-        z_coil
+        I
+        Z
         L0
     end
-
     % --- computed
     properties (Access = private)
-        setup_done = 0
         build_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'id','parent_model','id_dom2d','id_dom3d','etrode_equation', ...
-                        'sigma','i_coil','coil_mode'};
+            argslist = {'id','parent_model','id_dom3d','etrode_equation',...
+                'V','coil_mode'};
         end
     end
     % --- Contructor
@@ -51,17 +46,16 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
             arguments
                 args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.etrode_equation
                 % ---
-                args.sigma
-                args.v_coil
+                args.V
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
-            obj@OpenCoilAphi;
-            obj@SolidCoilAphi;
+            obj@OpenCoil;
+            obj@SolidCoil;
+            obj@VsCoil;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -69,24 +63,45 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            SolidOpenVsCoil.setup(obj);
+            % ---
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
-            setup@OpenCoilAphi(obj);
-            setup@SolidCoilAphi(obj);
-            % ---
-            if isempty(obj.v_coil)
+            % --- specific
+            if isempty(obj.V)
                 obj.coil_mode = 'rx';
-            elseif isnumeric(obj.v_coil)
-                if obj.v_coil == 0
+            elseif isnumeric(obj.V)
+                if obj.V == 0
                     obj.coil_mode = 'rx';
                 end
             end
             % ---
+            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % XTODO - surfacedom
+            % obj.petrode.is_defining_obj_of(obj);
+            % obj.netrode.is_defining_obj_of(obj);
+            % --- specific
+            obj.get_electrode;
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.vs_array = [];
+            obj.matrix.unit_current_field = [];
+            obj.matrix.alpha = [];
+            % ---
+            obj.build_done = 0;
+        end
+    end
+    methods (Access = public)
+        function reset(obj)
+            SolidOpenVsCoil.setup(obj);
         end
     end
 
@@ -94,37 +109,61 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
     methods
         function build(obj)
             % ---
-            obj.setup;
+            dom = obj.dom;
+            gid_elem = dom.gid_elem;
             % ---
-            if obj.build_done
+            vs_array = obj.V.getvalue('in_dom',obj.dom);
+            % --- check changes
+            is_changed = 1;
+            if isequal(vs_array,obj.matrix.vs_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
                 return
             end
+            %--------------------------------------------------------------
+            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.vs_array = vs_array;
+            %--------------------------------------------------------------
+            % OpenCoil first, then VsCoil
             % ---
-            build@OpenCoilAphi(obj);
-            build@VsCoilAphi(obj);
+            [unit_current_field,alpha] = obj.get_uj_alpha;
+            obj.matrix.unit_current_field = unit_current_field;
+            obj.matrix.alpha = alpha;
             % ---
-            obj.build_done = 1;
         end
     end
-
-    % --- reset
+    % --- assembly
     methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
+        function assembly(obj)
             % ---
-            reset@SolidCoilAphi(obj);
-            reset@OpenCoilAphi(obj);
-            reset@VsCoilAphi(obj);
+            obj.build;
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.id_node_netrode = ...
+                [obj.parent_model.matrix.id_node_netrode obj.gid_node_netrode];
+            obj.parent_model.matrix.id_node_petrode = ...
+                [obj.parent_model.matrix.id_node_petrode obj.gid_node_petrode];
+            %--------------------------------------------------------------
+            % obj.parent_model.matrix.alpha = ...
+            %     obj.parent_model.matrix.alpha + obj.matrix.alpha;
+            %--------------------------------------------------------------
+        end
+    end
+    % --- get
+    methods
+
+    end
+    % --- Utility Methods
+    methods
+        % -----------------------------------------------------------------
+        function plot(obj)
+            % ---
+            obj.dom.plot('face_color','none'); hold on
+            % ---
+            plot@OpenCoil(obj);
             % ---
         end
     end
-
 end

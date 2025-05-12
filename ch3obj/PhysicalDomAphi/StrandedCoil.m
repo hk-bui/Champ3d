@@ -16,11 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedCoil < Xhandle
+classdef StrandedCoil < Coil
     % --- Contructor
     methods
         function obj = StrandedCoil()
-            obj@Xhandle;
+            obj@Coil;
         end
     end
 end

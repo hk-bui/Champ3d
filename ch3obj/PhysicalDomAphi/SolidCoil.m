@@ -16,11 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef SolidCoil < Econductor
+classdef SolidCoil < Coil
     % --- Contructor
     methods
         function obj = SolidCoil()
-            obj@Econductor;
+            obj@Coil;
         end
     end
 end

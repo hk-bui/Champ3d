@@ -146,9 +146,11 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             obj.matrix.current_turn_density = ...
                 obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
             % ---
-            [t_js,wfjs] = obj.get_t_js;
-            obj.matrix.wfjs = wfjs;
-            obj.matrix.t_js = t_js;
+            if strcmpi(obj.coil_mode,'tx')
+                [t_js,wfjs] = obj.get_t_js;
+                obj.matrix.wfjs = wfjs;
+                obj.matrix.t_js = t_js;
+            end
             %--------------------------------------------------------------
             obj.build_done = 1;
         end

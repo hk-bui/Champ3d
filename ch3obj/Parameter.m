@@ -40,7 +40,7 @@ classdef Parameter < Xhandle
                 args.f = []
                 args.depend_on {mustBeMember(args.depend_on,...
                     {'celem','cface','velem','sface','ledge',...
-                     'J','V','T','B','E','H','A','P','Phi',...
+                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
                      'ltime'})}
                 args.from = []
                 args.varargin_list = []
@@ -437,10 +437,10 @@ classdef Parameter < Xhandle
                         end
                     end
                     % ---
-                    fargs{i} = source_model.coil.(id_coil).(['get' quantity]);
+                    fargs{i} = source_model.coil.(id_coil).(quantity);
                     % ---
                 elseif any(f_strcmpi(depon_,{...
-                        'J','V','T','B','E','H','A','P','Phi'}))
+                        'J','T','B','E','H','A','P','Phi'}))
                     % physical quantities
                     % must be able to take from other model with different ltime, mesh/dom
                     % ---

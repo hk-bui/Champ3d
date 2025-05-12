@@ -16,11 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VsCoil < Xhandle
+classdef VsCoil < Coil
     % --- Contructor
     methods
         function obj = VsCoil()
-            obj@Xhandle;
+            obj@Coil;
         end
     end
 end

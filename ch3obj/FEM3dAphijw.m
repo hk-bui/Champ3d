@@ -21,6 +21,9 @@ classdef FEM3dAphijw < FEM3dAphi
         build_done = 0
         base_matrix_done = 0
     end
+    properties (Access = private)
+        idVIsCoil = []
+    end
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -194,42 +197,52 @@ classdef FEM3dAphijw < FEM3dAphi
             if ~isempty(obj.coil)
                 id_coil__ = fieldnames(obj.coil);
             end
-            % ---
+            % --- all VsCoil first
             for iec = 1:length(id_coil__)
                 %----------------------------------------------------------
                 id_phydom = id_coil__{iec};
                 coil = obj.coil.(id_phydom);
+                % ---
+                if strcmpi(coil.coil_mode,'rx')
+                    continue
+                end
                 %----------------------------------------------------------
-                if isa(coil,'VsCoilAphi')
+                if isa(coil,'VsCoil')
                     %------------------------------------------------------
                     f_fprintf(0,'--- #coil/vscoil',1,id_phydom,0,'\n');
                     %------------------------------------------------------
-                    Voltage  = coil.matrix.v_coil;
-                    alpha    = coil.matrix.alpha;
+                    v_coil = coil.matrix.vs_array;
+                    alpha  = coil.matrix.alpha;
                     %------------------------------------------------------
-                    vRHSed = - obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * (alpha .* Voltage);
+                    vRHSed = - obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * (alpha .* v_coil);
                     vRHSed = vRHSed(id_edge_a_unknown);
                     %------------------------------------------------------
                     vRHSno = - obj.parent_mesh.discrete.grad.'  * obj.matrix.sigmawewe * ...
-                        obj.parent_mesh.discrete.grad * (alpha .* Voltage);
+                        obj.parent_mesh.discrete.grad * (alpha .* v_coil);
                     vRHSno = vRHSno(id_node_phi_unknown);
                     %------------------------------------------------------
                     RHS = RHS + [vRHSed; vRHSno];
                     %------------------------------------------------------
                 end
             end
-            % ---
+            % --- then IsCoil
+            o_ = 0;
+            obj.idVIsCoil = [];
             for iec = 1:length(id_coil__)
+                % ---
+                if strcmpi(coil.coil_mode,'rx')
+                    continue
+                end
                 %----------------------------------------------------------
                 id_phydom = id_coil__{iec};
                 coil = obj.coil.(id_phydom);
                 %----------------------------------------------------------
-                if isa(coil,'IsCoilAphi')
+                if isa(coil,'IsCoil')
                     %------------------------------------------------------
                     f_fprintf(0,'--- #coil/iscoil',1,id_phydom,0,'\n');
                     %------------------------------------------------------
+                    i_coil = coil.matrix.is_array;
                     alpha  = coil.matrix.alpha;
-                    i_coil = coil.matrix.i_coil;
                     %------------------------------------------------------
                     S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
@@ -243,6 +256,8 @@ classdef FEM3dAphijw < FEM3dAphi
                     LHS = [LHS; S13.' S23.' S33];
                     RHS = [RHS; i_coil];
                     %------------------------------------------------------
+                    o_ = o_ + 1;
+                    obj.idVIsCoil{o_} = coil;
                 end
             end
             %--------------------------------------------------------------
@@ -383,62 +398,71 @@ classdef FEM3dAphijw < FEM3dAphi
                 if (len_a_unknown + len_phi_unknown) < len_sol
                     obj.dof{it}.V = x(len_a_unknown+len_phi_unknown+1 : len_sol);
                 end
+                % --- get Vcoil
+                for iisc = 1:length(obj.dof{it}.V)
+                    obj.idVIsCoil{iisc}.V{it} = obj.dof{it}.V(iisc);
+                end
+                %----------------------------------------------------------------------
+                id_coil__ = {};
+                if ~isempty(obj.coil)
+                    id_coil__ = fieldnames(obj.coil);
+                end
+                % ---
+                alphaV = 0;
+                for iec = 1:length(id_coil__)
+                    id_phydom = id_coil__{iec};
+                    coil = obj.coil.(id_phydom);
+                    % ---
+                    if strcmpi(coil.coil_mode,'rx')
+                        continue
+                    end
+                    % ---
+                    if isa(coil,'VsCoil')
+                        alphaV  = alphaV + coil.matrix.alpha .* coil.matrix.vs_array;
+                    elseif isa(coil,'IsCoil')
+                        alphaV  = alphaV + coil.matrix.alpha .* coil.V{it};
+                    end
+                end
                 %----------------------------------------------------------------------
                 freq = obj.frequency;
                 jome = 1j*2*pi*freq;
-                % ---
+                %----------------------------------------------------------------------
+                obj.dof{it}.Phi.value = obj.dof{it}.Phi.value + 1/jome .* alphaV;
+                %----------------------------------------------------------------------
                 obj.dof{it}.B.value = obj.parent_mesh.discrete.rot * obj.dof{it}.A.value;
                 obj.dof{it}.E.value = ...
                     -jome .* (obj.dof{it}.A.value + ...
                               obj.parent_mesh.discrete.grad * obj.dof{it}.Phi.value);
                 %----------------------------------------------------------------------
+                obj.postpro;
             end
         end
         % -----------------------------------------------------------------------------
         function postpro(obj)
-            %--------------------------------------------------------------------------
-            parent_mesh = obj.parent_mesh;
-            nb_elem = parent_mesh.nb_elem;
-            nb_face = parent_mesh.nb_face;
-            nb_edge = parent_mesh.nb_edge;
-            nb_node = parent_mesh.nb_node;
-            %--------------------------------------------------------------------------
-            obj.field.av = obj.parent_mesh.field_we('dof',obj.dof.a);
-            obj.field.bv = obj.parent_mesh.field_wf('dof',obj.dof.b);
-            obj.field.ev = obj.parent_mesh.field_we('dof',obj.dof.e);
-            obj.field.phiv = obj.parent_mesh.field_wn('dof',obj.dof.phi);
-            obj.field.phi = obj.dof.phi;
-            % -------------------------------------------------------------------------
-            obj.field.jv = sparse(3,nb_elem);
-            obj.field.pv = sparse(1,nb_elem);
-            obj.field.js = sparse(2,nb_face);
-            obj.field.ps = sparse(1,nb_face);
-            %--------------------------------------------------------------------------
-            %allowed_physical_dom = {'econductor','sibc','coil'};
-            allowed_physical_dom = {'econductor','sibc'};
-            %--------------------------------------------------------------------------
-            for i = 1:length(allowed_physical_dom)
-                phydom_type = allowed_physical_dom{i};
+            %----------------------------------------------------------------------
+            it = obj.ltime.it;
+            %----------------------------------------------------------------------
+            id_coil__ = {};
+            if ~isempty(obj.coil)
+                id_coil__ = fieldnames(obj.coil);
+            end
+            % --- VsCoil
+            for iec = 1:length(id_coil__)
+                %----------------------------------------------------------
+                id_phydom = id_coil__{iec};
+                coil = obj.coil.(id_phydom);
                 % ---
-                if isprop(obj,phydom_type)
-                    if isempty(obj.(phydom_type))
-                        continue
-                    end
-                else
+                if strcmpi(coil.coil_mode,'rx')
                     continue
                 end
-                % ---
-                allphydomid = fieldnames(obj.(phydom_type));
-                for j = 1:length(allphydomid)
-                    id_phydom = allphydomid{j};
-                    phydom = obj.(phydom_type).(id_phydom);
-                    % ---
-                    f_fprintf(0,['--- #' phydom_type],1,id_phydom,0,'\n');
-                    % ---
-                    phydom.postpro;
+                %----------------------------------------------------------
+                if isa(coil,'VsCoil')
+                    alpha  = coil.matrix.alpha;
+                    coil.I{it} = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
+                        * (obj.parent_mesh.discrete.grad * alpha);
                 end
             end
-            %--------------------------------------------------------------------------
+            %----------------------------------------------------------------------
         end
     end
 end
