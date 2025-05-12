@@ -16,23 +16,22 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
-    
-    % --- entry
+classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoil & JsCoil
     properties
-        connexion {mustBeMember(connexion,{'serial','parallel'})} = 'serial'
+        connexion = 'serial'
         cs_area = 1
         nb_turn = 1
         fill_factor = 1
-        j_coil = 0
+        J = 0
         coil_mode = 'tx'
+        % ---
+        matrix
     end
-
     % --- computed
     properties
-        i_coil
-        v_coil
-        z_coil
+        I
+        V
+        Z
         L0
     end
 
@@ -45,25 +44,25 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation', ...
+            argslist = {'id','parent_model','id_dom3d','etrode_equation', ...
                         'connexion','cs_area','nb_turn','fill_factor', ...
-                        'j_coil','coil_mode'};
+                        'J','coil_mode'};
         end
     end
     % --- Contructor
     methods
         function obj = StrandedCloseJsCoilAphi(args)
             arguments
+                args.id
                 args.parent_model
-                args.id_dom2d
                 args.id_dom3d
                 args.etrode_equation
                 % ---
-                args.connexion
+                args.connexion {mustBeMember(args.connexion,{'serial','parallel'})} = 'serial'
                 args.cs_area
                 args.nb_turn
                 args.fill_factor
-                args.j_coil
+                args.J
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
@@ -86,10 +85,10 @@ classdef StrandedCloseJsCoilAphi < CloseCoilAphi & StrandedCoilAphi & JsCoilAphi
             setup@StrandedCoilAphi(obj);
             setup@JsCoilAphi(obj);
             % ---
-            if isempty(obj.j_coil)
+            if isempty(obj.J)
                 obj.coil_mode = 'rx';
-            elseif isnumeric(obj.j_coil)
-                if obj.j_coil == 0
+            elseif isnumeric(obj.J)
+                if obj.J == 0
                     obj.coil_mode = 'rx';
                 end
             end

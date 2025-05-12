@@ -16,44 +16,40 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
-    
-    % --- entry
+classdef StrandedOpenJsCoilAphi < OpenCoil & StrandedCoil & JsCoil
     properties
         connexion {mustBeMember(connexion,{'serial','parallel'})} = 'serial'
         cs_area = 1
         nb_turn = 1
         fill_factor = 1
-        j_coil = 0
+        Js = 0
         coil_mode = 'tx'
+        % ---
+        matrix
     end
-
     % --- computed
     properties
-        i_coil
-        v_coil
-        z_coil
+        I
+        V
+        Z
         L0
     end
-
-    % --- computed
     properties (Access = private)
         build_done = 0
-        assembly_done = 0
     end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation', ...
+            argslist = {'id','parent_model','id_dom3d','etrode_equation', ...
                         'connexion','cs_area','nb_turn','fill_factor', ...
-                        'j_coil','coil_mode'};
+                        'Js','coil_mode'};
         end
     end
     % --- Contructor
     methods
         function obj = StrandedOpenJsCoilAphi(args)
             arguments
+                args.id
                 args.parent_model
                 args.id_dom2d
                 args.id_dom3d
@@ -63,11 +59,11 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
                 args.cs_area
                 args.nb_turn
                 args.fill_factor
-                args.j_coil
+                args.Js
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
-            obj@OpenCoilAphi;
+            obj@OpenCoil;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -75,60 +71,103 @@ classdef StrandedOpenJsCoilAphi < OpenCoilAphi & StrandedCoilAphi & JsCoilAphi
             % ---
             obj <= args;
             % ---
-            obj.setup;
+            StrandedOpenJsCoilAphi.setup(obj);
         end
     end
 
     % --- setup
-    methods
+    methods (Static)
         function setup(obj)
-            setup@OpenCoilAphi(obj);
-            setup@StrandedCoilAphi(obj);
-            setup@JsCoilAphi(obj);
-            % ---
-            if isempty(obj.j_coil)
+            % --- specific
+            if isempty(obj.Js)
                 obj.coil_mode = 'rx';
-            elseif isnumeric(obj.j_coil)
-                if obj.j_coil == 0
+            elseif isnumeric(obj.Js)
+                if obj.Js == 0
                     obj.coil_mode = 'rx';
                 end
             end
             % ---
+            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            % --- call utility methods
+            obj.set_parameter;
+            obj.get_geodom;
+            obj.dom.is_defining_obj_of(obj);
+            % --- specific
+            obj.get_electrode;
+            % --- Initialization
+            obj.matrix.gid_elem = [];
+            obj.matrix.js_array = [];
+            obj.matrix.unit_current_field = [];
+            obj.matrix.alpha = [];
+            obj.matrix.current_turn_density = [];
+            obj.matrix.wfjs = [];
+            obj.matrix.t_js = [];
+            % ---
+            obj.build_done = 0;
         end
     end
-
+    methods (Access = public)
+        function reset(obj)
+            StrandedOpenJsCoilAphi.setup(obj);
+        end
+    end
     % --- build
     methods
         function build(obj)
             % ---
-            obj.setup;
+            dom = obj.dom;
+            gid_elem = dom.gid_elem;
             % ---
-            if obj.build_done
+            js_array = obj.Js.getvalue('in_dom',obj.dom);
+            % --- check changes
+            is_changed = 1;
+            if isequal(js_array,obj.matrix.js_array) && ...
+               isequal(gid_elem,obj.matrix.gid_elem)
+                is_changed = 0;
+            end
+            %--------------------------------------------------------------
+            if ~is_changed && obj.build_done == 1
                 return
             end
+            %--------------------------------------------------------------
+            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.js_array = js_array;
+            %--------------------------------------------------------------
+            % OpenCoil first, then JsCoil
             % ---
-            build@OpenCoilAphi(obj);
-            build@JsCoilAphi(obj);
+            [unit_current_field,alpha] = obj.get_uj_alpha;
+            obj.matrix.unit_current_field = unit_current_field;
+            obj.matrix.alpha = alpha;
+            obj.matrix.current_turn_density = ...
+                obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
+            % ---
+            [t_js,wfjs] = obj.get_t_js;
+            obj.matrix.wfjs = wfjs;
+            obj.matrix.t_js = t_js;
+            %--------------------------------------------------------------
+            obj.build_done = 1;
         end
     end
-
-    % --- reset
+    % --- assembly
     methods
-        function reset(obj)
-            if isprop(obj,'setup_done')
-                obj.setup_done = 0;
-            end
-            if isprop(obj,'build_done')
-                obj.build_done = 0;
-            end
-            if isprop(obj,'assembly_done')
-                obj.assembly_done = 0;
-            end
+        function assembly(obj)
             % ---
-            reset@OpenCoilAphi(obj);
-            reset@JsCoilAphi(obj);
+            obj.build;
+            %--------------------------------------------------------------
+            obj.parent_model.matrix.t_js = ...
+                obj.parent_model.matrix.t_js + obj.matrix.t_js;
+            %--------------------------------------------------------------
+        end
+    end
+    % --- Utility Methods
+    methods
+        % -----------------------------------------------------------------
+        function plot(obj)
+            % ---
+            obj.dom.plot('face_color','none'); hold on
+            % ---
+            plot@OpenCoil(obj);
             % ---
         end
     end
-
 end

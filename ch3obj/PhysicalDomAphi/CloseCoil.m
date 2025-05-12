@@ -19,9 +19,9 @@
 classdef CloseCoil < Coil
     properties
         etrode_equation
+        % ---
         electrode_dom
         shape_dom
-        matrix
     end
 
     % --- computed

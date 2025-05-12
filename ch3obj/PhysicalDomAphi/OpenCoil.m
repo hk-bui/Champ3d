@@ -17,102 +17,31 @@
 %--------------------------------------------------------------------------
 
 classdef OpenCoil < Coil
-
-    % --- computed
     properties
         etrode_equation
+        % ---
         gid_node_petrode
         gid_node_netrode
-        matrix
     end
-
-    properties (Access = private)
-        setup_done = 0
-        build_done = 0
-        assembly_done = 0
-    end
-    
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','id_dom2d','id_dom3d','etrode_equation'};
+            argslist = {'parent_model','id_dom3d','etrode_equation'};
         end
     end
     % --- Contructor
     methods
-        function obj = OpenCoil(args)
-            arguments
-                args.parent_model
-                args.id_dom2d
-                args.id_dom3d
-                args.etrode_equation
-            end
-            % ---
+        function obj = OpenCoil()
             obj@Coil;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            OpenCoil.setup(obj);
-            % ---
-            % must reset build+assembly
-            obj.build_done = 0;
-            obj.assembly_done = 0;
         end
     end
-
-    % --- setup/reset/build/assembly
-    methods (Static)
-        function setup(obj)
-            % ---
-            if obj.setup_done
-                return
-            end
-            % ---
-            setup@OpenCoil(obj);
-            % ---
-            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
-            % ---
-            obj.get_electrode;
-            % ---
-            % ---
-            obj.setup_done = 1;
-            % ---
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            % ---
-            % must reset setup+build+assembly
-            obj.setup_done = 0;
-            obj.build_done = 0;
-            obj.assembly_done = 0;
-            % ---
-            % must call super reset
-            % ,,, with obj as argument
-            reset@OpenCoil(obj);
-        end
-    end
+    % --- Utility Methods
     methods
-        function build(obj)
+        function [unit_current_field,alpha] = get_uj_alpha(obj)
             % ---
-            OpenCoil.setup(obj);
-            % ---
-            build@OpenCoil(obj);
-            % ---
-            if obj.build_done
-                return
-            end
-            % ---
-            parent_mesh = obj.dom.parent_mesh;
-            %parent_mesh.build_meshds;
-            %parent_mesh.build_discrete;
-            %parent_mesh.build_intkit;
+            parent_mesh = obj.parent_model.parent_mesh;
             % --- current field
-            unit_current_field = sparse(3,parent_mesh.nb_elem);
+            unit_current_field = zeros(3,parent_mesh.nb_elem);
             % ---
             nbEd_inEl = parent_mesh.refelem.nbEd_inEl;
             % ---
@@ -152,7 +81,7 @@ classdef OpenCoil < Coil
                 RHS = - gradgrad * V;
                 gradgrad = gradgrad(id_node_v_unknown,id_node_v_unknown);
                 RHS = RHS(id_node_v_unknown,1);
-                V(id_node_v_unknown) = f_solve_axb(gradgrad,RHS);
+                V(id_node_v_unknown) = gradgrad \ RHS;
             end
             % ---
             dofJs = parent_mesh.discrete.grad * V;
@@ -161,53 +90,11 @@ classdef OpenCoil < Coil
             % ---
             unit_current_field = unit_current_field + vJs;
             % ---
-            % current turn density vector field
-            % current_turn_density  = current_field .* nb_turn ./ cs_area;
-            % ---
-            obj.matrix.gid_elem = obj.dom.gid_elem;
-            obj.matrix.unit_current_field = unit_current_field;
-            obj.matrix.alpha = V;
-            % ---
-            obj.build_done = 1;
-        end
-    end
-    methods
-        function assembly(obj)
-            % ---
-            obj.build;
-            assembly@OpenCoil(obj);
-            % ---
-            if obj.assembly_done
-                return
-            end
-            % ---
-            obj.assembly_done = 1;
+            alpha = V;
             % ---
         end
     end
-    % --- Methods
-    methods
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'k'
-                args.face_color = 'none'
-                args.alpha {mustBeNumeric} = 0.5
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@OpenCoil(obj,argu{:});
-            % ---
-            if isfield(obj.matrix,'unit_current_field')
-                if ~isempty(obj.matrix.unit_current_field)
-                    hold on;
-                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
-                end
-            end
-        end
-    end
-    % --- Methods
+    % --- Utility Methods
     methods
         % -----------------------------------------------------------------
         function get_electrode(obj)
@@ -249,16 +136,7 @@ classdef OpenCoil < Coil
             obj.gid_node_netrode = unique(gid_node(netrode));
         end
         % -----------------------------------------------------------------
-        function plot(obj,args)
-            arguments
-                obj
-                args.edge_color = 'none'
-                args.face_color = 'c'
-                args.alpha {mustBeNumeric} = 0.9
-            end
-            % ---
-            argu = f_to_namedarg(args);
-            plot@Coil(obj,argu{:}); hold on
+        function plot(obj)
             % ---
             penode = obj.parent_model.parent_mesh.node(:,obj.gid_node_petrode);
             nenode = obj.parent_model.parent_mesh.node(:,obj.gid_node_netrode);
@@ -268,6 +146,14 @@ classdef OpenCoil < Coil
             elseif size(penode,1) == 3
                 plot3(penode(1,:),penode(2,:),penode(3,:),'ro'); hold on
                 plot3(nenode(1,:),nenode(2,:),nenode(3,:),'bo'); hold on
+            end
+            % ---
+            if isfield(obj.matrix,'unit_current_field')
+                if ~isempty(obj.matrix.unit_current_field)
+                    hold on;
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
+                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                end
             end
         end
         % -----------------------------------------------------------------
