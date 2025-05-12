@@ -18,7 +18,7 @@
 
 classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
     properties
-        I = 0
+        Is = 0
         coil_mode = 'tx'
         % ---
         matrix
@@ -37,7 +37,7 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
     methods (Static)
         function argslist = validargs()
             argslist = {'id','parent_model','id_dom3d','etrode_equation',...
-                'I','coil_mode'};
+                'Is','coil_mode'};
         end
     end
     % --- Contructor
@@ -49,7 +49,7 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
                 args.id_dom3d
                 args.etrode_equation
                 % ---
-                args.I
+                args.Is
                 args.coil_mode {mustBeMember(args.coil_mode,{'tx','rx'})}
             end
             % ---
@@ -72,10 +72,10 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
     methods (Static)
         function setup(obj)
             % --- specific
-            if isempty(obj.I)
+            if isempty(obj.Is)
                 obj.coil_mode = 'rx';
-            elseif isnumeric(obj.I)
-                if obj.I == 0
+            elseif isnumeric(obj.Is)
+                if obj.Is == 0
                     obj.coil_mode = 'rx';
                 end
             end
@@ -112,7 +112,7 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
             dom = obj.dom;
             gid_elem = dom.gid_elem;
             % ---
-            is_array = obj.I.getvalue('in_dom',obj.dom);
+            is_array = obj.Is.getvalue('in_dom',obj.dom);
             % --- check changes
             is_changed = 1;
             if isequal(is_array,obj.matrix.is_array) && ...
