@@ -243,12 +243,12 @@ classdef FEM3dAphijw < FEM3dAphi
                     i_coil = coil.matrix.is_array;
                     alpha  = coil.matrix.alpha;
                     %------------------------------------------------------
-                    S13 = (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    S23 = (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    S33 = alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha;
-                    % S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    % S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
-                    % S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    % S13 = (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    % S23 = (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    % S33 = alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha;
+                    S13 = jome * (obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    S23 = jome * (obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
+                    S33 = jome * (alpha.' * obj.parent_mesh.discrete.grad.' * obj.matrix.sigmawewe * obj.parent_mesh.discrete.grad * alpha);
                     % ---
                     S13 = S13(id_edge_a_unknown,1);
                     S23 = S23(id_node_phi_unknown,1);
@@ -332,6 +332,8 @@ classdef FEM3dAphijw < FEM3dAphi
             tol_in = args.tol_in;
             maxniter_in = args.maxniter_in;
             %----------------------------------------------------------
+            
+            %----------------------------------------------------------
             improvement = 1;
             niter_out = 0;
             % ---
@@ -394,12 +396,12 @@ classdef FEM3dAphijw < FEM3dAphi
                 %------------------------------------------------------
                 obj.dof{it}.A.value(id_edge_a_unknown) ...
                     = x(1:len_a_unknown);
-                obj.dof{it}.Phi.value(id_node_phi_unknown) ...
-                    = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
+                % obj.dof{it}.Phi.value(id_node_phi_unknown) ...
+                %     = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
                 %----------------------------------------------------------------------
                 obj.dof{it}.V = 0;
                 if (len_a_unknown + len_phi_unknown) < len_sol
-                    obj.dof{it}.V = x(len_a_unknown+len_phi_unknown+1 : len_sol);
+                    obj.dof{it}.V = x(len_a_unknown+len_phi_unknown+1 : len_sol).*obj.jome;
                 end
                 % --- get Vcoil
                 for iisc = 1:length(obj.dof{it}.V)
@@ -430,12 +432,17 @@ classdef FEM3dAphijw < FEM3dAphi
                 freq = obj.frequency;
                 jome = 1j*2*pi*freq;
                 %----------------------------------------------------------------------
-                % obj.dof{it}.Phi.value = obj.dof{it}.Phi.value + 1/jome .* alphaV;
+                % obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown) + 1/jome .* alphaV;
                 if any(alphaV)
-                    obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);% + 1/jome .* alphaV(id_node_phi_unknown);
+                    obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown) + 1/jome .* alphaV(id_node_phi_unknown);
                 else
                     obj.dof{it}.Phi.value(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
                 end
+                % ---
+                phivalue = zeros(obj.parent_mesh.nb_node,1);
+                phivalue(id_node_phi_unknown) = x(len_a_unknown+1 : len_a_unknown+len_phi_unknown);
+                %----------------------------------------------------------------------
+                obj.dof{it}.Phi.value = phivalue + 1/jome .* alphaV;
                 %----------------------------------------------------------------------
                 obj.dof{it}.B.value = obj.parent_mesh.discrete.rot * obj.dof{it}.A.value;
                 obj.dof{it}.E.value = ...
