@@ -436,9 +436,23 @@ classdef Parameter < Xhandle
                             error(['no #coil ' id_coil ' in source model !'])
                         end
                     end
-                    % ---
-                    fargs{i} = source_model.coil.(id_coil).(quantity);
-                    % ---
+                    % get by time interpolation
+                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
+                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                    if next_it == back_it
+                        fargs{i} = source_model.coil.(id_coil).(quantity){back_it};
+                    else
+                        % ---
+                        val01 = source_model.coil.(id_coil).(quantity){back_it};
+                        val02 = source_model.coil.(id_coil).(quantity){next_it};
+                        % ---
+                        delta_v = val02 - val01;
+                        delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
+                        % ---
+                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                        fargs{i} = val01 + delta_v./delta_t .* dt;
+                    end
+                    % --------------------------------------
                 elseif any(f_strcmpi(depon_,{...
                         'J','T','B','E','H','A','P','Phi'}))
                     % physical quantities

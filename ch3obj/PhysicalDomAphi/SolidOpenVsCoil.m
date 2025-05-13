@@ -23,14 +23,7 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
         % ---
         matrix
     end
-    % --- computed
-    properties
-        V
-        I
-        Z
-        L0
-    end
-    % --- computed
+    % --- 
     properties (Access = private)
         build_done = 0
     end

@@ -27,13 +27,6 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
         % ---
         matrix
     end
-    % --- computed
-    properties
-        I
-        V
-        Z
-        L0
-    end
     % --- 
     properties (Access = private)
         build_done = 0
@@ -66,6 +59,9 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             obj@CloseCoil;
             obj@StrandedCoil;
             obj@JsCoil;
+            % ---
+            obj.dofuJ = EdgeDof('parent_model',obj.parent_model);
+            obj.uJfield = EdgeDofBasedVectorElemField('parent_model',obj.parent_model,'dof',obj.dofuJ);
             % ---
             if isempty(fieldnames(args))
                 return
@@ -145,6 +141,7 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             obj.matrix.alpha = alpha;
             obj.matrix.current_turn_density = ...
                 obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
+            obj.dofuJ.value = obj.matrix.current_turn_density;
             % ---
             if strcmpi(obj.coil_mode,'tx')
                 [t_js,wfjs] = obj.get_t_js;
@@ -175,6 +172,39 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             % ---
             plot@CloseCoil(obj);
             % ---
+        end
+        % -----------------------------------------------------------------
+    end
+    % --- Utility Methods
+    methods
+    % -----------------------------------------------------------------
+        function getcircuitquantity(obj)
+            it = obj.parent_model.ltime.it;
+            % ---
+            obj.getFlux;
+            % ---
+            jome = obj.parent_model.jome;
+            if jome ~= 0
+                obj.V(it) = - jome * obj.Flux;
+                % ---
+                switch obj.coil_mode
+                    case 'rx'
+                        obj.I(it) = 0;
+                        obj.Z(it) = 0;
+                        obj.L(it) = 0;
+                        obj.R(it) = 0;
+                        obj.P(it) = 0;
+                        obj.Q(it) = 0;
+                    case 'tx'
+                        obj.I(it) = obj.matrix.js_array(1) * obj.cs_area;
+                        obj.Z(it) = obj.V(it) / obj.I(it);
+                        obj.L(it) = imag(obj.Z(it)) / jome;
+                        obj.R(it) = real(obj.Z(it));
+                        obj.P(it) = 1/2 * real(obj.V(it) * conj(obj.I(it)));
+                        obj.Q(it) = 1/2 * imag(obj.V(it) * conj(obj.I(it)));
+                end
+                % ---
+            end
         end
     end
 end
