@@ -456,10 +456,6 @@ classdef FEM3dAphijw < FEM3dAphi
                 %------------------------------------------------------------------
                 id_phydom = id_coil__{iec};
                 coil = obj.coil.(id_phydom);
-                % ---
-                if strcmpi(coil.coil_mode,'rx')
-                    continue
-                end
                 %------------------------------------------------------------------
                 if isa(coil,'VsCoil')
                     alpha  = coil.matrix.alpha;
@@ -471,6 +467,9 @@ classdef FEM3dAphijw < FEM3dAphi
                     coil.I(it) = - (obj.matrix.sigmawewe * obj.dof{it}.E.value).' ...
                                  * (obj.parent_mesh.discrete.grad * alpha);
                 end
+                %------------------------------------------------------------------
+                coil.getcircuitquantity;
+                %------------------------------------------------------------------
             end
             %----------------------------------------------------------------------
         end

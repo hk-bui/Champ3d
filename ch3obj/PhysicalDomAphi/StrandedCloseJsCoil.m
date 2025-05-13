@@ -60,9 +60,6 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             obj@StrandedCoil;
             obj@JsCoil;
             % ---
-            obj.dofuJ = EdgeDof('parent_model',obj.parent_model);
-            obj.uJfield = EdgeDofBasedVectorElemField('parent_model',obj.parent_model,'dof',obj.dofuJ);
-            % ---
             if isempty(fieldnames(args))
                 return
             end
@@ -95,6 +92,9 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             % obj.etrode.is_defining_obj_of(obj);
             % --- specific
             obj.get_electrode;
+            % --- Initialization
+            obj.dofuJ = EdgeDof('parent_model',obj.parent_model);
+            obj.uJfield = EdgeDofBasedVectorElemField('parent_model',obj.parent_model,'dof',obj.dofuJ);
             % --- Initialization
             obj.matrix.gid_elem = [];
             obj.matrix.js_array = [];
@@ -136,12 +136,12 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             %--------------------------------------------------------------
             % CloseCoil first, then JsCoil
             % ---
-            [unit_current_field,alpha] = obj.get_uj_alpha;
+            [unit_current_field,alpha,dofuJ_] = obj.get_uj_alpha;
             obj.matrix.unit_current_field = unit_current_field;
             obj.matrix.alpha = alpha;
             obj.matrix.current_turn_density = ...
                 obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
-            obj.dofuJ.value = obj.matrix.current_turn_density;
+            obj.dofuJ.value = dofuJ_;
             % ---
             if strcmpi(obj.coil_mode,'tx')
                 [t_js,wfjs] = obj.get_t_js;

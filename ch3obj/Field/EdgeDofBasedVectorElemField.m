@@ -21,14 +21,6 @@ classdef EdgeDofBasedVectorElemField < VectorElemField
         parent_model
         dof
     end
-    % properties (Dependent)
-    %     cvalue
-    %     cnode
-    %     ivalue
-    %     inode
-    %     gvalue
-    %     gnode
-    % end
     % --- Contructor
     methods
         function obj = EdgeDofBasedVectorElemField(args)

@@ -89,7 +89,7 @@ classdef CloseCoil < Coil
                     V(id_node_v_unknown) = gradgrad \ RHS;
                 end
                 % ---
-                dofJs = parent_mesh.discrete.grad * V;
+                dofJs = - parent_mesh.discrete.grad * V;
                 vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gid_elem);
                 vJs = f_normalize(vJs);
                 % ---
