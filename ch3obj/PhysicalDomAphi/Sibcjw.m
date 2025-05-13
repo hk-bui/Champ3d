@@ -94,6 +94,8 @@ classdef Sibcjw < PhysicalDom
     methods
         function build(obj)
             % ---
+            it = obj.parent_model.ltime.it;
+            % ---
             dom = obj.dom;
             % ---
             gid_face = dom.gid_face;
@@ -129,8 +131,8 @@ classdef Sibcjw < PhysicalDom
             is_changed = 1;
             if isequal(gid_node_phi,obj.matrix.gid_node_phi) && ...
                isequal(gid_face_,obj.matrix.gid_face) && ...
-               isequal(sigma_array,obj.matrix.sigma_array) && ...
-               isequal(skindepth,obj.matrix.skindepth)
+               isequal(sigma_array,obj.matrix.sigma_array{it}) && ...
+               isequal(skindepth,obj.matrix.skindepth{it})
                 is_changed = 0;
             end
             %--------------------------------------------------------------
@@ -140,9 +142,9 @@ classdef Sibcjw < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.gid_node_phi = gid_node_phi;
             obj.matrix.gid_face = gid_face_;
-            obj.matrix.sigma_array = sigma_array;
-            obj.matrix.skindepth = skindepth;
-            obj.matrix.z_sibc = z_sibc;
+            obj.matrix.sigma_array{it} = sigma_array;
+            obj.matrix.skindepth{it} = skindepth;
+            obj.matrix.z_sibc{it} = z_sibc;
             % obj.matrix.mur_array = mur_array;
             % obj.matrix.cparam_array = cparam_array;
             %--------------------------------------------------------------

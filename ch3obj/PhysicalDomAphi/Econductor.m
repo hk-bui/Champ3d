@@ -98,7 +98,7 @@ classdef Econductor < PhysicalDom
             sigma_array = obj.sigma.getvalue('in_dom',dom);
             % --- check changes
             is_changed = 1;
-            if isequal(sigma_array,obj.matrix.sigma_array) && ...
+            if isequal(sigma_array,obj.matrix.sigma_array{it}) && ...
                isequal(gid_elem,obj.matrix.gid_elem) && ...
                isequal(gid_node_phi,obj.matrix.gid_node_phi)
                 is_changed = 0;
@@ -110,11 +110,7 @@ classdef Econductor < PhysicalDom
             %--------------------------------------------------------------
             obj.matrix.gid_elem = gid_elem;
             obj.matrix.gid_node_phi = gid_node_phi;
-            obj.matrix.sigma_array = sigma_array;
-            % ---
-            obj.matrix.tarray{it}.sigma = ...
-                ElemTensorArray('parent_model',obj.parent_model,'gid_elem',gid_elem);
-            obj.matrix.tarray{it}.sigma.store(sigma_array);
+            obj.matrix.sigma_array{it} = sigma_array;
             %--------------------------------------------------------------
             % local sigmawewe matrix
             lmatrix = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);

@@ -27,7 +27,6 @@ classdef PhysicalModel < Xhandle
         matrix
         field
         dof
-        tarray
     end
     % --- Constructor
     methods
