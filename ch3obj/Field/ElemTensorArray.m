@@ -17,52 +17,52 @@
 %--------------------------------------------------------------------------
 
 classdef ElemTensorArray < TensorArray
-    properties
-        gid_elem = []
+    % --- computed
+    properties (Dependent)
+        tarray
     end
     % --- Contructor
     methods
         function obj = ElemTensorArray(args)
             arguments
-                args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.gid_elem
+                args.physical_dom {mustBeA(args.physical_dom,'PhysicalDom')}
+                args.parameter_array = []
             end
             % ---
             obj = obj@TensorArray;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model')
-                    error('#parent_model must be given !');
+                if ~isfield(args,'physical_dom')
+                    error('#physical_dom must be given !');
                 end
             end
             % ---
-            obj.parent_model = args.parent_model;
-            if isfield(args,'gid_elem')
-                obj.gid_elem = args.gid_elem;
-            end
+            obj <= args;
             % ---
         end
     end
-    % ---
+    % --- get
     methods
         % -----------------------------------------------------------------
-        function store(obj,array)
-            arguments
-                obj
-                array
+        function tarray = get.tarray(obj)
+            % ---
+            if isempty(obj.parameter_array)
+                tarray = [];
+                return
             end
             % ---
-            [array, array_type_] = f_column_format(array);
+            array_type = f_parraytype(obj.parameter_array);
             % ---
-            obj.tarray = array;
+            lent = length(obj.physical_dom.dom.gid_elem);
             % ---
-            switch array_type_
+            tarray = zeros(lent,3,3);
+            switch array_type
                 case 'scalar'
-                    obj.array_type = 'scalar';
+                    tarray(:,1,1) = obj.parameter_array;
                 case 'vector'
-                    obj.array_type = 'vector';
+                    tarray(:,:,1) = obj.parameter_array;
                 case 'tensor'
-                    obj.array_type = 'tensor';
+                    tarray = obj.parameter_array;
             end
             % ---
         end
@@ -71,21 +71,14 @@ classdef ElemTensorArray < TensorArray
     % ---
     methods
         % -----------------------------------------------------------------
-        function txVf = cmultiply(obj,field_obj)
+        function txVf = cmultiply(obj,field_obj,gid_elem)
             arguments
                 obj
                 field_obj
+                gid_elem
             end
             % ---
-            tarray = zeros(length(obj.gid_elem),3,3);
-            switch obj.array_type
-                case 'scalar'
-                    tarray(:,1,1) = array;
-                case 'vector'
-                    tarray(:,:,1) = array;
-                case 'tensor'
-                    tarray = array;
-            end
+
             % ---
             Vf = field_obj.cvalue(obj.gid_elem);
             switch obj.array_type

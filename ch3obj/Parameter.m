@@ -24,6 +24,8 @@ classdef Parameter < Xhandle
         from
         varargin_list
         fvectorized
+        % ---
+        constant_parameter_type
     end
     
     % --- Valid args list
@@ -63,7 +65,22 @@ classdef Parameter < Xhandle
             % ---
             if isnumeric(args.f)
                 constant_parameter = args.f;
+                % ---
+                sizeconst = size(constant_parameter);
+                % ---
+                if numel(constant_parameter) == 1
+                    obj.constant_parameter_type = 'scalar';
+                elseif numel(constant_parameter) == 2 || numel(constant_parameter) == 3
+                    constant_parameter = f_tocolv(constant_parameter);
+                    obj.constant_parameter_type = 'vector';
+                elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
+                    obj.constant_parameter_type = 'tensor';
+                else
+                    obj.constant_parameter_type = 'standardTensorArray';
+                end
+                % ---
                 args.f = @()(constant_parameter);
+                % ---
             elseif isa(args.f,'function_handle')
                 if isempty(args.from)
                     error('#from must be given ! Give EMModel, THModel, ... ');

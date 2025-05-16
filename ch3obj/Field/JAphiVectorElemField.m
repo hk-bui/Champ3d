@@ -65,8 +65,10 @@ classdef JAphiVectorElemField < VectorElemField
                 gid_elem = intersect(id_elem,phydom.gid_elem);
                 gid_elem = unique(gid_elem);
                 % ---
-                E = obj.Efield.cvalue(gid_elem);
-                val = 
+                % sigma_array = phydom.matrix.sigma_array
+                % % ---
+                % E = obj.Efield.cvalue(gid_elem);
+                % val = 
             end
             % ---
             val = obj.parent_model.parent_mesh.field_we('dof',obj.Efield.value,...
