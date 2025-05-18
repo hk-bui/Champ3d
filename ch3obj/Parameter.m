@@ -151,6 +151,14 @@ classdef Parameter < Xhandle
                 vout = obj.eval_fserial(dom);
             end
             % ---
+            if length(size(vout)) < 3
+                if any(size(vout) == 1)
+                    vout = f_torowv(vout);
+                else
+                    vout = f_tocolv(vout);
+                end
+            end
+            % ---
         end
         %------------------------------------------------------------------
     end

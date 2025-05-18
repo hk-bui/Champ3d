@@ -105,15 +105,15 @@ classdef LVector < Xhandle
                 end
             end
             % --- normalize
-            lvector.main_dir = f_normalize(lvector.main_dir,2);
+            lvector.main_dir = f_normalize(lvector.main_dir);
             % ---
             if ~isempty(obj.rot_axis) && ~isempty(obj.rot_angle)
                 for i = 1:nb_elem
                     % ---
-                    raxis = lvector.rot_axis(i,:) ./ norm(lvector.rot_axis(i,:));
-                    a = lvector.rot_angle(i,:);
+                    raxis = lvector.rot_axis(:,i) ./ norm(lvector.rot_axis(:,i));
+                    a = lvector.rot_angle(i);
                     %------------------------------------------------------
-                    lvector.main_dir(i,:) = obj.rotaroundaxis(lvector.main_dir(i,:),raxis,a);
+                    lvector.main_dir(:,i) = obj.rotaroundaxis(lvector.main_dir(:,i),raxis,a);
                     %------------------------------------------------------
                 end
             end
@@ -155,8 +155,7 @@ classdef LVector < Xhandle
                       uy*ux*(1-cos(a))              cos(a) + uy^2 * (1-cos(a))];
             end
             % ---
-            vrot = R * v.';
-            vrot = vrot.';
+            vrot = R * v;
         end
         % -----------------------------------------------------------------
     end
