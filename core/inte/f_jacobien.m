@@ -59,46 +59,41 @@ if any(f_strcmpi(elem_type,{'tri','triangle','quad'}))
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------
     if isempty(flat_node)
-        x = permute(reshape(node(1,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
-        y = permute(reshape(node(2,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
+        x = reshape(node(1,elem(:,:)),nbNo_inEl,nb_elem);
+        y = reshape(node(2,elem(:,:)),nbNo_inEl,nb_elem);
     else
-        if nb_elem == 1
-            x = squeeze(flat_node(1,:,:));
-            y = squeeze(flat_node(2,:,:));
-        else
-            x = permute(squeeze(flat_node(1,:,:)),[2 1]);
-            y = permute(squeeze(flat_node(2,:,:)),[2 1]);
-        end
+        x = squeeze(flat_node(1,:,:));
+        y = squeeze(flat_node(2,:,:));
     end
     %----------------------------------------------------------------------
     lenu = length(u);
     detJ = cell(1,lenu);
     Jinv = cell(1,lenu);
     for i = 1:length(u)
-        detJ{i} = zeros(nb_elem,1);
-        Jinv{i} = zeros(nb_elem,dim,dim);
+        detJ{i} = zeros(1,nb_elem);
+        Jinv{i} = zeros(dim,dim,nb_elem);
     end
     %----------------------------------------------------------------------
     for i = 1:lenu
         u_ = u(i).*ones(1,nb_elem);
         v_ = v(i).*ones(1,nb_elem);
         %------------------------------------------------------------------
-        gradNx = fgradNx(u_,v_); gradNx = gradNx.';
-        gradNy = fgradNy(u_,v_); gradNy = gradNy.';
+        gradNx = fgradNx(u_,v_);
+        gradNy = fgradNy(u_,v_);
         % ---
-        J11 = sum(gradNx.*x,2);
-        J12 = sum(gradNx.*y,2);
+        J11 = sum(gradNx.*x);
+        J12 = sum(gradNx.*y);
         % ---
-        J21 = sum(gradNy.*x,2);
-        J22 = sum(gradNy.*y,2);
+        J21 = sum(gradNy.*x);
+        J22 = sum(gradNy.*y);
         % ---
         dJ = J11.*J22 - J21.*J12;
         % ---
-        Ji = zeros(nb_elem,dim,dim);
-        Ji(:,1,1) =  1./dJ.*J22;
-        Ji(:,1,2) = -1./dJ.*J12;
-        Ji(:,2,1) = -1./dJ.*J21;
-        Ji(:,2,2) =  1./dJ.*J11;
+        Ji = zeros(dim,dim,nb_elem);
+        Ji(1,1,:) =  1./dJ.*J22;
+        Ji(1,2,:) = -1./dJ.*J12;
+        Ji(2,1,:) = -1./dJ.*J21;
+        Ji(2,2,:) =  1./dJ.*J11;
         % ---
         detJ{i} = dJ;
         Jinv{i} = Ji;
@@ -112,16 +107,16 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
     %----------------------------------------------------------------------
     nb_elem = size(elem,2);
     %----------------------------------------------------------------------
-    x = permute(reshape(node(1,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
-    y = permute(reshape(node(2,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
-    z = permute(reshape(node(3,elem(:,:)),nbNo_inEl,nb_elem),[2 1]);
+    x = reshape(node(1,elem(:,:)),nbNo_inEl,nb_elem);
+    y = reshape(node(2,elem(:,:)),nbNo_inEl,nb_elem);
+    z = reshape(node(3,elem(:,:)),nbNo_inEl,nb_elem);
     %----------------------------------------------------------------------
     lenu = length(u);
     detJ = cell(1,lenu);
     Jinv = cell(1,lenu);
     for i = 1:lenu
-        detJ{i} = zeros(nb_elem,1);
-        Jinv{i} = zeros(nb_elem,dim,dim);
+        detJ{i} = zeros(1,nb_elem);
+        Jinv{i} = zeros(dim,dim,nb_elem);
     end
     %----------------------------------------------------------------------
     for i = 1:lenu
@@ -129,21 +124,21 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
         v_ = v(i).*ones(1,nb_elem);
         w_ = w(i).*ones(1,nb_elem);
         %------------------------------------------------------------------
-        gradNx = fgradNx(u_,v_,w_); gradNx = gradNx.';
-        gradNy = fgradNy(u_,v_,w_); gradNy = gradNy.';
-        gradNz = fgradNz(u_,v_,w_); gradNz = gradNz.';
+        gradNx = fgradNx(u_,v_,w_);
+        gradNy = fgradNy(u_,v_,w_);
+        gradNz = fgradNz(u_,v_,w_);
         % ---
-        J11 = sum(gradNx.*x,2);
-        J12 = sum(gradNx.*y,2);
-        J13 = sum(gradNx.*z,2);
+        J11 = sum(gradNx.*x);
+        J12 = sum(gradNx.*y);
+        J13 = sum(gradNx.*z);
         % ---
-        J21 = sum(gradNy.*x,2);
-        J22 = sum(gradNy.*y,2);
-        J23 = sum(gradNy.*z,2);
+        J21 = sum(gradNy.*x);
+        J22 = sum(gradNy.*y);
+        J23 = sum(gradNy.*z);
         % ---
-        J31 = sum(gradNz.*x,2);
-        J32 = sum(gradNz.*y,2);
-        J33 = sum(gradNz.*z,2);
+        J31 = sum(gradNz.*x);
+        J32 = sum(gradNz.*y);
+        J33 = sum(gradNz.*z);
         % ---
         A11 = J22.*J33 - J23.*J32;
         A12 = J32.*J13 - J12.*J33;
@@ -158,16 +153,16 @@ elseif any(f_strcmpi(elem_type,{'tet','tetra','prism','hex','hexa'}))
         dJ = J11.*J22.*J33 + J21.*J32.*J13 + J31.*J12.*J23 - ...
              J11.*J32.*J23 - J31.*J22.*J13 - J21.*J12.*J33;
         % ---
-        Ji = zeros(nb_elem,dim,dim);
-        Ji(:,1,1) = 1./dJ.*A11;
-        Ji(:,1,2) = 1./dJ.*A12;
-        Ji(:,1,3) = 1./dJ.*A13;
-        Ji(:,2,1) = 1./dJ.*A21;
-        Ji(:,2,2) = 1./dJ.*A22;
-        Ji(:,2,3) = 1./dJ.*A23;
-        Ji(:,3,1) = 1./dJ.*A31;
-        Ji(:,3,2) = 1./dJ.*A32;
-        Ji(:,3,3) = 1./dJ.*A33;
+        Ji = zeros(dim,dim,nb_elem);
+        Ji(1,1,:) = 1./dJ.*A11;
+        Ji(1,2,:) = 1./dJ.*A12;
+        Ji(1,3,:) = 1./dJ.*A13;
+        Ji(2,1,:) = 1./dJ.*A21;
+        Ji(2,2,:) = 1./dJ.*A22;
+        Ji(2,3,:) = 1./dJ.*A23;
+        Ji(3,1,:) = 1./dJ.*A31;
+        Ji(3,2,:) = 1./dJ.*A32;
+        Ji(3,3,:) = 1./dJ.*A33;
         % ---
         detJ{i} = dJ;
         Jinv{i} = Ji;

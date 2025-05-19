@@ -705,19 +705,19 @@ classdef Mesh < Xhandle
             Wf = obj.wf('u',U,'v',V,'w',W,'wn',Wn,'gradf',gradF,'jinv',Jinv);
             %--------------------------------------------------------------
             nbNo_inEl = refelem_.nbNo_inEl;
-            realx = (reshape(obj.node(1,obj.elem),nbNo_inEl,[])).';
-            realy = (reshape(obj.node(2,obj.elem),nbNo_inEl,[])).';
+            realx = reshape(obj.node(1,obj.elem),nbNo_inEl,[]);
+            realy = reshape(obj.node(2,obj.elem),nbNo_inEl,[]);
             if for3d
-                realz = (reshape(obj.node(3,obj.elem),nbNo_inEl,[])).';
+                realz = reshape(obj.node(3,obj.elem),nbNo_inEl,[]);
             end
             nb_gnode  = length(U);
             node_g = cell(1,nb_gnode);
             for i = 1:nb_gnode
-                node_g{i} = zeros(obj.nb_elem,dim_);
-                node_g{i}(:,1) = sum(Wn{i} .* realx,2);
-                node_g{i}(:,2) = sum(Wn{i} .* realy,2);
+                node_g{i} = zeros(dim_,obj.nb_elem);
+                node_g{i}(1,:) = sum(Wn{i} .* realx);
+                node_g{i}(2,:) = sum(Wn{i} .* realy);
                 if for3d
-                    node_g{i}(:,3) = sum(Wn{i} .* realz,2);
+                    node_g{i}(3,:) = sum(Wn{i} .* realz);
                 end
             end
             %--------------------------------------------------------------
@@ -729,7 +729,7 @@ classdef Mesh < Xhandle
             obj.intkit.cWe = cWe;
             obj.intkit.cWf = cWf;
             obj.intkit.cWv = cWv;
-            obj.intkit.cnode{1} = obj.celem.';
+            obj.intkit.cnode{1} = obj.celem;
             % ---
             obj.intkit.detJ = detJ;
             obj.intkit.Jinv = Jinv;
@@ -763,29 +763,29 @@ classdef Mesh < Xhandle
             obj.build_meshds;
             %--------------------------------------------------------------
             for3d = 0;
-            dim_   = 2;
+            dim_  = 2;
             if size(node,1) == 3
                 for3d = 1;
-                dim_   = 3;
+                dim_  = 3;
             end
             %--------------------------------------------------------------
             % Gauss points
             Wn = obj.wn('u',U,'v',V,'w',W);
             %--------------------------------------------------------------
             nbNo_inEl = refelem_.nbNo_inEl;
-            realx = (reshape(node(1,obj.elem),nbNo_inEl,[])).';
-            realy = (reshape(node(2,obj.elem),nbNo_inEl,[])).';
+            realx = reshape(node(1,obj.elem),nbNo_inEl,[]);
+            realy = reshape(node(2,obj.elem),nbNo_inEl,[]);
             if for3d
-                realz = (reshape(node(3,obj.elem),nbNo_inEl,[])).';
+                realz = reshape(node(3,obj.elem),nbNo_inEl,[]);
             end
-            nb_inode  = length(U);
+            nb_inode = length(U);
             node_g = cell(1,nb_inode);
             for i = 1:nb_inode
-                node_g{i} = zeros(obj.nb_elem,dim_);
-                node_g{i}(:,1) = sum(Wn{i} .* realx,2);
-                node_g{i}(:,2) = sum(Wn{i} .* realy,2);
+                node_g{i} = zeros(dim_,obj.nb_elem);
+                node_g{i}(1,:) = sum(Wn{i} .* realx);
+                node_g{i}(2,:) = sum(Wn{i} .* realy);
                 if for3d
-                    node_g{i}(:,3) = sum(Wn{i} .* realz,2);
+                    node_g{i}(3,:) = sum(Wn{i} .* realz);
                 end
             end
             %--------------------------------------------------------------
@@ -825,26 +825,26 @@ classdef Mesh < Xhandle
             Wf = obj.wf('u',U,'v',V,'w',W,'wn',Wn,'gradf',gradF,'jinv',Jinv);
             %--------------------------------------------------------------
             for3d = 0;
-            dim_   = 2;
+            dim_  = 2;
             if size(obj.node,1) == 3
                 for3d = 1;
-                dim_   = 3;
+                dim_  = 3;
             end
             %--------------------------------------------------------------------------
             nbNo_inEl = refelem_.nbNo_inEl;
-            realx = (reshape(obj.node(1,obj.elem),nbNo_inEl,[])).';
-            realy = (reshape(obj.node(2,obj.elem),nbNo_inEl,[])).';
+            realx = reshape(obj.node(1,obj.elem),nbNo_inEl,[]);
+            realy = reshape(obj.node(2,obj.elem),nbNo_inEl,[]);
             if for3d
-                realz = (reshape(obj.node(3,obj.elem),nbNo_inEl,[])).';
+                realz = reshape(obj.node(3,obj.elem),nbNo_inEl,[]);
             end
-            nb_inode  = length(U);
+            nb_inode = length(U);
             node_i = cell(1,nb_inode);
             for i = 1:nb_inode
-                node_i{i} = zeros(obj.nb_elem,dim_);
-                node_i{i}(:,1) = sum(Wn{i} .* realx,2);
-                node_i{i}(:,2) = sum(Wn{i} .* realy,2);
+                node_i{i} = zeros(dim_,obj.nb_elem);
+                node_i{i}(1,:) = sum(Wn{i} .* realx);
+                node_i{i}(2,:) = sum(Wn{i} .* realy);
                 if for3d
-                    node_i{i}(:,3) = sum(Wn{i} .* realz,2);
+                    node_i{i}(3,:) = sum(Wn{i} .* realz);
                 end
             end
             %--------------------------------------------------------------
@@ -881,29 +881,29 @@ classdef Mesh < Xhandle
             obj.build_meshds;
             %--------------------------------------------------------------
             for3d = 0;
-            dim_   = 2;
+            dim_  = 2;
             if size(node,1) == 3
                 for3d = 1;
-                dim_   = 3;
+                dim_  = 3;
             end
             %--------------------------------------------------------------
             % Interpolation points
             Wn = obj.wn('u',U,'v',V,'w',W);
             %--------------------------------------------------------------
             nbNo_inEl = refelem_.nbNo_inEl;
-            realx = (reshape(node(1,obj.elem),nbNo_inEl,[])).';
-            realy = (reshape(node(2,obj.elem),nbNo_inEl,[])).';
+            realx = reshape(node(1,obj.elem),nbNo_inEl,[]);
+            realy = reshape(node(2,obj.elem),nbNo_inEl,[]);
             if for3d
-                realz = (reshape(node(3,obj.elem),nbNo_inEl,[])).';
+                realz = reshape(node(3,obj.elem),nbNo_inEl,[]);
             end
-            nb_inode  = length(U);
+            nb_inode = length(U);
             node_i = cell(1,nb_inode);
             for i = 1:nb_inode
-                node_i{i} = zeros(obj.nb_elem,dim_);
-                node_i{i}(:,1) = sum(Wn{i} .* realx,2);
-                node_i{i}(:,2) = sum(Wn{i} .* realy,2);
+                node_i{i} = zeros(dim_,obj.nb_elem);
+                node_i{i}(1,:) = sum(Wn{i} .* realx);
+                node_i{i}(2,:) = sum(Wn{i} .* realy);
                 if for3d
-                    node_i{i}(:,3) = sum(Wn{i} .* realz,2);
+                    node_i{i}(3,:) = sum(Wn{i} .* realz);
                 end
             end
             %--------------------------------------------------------------
@@ -1028,30 +1028,30 @@ classdef Mesh < Xhandle
             %--------------------------------------------------------------
             Wn = cell(1,length(u));
             for i = 1:length(u)
-                Wn{i} = zeros(nb_elem_,nbNo_inEl);
+                Wn{i} = zeros(nbNo_inEl,nb_elem_);
             end
             %--------------------------------------------------------------
             if any(f_strcmpi(elem_type_,{'tri','triangle','quad'}))
                 for i = 1:length(u)
-                    u_ = u(i).*ones(nb_elem_,1);
-                    v_ = v(i).*ones(nb_elem_,1);
+                    u_ = u(i).*ones(1,nb_elem_);
+                    v_ = v(i).*ones(1,nb_elem_);
                     % ---
-                    fwn = zeros(nb_elem_,nbNo_inEl);
+                    fwn = zeros(nbNo_inEl,nb_elem_);
                     for j = 1:length(fN)
-                        fwn(:,j) = fN{j}(u_,v_);
+                        fwn(j,:) = fN{j}(u_,v_);
                     end
                     % ---
                     Wn{i} = fwn;
                 end
             elseif any(f_strcmpi(elem_type_,{'tet','tetra','prism','hex','hexa'}))
                 for i = 1:length(u)
-                    u_ = u(i).*ones(nb_elem_,1);
-                    v_ = v(i).*ones(nb_elem_,1);
-                    w_ = w(i).*ones(nb_elem_,1);
+                    u_ = u(i).*ones(1,nb_elem_);
+                    v_ = v(i).*ones(1,nb_elem_);
+                    w_ = w(i).*ones(1,nb_elem_);
                     % ---
-                    fwn = zeros(nb_elem_,nbNo_inEl);
+                    fwn = zeros(nbNo_inEl,nb_elem_);
                     for j = 1:length(fN)
-                        fwn(:,j) = fN{j}(u_,v_,w_);
+                        fwn(j,:) = fN{j}(u_,v_,w_);
                     end
                     % ---
                     Wn{i} = fwn;
@@ -1107,31 +1107,31 @@ classdef Mesh < Xhandle
                 gradWn = cell(1,lenu);
                 gradF  = cell(1,lenu);
                 for i = 1:length(u)
-                    gradWn{i} = zeros(nb_elem_,dim_,nbNo_inEl);
-                    gradF{i}  = zeros(nb_elem_,dim_,nbFa_inEl);
+                    gradWn{i} = zeros(dim_,nbNo_inEl,nb_elem_);
+                    gradF{i}  = zeros(dim_,nbFa_inEl,nb_elem_);
                 end
                 %----------------------------------------------------------
                 for i = 1:lenu
                     u_ = u(i).*ones(1,nb_elem_);
                     v_ = v(i).*ones(1,nb_elem_);
                     % ---
-                    gradNx = fgradNx(u_,v_); gradNx = gradNx.';
-                    gradNy = fgradNy(u_,v_); gradNy = gradNy.';
+                    gradNx = fgradNx(u_,v_);
+                    gradNy = fgradNy(u_,v_);
                     % ---
-                    fgradwn = zeros(nb_elem_,dim_,nbNo_inEl);
-                    Jinv1 = [jinv{i}(:,1,1), jinv{i}(:,1,2)];
-                    Jinv2 = [jinv{i}(:,2,1), jinv{i}(:,2,2)];
+                    fgradwn = zeros(dim_,nbNo_inEl,nb_elem_);
+                    Jinv1 = squeeze([jinv{i}(1,1,:), jinv{i}(1,2,:)]);
+                    Jinv2 = squeeze([jinv{i}(2,1,:), jinv{i}(2,2,:)]);
                     for j = 1:nbNo_inEl
-                        gradNxy = [gradNx(:,j), gradNy(:,j)];
-                        fgradwn(:,1,j) = dot(Jinv1, gradNxy, 2);
-                        fgradwn(:,2,j) = dot(Jinv2, gradNxy, 2);
+                        gradNxy = [gradNx(j,:); gradNy(j,:)];
+                        fgradwn(1,j,:) = dot(Jinv1, gradNxy);
+                        fgradwn(2,j,:) = dot(Jinv2, gradNxy);
                     end
                     %------------------------------------------------------
                     if any(strcmpi(get,{'gradF','sum_on_face'}))
-                        fgradf = zeros(nb_elem_,dim_,nbFa_inEl);
+                        fgradf = zeros(dim_,nbFa_inEl,nb_elem_);
                         for j = 1:nbFa_inEl
                             nbN = length(find(FaNo_inEl(j,:)));
-                            fgradf(:,:,j) = sum(fgradwn(:,:,FaNo_inEl(j,1:nbN)),3);
+                            fgradf(:,j,:) = sum(fgradwn(:,FaNo_inEl(j,1:nbN),:),2);
                         end
                     end
                     % ---
@@ -1154,8 +1154,8 @@ classdef Mesh < Xhandle
                 gradWn = cell(1,lenu);
                 gradF  = cell(1,lenu);
                 for i = 1:length(u)
-                    gradWn{i} = zeros(nb_elem_,dim_,nbNo_inEl);
-                    gradF{i}  = zeros(nb_elem_,dim_,nbFa_inEl);
+                    gradWn{i} = zeros(dim_,nbNo_inEl,nb_elem_);
+                    gradF{i}  = zeros(dim_,nbFa_inEl,nb_elem_);
                 end
                 %----------------------------------------------------------
                 for i = 1:lenu
@@ -1163,26 +1163,26 @@ classdef Mesh < Xhandle
                     v_ = v(i).*ones(1,nb_elem_);
                     w_ = w(i).*ones(1,nb_elem_);
                     % ---
-                    gradNx = fgradNx(u_,v_,w_); gradNx = gradNx.';
-                    gradNy = fgradNy(u_,v_,w_); gradNy = gradNy.';
-                    gradNz = fgradNz(u_,v_,w_); gradNz = gradNz.';
+                    gradNx = fgradNx(u_,v_,w_);
+                    gradNy = fgradNy(u_,v_,w_);
+                    gradNz = fgradNz(u_,v_,w_);
                     % ---
-                    fgradwn = zeros(nb_elem_,dim_,nbNo_inEl);
-                    Jinv1 = [jinv{i}(:,1,1), jinv{i}(:,1,2), jinv{i}(:,1,3)];
-                    Jinv2 = [jinv{i}(:,2,1), jinv{i}(:,2,2), jinv{i}(:,2,3)];
-                    Jinv3 = [jinv{i}(:,3,1), jinv{i}(:,3,2), jinv{i}(:,3,3)];
+                    fgradwn = zeros(dim_,nbNo_inEl,nb_elem_);
+                    Jinv1 = squeeze([jinv{i}(1,1,:), jinv{i}(1,2,:), jinv{i}(1,3,:)]);
+                    Jinv2 = squeeze([jinv{i}(2,1,:), jinv{i}(2,2,:), jinv{i}(2,3,:)]);
+                    Jinv3 = squeeze([jinv{i}(3,1,:), jinv{i}(3,2,:), jinv{i}(3,3,:)]);
                     for j = 1:nbNo_inEl
-                        gradNxyz = [gradNx(:,j), gradNy(:,j), gradNz(:,j)];
-                        fgradwn(:,1,j) = dot(Jinv1, gradNxyz, 2);
-                        fgradwn(:,2,j) = dot(Jinv2, gradNxyz, 2);
-                        fgradwn(:,3,j) = dot(Jinv3, gradNxyz, 2);
+                        gradNxyz = [gradNx(j,:); gradNy(j,:); gradNz(j,:)];
+                        fgradwn(1,j,:) = dot(Jinv1, gradNxyz);
+                        fgradwn(2,j,:) = dot(Jinv2, gradNxyz);
+                        fgradwn(3,j,:) = dot(Jinv3, gradNxyz);
                     end
                     %------------------------------------------------------
                     if any(f_strcmpi(get,{'gradF','sum_on_face'}))
-                        fgradf = zeros(nb_elem_,dim_,nbFa_inEl);
+                        fgradf = zeros(dim_,nbFa_inEl,nb_elem_);
                         for j = 1:nbFa_inEl
                             nbN = length(find(FaNo_inEl(j,:)));
-                            fgradf(:,:,j) = sum(fgradwn(:,:,FaNo_inEl(j,1:nbN)),3);
+                            fgradf(:,j,:) = sum(fgradwn(:,FaNo_inEl(j,1:nbN),:),2);
                         end
                     end
                     % ---
@@ -1248,16 +1248,16 @@ classdef Mesh < Xhandle
                 %----------------------------------------------------------
                 We = cell(1,length(u));
                 for i = 1:length(u)
-                    We{i} = zeros(nb_elem_,dim_,nbEd_inEl);
+                    We{i} = zeros(dim_,nbEd_inEl,nb_elem_);
                 end
                 %----------------------------------------------------------
                 for i = 1:length(u)
                     % ---
-                    fwe = zeros(nb_elem_,dim_,nbEd_inEl);
+                    fwe = zeros(dim_,nbEd_inEl,nb_elem_);
                     for j = 1:nbEd_inEl
-                        fwe(:,:,j) = - (wn{i}(:,EdNo_inEl(j,1)).*gradf{i}(:,:,NoFa_ofEd(j,1)) - ...
-                            wn{i}(:,EdNo_inEl(j,2)).*gradf{i}(:,:,NoFa_ofEd(j,2)))...
-                            .*ori_edge_in_elem(j,:).';
+                        fwe(:,j,:) = - (wn{i}(EdNo_inEl(j,1),:).*squeeze(gradf{i}(:,NoFa_ofEd(j,1),:)) - ...
+                                        wn{i}(EdNo_inEl(j,2),:).*squeeze(gradf{i}(:,NoFa_ofEd(j,2),:)))...
+                                      .*ori_edge_in_elem(j,:);
                     end
                     % ---
                     We{i} = fwe;
@@ -1274,16 +1274,16 @@ classdef Mesh < Xhandle
                 %----------------------------------------------------------
                 We = cell(1,length(u));
                 for i = 1:length(u)
-                    We{i} = zeros(nb_elem_,dim_,nbEd_inEl);
+                    We{i} = zeros(dim_,nbEd_inEl,nb_elem_);
                 end
                 %----------------------------------------------------------
                 for i = 1:length(u)
                     % ---
-                    fwe = zeros(nb_elem_,dim_,nbEd_inEl);
+                    fwe = zeros(dim_,nbEd_inEl,nb_elem_);
                     for j = 1:nbEd_inEl
-                        fwe(:,:,j) = - (wn{i}(:,EdNo_inEl(j,1)).*gradf{i}(:,:,NoFa_ofEd(j,1)) - ...
-                            wn{i}(:,EdNo_inEl(j,2)).*gradf{i}(:,:,NoFa_ofEd(j,2)))...
-                            .*ori_edge_in_elem(j,:).';
+                        fwe(:,j,:) = - (wn{i}(EdNo_inEl(j,1),:).*squeeze(gradf{i}(:,NoFa_ofEd(j,1),:)) - ...
+                                        wn{i}(EdNo_inEl(j,2),:).*squeeze(gradf{i}(:,NoFa_ofEd(j,2),:)))...
+                                      .*ori_edge_in_elem(j,:);
                     end
                     % ---
                     We{i} = fwe;
@@ -1354,21 +1354,13 @@ classdef Mesh < Xhandle
                 %----------------------------------------------------------
                 Wf = cell(1,length(u));
                 for i = 1:length(u)
-                    Wf{i} = zeros(nb_elem_,dim_,nbFa_inEl);
+                    Wf{i} = zeros(dim_,nbFa_inEl,nb_elem_);
                 end
                 %----------------------------------------------------------
-                if nb_elem_ == 1
-                    for i = 1:length(u)
-                        Wf{i}(1,1,:) = - squeeze(we{i}(:,2,:)).' .* ori_face_in_elem(:,:).';
-                        Wf{i}(1,2,:) =   squeeze(we{i}(:,1,:)).' .* ori_face_in_elem(:,:).';
-                    end
-                else
-                    for i = 1:length(u)
-                        Wf{i}(:,1,:) = - squeeze(we{i}(:,2,:)) .* ori_face_in_elem(:,:).';
-                        Wf{i}(:,2,:) =   squeeze(we{i}(:,1,:)) .* ori_face_in_elem(:,:).';
-                    end
+                for i = 1:length(u)
+                    Wf{i}(1,:,:) = - squeeze(we{i}(2,:,:)) .* ori_face_in_elem(:,:);
+                    Wf{i}(2,:,:) =   squeeze(we{i}(1,:,:)) .* ori_face_in_elem(:,:);
                 end
-
                 %----------------------------------------------------------
             elseif any(f_strcmpi(elem_type_,{'tet','tetra','prism','hex','hexa'}))
                 dim_ = 3;
@@ -1382,7 +1374,7 @@ classdef Mesh < Xhandle
                 %----------------------------------------------------------
                 Wf = cell(1,length(u));
                 for i = 1:length(u)
-                    Wf{i} = zeros(nb_elem_,dim_,nbFa_inEl);
+                    Wf{i} = zeros(dim_,nbFa_inEl,nb_elem_);
                 end
                 %----------------------------------------------------------
                 for i = 1:length(u)
@@ -1392,7 +1384,7 @@ classdef Mesh < Xhandle
                     gradFxgradF = cell(nbNodemax,1);
                     % ---
                     for j = 1:nbNodemax
-                        gradFxgradF{j} = zeros(nb_elem_,dim_,nbFa_inEl);
+                        gradFxgradF{j} = zeros(dim_,nbFa_inEl,nb_elem_);
                     end
                     for j = 1:nbFa_inEl
                         for k = 1:nbNo_inFa(j)
@@ -1401,21 +1393,21 @@ classdef Mesh < Xhandle
                                 knext = nbNo_inFa(j);
                             end
                             %-----
-                            gradFk = gradf{i}(:,:,NoFa_ofFa(j,k));
-                            gradFknext = gradf{i}(:,:,NoFa_ofFa(j,knext));
+                            gradFk = squeeze(gradf{i}(:,NoFa_ofFa(j,k),:));
+                            gradFknext = squeeze(gradf{i}(:,NoFa_ofFa(j,knext),:));
                             %-----
-                            gradFxgradF{k}(:,:,j) = cross(gradFk,gradFknext,2);
+                            gradFxgradF{k}(:,j,:) = cross(gradFk,gradFknext);
                         end
                     end
                     %------------------------------------------------------
-                    fwf = zeros(nb_elem_,dim_,nbFa_inEl);
+                    fwf = zeros(dim_,nbFa_inEl,nb_elem_);
                     for j = 1:nbFa_inEl
-                        Wfxyz = zeros(nb_elem_,dim_);
+                        Wfxyz = zeros(dim_,nb_elem_);
                         for k = 1:nbNo_inFa(j)
                             Wfxyz = Wfxyz + ...
-                                wn{i}(:,FaNo_inEl(j,k)).*gradFxgradF{k}(:,:,j);
+                                wn{i}(FaNo_inEl(j,k),:).*squeeze(gradFxgradF{k}(:,j,:));
                         end
-                        fwf(:,:,j) = (5 - nbNo_inFa(j)) .* Wfxyz .* ori_face_in_elem(j,:).';
+                        fwf(:,j,:) = (5 - nbNo_inFa(j)) .* Wfxyz .* ori_face_in_elem(j,:);
                     end
                     % ---
                     Wf{i} = fwf;
