@@ -137,8 +137,8 @@ classdef Mesh2d < Mesh
                     Wn = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wn{iG} = obj.intkit.cWn{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+                        Wn{iG} = obj.intkit.cWn{iG}(:,id_elem);
+                        detJ{iG} = obj.intkit.cdetJ{iG}(1,id_elem);
                     end
                 case 'full'
                     nbG = refelem.nbG;
@@ -147,25 +147,27 @@ classdef Mesh2d < Mesh
                     Wn = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wn{iG} = obj.intkit.Wn{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+                        Wn{iG} = obj.intkit.Wn{iG}(:,id_elem);
+                        detJ{iG} = obj.intkit.detJ{iG}(1,id_elem);
                     end
             end
             %--------------------------------------------------------------
-            coefwn = zeros(nb_elem,nbNo_inEl);
+            coefwn = zeros(nbNo_inEl,nb_elem);
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbNo_inEl
-                        wix = Wn{iG}(:,i);
-                        coefwn(:,i) = coefwn(:,i) + ...
+                        wix = Wn{iG}(i,:);
+                        coefwn(i,:) = coefwn(i,:) + ...
                             weigh .* dJ .* coefficient .* wix;
                     end
                 end
                 %----------------------------------------------------------
+            else
+                error('#coefficient must be scalar');
             end
         end
         % -----------------------------------------------------------------
@@ -213,8 +215,8 @@ classdef Mesh2d < Mesh
                     Wn = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wn{iG} = obj.intkit.cWn{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+                        Wn{iG} = obj.intkit.cWn{iG}(:,id_elem);
+                        detJ{iG} = obj.intkit.cdetJ{iG}(1,id_elem);
                     end
                 case 'full'
                     nbG = refelem.nbG;
@@ -223,28 +225,31 @@ classdef Mesh2d < Mesh
                     Wn = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wn{iG} = obj.intkit.Wn{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+                        Wn{iG} = obj.intkit.Wn{iG}(:,id_elem);
+                        detJ{iG} = obj.intkit.detJ{iG}(1,id_elem);
                     end
             end
             %--------------------------------------------------------------
-            coefwnwn = zeros(nb_elem,nbNo_inEl,nbNo_inEl);
+            coefwnwn = zeros(nbNo_inEl,nbNo_inEl,nb_elem);
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbNo_inEl
-                        wix = Wn{iG}(:,i);
+                        wix = Wn{iG}(i,:);
                         for j = i:nbNo_inEl
-                            wjx = Wn{iG}(:,j);
-                            coefwnwn(:,i,j) = coefwnwn(:,i,j) + ...
-                                weigh .* dJ .* coefficient .* wix .* wjx;
+                            wjx = Wn{iG}(j,:);
+                            coefwnwn(i,j,:) = squeeze(coefwnwn(i,j,:)).' + ...
+                                weigh .* dJ .* coefficient .* ...
+                                (wix .* wjx);
                         end
                     end
                 end
                 %----------------------------------------------------------
+            else
+                error('#coefficient must be scalar');
             end
         end
         % -----------------------------------------------------------------
@@ -292,8 +297,8 @@ classdef Mesh2d < Mesh
                     We = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        We{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+                        We{iG} = obj.intkit.cWe{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.cdetJ{iG}(1,id_elem);
                     end
                 case 'full'
                     nbG = refelem.nbG;
@@ -302,28 +307,28 @@ classdef Mesh2d < Mesh
                     We = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        We{iG} = obj.intkit.We{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+                        We{iG} = obj.intkit.We{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.detJ{iG}(1,id_elem);
                     end
             end
             %--------------------------------------------------------------
-            coefwewe = zeros(nb_elem,nbEd_inEl,nbEd_inEl);
+            coefwewe = zeros(nbEd_inEl,nbEd_inEl,nb_elem);
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbEd_inEl
-                        weix = We{iG}(:,1,i);
-                        weiy = We{iG}(:,2,i);
+                        weix = We{iG}(1,i,:);
+                        weiy = We{iG}(2,i,:);
                         for j = i:nbEd_inEl % !!! i
-                            wejx = We{iG}(:,1,j);
-                            wejy = We{iG}(:,2,j);
+                            wejx = We{iG}(1,j,:);
+                            wejy = We{iG}(2,j,:);
                             % ---
-                            coefwewe(:,i,j) = coefwewe(:,i,j) + ...
-                                weigh .* dJ .* ( coefficient .* ...
-                                (weix .* wejx + weiy .* wejy) );
+                            coefwewe(i,j,:) = squeeze(coefwewe(i,j,:)).' + ...
+                                weigh .* dJ .* coefficient .* ...
+                                squeeze(weix .* wejx + weiy .* wejy).';
                         end
                     end
                 end
@@ -331,21 +336,22 @@ classdef Mesh2d < Mesh
             elseif any(f_strcmpi(coef_array_type,{'tensor'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbEd_inEl
-                        weix = We{iG}(:,1,i);
-                        weiy = We{iG}(:,2,i);
+                        weix = We{iG}(1,i,:);
+                        weiy = We{iG}(2,i,:);
                         for j = i:nbEd_inEl % !!! i
-                            wejx = We{iG}(:,1,j);
-                            wejy = We{iG}(:,2,j);
+                            wejx = We{iG}(1,j,:);
+                            wejy = We{iG}(2,j,:);
                             % ---
-                            coefwewe(:,i,j) = coefwewe(:,i,j) + ...
-                                weigh .* dJ .* (...
+                            coefwewe(i,j,:) = squeeze(coefwewe(i,j,:)).' + ...
+                                weigh .* dJ .* ...
+                                squeeze(...
                                 coefficient(:,1,1) .* weix .* wejx +...
                                 coefficient(:,1,2) .* weiy .* wejx +...
                                 coefficient(:,2,1) .* weix .* wejy +...
-                                coefficient(:,2,2) .* weiy .* wejy );
+                                coefficient(:,2,2) .* weiy .* wejy).';
                         end
                     end
                 end
@@ -397,8 +403,8 @@ classdef Mesh2d < Mesh
                     Wf = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wf{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+                        Wf{iG} = obj.intkit.cWf{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.cdetJ{iG}(1,id_elem);
                     end
                 case 'full'
                     nbG = refelem.nbG;
@@ -407,28 +413,28 @@ classdef Mesh2d < Mesh
                     Wf = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wf{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+                        Wf{iG} = obj.intkit.Wf{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.detJ{iG}(1,id_elem);
                     end
             end
             %--------------------------------------------------------------
-            coefwfwf = zeros(nb_elem,nbFa_inEl,nbFa_inEl);
+            coefwfwf = zeros(nbFa_inEl,nbFa_inEl,nb_elem);
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbFa_inEl
-                        weix = Wf{iG}(:,1,i);
-                        weiy = Wf{iG}(:,2,i);
+                        weix = Wf{iG}(1,i,:);
+                        weiy = Wf{iG}(2,i,:);
                         for j = i:nbFa_inEl % !!! i
-                            wejx = Wf{iG}(:,1,j);
-                            wejy = Wf{iG}(:,2,j);
+                            wejx = Wf{iG}(1,j,:);
+                            wejy = Wf{iG}(2,j,:);
                             % ---
-                            coefwfwf(:,i,j) = coefwfwf(:,i,j) + ...
-                                weigh .* dJ .* ( coefficient .* ...
-                                (weix .* wejx + weiy .* wejy) );
+                            coefwfwf(i,j,:) = squeeze(coefwfwf(i,j,:)).' + ...
+                                weigh .* dJ .* coefficient .* ...
+                                squeeze(weix .* wejx + weiy .* wejy).';
                         end
                     end
                 end
@@ -436,22 +442,134 @@ classdef Mesh2d < Mesh
             elseif any(f_strcmpi(coef_array_type,{'tensor'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbFa_inEl
-                        weix = Wf{iG}(:,1,i);
-                        weiy = Wf{iG}(:,2,i);
+                        weix = Wf{iG}(1,i,:);
+                        weiy = Wf{iG}(2,i,:);
                         for j = i:nbFa_inEl % !!! i
-                            wejx = Wf{iG}(:,1,j);
-                            wejy = Wf{iG}(:,2,j);
+                            wejx = Wf{iG}(1,j,:);
+                            wejy = Wf{iG}(2,j,:);
                             % ---
-                            coefwfwf(:,i,j) = coefwfwf(:,i,j) + ...
-                                weigh .* dJ .* (...
+                            coefwfwf(i,j,:) = squeeze(coefwfwf(i,j,:)).' + ...
+                                weigh .* dJ .* ...
+                                squeeze(...
                                 coefficient(:,1,1) .* weix .* wejx +...
                                 coefficient(:,1,2) .* weiy .* wejx +...
                                 coefficient(:,2,1) .* weix .* wejy +...
-                                coefficient(:,2,2) .* weiy .* wejy );
+                                coefficient(:,2,2) .* weiy .* wejy).';
                         end
+                    end
+                end
+                %----------------------------------------------------------
+            end
+        end
+        % -----------------------------------------------------------------
+        function coefwevf = cwevf(obj,args)
+            arguments
+                obj
+                args.id_elem = []
+                args.coefficient = 1
+                args.vector_field = [1 1 1];
+                args.order = 'full'
+            end
+            %--------------------------------------------------------------
+            id_elem = args.id_elem;
+            coefficient = args.coefficient;
+            order = args.order;
+            vector_field = args.vector_field;
+            %--------------------------------------------------------------
+            if isempty(id_elem)
+                nb_elem = obj.nb_elem;
+                id_elem = 1:nb_elem;
+            else
+                nb_elem = length(id_elem);
+            end
+            % ---
+            if isnumeric(order)
+                if order < 1
+                    order = '0';
+                else
+                    order = 'full';
+                end
+            end
+            %--------------------------------------------------------------
+            [coefficient, coef_array_type] = f_column_format(coefficient);
+            vector_field = f_column_format(vector_field);
+            %--------------------------------------------------------------
+            refelem = obj.refelem;
+            nbEd_inEl = refelem.nbEd_inEl;
+            %--------------------------------------------------------------
+            if isempty(obj.intkit.We) || isempty(obj.intkit.cWe)
+                obj.build_intkit;
+            end
+            %--------------------------------------------------------------
+            switch order
+                case '0'
+                    nbG = 1;
+                    Weigh = refelem.cWeigh;
+                    % ---
+                    We = cell(1,nbG);
+                    detJ = cell(1,nbG);
+                    for iG = 1:nbG
+                        We{iG} = obj.intkit.cWe{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.cdetJ{iG}(1,id_elem);
+                    end
+                case 'full'
+                    nbG = refelem.nbG;
+                    Weigh = refelem.Weigh;
+                    % ---
+                    We = cell(1,nbG);
+                    detJ = cell(1,nbG);
+                    for iG = 1:nbG
+                        We{iG} = obj.intkit.We{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.detJ{iG}(1,id_elem);
+                    end
+            end
+            %--------------------------------------------------------------
+            coefwevf = zeros(nbEd_inEl,nb_elem);
+            %--------------------------------------------------------------
+            if numel(vector_field) == 2
+                vfx = vector_field(1);
+                vfy = vector_field(2);
+            elseif size(vector_field,2) > length(id_elem) && ...
+                   size(vector_field,2) == obj.nb_elem
+                vfx = vector_field(1,id_elem);
+                vfy = vector_field(2,id_elem);
+            else
+                vfx = vector_field(1,:);
+                vfy = vector_field(2,:);
+            end
+            %--------------------------------------------------------------
+            if any(strcmpi(coef_array_type,{'scalar'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    dJ    = detJ{iG};
+                    weigh = Weigh(iG);
+                    for i = 1:nbEd_inEl
+                        wfix = We{iG}(1,i,:);
+                        wfiy = We{iG}(2,i,:);
+                        coefwevf(i,:) = coefwevf(i,:) + ...
+                            weigh .* dJ .* coefficient .* ...
+                            squeeze(wfix .* vfx + wfiy .* vfy).';
+                    end
+                end
+                %----------------------------------------------------------
+            elseif any(strcmpi(coef_array_type,{'tensor'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    dJ    = detJ{iG};
+                    weigh = Weigh(iG);
+                    for i = 1:nbEd_inEl
+                        wfix = We{iG}(1,i,:);
+                        wfiy = We{iG}(2,i,:);
+                        coefwevf(i,:) = coefwevf(i,:) + ...
+                            weigh .* dJ .* ...
+                            squeeze(...
+                            coefficient(:,1,1) .* wfix .* vfx +...
+                            coefficient(:,1,2) .* wfiy .* vfx +...
+                            coefficient(:,2,1) .* wfix .* vfy +...
+                            coefficient(:,2,2) .* wfiy .* vfy).';
                     end
                 end
                 %----------------------------------------------------------
@@ -505,8 +623,8 @@ classdef Mesh2d < Mesh
                     Wf = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wf{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+                        Wf{iG} = obj.intkit.cWf{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.cdetJ{iG}(1,id_elem);
                     end
                 case 'full'
                     nbG = refelem.nbG;
@@ -515,54 +633,414 @@ classdef Mesh2d < Mesh
                     Wf = cell(1,nbG);
                     detJ = cell(1,nbG);
                     for iG = 1:nbG
-                        Wf{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
-                        detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+                        Wf{iG} = obj.intkit.Wf{iG}(:,:,id_elem);
+                        detJ{iG} = obj.intkit.detJ{iG}(1,id_elem);
                     end
             end
             %--------------------------------------------------------------
-            coefwfvf = zeros(nb_elem,nbFa_inEl);
+            coefwfvf = zeros(nbFa_inEl,nb_elem);
             %--------------------------------------------------------------
             if numel(vector_field) == 2
                 vfx = vector_field(1);
                 vfy = vector_field(2);
-            elseif size(vector_field,1) >  length(id_elem) && ...
-                    size(vector_field,1) == obj.nb_elem
-                vfx = vector_field(id_elem,1);
-                vfy = vector_field(id_elem,2);
+            elseif size(vector_field,2) > length(id_elem) && ...
+                   size(vector_field,2) == obj.nb_elem
+                vfx = vector_field(1,id_elem);
+                vfy = vector_field(2,id_elem);
             else
-                vfx = vector_field(:,1);
-                vfy = vector_field(:,2);
+                vfx = vector_field(1,:);
+                vfy = vector_field(2,:);
             end
             %--------------------------------------------------------------
             if any(strcmpi(coef_array_type,{'scalar'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbFa_inEl
-                        wfix = Wf{iG}(:,1,i);
-                        wfiy = Wf{iG}(:,2,i);
-                        coefwfvf(:,i) = coefwfvf(:,i) + ...
-                            weigh .* dJ .* ( coefficient .* ...
-                            (wfix .* vfx + wfiy .* vfy) );
+                        wfix = Wf{iG}(1,i,:);
+                        wfiy = Wf{iG}(2,i,:);
+                        coefwfvf(i,:) = coefwfvf(i,:) + ...
+                            weigh .* dJ .* coefficient .* ...
+                            squeeze(wfix .* vfx + wfiy .* vfy).';
                     end
                 end
                 %----------------------------------------------------------
             elseif any(strcmpi(coef_array_type,{'tensor'}))
                 %----------------------------------------------------------
                 for iG = 1:nbG
-                    dJ    = f_tocolv(detJ{iG});
+                    dJ    = detJ{iG};
                     weigh = Weigh(iG);
                     for i = 1:nbFa_inEl
-                        wfix = Wf{iG}(:,1,i);
-                        wfiy = Wf{iG}(:,2,i);
-                        coefwfvf(:,i) = coefwfvf(:,i) + ...
-                            weigh .* dJ .* (...
+                        wfix = Wf{iG}(1,i,:);
+                        wfiy = Wf{iG}(2,i,:);
+                        coefwfvf(i,:) = coefwfvf(i,:) + ...
+                            weigh .* dJ .* ...
+                            squeeze(...
                             coefficient(:,1,1) .* wfix .* vfx +...
                             coefficient(:,1,2) .* wfiy .* vfx +...
                             coefficient(:,2,1) .* wfix .* vfy +...
-                            coefficient(:,2,2) .* wfiy .* vfy );
+                            coefficient(:,2,2) .* wfiy .* vfy).';
                     end
+                end
+                %----------------------------------------------------------
+            end
+        end
+    end
+
+    % ---get field
+    methods
+        % -----------------------------------------------------------------
+        function scalar_field = field_wn(obj,args)
+            arguments
+                obj
+                args.id_elem = []
+                args.coefficient = 1
+                args.dof = 1
+                args.on {mustBeMember(args.on,{'center','gauss_points','interpolation_points'})} = 'center'
+            end
+            %--------------------------------------------------------------
+            id_elem = args.id_elem;
+            coefficient = args.coefficient;
+            dof = args.dof;
+            on_ = args.on;
+            %--------------------------------------------------------------
+            nb_elem = obj.nb_elem;
+            % ---
+            if isempty(id_elem)
+                id_elem = 1:nb_elem;
+            end
+            %--------------------------------------------------------------
+            if numel(dof) ~= obj.nb_node
+                error('dof must be defined in whole mesh !');
+            end
+            %--------------------------------------------------------------
+            [coefficient, coef_array_type] = f_column_format(coefficient);
+            dof = TensorArray.scalar(dof);
+            %--------------------------------------------------------------
+            refelem = obj.refelem;
+            nbNo_inEl = refelem.nbNo_inEl;
+            %--------------------------------------------------------------
+            if isempty(obj.elem)
+                error('No mesh data !');
+            end
+            elem = obj.elem;
+            %--------------------------------------------------------------
+            switch on_
+                case 'center'
+                    % ---
+                    if isempty(obj.intkit.cWn)
+                        obj.build_intkit;
+                    end
+                    % ---
+                    nbG = 1;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.intkit.cWn{iG}(:,id_elem);
+                    end
+                case 'gauss_points'
+                    % ---
+                    if isempty(obj.intkit.Wn)
+                        obj.build_intkit;
+                    end
+                    % ---
+                    nbG = refelem.nbG;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.intkit.Wn{iG}(:,id_elem);
+                    end
+                case 'interpolation_points'
+                    % ---
+                    if isempty(obj.prokit.Wn)
+                        obj.build_prokit;
+                    end
+                    % ---
+                    nbG = obj.refelem.nbI;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.prokit.Wn{iG}(:,id_elem);
+                    end
+            end
+            %--------------------------------------------------------------
+            scalar_field = cell(nbG,1);
+            for i = 1:nbG
+                scalar_field{i} = sparse(1,nb_elem);
+            end
+            %--------------------------------------------------------------
+            if any(f_strcmpi(coef_array_type,{'scalar'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    fi = zeros(1,length(id_elem));
+                    for i = 1:nbNo_inEl
+                        wi = Wx{iG}(i,:);
+                        id_node = elem(i,id_elem);
+                        fi(1,:) = fi(1,:) + coefficient .* wi .* dof(id_node);
+                    end
+                    % ---
+                    scalar_field{iG}(1,id_elem) = fi;
+                end
+                % ---
+                if nbG == 1
+                    scalar_field = scalar_field{1};
+                end
+                %----------------------------------------------------------
+            else
+                error('#coefficient must be scalar');
+            end
+        end
+        % -----------------------------------------------------------------
+        function vector_field = field_we(obj,args)
+            arguments
+                obj
+                args.id_elem = []
+                args.coefficient = 1
+                args.dof = 1
+                args.on {mustBeMember(args.on,{'center','gauss_points','interpolation_points'})} = 'center'
+            end
+            %--------------------------------------------------------------
+            id_elem = args.id_elem;
+            coefficient = args.coefficient;
+            dof = args.dof;
+            on_ = args.on;
+            %--------------------------------------------------------------
+            nb_elem = obj.nb_elem;
+            % ---
+            if isempty(id_elem)
+                id_elem = 1:nb_elem;
+            end
+            %--------------------------------------------------------------
+            if numel(dof) ~= obj.nb_edge
+                error('dof must be defined in whole mesh !');
+            end
+            %--------------------------------------------------------------
+            [coefficient, coef_array_type] = f_column_format(coefficient);
+            dof = TensorArray.scalar(dof);
+            %--------------------------------------------------------------
+            refelem = obj.refelem;
+            nbEd_inEl = refelem.nbEd_inEl;
+            %--------------------------------------------------------------
+            if isempty(obj.meshds.id_edge_in_elem)
+                obj.build_meshds;
+            end
+            id_edge_in_elem = obj.meshds.id_edge_in_elem;
+            %--------------------------------------------------------------
+            switch on_
+                case 'center'
+                    % ---
+                    if isempty(obj.intkit.cWe)
+                        obj.build_intkit;
+                    end
+                    % ---
+                    nbG = 1;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.intkit.cWe{iG}(:,:,id_elem);
+                    end
+                case 'gauss_points'
+                    % ---
+                    if isempty(obj.intkit.We)
+                        obj.build_intkit;
+                    end
+                    % ---
+                    nbG = refelem.nbG;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.intkit.We{iG}(:,:,id_elem);
+                    end
+                case 'interpolation_points'
+                    % ---
+                    if isempty(obj.prokit.We)
+                        obj.build_prokit;
+                    end
+                    % ---
+                    nbG = obj.refelem.nbI;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.prokit.We{iG}(:,:,id_elem);
+                    end
+            end
+            %--------------------------------------------------------------
+            vector_field = cell(nbG,1);
+            for i = 1:nbG
+                vector_field{i} = sparse(2,nb_elem);
+            end
+            %--------------------------------------------------------------
+            if any(f_strcmpi(coef_array_type,{'scalar'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    fi = zeros(2,length(id_elem));
+                    for i = 1:nbEd_inEl
+                        wix = squeeze(Wx{iG}(1,i,:)).';
+                        wiy = squeeze(Wx{iG}(2,i,:)).';
+                        id_edge = id_edge_in_elem(i,id_elem);
+                        fi(1,:) = fi(1,:) + coefficient .* wix .* dof(id_edge);
+                        fi(2,:) = fi(2,:) + coefficient .* wiy .* dof(id_edge);
+                    end
+                    % ---
+                    vector_field{iG}(1:2,id_elem) = fi;
+                end
+                % ---
+                if nbG == 1
+                    vector_field = vector_field{1};
+                end
+                %----------------------------------------------------------
+            elseif any(f_strcmpi(coef_array_type,{'tensor'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    fi = zeros(2,length(id_elem));
+                    %------------------------------------------------------
+                    for i = 1:nbEd_inEl
+                        wix = Wx{iG}(1,i,:);
+                        wiy = Wx{iG}(2,i,:);
+                        id_edge = id_edge_in_elem(i,id_elem);
+                        fi(1,:) = fi(1,:) + ...
+                            squeeze(coefficient(:,1,1) .* wix + ...
+                                    coefficient(:,1,2) .* wiy).' ...
+                            .* dof(id_edge) ;
+                        fi(2,:) = fi(2,:) + ...
+                            squeeze(coefficient(:,2,1) .* wix + ...
+                                    coefficient(:,2,2) .* wiy).' ...
+                            .* dof(id_edge) ;
+                    end
+                    % ---
+                    vector_field{iG}(1:2,id_elem) = fi;
+                end
+                % ---
+                if nbG == 1
+                    vector_field = vector_field{1};
+                end
+                %----------------------------------------------------------
+            end
+        end
+        % -----------------------------------------------------------------
+        function vector_field = field_wf(obj,args)
+            arguments
+                obj
+                args.id_elem = []
+                args.coefficient = 1
+                args.dof = 1
+                args.on {mustBeMember(args.on,{'center','gauss_points','interpolation_points'})} = 'center'
+            end
+            %--------------------------------------------------------------
+            id_elem = args.id_elem;
+            coefficient = args.coefficient;
+            dof = args.dof;
+            on_ = args.on;
+            %--------------------------------------------------------------
+            nb_elem = obj.nb_elem;
+            % ---
+            if isempty(id_elem)
+                id_elem = 1:nb_elem;
+            end
+            %--------------------------------------------------------------
+            if numel(dof) ~= obj.nb_face
+                error('dof must be defined in whole mesh !');
+            end
+            %--------------------------------------------------------------
+            [coefficient, coef_array_type] = f_column_format(coefficient);
+            dof = TensorArray.scalar(dof);
+            %--------------------------------------------------------------
+            refelem = obj.refelem;
+            nbFa_inEl = refelem.nbFa_inEl;
+            %--------------------------------------------------------------
+            if isempty(obj.meshds.id_face_in_elem)
+                obj.build_meshds;
+            end
+            id_face_in_elem = obj.meshds.id_face_in_elem;
+            %--------------------------------------------------------------
+            switch on_
+                case 'center'
+                    % ---
+                    if isempty(obj.intkit.cWf)
+                        obj.build_intkit;
+                    end
+                    % ---
+                    nbG = 1;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.intkit.cWf{iG}(:,:,id_elem);
+                    end
+                case 'gauss_points'
+                    % ---
+                    if isempty(obj.intkit.Wf)
+                        obj.build_intkit;
+                    end
+                    % ---
+                    nbG = refelem.nbG;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.intkit.Wf{iG}(:,:,id_elem);
+                    end
+                case 'interpolation_points'
+                    % ---
+                    if isempty(obj.prokit.Wf)
+                        obj.build_prokit;
+                    end
+                    % ---
+                    nbG = obj.refelem.nbI;
+                    % ---
+                    Wx = cell(1,nbG);
+                    for iG = 1:nbG
+                        Wx{iG} = obj.prokit.Wf{iG}(:,:,id_elem);
+                    end
+            end
+            %--------------------------------------------------------------
+            vector_field = cell(nbG,1);
+            for i = 1:nbG
+                vector_field{i} = sparse(2,nb_elem);
+            end
+            %--------------------------------------------------------------
+            if any(f_strcmpi(coef_array_type,{'scalar'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    fi = zeros(2,length(id_elem));
+                    for i = 1:nbFa_inEl
+                        wix = squeeze(Wx{iG}(1,i,:)).';
+                        wiy = squeeze(Wx{iG}(2,i,:)).';
+                        id_face = id_face_in_elem(i,id_elem);
+                        fi(1,:) = fi(1,:) + coefficient .* wix .* dof(id_face);
+                        fi(2,:) = fi(2,:) + coefficient .* wiy .* dof(id_face);
+                    end
+                    % ---
+                    vector_field{iG}(1:2,id_elem) = fi;
+                end
+                % ---
+                if nbG == 1
+                    vector_field = vector_field{1};
+                end
+                %----------------------------------------------------------
+            elseif any(f_strcmpi(coef_array_type,{'tensor'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    fi = zeros(2,length(id_elem));
+                    %------------------------------------------------------
+                    for i = 1:nbFa_inEl
+                        wix = Wx{iG}(1,i,:);
+                        wiy = Wx{iG}(2,i,:);
+                        id_face = id_face_in_elem(i,id_elem);
+                        fi(1,:) = fi(1,:) + ...
+                            squeeze(coefficient(:,1,1) .* wix + ...
+                                    coefficient(:,1,2) .* wiy).' ...
+                            .* dof(id_face) ;
+                        fi(2,:) = fi(2,:) + ...
+                            squeeze(coefficient(:,2,1) .* wix + ...
+                                    coefficient(:,2,2) .* wiy).' ...
+                            .* dof(id_face) ;
+                    end
+                    % ---
+                    vector_field{iG}(1:2,id_elem) = fi;
+                end
+                % ---
+                if nbG == 1
+                    vector_field = vector_field{1};
                 end
                 %----------------------------------------------------------
             end

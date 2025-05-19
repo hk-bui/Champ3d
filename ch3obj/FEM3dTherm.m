@@ -167,9 +167,9 @@ classdef FEM3dTherm < ThModel
                     % ---
                     if niter_out == 1
                         if it == 1
-                            x0 = obj.dof{it}.T.value(obj.matrix.id_node_t);
+                            x0 = obj.dof{it}.T.value(obj.matrix.id_node_t).';
                         else
-                            x0 = obj.dof{it-1}.T.value(obj.matrix.id_node_t);
+                            x0 = obj.dof{it-1}.T.value(obj.matrix.id_node_t).';
                         end
                     end
                     % --- qmr + jacobi

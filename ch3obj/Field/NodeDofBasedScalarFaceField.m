@@ -92,19 +92,19 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 Wx = sm.prokit.Wn;
                 % ---
                 if any(f_strcmpi(sm.elem_type,'tri'))
-                    dof_ = obj.dof.value(face_(1:3,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:3,gid_face));
                 elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dof_ = obj.dof.value(face_(1:4,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:4,gid_face));
                 end
                 % ---
                 for m = 1:nbNodeI
-                    vi = zeros(length(lid_face),1);
+                    vi = zeros(1,length(lid_face));
                     for l = 1:sm.refelem.nbNo_inEl
-                        wi = Wx{m}(:,l);
-                        vi = vi + wi .* dof_(:,l);
+                        wi = Wx{m}(l,:);
+                        vi = vi + wi .* dof_(l,:);
                     end
                     % ---
-                    val{m}(1,lid_face) = vi.';
+                    val{m}(1,lid_face) = vi;
                 end
             end
             % ---
@@ -141,19 +141,19 @@ classdef NodeDofBasedScalarFaceField < ScalarFaceField
                 Wx = sm.intkit.Wn;
                 % ---
                 if any(f_strcmpi(sm.elem_type,'tri'))
-                    dof_ = obj.dof.value(face_(1:3,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:3,gid_face));
                 elseif any(f_strcmpi(sm.elem_type,'quad'))
-                    dof_ = obj.dof.value(face_(1:4,gid_face)).';
+                    dof_ = obj.dof.value(face_(1:4,gid_face));
                 end
                 % ---
                 for m = 1:nbNodeG
-                    vi = zeros(length(lid_face),1);
+                    vi = zeros(1,length(lid_face));
                     for l = 1:sm.refelem.nbNo_inEl
-                        wi = Wx{m}(:,l);
-                        vi = vi + wi .* dof_(:,l);
+                        wi = Wx{m}(l,:);
+                        vi = vi + wi .* dof_(l,:);
                     end
                     % ---
-                    val{m}(1,lid_face) = vi.';
+                    val{m}(1,lid_face) = vi;
                 end
             end
             % ---

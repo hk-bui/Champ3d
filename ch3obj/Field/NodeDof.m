@@ -47,14 +47,14 @@ classdef NodeDof < Xhandle
         function set.value(obj,value)
             nb_node = obj.parent_model.parent_mesh.nb_node;
             if isempty(value)
-                obj.value = zeros(nb_node,1);
+                obj.value = zeros(1,nb_node);
             elseif numel(value) == 1
-                obj.value = value .* ones(nb_node,1);
+                obj.value = value .* ones(1,nb_node);
             else
                 if numel(value) ~= nb_node
                     error('#value must correspond to mesh node, check size !');
                 else
-                    obj.value = f_tocolv(value);
+                    obj.value = f_torowv(value);
                 end
             end
         end

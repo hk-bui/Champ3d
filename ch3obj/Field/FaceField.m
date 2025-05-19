@@ -49,7 +49,7 @@ classdef FaceField < Xhandle
             % ---
             nbNodeI = submesh{1}.refelem.nbI;
             for i = 1:nbNodeI
-                val{i} = zeros(lnb_face,3);
+                val{i} = zeros(3,lnb_face);
             end
             % ---
             for k = 1:length(submesh)
@@ -60,7 +60,7 @@ classdef FaceField < Xhandle
                 inode = sm.prokit.node;
                 % ---
                 for i = 1:length(inode)
-                    val{i}(lid_face,:) = inode{i};
+                    val{i}(:,lid_face) = inode{i};
                 end
                 % ---
             end
@@ -81,7 +81,7 @@ classdef FaceField < Xhandle
             % ---
             nbNodeG = submesh{1}.refelem.nbG;
             for i = 1:nbNodeG
-                val{i} = zeros(lnb_face,3);
+                val{i} = zeros(3,lnb_face);
             end
             % ---
             for k = 1:length(submesh)
@@ -92,7 +92,7 @@ classdef FaceField < Xhandle
                 gnode = sm.intkit.node;
                 % ---
                 for i = 1:length(gnode)
-                    val{i}(lid_face,:) = gnode{i};
+                    val{i}(:,lid_face) = gnode{i};
                 end
                 % ---
             end

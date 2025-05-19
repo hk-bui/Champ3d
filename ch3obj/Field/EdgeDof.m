@@ -47,14 +47,14 @@ classdef EdgeDof < Xhandle
         function set.value(obj,value)
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             if isempty(value)
-                obj.value = zeros(nb_edge,1);
+                obj.value = zeros(1,nb_edge);
             elseif numel(value) == 1
-                obj.value = value .* ones(nb_edge,1);
+                obj.value = value .* ones(1,nb_edge);
             else
                 if numel(value) ~= nb_edge
                     error('#value must correspond to mesh edge, check size !');
                 else
-                    obj.value = f_tocolv(value);
+                    obj.value = f_torowv(value);
                 end
             end
         end

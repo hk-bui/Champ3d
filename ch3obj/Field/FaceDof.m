@@ -47,14 +47,14 @@ classdef FaceDof < Xhandle
         function set.value(obj,value)
             nb_face = obj.parent_model.parent_mesh.nb_face;
             if isempty(value)
-                obj.value = zeros(nb_face,1);
+                obj.value = zeros(1,nb_face);
             elseif numel(value) == 1
-                obj.value = value .* ones(nb_face,1);
+                obj.value = value .* ones(1,nb_face);
             else
                 if numel(value) ~= nb_face
                     error('#value must correspond to mesh face, check size !');
                 else
-                    obj.value = f_tocolv(value);
+                    obj.value = f_torowv(value);
                 end
             end
         end

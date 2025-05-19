@@ -45,7 +45,7 @@ classdef ElemField < Xhandle
                 val = obj.parent_model.parent_mesh.prokit.node;
             else
                 for i = 1:length(obj.parent_model.parent_mesh.prokit.node)
-                    val{i} = obj.parent_model.parent_mesh.prokit.node{i}(id_elem,:);
+                    val{i} = obj.parent_model.parent_mesh.prokit.node{i}(:,id_elem);
                 end
             end
             % ---
@@ -61,7 +61,7 @@ classdef ElemField < Xhandle
                 val = obj.parent_model.parent_mesh.intkit.node;
             else
                 for i = 1:length(obj.parent_model.parent_mesh.intkit.node)
-                    val{i} = obj.parent_model.parent_mesh.intkit.node{i}(id_elem,:);
+                    val{i} = obj.parent_model.parent_mesh.intkit.node{i}(:,id_elem);
                 end
             end
             % ---
