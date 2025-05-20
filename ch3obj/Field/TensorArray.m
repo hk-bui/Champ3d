@@ -139,16 +139,36 @@ classdef TensorArray < Xhandle
                 vnorm = sqrt(sum(varray.^2, 2)); % 2-position !!
                 vnorm(abs(vnorm) <= eps) = 0;
             else
-                f_fprintf(1,'/!\\',0,'norm undefined for complex vector ! consider max or complex2time \n');
-                error('undefined norm for complex vector !');
+                % --- max
+                vnorm = sqrt(sum(varray .* conj(varray), 2)); % 2-position !!
+                vnorm(abs(vnorm) <= eps) = 0;
             end
         end
         %-------------------------------------------------------------------
-        function vtime = max(vector_array)
+        function vmax = maxvector(vector_array)
+            % --- make sense for complex vector
             varray = TensorArray.vector(vector_array);
             % ---
             if isreal(varray)
-                vtime = varray;
+                vmax = varray;
+            else
+                s = TensorArray.dot(varray,varray);
+                vcomplex = abs(sqrt(s)) .* varray ./ sqrt(s);
+                vmax = real(vcomplex);
+            end
+            % ---
+        end
+        %-------------------------------------------------------------------
+        function vmin = minvector(vector_array)
+            % --- make sense for complex vector
+            varray = TensorArray.vector(vector_array);
+            % ---
+            if isreal(varray)
+                vmin = varray;
+            else
+                s = TensorArray.dot(varray,varray);
+                vcomplex = abs(sqrt(s)) .* varray ./ sqrt(s);
+                vmin = imag(vcomplex);
             end
             % ---
         end
@@ -169,6 +189,10 @@ classdef TensorArray < Xhandle
                 vtime = mag .* cos(2*pi*frequency*t + ang);
             end
             % ---
+        end
+        %-------------------------------------------------------------------
+        function s = dot(v1,v2)
+            s = sum(v1 .* v2, 2);
         end
         %-------------------------------------------------------------------
         function tarray = fullformat(array,nb_elem)
@@ -192,19 +216,6 @@ classdef TensorArray < Xhandle
                     tarray = obj.parameter_array;
             end
             % ---
-        end
-        %-------------------------------------------------------------------
-        function array_type = arraytype(array)
-            arguments
-                array
-                nb_elem = []
-            end
-            % ---
-            if isempty(nb_elem)
-                
-            else
-                
-            end
         end
         %-------------------------------------------------------------------
     end
