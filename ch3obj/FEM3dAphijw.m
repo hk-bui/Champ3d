@@ -315,7 +315,7 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.dof{it}.Phi = NodeDof('parent_model',obj);
             obj.dof{it}.B = FaceDof('parent_model',obj);
             obj.dof{it}.E = EdgeDof('parent_model',obj);
-            obj.dof{it}.V = GlobalQuantityDof('parent_model',obj);
+            obj.dof{it}.V = [];
             %--------------------------------------------------------------
             obj.field{it}.A.elem = ...
                 EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.A);
