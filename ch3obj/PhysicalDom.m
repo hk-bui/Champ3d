@@ -24,6 +24,9 @@ classdef PhysicalDom < Xhandle
         % ---
         dom
         % ---
+        matrix
+        tarray
+        % ---
         % 'by_coordinates', 'by_id_dom'[by default]
         parameter_dependency_search = 'by_id_dom'
     end

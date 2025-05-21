@@ -19,14 +19,14 @@
 classdef TensorArray < Xhandle
     properties
         physical_dom
-        parameter_array
+        value
     end
     % --- Contructor
     methods
         function obj = TensorArray(args)
             arguments
                 args.physical_dom {mustBeA(args.physical_dom,'PhysicalDom')}
-                args.parameter_array = []
+                args.value = []
             end
             % ---
             obj = obj@Xhandle;
@@ -211,9 +211,9 @@ classdef TensorArray < Xhandle
                 case 'scalar'
                     tarray(:,1,1) = repmat(array,[]);
                 case 'vector'
-                    tarray(:,:,1) = obj.parameter_array;
+                    tarray(:,:,1) = obj.value;
                 case 'tensor'
-                    tarray = obj.parameter_array;
+                    tarray = obj.value;
             end
             % ---
         end

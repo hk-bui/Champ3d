@@ -16,15 +16,15 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef JAphiVectorElemField < VectorElemField
+classdef JAphiVectorFaceField < VectorElemField
     properties
         parent_model
-        econductor
+        sibc
         Efield
     end
     % --- Contructor
     methods
-        function obj = JAphiVectorElemField(args)
+        function obj = JAphiVectorFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorElemField')}
@@ -54,20 +54,21 @@ classdef JAphiVectorElemField < VectorElemField
             val = zeros(3,length(id_elem));
             % ---
             id_phydom__ = {};
-            if ~isempty(obj.econductor)
-                id_phydom__ = fieldnames(obj.econductor);
+            if ~isempty(obj.parent_model.econductor)
+                id_phydom__ = fieldnames(obj.parent_model.econductor);
             end
             % ---
             for iec = 1:length(id_phydom__)
                 id_phydom = id_phydom__{iec};
                 % ---
-                phydom = obj.econductor.(id_phydom).sigma.physical_dom;
+                phydom = obj.parent_model.econductor.(id_phydom);
                 % ---
-                [gid_elem, ~, lid_elem] = intersect(id_elem,phydom.gid_elem);
-                lid_elem = phydom.gid_elem(lid_elem);
+                gid_elem = intersect(id_elem,phydom.gid_elem);
+                gid_elem = unique(gid_elem);
                 % ---
-                sigma_array = obj.econductor.(id_phydom).sigma.value(lid_elem);
-                E = obj.Efield.cvalue(gid_elem);
+                % sigma_array = phydom.matrix.sigma_array
+                % % ---
+                % E = obj.Efield.cvalue(gid_elem);
                 % val = 
             end
             % ---
