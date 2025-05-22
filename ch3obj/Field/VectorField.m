@@ -16,11 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VectorField < Xhandle
+classdef VectorField < Field
     % --- Contructor
     methods
         function obj = VectorField()
-            obj = obj@Xhandle;
+            obj = obj@Field;
         end
     end
     % --- Utilily Methods

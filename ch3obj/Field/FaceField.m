@@ -16,11 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FaceField < Xhandle
+classdef FaceField < Field
     % --- Contructor
     methods
         function obj = FaceField()
-            obj = obj@Xhandle;
+            obj = obj@Field;
         end
     end
     % --- get

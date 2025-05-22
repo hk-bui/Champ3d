@@ -16,70 +16,56 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ElemField < Field
+classdef NodeField < Field
     % --- Contructor
     methods
-        function obj = ElemField()
+        function obj = NodeField()
             obj = obj@Field;
         end
     end
-    % --- get
+    % --- Get
     methods
         % -----------------------------------------------------------------
-        function val = cnode(obj,id_elem)
+        function val = cnode(obj,id_node)
             % ---
             if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                id_node = 1:obj.parent_model.parent_mesh.nb_node;
             end
             % ---
-            if isempty(id_elem)
+            if isempty(id_node)
                 val = [];
                 return
             end
             % ---
-            val = obj.parent_model.parent_mesh.celem(:,id_elem).';
+            val = obj.parent_model.parent_mesh.node(:,id_node).';
         end
         % -----------------------------------------------------------------
-        function val = inode(obj,id_elem)
+        function val = inode(obj,id_node)
             % ---
             if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                id_node = 1:obj.parent_model.parent_mesh.nb_node;
             end
             % ---
-            if isempty(id_elem)
+            if isempty(id_node)
                 val = [];
                 return
             end
             % ---
-            if length(id_elem) == obj.parent_model.parent_mesh.nb_elem
-                val = obj.parent_model.parent_mesh.prokit.node;
-            else
-                for i = 1:length(obj.parent_model.parent_mesh.prokit.node)
-                    val{i} = obj.parent_model.parent_mesh.prokit.node{i}(id_elem,:);
-                end
-            end
-            % ---
+            val{1} = obj.parent_model.parent_mesh.node(:,id_node).';
         end
         % -----------------------------------------------------------------
-        function val = gnode(obj,id_elem)
+        function val = gnode(obj,id_node)
             % ---
             if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                id_node = 1:obj.parent_model.parent_mesh.nb_node;
             end
             % ---
-            if isempty(id_elem)
+            if isempty(id_node)
                 val = [];
                 return
             end
             % ---
-            if length(id_elem) == obj.parent_model.parent_mesh.nb_elem
-                val = obj.parent_model.parent_mesh.intkit.node;
-            else
-                for i = 1:length(obj.parent_model.parent_mesh.intkit.node)
-                    val{i} = obj.parent_model.parent_mesh.intkit.node{i}(id_elem,:);
-                end
-            end
-            % ---
+            val{1} = obj.parent_model.parent_mesh.node(:,id_node).';
         end
         % -----------------------------------------------------------------
     end

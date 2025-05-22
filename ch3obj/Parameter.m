@@ -477,25 +477,24 @@ classdef Parameter < Xhandle
                                     % ---
                                 end
                                 % --- space interpolation
-                                nbINoinEl = source_model.parent_mesh.refelem.nbI;
+                                interp_node = source_model.parent_mesh.prokit.node;
+                                nbINode = length(interp_node);
                                 nb_elem   = length(id_elem_source);
                                 % ---
-                                node_i = zeros(nbINoinEl * nb_elem, 3);
-                                % ---
-                                interp_node = source_model.parent_mesh.prokit.node;
+                                node_i = zeros(nbINode * nb_elem, 3);
                                 % ---
                                 id0 = 1:nb_elem;
-                                for k = 1:nbINoinEl
+                                for k = 1:nbINode
                                     idn = id0 + (k - 1) * nb_elem;
                                     node_i(idn,:) = interp_node{k}(id_elem_source,:);
                                 end
                                 % ---
                                 dim_ = size(valcell{1},2);
                                 if dim_ == 1
-                                    valx = zeros(nbINoinEl * nb_elem, 1);
+                                    valx = zeros(nbINode * nb_elem, 1);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         valx(idn) = valcell{k}(:,1);
                                     end
@@ -506,11 +505,11 @@ classdef Parameter < Xhandle
                                     fargs{i} = fxi(cnode_.');
                                     % ---
                                 elseif dim_ == 2
-                                    valx = zeros(nbINoinEl * nb_elem, 1);
-                                    valy = zeros(nbINoinEl * nb_elem, 1);
+                                    valx = zeros(nbINode * nb_elem, 1);
+                                    valy = zeros(nbINode * nb_elem, 1);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         valx(idn) = valcell{k}(:,1);
                                         valy(idn) = valcell{k}(:,2);
@@ -526,12 +525,12 @@ classdef Parameter < Xhandle
                                     fargs{i} = [vx_ vy_];
                                     % ---
                                 elseif dim_ == 3
-                                    valx = zeros(nbINoinEl * nb_elem, 1);
-                                    valy = zeros(nbINoinEl * nb_elem, 1);
-                                    valz = zeros(nbINoinEl * nb_elem, 1);
+                                    valx = zeros(nbINode * nb_elem, 1);
+                                    valy = zeros(nbINode * nb_elem, 1);
+                                    valz = zeros(nbINode * nb_elem, 1);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         valx(idn) = valcell{k}(:,1);
                                         valy(idn) = valcell{k}(:,2);
@@ -603,23 +602,23 @@ classdef Parameter < Xhandle
                                     % --- space interpolation
                                     % --- take interp_node from Field
                                     interp_node = source_model.field{back_it}.(depon_).face.inode(id_face_source);
-                                    nbINoinEl = length(interp_node);
-                                    nb_face   = length(id_face_source);
+                                    nbINode = length(interp_node);
+                                    nb_face = length(id_face_source);
                                     % ---
-                                    node_i = zeros(nbINoinEl * nb_face, 3);
+                                    node_i = zeros(nbINode * nb_face, 3);
                                     % ---
                                     id0 = 1:nb_face;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_face;
                                         node_i(idn,:) = interp_node{k};
                                     end
                                     % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
-                                        valx = zeros(nbINoinEl * nb_face, 1);
+                                        valx = zeros(nbINode * nb_face, 1);
                                         % ---
                                         id0 = 1:nb_face;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_face;
                                             valx(idn) = valcell{k}(:,1);
                                         end
@@ -630,11 +629,11 @@ classdef Parameter < Xhandle
                                         fargs{i} = fxi(cnode_.');
                                         % ---
                                     elseif dim_ == 2
-                                        valx = zeros(nbINoinEl * nb_face, 1);
-                                        valy = zeros(nbINoinEl * nb_face, 1);
+                                        valx = zeros(nbINode * nb_face, 1);
+                                        valy = zeros(nbINode * nb_face, 1);
                                         % ---
                                         id0 = 1:nb_face;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_face;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);
@@ -650,12 +649,12 @@ classdef Parameter < Xhandle
                                         fargs{i} = [vx_ vy_];
                                         % ---
                                     elseif dim_ == 3
-                                        valx = zeros(nbINoinEl * nb_face, 1);
-                                        valy = zeros(nbINoinEl * nb_face, 1);
-                                        valz = zeros(nbINoinEl * nb_face, 1);
+                                        valx = zeros(nbINode * nb_face, 1);
+                                        valy = zeros(nbINode * nb_face, 1);
+                                        valz = zeros(nbINode * nb_face, 1);
                                         % ---
                                         id0 = 1:nb_face;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_face;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);
@@ -703,25 +702,24 @@ classdef Parameter < Xhandle
                                         % ---
                                     end
                                     % --- space interpolation
-                                    nbINoinEl = source_model.parent_mesh.refelem.nbI;
-                                    nb_elem   = length(id_elem_source);
-                                    % ---
-                                    node_i = zeros(nbINoinEl * nb_elem, 3);
-                                    % ---
                                     interp_node = source_model.parent_mesh.prokit.node;
+                                    nbINode = length(interp_node);
+                                    nb_elem = length(id_elem_source);
+                                    % ---
+                                    node_i = zeros(nbINode * nb_elem, 3);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         node_i(idn,:) = interp_node{k}(id_elem_source,:);
                                     end
                                     % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
-                                        valx = zeros(nbINoinEl * nb_elem, 1);
+                                        valx = zeros(nbINode * nb_elem, 1);
                                         % ---
                                         id0 = 1:nb_elem;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_elem;
                                             valx(idn) = valcell{k}(:,1);
                                         end
@@ -732,11 +730,11 @@ classdef Parameter < Xhandle
                                         fargs{i} = fxi(cnode_.');
                                         % ---
                                     elseif dim_ == 2
-                                        valx = zeros(nbINoinEl * nb_elem, 1);
-                                        valy = zeros(nbINoinEl * nb_elem, 1);
+                                        valx = zeros(nbINode * nb_elem, 1);
+                                        valy = zeros(nbINode * nb_elem, 1);
                                         % ---
                                         id0 = 1:nb_elem;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_elem;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);
@@ -752,12 +750,12 @@ classdef Parameter < Xhandle
                                         fargs{i} = [vx_ vy_];
                                         % ---
                                     elseif dim_ == 3
-                                        valx = zeros(nbINoinEl * nb_elem, 1);
-                                        valy = zeros(nbINoinEl * nb_elem, 1);
-                                        valz = zeros(nbINoinEl * nb_elem, 1);
+                                        valx = zeros(nbINode * nb_elem, 1);
+                                        valy = zeros(nbINode * nb_elem, 1);
+                                        valz = zeros(nbINode * nb_elem, 1);
                                         % ---
                                         id0 = 1:nb_elem;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_elem;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);
