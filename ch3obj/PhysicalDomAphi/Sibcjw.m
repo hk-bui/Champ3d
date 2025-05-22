@@ -113,7 +113,7 @@ classdef Sibcjw < PhysicalDom
             % ---
             z_sibc = (1+1j)./(skindepth.*sigma_array) .* ...
                 (1 + (1-1j)/4 .* skindepth .* cparam_array);
-            z_sibc = TensorArray.tensor(z_sibc,'nb_elem',lnb_face);
+            z_sibc = Array.tensor(z_sibc,'nb_elem',lnb_face);
             %--------------------------------------------------------------
             % local surface mesh
             submesh = dom.submesh;
@@ -210,6 +210,7 @@ classdef Sibcjw < PhysicalDom
             obj.parent_model.matrix.id_node_phi = ...
                 unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);
             %--------------------------------------------------------------
+            it = obj.parent_model.ltime.it;
             obj.field{it}.J.face.sibc.(obj.id).sigma = obj.tarray{it}.sigma;
             %--------------------------------------------------------------
         end
@@ -222,8 +223,8 @@ classdef Sibcjw < PhysicalDom
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             lnb_face = length(obj.dom.gid_face);
             % ---
-            sigma_array = TensorArray.tensor(obj.matrix.sigma_array,'nb_elem',lnb_face);
-            skindepth   = TensorArray.tensor(obj.matrix.skindepth,'nb_elem',lnb_face);
+            sigma_array = Array.tensor(obj.matrix.sigma_array,'nb_elem',lnb_face);
+            skindepth   = Array.tensor(obj.matrix.skindepth,'nb_elem',lnb_face);
             % ---
             es = sparse(2,lnb_face);
             js = sparse(2,lnb_face);

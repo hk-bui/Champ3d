@@ -19,8 +19,6 @@
 classdef Mconductor < PhysicalDom
     properties
         mur
-        % ---
-        matrix
     end
     % ---
     properties (Access = private)

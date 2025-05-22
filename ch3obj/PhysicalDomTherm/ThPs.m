@@ -19,8 +19,6 @@
 classdef ThPs < PhysicalDom
     properties
         ps = 0
-        % ---
-        matrix
     end
     % --- 
     properties (Access = private)
@@ -93,7 +91,7 @@ classdef ThPs < PhysicalDom
             gid_node_t = f_uniquenode(dom.parent_mesh.face(:,gid_face));
             % ---
             ps_array = obj.ps.getvalue('in_dom',obj);
-            ps_array = TensorArray.tensor(ps_array,'nb_elem',nb_face);
+            ps_array = Array.tensor(ps_array,'nb_elem',nb_face);
             %--------------------------------------------------------------
             % local surface mesh
             submesh = dom.submesh;

@@ -106,7 +106,7 @@ classdef VectorElemField < ElemField
                 title('Norm');
                 node_ = obj.parent_model.parent_mesh.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                v__ = TensorArray.norm(v_);
+                v__ = VectorArray.norm(v_);
                 f_patch('node',node_,'elem',elem,'elem_field',v__);
             else
                 for i = 1:4
@@ -122,14 +122,14 @@ classdef VectorElemField < ElemField
                         f_quiver(celem,v__);
                     elseif i == 3
                         title('Max');
-                        v__ = TensorArray.maxvector(v_);
+                        v__ = VectorArray.max(v_);
                         f_quiver(celem,v__);
                     elseif i == 4
                         title('Max');
                         % ---
                         node_ = obj.parent_model.parent_mesh.node;
                         elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                        v__ = TensorArray.norm(TensorArray.maxvector(v_));
+                        v__ = VectorArray.norm(VectorArray.max(v_));
                         f_patch('node',node_,'elem',elem,'elem_field',v__);
                     end
                     % ---

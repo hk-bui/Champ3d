@@ -19,8 +19,6 @@
 classdef Thconductor < PhysicalDom
     properties
         lambda = 0
-        % ---
-        matrix
     end
     % --- 
     properties (Access = private)

@@ -20,8 +20,6 @@ classdef SolidOpenVsCoil < OpenCoil & SolidCoil & VsCoil
     properties
         Vs = 0
         coil_mode = 'tx'
-        % ---
-        matrix
     end
     % --- 
     properties (Access = private)

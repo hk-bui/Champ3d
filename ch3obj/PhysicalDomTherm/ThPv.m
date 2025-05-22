@@ -19,8 +19,6 @@
 classdef ThPv < PhysicalDom
     properties
         pv = 0
-        % ---
-        matrix
     end
     % --- 
     properties (Access = private)

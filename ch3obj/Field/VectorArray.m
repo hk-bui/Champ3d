@@ -17,6 +17,10 @@
 %--------------------------------------------------------------------------
 
 classdef VectorArray < Array
+    properties
+        parent_dom
+        value
+    end
     % --- Contructor
     methods
         function obj = VectorArray(args)
@@ -61,35 +65,35 @@ classdef VectorArray < Array
             end
         end
         %-------------------------------------------------------------------
-        function vmax = maxvector(vector_array)
+        function vmax = max(vector_array)
             % --- make sense for complex vector
             varray = Array.vector(vector_array);
             % ---
             if isreal(varray)
                 vmax = varray;
             else
-                s = Array.dot(varray,varray);
+                s = VectorArray.dot(varray,varray);
                 vcomplex = abs(sqrt(s)) .* varray ./ sqrt(s);
                 vmax = real(vcomplex);
             end
             % ---
         end
         %-------------------------------------------------------------------
-        function vmin = minvector(vector_array)
+        function vmin = min(vector_array)
             % --- make sense for complex vector
             varray = Array.vector(vector_array);
             % ---
             if isreal(varray)
                 vmin = varray;
             else
-                s = Array.dot(varray,varray);
+                s = VectorArray.dot(varray,varray);
                 vcomplex = abs(sqrt(s)) .* varray ./ sqrt(s);
                 vmin = imag(vcomplex);
             end
             % ---
         end
         %-------------------------------------------------------------------
-        function vtime = complex2time(vector_array,frequency,t)
+        function vtime = at_time(vector_array,frequency,t)
             arguments
                 vector_array
                 frequency = 1
@@ -111,10 +115,44 @@ classdef VectorArray < Array
             s = sum(v1 .* v2, 2);
         end
         %-------------------------------------------------------------------
+        function vrot = rotaroundaxis(vector_array,rot_axis,rot_angle)
+            arguments
+                vector_array
+                rot_axis
+                rot_angle
+            end
+            % ---
+            vector_array = Array.vector(vector_array);
+            nb_elem = size(vector_array,1);
+            dim = size(vector_array,2);
+            % ---
+            vrot = zeros(nb_elem,dim);
+            for i = 1:nb_elem
+                v = vector_array(i,:);
+                a = rot_angle / 180 * pi;
+                if dim == 3
+                    ux = rot_axis(1); uy = rot_axis(2); uz = rot_axis(3);
+                    R  = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) - uz*sin(a)   ux*uz*(1-cos(a)) + uy*sin(a) ; ...
+                          uy*ux*(1-cos(a)) + uz*sin(a)  cos(a) + uy^2 * (1-cos(a))     uy*uz*(1-cos(a)) - ux*sin(a) ;...
+                          uz*ux*(1-cos(a)) - uy*sin(a)  uz*uy*(1-cos(a)) + ux*sin(a)   cos(a) + uz^2 * (1-cos(a))];
+                elseif dim == 2
+                    ux = rot_axis_(1); uy = rot_axis_(2);
+                    R  = [cos(a) + ux^2 * (1-cos(a))    ux*uy*(1-cos(a)) ; ...
+                          uy*ux*(1-cos(a))              cos(a) + uy^2 * (1-cos(a))];
+                end
+                % ---
+                vrot(i,:) = (R * v.').';
+            end
+            % ---
+        end
+        %-------------------------------------------------------------------
     end
     % --- obj's methods
     methods
         %-------------------------------------------------------------------
+        function set.value(obj,val)
+            obj.value = Array.vector(val);
+        end
         %-------------------------------------------------------------------
     end
 end

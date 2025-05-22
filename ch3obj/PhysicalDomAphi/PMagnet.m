@@ -19,8 +19,6 @@
 classdef PMagnet < PhysicalDom
     properties
         br
-        % ---
-        matrix
     end
     properties (Access = private)
         build_done = 0

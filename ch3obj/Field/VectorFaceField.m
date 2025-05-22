@@ -75,15 +75,15 @@ classdef VectorFaceField < FaceField
                     subplot(130 + i);
                     if i == 1
                         title('Real part');
-                        v__ = TensorArray.norm(real(v_));
+                        v__ = VectorArray.norm(real(v_));
                         f_patch('node',node_,'face',face_,'face_field',v__);
                     elseif i == 2
                         title('Imag part');
-                        v__ = TensorArray.norm(imag(v_));
+                        v__ = VectorArray.norm(imag(v_));
                         f_patch('node',node_,'face',face_,'face_field',v__);
                     elseif i == 3
                         title('Max');
-                        v__ = TensorArray.norm(TensorArray.maxvector(v_));
+                        v__ = VectorArray.norm(VectorArray.max(v_));
                         f_patch('node',node_,'face',face_,'face_field',v__);
                     end
                 end

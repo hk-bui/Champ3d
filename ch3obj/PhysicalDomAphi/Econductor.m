@@ -164,6 +164,7 @@ classdef Econductor < PhysicalDom
             obj.parent_model.matrix.id_node_phi = ...
                 unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);
             %--------------------------------------------------------------
+            it = obj.parent_model.ltime.it;
             obj.field{it}.J.elem.econductor.(obj.id).sigma = obj.tarray{it}.sigma;
             %--------------------------------------------------------------
         end
@@ -176,7 +177,7 @@ classdef Econductor < PhysicalDom
             gid_elem = obj.matrix.gid_elem;
             sigma_array = obj.matrix.sigma_array;
             %--------------------------------------------------------------
-            [coef, coef_array_type] = TensorArray.tensor(sigma_array);
+            [coef, coef_array_type] = Array.tensor(sigma_array);
             %--------------------------------------------------------------
             ev = obj.parent_model.field.ev(:,gid_elem);
             jv = zeros(3,length(gid_elem));

@@ -19,8 +19,6 @@
 classdef Bsfield < PhysicalDom
     properties
         bs
-        % ---
-        matrix
     end
     % ---
     properties (Access = private)

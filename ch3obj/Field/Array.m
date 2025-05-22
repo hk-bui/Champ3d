@@ -17,10 +17,6 @@
 %--------------------------------------------------------------------------
 
 classdef Array < Xhandle
-    properties
-        parent_dom
-        value
-    end
     % --- Contructor
     methods
         function obj = Array()

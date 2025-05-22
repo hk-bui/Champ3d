@@ -24,8 +24,6 @@ classdef StrandedOpenJsCoil < OpenCoil & StrandedCoil & JsCoil
         fill_factor = 1
         Js = 0
         coil_mode = 'tx'
-        % ---
-        matrix
     end
     properties (Access = private)
         build_done = 0

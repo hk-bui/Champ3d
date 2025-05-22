@@ -20,8 +20,6 @@ classdef Thcapacitor < PhysicalDom
     properties
         rho = 0
         cp  = 0
-        % ---
-        matrix
     end
     % --- 
     properties (Access = private)

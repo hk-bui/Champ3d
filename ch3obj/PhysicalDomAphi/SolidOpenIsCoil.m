@@ -20,8 +20,6 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
     properties
         Is = 0
         coil_mode = 'tx'
-        % ---
-        matrix
     end
     % ---
     properties (Access = private)
