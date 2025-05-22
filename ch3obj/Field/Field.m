@@ -17,6 +17,9 @@
 %--------------------------------------------------------------------------
 
 classdef Field < Xhandle
+    properties (Access = private)
+        value
+    end
     % --- Contructor
     methods
         function obj = Field()
@@ -25,21 +28,53 @@ classdef Field < Xhandle
     end
     % --- Utilily Methods
     methods
-        function field_array = subsref(obj,gid)
+        % -----------------------------------------------------------------
+        function field_obj = subsref(obj,gid)
+            % ---
+            % applied to subclass !
+            % ---
+            % field([...]), field({[...]}), field({{[...]}})
+            % field([]), field({[]}), field({{[]}})
+            % ---
+            field_obj = Field();
+            % ---
             if iscell(gid)
                 gid = gid{1};
                 if iscell(gid)
                     % --- gvalue
                     gid = gid{1};
-                    field_array = obj.gvalue(gid);
+                    value_ = obj.gvalue(gid);
                 elseif isnumeric(gid)
                     % --- ivalue
-                    field_array = obj.ivalue(gid);
+                    value_ = obj.ivalue(gid);
                 end
             elseif isnumeric(gid)
                 % --- cvalue
-                field_array = obj.cvalue(gid);
+                value_ = obj.cvalue(gid);
+            end
+            % ---
+            field_obj.value = value_;
+            % ---
+        end
+        % -----------------------------------------------------------------
+        function field_obj = mtimes(obj,objx)
+            % ---
+            % obj must be a Field
+            % objx may be a Field, a TensorArray, or a VectorArray
+            % ---
+            field_obj = Field();
+            % ---
+            V = obj.value;
+            T = obj.value;
+            % ---
+            if isa(objx,'TensorArray')
+                
+            elseif isa(objx,'VectorArray')
+                
+            else
+                field_obj.value = [];
             end
         end
+        % -----------------------------------------------------------------
     end
 end

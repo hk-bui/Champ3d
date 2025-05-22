@@ -159,19 +159,19 @@ classdef TensorArray < Array
                         txt = zeros(size(tensor_array));
                         if size(vxc,2) == 3
                             txt(:,1) = T(:,1,1) .* tensor_array(:,1) + ...
-                                          T(:,1,2) .* tensor_array(:,2) + ...
-                                          T(:,1,3) .* tensor_array(:,3);
+                                       T(:,1,2) .* tensor_array(:,2) + ...
+                                       T(:,1,3) .* tensor_array(:,3);
                             txt(:,2) = T(:,2,1) .* tensor_array(:,1) + ...
-                                          T(:,2,2) .* tensor_array(:,2) + ...
-                                          T(:,2,3) .* tensor_array(:,3);
+                                       T(:,2,2) .* tensor_array(:,2) + ...
+                                       T(:,2,3) .* tensor_array(:,3);
                             txt(:,3) = T(:,3,1) .* tensor_array(:,1) + ...
-                                          T(:,3,2) .* tensor_array(:,2) + ...
-                                          T(:,3,3) .* tensor_array(:,3);
+                                       T(:,3,2) .* tensor_array(:,2) + ...
+                                       T(:,3,3) .* tensor_array(:,3);
                         elseif size(txt,2) == 2
                             txt(:,1) = T(:,1,1) .* tensor_array(:,1) + ...
-                                          T(:,1,2) .* tensor_array(:,2);
+                                       T(:,1,2) .* tensor_array(:,2);
                             txt(:,2) = T(:,2,1) .* tensor_array(:,1) + ...
-                                          T(:,2,2) .* tensor_array(:,2);
+                                       T(:,2,2) .* tensor_array(:,2);
                         end
                     end
                      %------------------------------------------------------
@@ -187,17 +187,17 @@ classdef TensorArray < Array
             [obj.value, obj.type] = Array.tensor(val);
         end
         %-------------------------------------------------------------------
-        function val = getvalue(obj,id_elem)
+        function val = getvalue(obj,lid_elem)
             arguments
                 obj
-                id_elem = []
+                lid_elem = []
             end
             % ---
             if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                lid_elem = 1:size(obj.value,1);
             end
             % ---
-            if isempty(id_elem)
+            if isempty(lid_elem)
                 val = [];
                 return
             end
@@ -205,7 +205,7 @@ classdef TensorArray < Array
             if numel(obj.value) == 1
                 val = obj.value;
             else
-                val = obj.value(id_elem,:,:);
+                val = obj.value(lid_elem,:,:);
             end
         end
         %-------------------------------------------------------------------
@@ -216,6 +216,30 @@ classdef TensorArray < Array
         %-------------------------------------------------------------------
         function value = uplus(obj)
             value = obj.value;
+        end
+        %-------------------------------------------------------------------
+        function TAobj = subsref(obj,lid_elem)
+            % ---
+            % tarray([...])
+            % ---
+            TAobj = TensorArray();
+            % ---
+            if nargin <= 1
+                lid_elem = 1:size(obj.value,1);
+            end
+            % ---
+            if isempty(lid_elem)
+                val = [];
+                return
+            end
+            % ---
+            if numel(obj.value) == 1
+                val = obj.value;
+            else
+                val = obj.value(lid_elem,:,:);
+            end
+            % ---
+            TAobj.value = val;
         end
         %-------------------------------------------------------------------
     end
