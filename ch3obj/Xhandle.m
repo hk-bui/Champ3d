@@ -52,10 +52,6 @@ classdef Xhandle < matlab.mixin.Copyable
             end
         end
         %------------------------------------------------------------------
-        function objx = uplus(obj)
-            objx = copy(obj);
-        end
-        %------------------------------------------------------------------
         function objx = ctranspose(obj)
             objx = copy(obj);
         end

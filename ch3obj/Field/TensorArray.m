@@ -107,6 +107,78 @@ classdef TensorArray < Array
             end
         end
         %-------------------------------------------------------------------
+        function txt = multiply(tensor_array,varargin)
+            % ---
+            if nargin <= 1
+                txt = tensor_array;
+                return
+            end
+            % ---
+            for i = 1:length(varargin)
+                % ---
+                T = varargin{i};
+                if isempty(T)
+                    continue
+                end
+                % ---
+                [T, array_type] = Array.tensor(T);
+                % ---
+                if iscell(tensor_array)
+                    %------------------------------------------------------
+                    for ic = 1:length(tensor_array)
+                        Vin = tensor_array{ic};
+                        if strcmpi(array_type,'scalar')
+                            txt{ic} = Vin .* T;
+                        elseif strcmpi(array_type,'tensor')
+                            vxc = zeros(size(Vin));
+                            if size(vxc,2) == 3
+                                vxc(:,1) = T(:,1,1) .* Vin(:,1) + ...
+                                           T(:,1,2) .* Vin(:,2) + ...
+                                           T(:,1,3) .* Vin(:,3);
+                                vxc(:,2) = T(:,2,1) .* Vin(:,1) + ...
+                                           T(:,2,2) .* Vin(:,2) + ...
+                                           T(:,2,3) .* Vin(:,3);
+                                vxc(:,3) = T(:,3,1) .* Vin(:,1) + ...
+                                           T(:,3,2) .* Vin(:,2) + ...
+                                           T(:,3,3) .* Vin(:,3);
+                            elseif size(vxc,2) == 2
+                                vxc(:,1) = T(:,1,1) .* Vin(:,1) + ...
+                                           T(:,1,2) .* Vin(:,2);
+                                vxc(:,2) = T(:,2,1) .* Vin(:,1) + ...
+                                           T(:,2,2) .* Vin(:,2);
+                            end
+                            txt{ic} = vxc;
+                        end
+                    end
+                    %------------------------------------------------------
+                else
+                    %------------------------------------------------------
+                    if strcmpi(array_type,'scalar')
+                        txt = tensor_array .* T;
+                    elseif strcmpi(array_type,'tensor')
+                        txt = zeros(size(tensor_array));
+                        if size(vxc,2) == 3
+                            txt(:,1) = T(:,1,1) .* tensor_array(:,1) + ...
+                                          T(:,1,2) .* tensor_array(:,2) + ...
+                                          T(:,1,3) .* tensor_array(:,3);
+                            txt(:,2) = T(:,2,1) .* tensor_array(:,1) + ...
+                                          T(:,2,2) .* tensor_array(:,2) + ...
+                                          T(:,2,3) .* tensor_array(:,3);
+                            txt(:,3) = T(:,3,1) .* tensor_array(:,1) + ...
+                                          T(:,3,2) .* tensor_array(:,2) + ...
+                                          T(:,3,3) .* tensor_array(:,3);
+                        elseif size(txt,2) == 2
+                            txt(:,1) = T(:,1,1) .* tensor_array(:,1) + ...
+                                          T(:,1,2) .* tensor_array(:,2);
+                            txt(:,2) = T(:,2,1) .* tensor_array(:,1) + ...
+                                          T(:,2,2) .* tensor_array(:,2);
+                        end
+                    end
+                     %------------------------------------------------------
+                end
+            end
+        end
+        %-------------------------------------------------------------------
     end
     % --- obj's methods
     methods
@@ -135,6 +207,15 @@ classdef TensorArray < Array
             else
                 val = obj.value(id_elem,:,:);
             end
+        end
+        %-------------------------------------------------------------------
+    end
+    % --- obj's operators
+    % --- performed with full-size
+    methods
+        %-------------------------------------------------------------------
+        function value = uplus(obj)
+            value = obj.value;
         end
         %-------------------------------------------------------------------
     end

@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef JAphiVectorFaceField < VectorFaceField
+classdef JAphiFaceField < VectorFaceField
     properties
         parent_model
         sibc
@@ -24,7 +24,7 @@ classdef JAphiVectorFaceField < VectorFaceField
     end
     % --- Contructor
     methods
-        function obj = JAphiVectorFaceField(args)
+        function obj = JAphiFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
                 args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorFaceField')}
@@ -56,7 +56,7 @@ classdef JAphiVectorFaceField < VectorFaceField
                 return
             end
             % ---
-            val = zeros(length(id_face),3);
+            val = zeros(length(id_face),2);
             % ---
             if ~isempty(obj.sibc)
                 id_phydom_ = fieldnames(obj.sibc);

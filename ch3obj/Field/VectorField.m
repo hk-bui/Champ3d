@@ -85,47 +85,47 @@ classdef VectorField < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
-        function val = cdot(obj,vector_field)
-            arguments
-                obj
-                vector_field
-            end
-            % ---
-            if nargin <= 1
-                if isa(obj,'ElemField')
-                    gid_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-                elseif isa(obj,'FaceField')
-                    gid_elem = 1:obj.parent_model.parent_mesh.nb_face;
-                end
-            end
-            % ---
-            if isempty(gid_elem)
-                val = [];
-                return
-            end
-            % ---
-            if isa(vector_field,'VectorArray')
-                % ---
-                if isa(obj,'ElemField')
-                    [gid_elem, ~, lid_elem] = intersect(gid_elem,vector_field.parent_dom.gid_elem);
-                elseif isa(obj,'FaceField')
-                    [gid_elem, ~, lid_elem] = intersect(gid_elem,vector_field.parent_dom.gid_face);
-                end
-                % ---
-                Vin = obj.cvalue(gid_elem);
-                Vfi = vector_field.getvalue(lid_elem);
-
-            elseif isa(vector_field,'ElemField') || isa(vector_field,'FaceField')
-                Vin = obj.cvalue(gid_elem);
-                Vfi = vector_field.cvalue(gid_elem);
-
-            elseif isnumeric(vector_field)
-                Vin = obj.cvalue(gid_elem);
-                Vfi = Array.vector(vector_field);
-            end
-            % ---
-            val = VectorArray.dot(Vin,Vfi);
-        end
+        % function val = cdot(obj,vector_field)
+        %     arguments
+        %         obj
+        %         vector_field
+        %     end
+        %     % ---
+        %     if nargin <= 1
+        %         if isa(obj,'ElemField')
+        %             gid_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+        %         elseif isa(obj,'FaceField')
+        %             gid_elem = 1:obj.parent_model.parent_mesh.nb_face;
+        %         end
+        %     end
+        %     % ---
+        %     if isempty(gid_elem)
+        %         val = [];
+        %         return
+        %     end
+        %     % ---
+        %     if isa(vector_field,'VectorArray')
+        %         % ---
+        %         if isa(obj,'ElemField')
+        %             [gid_elem, ~, lid_elem] = intersect(gid_elem,vector_field.parent_dom.gid_elem);
+        %         elseif isa(obj,'FaceField')
+        %             [gid_elem, ~, lid_elem] = intersect(gid_elem,vector_field.parent_dom.gid_face);
+        %         end
+        %         % ---
+        %         Vin = obj.cvalue(gid_elem);
+        %         Vfi = vector_field.getvalue(lid_elem);
+        % 
+        %     elseif isa(vector_field,'ElemField') || isa(vector_field,'FaceField')
+        %         Vin = obj.cvalue(gid_elem);
+        %         Vfi = vector_field.cvalue(gid_elem);
+        % 
+        %     elseif isnumeric(vector_field)
+        %         Vin = obj.cvalue(gid_elem);
+        %         Vfi = Array.vector(vector_field);
+        %     end
+        %     % ---
+        %     val = VectorArray.dot(Vin,Vfi);
+        % end
         % -----------------------------------------------------------------
 
         % -----------------------------------------------------------------

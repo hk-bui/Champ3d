@@ -16,25 +16,27 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef JAphiVectorElemField < VectorElemField
+classdef PAphiFaceField < ScalarFaceField
     properties
         parent_model
-        econductor
+        sibc
         Efield
+        Jfield
     end
     % --- Contructor
     methods
-        function obj = JAphiVectorElemField(args)
+        function obj = PAphiFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorElemField')}
+                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorFaceField')}
+                args.Jfield {mustBeA(args.Jfield,'JAphiFaceField')}
             end
             % ---
-            obj = obj@VectorElemField;
+            obj = obj@ScalarFaceField;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model') || ~isfield(args,'Efield')
-                    error('#parent_model and #Efield must be given !');
+                if ~isfield(args,'parent_model') || ~isfield(args,'Efield') || ~isfield(args,'Jfield')
+                    error('#parent_model, #Efield, #Jfield must be given !');
                 end
             end
             % ---
@@ -45,34 +47,43 @@ classdef JAphiVectorElemField < VectorElemField
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = cvalue(obj,id_elem)
+        function val = cvalue(obj,id_face)
             % ---
             if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            if isempty(id_elem)
+            if isempty(id_face)
                 val = [];
                 return
             end
             % ---
-            val = zeros(length(id_elem),3);
+            val = zeros(length(id_face),2);
             % ---
-            if ~isempty(obj.econductor)
-                id_phydom_ = fieldnames(obj.econductor);
+            if ~isempty(obj.sibc)
+                id_phydom_ = fieldnames(obj.sibc);
                 % ---
                 for iec = 1:length(id_phydom_)
-                    tarray = obj.econductor.(id_phydom_{iec}).sigma;
+                    tarray = obj.sibc.(id_phydom_{iec}).skindepth;
                     % ---
-                    [gid_elem,lid_elem] = intersect(id_elem,tarray.parent_dom.gid_elem);
-                    val(lid_elem,:) = obj.Efield.cmultiply(tarray,gid_elem);
+                    [gid_face,lid_face] = intersect(id_face,tarray.parent_dom.gid_face);
+                    % ---
+                    E = obj.Efield.cvalue(id_face);
+                    J = obj.Jfield.cvalue(id_face);
+                    EJconj = real(VectorArray.dot(E,conj(J)));
+                    % ---
+                    val(lid_face,:) = obj.Efield.cmultiply(tarray,gid_face);
                 end
             end
             % ---
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
-            
+            % ---
+            % E = obj.Efield.cvalue(id_elem);
+            % Jconj = VectorArray.conjugate(obj.Jfield.cvalue(id_elem));
+            % val = VectorArray.dot(E,conj(J));
+            % ---
         end
         % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)

@@ -212,6 +212,7 @@ classdef Sibcjw < PhysicalDom
             %--------------------------------------------------------------
             it = obj.parent_model.ltime.it;
             obj.parent_model.field{it}.J.face.sibc.(obj.id).sigma = obj.tarray{it}.sigma;
+            obj.parent_model.field{it}.P.face.sibc.(obj.id).skindepth = obj.tarray{it}.skindepth;
             %--------------------------------------------------------------
         end
     end

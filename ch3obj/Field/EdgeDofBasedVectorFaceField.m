@@ -60,7 +60,7 @@ classdef EdgeDofBasedVectorFaceField < VectorFaceField
             id_edge_in_face = obj.parent_model.parent_mesh.meshds.id_edge_in_face;
             lnb_face = length(dom.gid_face);
             % ---
-            val = zeros(lnb_face,3);
+            val = zeros(lnb_face,2);
             %--------------------------------------------------------------
             submesh = dom.submesh;
             for k = 1:length(submesh)

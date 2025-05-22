@@ -42,6 +42,7 @@ classdef VectorArray < Array
         end
     end
     % --- Utilily Methods
+    % --- not-cell row-vector column-array
     methods (Static)
         %-------------------------------------------------------------------
         function varray = normalize(vector_array)
@@ -111,10 +112,6 @@ classdef VectorArray < Array
             % ---
         end
         %-------------------------------------------------------------------
-        function s = dot(v1,v2)
-            s = sum(v1 .* v2, 2);
-        end
-        %-------------------------------------------------------------------
         function vrot = rotaroundaxis(vector_array,rot_axis,rot_angle)
             arguments
                 vector_array
@@ -147,6 +144,120 @@ classdef VectorArray < Array
         end
         %-------------------------------------------------------------------
     end
+    % --- Utilily Methods
+    % --- cell/not-cell row-vector column-array (general purpose)
+    methods (Static)
+        %-------------------------------------------------------------------
+        function s = dot(v1,v2)
+            if iscell(v1) && iscell(v2)
+                for i = 1:length(v1)
+                    s{i} = VectorArray.dot(v1{i},v2{i});
+                end
+            elseif iscell(v1) && ~iscell(v2)
+                for i = 1:length(v1)
+                    s{i} = VectorArray.dot(v1{i},v2);
+                end
+            elseif ~iscell(v1) && iscell(v2)
+                for i = 1:length(v2)
+                    s{i} = VectorArray.dot(v1,v2{i});
+                end
+            else
+                s = sum(v1 .* v2, 2);
+            end
+        end
+        %-------------------------------------------------------------------
+        function vxcoef = multiply(vector_array,varargin)
+            % ---
+            if nargin <= 1
+                vxcoef = vector_array;
+                return
+            end
+            % ---
+            if iscell(vector_array)
+                for i = 1:length(vector_array)
+                    vxcoef{i} = zeros(size(vector_array{i}));
+                end
+            elseif isnumeric(vector_array)
+                vxcoef = zeros(size(vector_array));
+            end
+            % ---
+            for i = 1:length(varargin)
+                % ---
+                T = varargin{i};
+                if isempty(T)
+                    continue
+                end
+                % ---
+                [T, array_type] = Array.tensor(T);
+                % ---
+                if iscell(vector_array)
+                    %------------------------------------------------------
+                    for ic = 1:length(vector_array)
+                        Vin = vector_array{ic};
+                        if strcmpi(array_type,'scalar')
+                            vxcoef{ic} = Vin .* T;
+                        elseif strcmpi(array_type,'tensor')
+                            vxc = zeros(size(Vin));
+                            if size(vxc,2) == 3
+                                vxc(:,1) = T(:,1,1) .* Vin(:,1) + ...
+                                           T(:,1,2) .* Vin(:,2) + ...
+                                           T(:,1,3) .* Vin(:,3);
+                                vxc(:,2) = T(:,2,1) .* Vin(:,1) + ...
+                                           T(:,2,2) .* Vin(:,2) + ...
+                                           T(:,2,3) .* Vin(:,3);
+                                vxc(:,3) = T(:,3,1) .* Vin(:,1) + ...
+                                           T(:,3,2) .* Vin(:,2) + ...
+                                           T(:,3,3) .* Vin(:,3);
+                            elseif size(vxc,2) == 2
+                                vxc(:,1) = T(:,1,1) .* Vin(:,1) + ...
+                                           T(:,1,2) .* Vin(:,2);
+                                vxc(:,2) = T(:,2,1) .* Vin(:,1) + ...
+                                           T(:,2,2) .* Vin(:,2);
+                            end
+                            vxcoef{ic} = vxc;
+                        end
+                    end
+                    %------------------------------------------------------
+                else
+                    %------------------------------------------------------
+                    if strcmpi(array_type,'scalar')
+                        vxcoef = vector_array .* T;
+                    elseif strcmpi(array_type,'tensor')
+                        vxcoef = zeros(size(vector_array));
+                        if size(vxc,2) == 3
+                            vxcoef(:,1) = T(:,1,1) .* vector_array(:,1) + ...
+                                          T(:,1,2) .* vector_array(:,2) + ...
+                                          T(:,1,3) .* vector_array(:,3);
+                            vxcoef(:,2) = T(:,2,1) .* vector_array(:,1) + ...
+                                          T(:,2,2) .* vector_array(:,2) + ...
+                                          T(:,2,3) .* vector_array(:,3);
+                            vxcoef(:,3) = T(:,3,1) .* vector_array(:,1) + ...
+                                          T(:,3,2) .* vector_array(:,2) + ...
+                                          T(:,3,3) .* vector_array(:,3);
+                        elseif size(vxcoef,2) == 2
+                            vxcoef(:,1) = T(:,1,1) .* vector_array(:,1) + ...
+                                          T(:,1,2) .* vector_array(:,2);
+                            vxcoef(:,2) = T(:,2,1) .* vector_array(:,1) + ...
+                                          T(:,2,2) .* vector_array(:,2);
+                        end
+                    end
+                     %------------------------------------------------------
+                end
+            end
+        end
+        %-------------------------------------------------------------------
+        function vconj = conjugate(vector_array)
+            if iscell(vector_array)
+                for i = 1:length(vector_array)
+                    vconj{i} = conj(vector_array{i});
+                end
+            else
+                vconj = conj(vector_array);
+            end
+        end
+        %-------------------------------------------------------------------
+    end
+
     % --- obj's methods
     methods
         %-------------------------------------------------------------------
