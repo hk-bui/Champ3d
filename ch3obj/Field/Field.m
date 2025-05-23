@@ -57,7 +57,7 @@ classdef Field < Xhandle
             % ---
         end
         % -----------------------------------------------------------------
-        function field_obj = mtimes(obj,objx)
+        function field_obj = mtimes(obj,rhs_obj)
             % ---
             % obj must be a Field
             % objx may be a Field, a TensorArray, or a VectorArray
@@ -65,15 +65,18 @@ classdef Field < Xhandle
             field_obj = Field();
             % ---
             V = obj.value;
-            T = obj.value;
+            T = rhs_obj.value;
             % ---
-            if isa(objx,'TensorArray')
-                
-            elseif isa(objx,'VectorArray')
-                
-            else
-                field_obj.value = [];
+            if isa(rhs_obj,'TensorArray')
+                value_ = VectorArray.multiply(V,T);
+            elseif isa(rhs_obj,'VectorArray')
+                value_ = VectorArray.dot(V,T);
+            elseif isa(rhs_obj,'Field')
+                value_ = VectorArray.dot(V,T);
             end
+            % ---
+            field_obj.value = value_;
+            % ---
         end
         % -----------------------------------------------------------------
     end
