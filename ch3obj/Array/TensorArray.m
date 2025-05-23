@@ -24,21 +24,20 @@ classdef TensorArray < Array
     end
     % --- Contructor
     methods
-        function obj = TensorArray(args)
+        function obj = TensorArray(value,args)
             arguments
+                value
                 args.parent_dom {mustBeA(args.parent_dom,{'PhysicalDom','MeshDom'})}
-                args.value = []
             end
             % ---
             obj = obj@Array;
             % ---
-            if nargin >1
-                if ~isfield(args,'parent_dom')
-                    error('#parent_dom must be given !');
+            if nargin > 0
+                obj.value = value;
+                if isfield(args,'parent_dom')
+                    obj.parent_dom = args.parent_dom;
                 end
             end
-            % ---
-            obj <= args;
             % ---
         end
     end

@@ -17,7 +17,7 @@
 %--------------------------------------------------------------------------
 
 classdef Field < Xhandle
-    properties (Access = private)
+    properties
         value
     end
     % --- Contructor
