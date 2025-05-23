@@ -26,6 +26,8 @@ classdef Field < Xhandle
             obj = obj@Xhandle;
             if nargin > 0
                 obj.value = value;
+            else
+                obj.value = [];
             end
         end
     end

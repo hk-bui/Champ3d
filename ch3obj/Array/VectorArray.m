@@ -25,7 +25,7 @@ classdef VectorArray < Array
     methods
         function obj = VectorArray(value,args)
             arguments
-                value
+                value = []
                 args.parent_dom {mustBeA(args.parent_dom,{'PhysicalDom','MeshDom'})}
             end
             % ---

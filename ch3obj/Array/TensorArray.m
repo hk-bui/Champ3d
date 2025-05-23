@@ -26,7 +26,7 @@ classdef TensorArray < Array
     methods
         function obj = TensorArray(value,args)
             arguments
-                value
+                value = []
                 args.parent_dom {mustBeA(args.parent_dom,{'PhysicalDom','MeshDom'})}
             end
             % ---
@@ -197,30 +197,30 @@ classdef TensorArray < Array
             end
         end
         %-------------------------------------------------------------------
-        function outobj = mtimes(obj,rhs_obj)
+        function outobj = mtimes(lhs_obj,rhs_obj)
             % ---
             % obj([...])
             % use obj([...]).value or =+ obj to getvalue
             % ---
             if isnumeric(rhs_obj)
-                T = obj.value;
+                T = lhs_obj.value;
                 % ---
                 outobj = VectorArray();
                 value_ = rhs_obj .* T;
             elseif isa(rhs_obj,'TensorArray')
-                T1 = obj.value;
+                T1 = lhs_obj.value;
                 T2 = rhs_obj.value;
                 % ---
                 outobj = TensorArray();
                 value_ = TensorArray.multiply(T1,T2);
             elseif isa(rhs_obj,'VectorArray')
-                T = obj.value;
+                T = lhs_obj.value;
                 V = rhs_obj.value;
                 % ---
                 outobj = VectorArray();
                 value_ = VectorArray.multiply(V,T);
             elseif isa(rhs_obj,'Field')
-                T = obj.value;
+                T = lhs_obj.value;
                 V = rhs_obj.value;
                 % ---
                 outobj = Field();
@@ -231,30 +231,30 @@ classdef TensorArray < Array
             % ---
         end
         %-------------------------------------------------------------------
-        function outobj = mrdivide(obj,numerator)
+        function outobj = mrdivide(numerator,denominator) 
             % ---
             % obj([...])
             % use obj([...]).value or =+ obj to getvalue
             % ---
             if isnumeric(numerator)
-                T = obj.value;
+                T = denominator.value;
                 outobj = TensorArray();
                 value_ = numerator .* TensorArray.inverse(T);
-            elseif isa(numerator,'TensorArray')
-                T1 = obj.value;
-                T2 = numerator.value;
+            elseif isa(denominator,'TensorArray')
+                T1 = numerator.value;
+                T2 = denominator.value;
                 % ---
                 outobj = TensorArray();
                 value_ = TensorArray.divide(T1,T2);
-            elseif isa(numerator,'VectorArray')
-                T = obj.value;
-                V = numerator.value;
+            elseif isa(denominator,'VectorArray')
+                T = numerator.value;
+                V = denominator.value;
                 % ---
                 outobj = VectorArray();
                 value_ = VectorArray.multiply(V,TensorArray.inverse(T));
-            elseif isa(numerator,'Field')
-                T = obj.value;
-                V = numerator.value;
+            elseif isa(denominator,'Field')
+                T = numerator.value;
+                V = denominator.value;
                 % ---
                 outobj = Field();
                 value_ = VectorArray.multiply(V,TensorArray.inverse(T));
