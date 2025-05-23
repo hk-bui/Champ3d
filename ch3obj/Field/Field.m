@@ -16,14 +16,14 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Field < Xhandle
+classdef Field < Array
     properties
         value
     end
     % --- Contructor
     methods
         function obj = Field(value)
-            obj = obj@Xhandle;
+            obj = obj@Array;
             if nargin > 0
                 obj.value = value;
             else
