@@ -42,50 +42,8 @@ classdef TensorArray < Array
         end
     end
 
-    % --- obj's methods
+    % --- obj's methods - ([...])
     methods
-        %-------------------------------------------------------------------
-        function set.value(obj,val)
-            [obj.value, obj.type] = Array.tensor(val);
-        end
-        %-------------------------------------------------------------------
-        function gindex = gindex(obj)
-            gindex = obj.parent_dom.gindex;
-        end
-        %-------------------------------------------------------------------
-        function val = getvalue(obj,lindex)
-            % ---
-            % eq. to : obj(lindex).value
-            % ---
-            arguments
-                obj
-                lindex = []
-            end
-            % ---
-            if nargin <= 1
-                lindex = 1:size(obj.value,1);
-            end
-            % ---
-            if isempty(lindex)
-                val = [];
-                return
-            end
-            % ---
-            if numel(obj.value) == 1
-                val = obj.value;
-            else
-                val = obj.value(lindex,:,:);
-            end
-        end
-        %-------------------------------------------------------------------
-    end
-
-    % --- obj's operators
-    methods
-        %-------------------------------------------------------------------
-        function value = uplus(obj)
-            value = obj.value;
-        end
         %-------------------------------------------------------------------
         function taout = subsref(obj,lidstruct)
             % ---
@@ -114,7 +72,7 @@ classdef TensorArray < Array
                     taout.value = val;
                     % ---
                 otherwise
-                    % builtin behavior for field. and field{}
+                    % builtin behavior
                     try
                         taout = builtin('subsref', obj, lidstruct);
                     catch
@@ -122,72 +80,56 @@ classdef TensorArray < Array
                     end
             end
         end
+    end
+
+    % --- set/get
+    methods
         %-------------------------------------------------------------------
-        function outobj = mtimes(lhs_obj,rhs_obj)
-            % ---
-            % obj([...])
-            % use obj([...]).value or =+ obj to getvalue
-            % ---
-            if isnumeric(rhs_obj)
-                T = lhs_obj.value;
-                % ---
-                outobj = VectorArray();
-                value_ = rhs_obj .* T;
-            elseif isa(rhs_obj,'TensorArray')
-                T1 = lhs_obj.value;
-                T2 = rhs_obj.value;
-                % ---
-                outobj = TensorArray();
-                value_ = TensorArray.multiply(T1,T2);
-            elseif isa(rhs_obj,'VectorArray')
-                T = lhs_obj.value;
-                V = rhs_obj.value;
-                % ---
-                outobj = VectorArray();
-                value_ = Array.multiply(V,T);
-            elseif isa(rhs_obj,'Field')
-                T = lhs_obj.value;
-                V = rhs_obj.value;
-                % ---
-                outobj = Field();
-                value_ = Array.multiply(V,T);
-            end
-            % ---
-            outobj.value = value_;
-            % ---
+        function set.value(obj,val)
+            [obj.value, obj.type] = Array.tensor(val);
         end
         %-------------------------------------------------------------------
-        function outobj = mrdivide(numerator,denominator) 
-            % ---
-            % obj([...])
-            % use obj([...]).value or =+ obj to getvalue
-            % ---
-            if isnumeric(numerator)
-                T = denominator.value;
-                outobj = TensorArray();
-                value_ = numerator .* TensorArray.inverse(T);
-            elseif isa(denominator,'TensorArray')
-                T1 = numerator.value;
-                T2 = denominator.value;
-                % ---
-                outobj = TensorArray();
-                value_ = TensorArray.divide(T1,T2);
-            elseif isa(denominator,'VectorArray')
-                T = numerator.value;
-                V = denominator.value;
-                % ---
-                outobj = VectorArray();
-                value_ = Array.multiply(V,TensorArray.inverse(T));
-            elseif isa(denominator,'Field')
-                T = numerator.value;
-                V = denominator.value;
-                % ---
-                outobj = Field();
-                value_ = Array.multiply(V,TensorArray.inverse(T));
-            end
-            % ---
-            outobj.value = value_;
-            % ---
+        function gindex = gindex(obj)
+            gindex = obj.parent_dom.gindex;
+        end
+        %-------------------------------------------------------------------
+        % get : value = obj(lindex).value
+        %-------------------------------------------------------------------
+        function value = uplus(obj)
+            value = obj.value;
+        end
+        %-------------------------------------------------------------------
+    end
+
+    % --- obj's operators
+    methods
+        %-------------------------------------------------------------------
+        function objout = uminus(obj)
+            objout = TensorArray(- obj.value);
+        end
+        %-------------------------------------------------------------------
+        function objout = inverse(obj)
+            objout = TensorArray(Array.inverse(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = conj(obj)
+            objout = TensorArray(conj(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = real(obj)
+            objout = TensorArray(real(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = imag(obj)
+            objout = TensorArray(imag(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = plus(obj1,obj2)
+            objout = TensorArray(obj1.value + obj2.value);
+        end
+        %-------------------------------------------------------------------
+        function objout = minus(obj1,obj2)
+            objout = TensorArray(obj1.value - obj2.value);
         end
         %-------------------------------------------------------------------
     end

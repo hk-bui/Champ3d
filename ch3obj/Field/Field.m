@@ -31,7 +31,8 @@ classdef Field < Array
             end
         end
     end
-    % --- Utilily Methods
+
+    % --- obj's methods - field([...]), field({[...]}), field({{[...]}})
     methods
         % -----------------------------------------------------------------
         function fout = subsref(obj,gidstruct)
@@ -76,35 +77,130 @@ classdef Field < Array
                     end
             end
         end
-        % -----------------------------------------------------------------
-        function outobj = mtimes(obj,rhs_obj)
-            % ---
-            % obj must be a Field
-            % objx may be a Field, a TensorArray, or a VectorArray
-            % ---
-            if isa(rhs_obj,'TensorArray')
-                V = obj.value;
-                T = rhs_obj.value;
-                % ---
-                outobj = Field();
-                value_ = Array.multiply(V,T);
-            elseif isa(rhs_obj,'VectorArray')
-                V1 = obj.value;
-                V2 = rhs_obj.value;
-                % ---
-                outobj = TensorArray();
-                value_ = Array.dot(V1,V2);
-            elseif isa(rhs_obj,'Field')
-                V1 = obj.value;
-                V2 = rhs_obj.value;
-                % ---
-                outobj = TensorArray();
-                value_ = Array.dot(V1,V2);
+    end
+
+    % --- operators (overload)
+    methods
+        %-------------------------------------------------------------------
+        function objout = uminus(obj)
+            if iscell(obj.value)
+                for i = 1:length(obj.value)
+                    val{i} = - obj.value{i};
+                end
+            else
+                val = - obj.value;
             end
             % ---
-            outobj.value = value_;
-            % ---
+            objout = Field(val);
         end
-        % -----------------------------------------------------------------
+        %-------------------------------------------------------------------
+        function objout = norm(obj)
+            if iscell(obj.value)
+                for i = 1:length(obj.value)
+                    val{i} = Array.norm(obj.value{i});
+                end
+            else
+                val = Array.norm(obj.value);
+            end
+            % ---
+            objout = Field(val);
+        end
+        %-------------------------------------------------------------------
+        function objout = normalize(obj)
+            if iscell(obj.value)
+                for i = 1:length(obj.value)
+                    val{i} = Array.normalize(obj.value{i});
+                end
+            else
+                val = Array.normalize(obj.value);
+            end
+            % ---
+            objout = Field(val);
+        end
+        %-------------------------------------------------------------------
+        function objout = conj(obj)
+            if iscell(obj.value)
+                for i = 1:length(obj.value)
+                    val{i} = conj(obj.value{i});
+                end
+            else
+                val = conj(obj.value);
+            end
+            % ---
+            objout = Field(val);
+        end
+        %-------------------------------------------------------------------
+        function objout = real(obj)
+            if iscell(obj.value)
+                for i = 1:length(obj.value)
+                    val{i} = real(obj.value{i});
+                end
+            else
+                val = real(obj.value);
+            end
+            % ---
+            objout = Field(val);
+        end
+        %-------------------------------------------------------------------
+        function objout = imag(obj)
+            if iscell(obj.value)
+                for i = 1:length(obj.value)
+                    val{i} = imag(obj.value{i});
+                end
+            else
+                val = imag(obj.value);
+            end
+            % ---
+            objout = Field(val);
+        end
+        %-------------------------------------------------------------------
+        function objout = plus(obj1,obj2)
+            if iscell(obj1.value)
+                if iscell(obj2.value)
+                    for i = 1:length(obj1.value)
+                        val{i} = obj1.value{i} + obj2.value{i};
+                    end
+                else
+                    for i = 1:length(obj1.value)
+                        val{i} = obj1.value{i} + obj2.value;
+                    end
+                end
+            else
+                if iscell(obj2.value)
+                    for i = 1:length(obj2.value)
+                        val{i} = obj1.value + obj2.value{i};
+                    end
+                else
+                    val = obj1.value + obj2.value;
+                end
+            end
+            % ---
+            objout = Field(val);
+        end
+        %-------------------------------------------------------------------
+        function objout = minus(obj1,obj2)
+            if iscell(obj1.value)
+                if iscell(obj2.value)
+                    for i = 1:length(obj1.value)
+                        val{i} = obj1.value{i} - obj2.value{i};
+                    end
+                else
+                    for i = 1:length(obj1.value)
+                        val{i} = obj1.value{i} - obj2.value;
+                    end
+                end
+            else
+                if iscell(obj2.value)
+                    for i = 1:length(obj2.value)
+                        val{i} = obj1.value - obj2.value{i};
+                    end
+                else
+                    val = obj1.value - obj2.value;
+                end
+            end
+            % ---
+            objout = Field(val);
+        end
+        %-------------------------------------------------------------------
     end
 end

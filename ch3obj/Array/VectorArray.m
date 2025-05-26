@@ -40,8 +40,44 @@ classdef VectorArray < Array
             % ---
         end
     end
+    
+    % --- obj's methods - ([...])
+    methods
+        %-------------------------------------------------------------------
+        function vaout = subsref(obj,lidstruct)
+            % ---
+            % taobj([...])
+            % taobj([])
+            % ---
+            switch lidstruct(1).type
+                case '()'
+                    if isempty(lidstruct(1).subs)
+                        lindex = 1:size(obj.value,1);
+                    else
+                        lindex = lidstruct(1).subs{1};
+                    end
+                    % ---
+                    if isempty(lindex)
+                        val = [];
+                    else
+                        val = obj.value(lindex,:);
+                    end
+                    % ---
+                    vaout = obj';
+                    vaout.value = val;
+                    % ---
+                otherwise
+                    % builtin behavior
+                    try
+                        vaout = builtin('subsref', obj, lidstruct);
+                    catch
+                        builtin('subsref', obj, lidstruct);
+                    end
+            end
+        end
+    end
 
-    % --- obj's methods
+    % --- set/get
     methods
         %-------------------------------------------------------------------
         function set.value(obj,val)
@@ -50,6 +86,47 @@ classdef VectorArray < Array
         %-------------------------------------------------------------------
         function gindex = gindex(obj)
             gindex = obj.parent_dom.gindex;
+        end
+        %-------------------------------------------------------------------
+        function value = uplus(obj)
+            value = obj.value;
+        end
+        %-------------------------------------------------------------------
+    end
+
+    % --- operators (overload)
+    methods
+        %-------------------------------------------------------------------
+        function objout = uminus(obj)
+            objout = VectorArray(- obj.value);
+        end
+        %-------------------------------------------------------------------
+        function objout = norm(obj)
+            objout = VectorArray(Array.norm(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = normalize(obj)
+            objout = VectorArray(Array.normalize(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = conj(obj)
+            objout = VectorArray(conj(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = real(obj)
+            objout = VectorArray(real(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = imag(obj)
+            objout = VectorArray(imag(obj.value));
+        end
+        %-------------------------------------------------------------------
+        function objout = plus(obj1,obj2)
+            objout = VectorArray(obj1.value + obj2.value);
+        end
+        %-------------------------------------------------------------------
+        function objout = minus(obj1,obj2)
+            objout = VectorArray(obj1.value - obj2.value);
         end
         %-------------------------------------------------------------------
     end

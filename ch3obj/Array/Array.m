@@ -23,6 +23,160 @@ classdef (Abstract) Array < Xhandle
             obj = obj@Xhandle;
         end
     end
+    % --- obj's method (overload)
+    methods
+        %-------------------------------------------------------------------
+        function objout = mtimes(obj1,obj2)
+            % ---
+            if isnumeric(obj1)
+                array_type = Array.type(obj1);
+                if strcmpi(array_type,'scalar') || strcmpi(array_type,'tensor')
+                    obj1 = TensorArray(obj1);
+                elseif strcmpi(array_type,'vector')
+                    obj1 = VectorArray(obj1);
+                end
+                % ---
+                objout = mtimes(obj1,obj2);
+                % ---
+            end
+            % ---
+            if isnumeric(obj2)
+                array_type = Array.type(obj2);
+                if strcmpi(array_type,'scalar') || strcmpi(array_type,'tensor')
+                    obj2 = TensorArray(obj2);
+                elseif strcmpi(array_type,'vector')
+                    obj2 = VectorArray(obj2);
+                end
+                % ---
+                objout = mtimes(obj1,obj2);
+                % ---
+            end
+            % ---
+            if isa(obj1,'TensorArray') && isa(obj2,'TensorArray')
+                % ---
+                objout = TensorArray;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'TensorArray') && isa(obj2,'VectorArray')
+                % ---
+                objout = VectorArray;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'TensorArray') && isa(obj2,'Field')
+                % ---
+                objout = Field;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'VectorArray') && isa(obj2,'TensorArray')
+                % ---
+                objout = VectorArray;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'VectorArray') && isa(obj2,'VectorArray')
+                % ---
+                objout = TensorArray;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'VectorArray') && isa(obj2,'Field')
+                % ---
+                objout = Field;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'Field') && isa(obj2,'TensorArray')
+                % ---
+                objout = Field;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'Field') && isa(obj2,'VectorArray')
+                % ---
+                objout = Field;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'Field') && isa(obj2,'Field')
+                % ---
+                objout = Field;
+                objout.value = Array.multiply(obj1.value,obj2.value);
+                % ---
+            end
+            % ---
+        end
+        %-------------------------------------------------------------------
+        function objout = mrdivide(obj1,obj2)
+            % ---
+            if isnumeric(obj1)
+                array_type = Array.type(obj1);
+                if strcmpi(array_type,'scalar') || strcmpi(array_type,'tensor')
+                    obj1 = TensorArray(obj1);
+                elseif strcmpi(array_type,'vector')
+                    obj1 = VectorArray(obj1);
+                end
+                % ---
+                objout = mrdivide(obj1,obj2);
+                % ---
+            end
+            % ---
+            if isnumeric(obj2)
+                array_type = Array.type(obj2);
+                if strcmpi(array_type,'scalar') || strcmpi(array_type,'tensor')
+                    obj2 = TensorArray(obj2);
+                elseif strcmpi(array_type,'vector')
+                    obj2 = VectorArray(obj2);
+                end
+                % ---
+                objout = mrdivide(obj1,obj2);
+                % ---
+            end
+            % ---
+            if isa(obj1,'TensorArray') && isa(obj2,'TensorArray')
+                % ---
+                objout = TensorArray;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'TensorArray') && isa(obj2,'VectorArray')
+                % ---
+                objout = VectorArray;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'TensorArray') && isa(obj2,'Field')
+                % ---
+                objout = Field;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'VectorArray') && isa(obj2,'TensorArray')
+                % ---
+                objout = VectorArray;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'VectorArray') && isa(obj2,'VectorArray')
+                % ---
+                objout = TensorArray;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'VectorArray') && isa(obj2,'Field')
+                % ---
+                objout = Field;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'Field') && isa(obj2,'TensorArray')
+                % ---
+                objout = Field;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'Field') && isa(obj2,'VectorArray')
+                % ---
+                objout = Field;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            elseif isa(obj1,'Field') && isa(obj2,'Field')
+                % ---
+                objout = Field;
+                objout.value = Array.divide(obj1.value,obj2.value);
+                % ---
+            end
+            % ---
+        end
+        %-------------------------------------------------------------------
+    end
     % --- Utilily Methods - creat/format
     methods (Static, Sealed)
         %-------------------------------------------------------------------
@@ -132,7 +286,7 @@ classdef (Abstract) Array < Xhandle
     end
 
     % --- Utilily Methods - for vector array
-    methods (Static, Sealed)
+    methods (Static)
         %-------------------------------------------------------------------
         function s = dot(v1,v2)
             v1 = Array.vector(v1);
@@ -241,25 +395,26 @@ classdef (Abstract) Array < Xhandle
     end
 
     % --- Utilily Methods - for tensor array
-    methods (Static, Sealed)
+    methods (Static)
         %-------------------------------------------------------------------
-        function tinv = inverse(tensor_array)
+        function tinv = inverse(array)
             % ---
-            [tensor_array,array_type] = Array.tensor(tensor_array);
-            if strcmpi(array_type,'scalar')
-                tinv = 1./tensor_array;
+            array_type = Array.type(array);
+            % ---
+            if strcmpi(array_type,'scalar') || strcmpi(array_type,'vector')
+                tinv = 1./array;
             elseif strcmpi(array_type,'tensor')
-                sizeg = size(tensor_array);
+                sizeg = size(array);
                 dim = sizeg(2);
                 % ---
                 if dim == 2
                     % --- 
                     tinv = zeros(sizeg(1),2,2);
                     % ---
-                    a11(1,:) = tensor_array(:,1,1);
-                    a12(1,:) = tensor_array(:,1,2);
-                    a21(1,:) = tensor_array(:,2,1);
-                    a22(1,:) = tensor_array(:,2,2);
+                    a11(1,:) = array(:,1,1);
+                    a12(1,:) = array(:,1,2);
+                    a21(1,:) = array(:,2,1);
+                    a22(1,:) = array(:,2,2);
                     d = a11.*a22 - a21.*a12;
                     ix = find(d);
                     tinv(ix,1,1) = +1./d(ix).*a22(ix);
@@ -271,15 +426,15 @@ classdef (Abstract) Array < Xhandle
                     % --- 
                     tinv = zeros(sizeg(1),3,3);
                     % ---
-                    a11(1,:) = tensor_array(:,1,1);
-                    a12(1,:) = tensor_array(:,1,2);
-                    a13(1,:) = tensor_array(:,1,3);
-                    a21(1,:) = tensor_array(:,2,1);
-                    a22(1,:) = tensor_array(:,2,2);
-                    a23(1,:) = tensor_array(:,2,3);
-                    a31(1,:) = tensor_array(:,3,1);
-                    a32(1,:) = tensor_array(:,3,2);
-                    a33(1,:) = tensor_array(:,3,3);
+                    a11(1,:) = array(:,1,1);
+                    a12(1,:) = array(:,1,2);
+                    a13(1,:) = array(:,1,3);
+                    a21(1,:) = array(:,2,1);
+                    a22(1,:) = array(:,2,2);
+                    a23(1,:) = array(:,2,3);
+                    a31(1,:) = array(:,3,1);
+                    a32(1,:) = array(:,3,2);
+                    a33(1,:) = array(:,3,3);
                     A11 = a22.*a33 - a23.*a32;
                     A12 = a32.*a13 - a12.*a33;
                     A13 = a12.*a23 - a13.*a22;
@@ -315,6 +470,32 @@ classdef (Abstract) Array < Xhandle
                 array1
                 array2
             end
+            % --------------------------------------------------------------
+            if iscell(array1)
+                if iscell(array2)
+                    % --- Field({}).value * Field({}).value
+                    for i = 1:length(array1)
+                        aout{i} = array1{i} .* array2{i};
+                    end
+                else
+                    % --- Field({}).value * Field().value
+                    % --- Field({}).value * TensorArray
+                    % --- Field({}).value * VectorArray
+                    for i = 1:length(array1)
+                        aout{i} = Array.multiply(array1{i},array2);
+                    end
+                end
+            else
+                if iscell(array2)
+                    % --- Field({}).value * Field({}).value
+                    for i = 1:length(array1)
+                        aout{i} = array1{i} .* array2{i};
+                    end
+                else
+                    aout = Array.multiply(array2,array1);
+                end
+            end
+            % --------------------------------------------------------------
             type1 = Array.type(array1);
             type2 = Array.type(array2);
             if strcmpi(type1,'scalar') && strcmpi(type2,'scalar') || ...
@@ -346,9 +527,63 @@ classdef (Abstract) Array < Xhandle
                     aout(:,2) = array2(:,2,1) .* array1(:,1) + ...
                                 array2(:,2,2) .* array1(:,2);
                 end
-                 %------------------------------------------------------
+                %------------------------------------------------------
             elseif strcmpi(type1,'tensor') && strcmpi(type2,'vector')
                 aout = multiply(array2,array1);
+            end
+        end
+        %-------------------------------------------------------------------
+        function aout = divide(array1,array2)
+            arguments
+                array1
+                array2
+            end
+            % --------------------------------------------------------------
+            if iscell(array1)
+                if iscell(array2)
+                    % --- Field({}).value / Field({}).value
+                    for i = 1:length(array1)
+                        aout{i} = array1{i} ./ array2{i};
+                    end
+                else
+                    % --- Field({}).value / Field().value
+                    % --- Field({}).value / TensorArray
+                    % --- Field({}).value / VectorArray
+                    for i = 1:length(array1)
+                        aout{i} = Array.divide(array1{i},array2);
+                    end
+                end
+            else
+                if iscell(array2)
+                    % --- TensorArray / Field({}).value
+                    % --- VectorArray / Field({}).value
+                    % --- Field().value / Field({}).value
+                    for i = 1:length(array2)
+                        aout{i} = Array.divide(array1,array2{i});
+                    end
+                end
+            end
+            % --------------------------------------------------------------
+            type1 = Array.type(array1);
+            type2 = Array.type(array2);
+            if strcmpi(type1,'scalar') && strcmpi(type2,'scalar') || ...
+               strcmpi(type1,'scalar') && strcmpi(type2,'vector') || ...
+               strcmpi(type1,'scalar') && strcmpi(type2,'tensor') || ...
+               strcmpi(type1,'vector') && strcmpi(type2,'scalar') || ...
+               strcmpi(type1,'tensor') && strcmpi(type2,'scalar')
+                % ---
+                aout = array1 ./ array2;
+                % ---
+            elseif strcmpi(type1,'vector') && strcmpi(type2,'vector')
+                % --- XTODO : make sense ?
+                aout = array1 ./ array2;
+            elseif strcmpi(type1,'vector') && strcmpi(type2,'tensor')
+                aout = Array.multiply(array1,Array.inverse(array2));
+                %------------------------------------------------------
+            elseif strcmpi(type1,'tensor') && strcmpi(type2,'vector')
+                % --- XTODO : make sense ?
+                aout = Array.multiply(array1,Array.inverse(array2));
+                %------------------------------------------------------
             end
         end
         %-------------------------------------------------------------------
