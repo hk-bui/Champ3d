@@ -38,6 +38,7 @@ classdef (Abstract) Array < Xhandle
                 % ---
                 objout = mtimes(obj1,obj2);
                 % ---
+                return
             end
             % ---
             if isnumeric(obj2)
@@ -50,6 +51,7 @@ classdef (Abstract) Array < Xhandle
                 % ---
                 objout = mtimes(obj1,obj2);
                 % ---
+                return
             end
             % ---
             if isa(obj1,'TensorArray') && isa(obj2,'TensorArray')
@@ -113,6 +115,7 @@ classdef (Abstract) Array < Xhandle
                 % ---
                 objout = mrdivide(obj1,obj2);
                 % ---
+                return
             end
             % ---
             if isnumeric(obj2)
@@ -125,6 +128,7 @@ classdef (Abstract) Array < Xhandle
                 % ---
                 objout = mrdivide(obj1,obj2);
                 % ---
+                return
             end
             % ---
             if isa(obj1,'TensorArray') && isa(obj2,'TensorArray')
@@ -149,7 +153,7 @@ classdef (Abstract) Array < Xhandle
                 % ---
             elseif isa(obj1,'VectorArray') && isa(obj2,'VectorArray')
                 % ---
-                objout = TensorArray;
+                objout = VectorArray;
                 objout.value = Array.divide(obj1.value,obj2.value);
                 % ---
             elseif isa(obj1,'VectorArray') && isa(obj2,'Field')
@@ -475,8 +479,9 @@ classdef (Abstract) Array < Xhandle
                 if iscell(array2)
                     % --- Field({}).value * Field({}).value
                     for i = 1:length(array1)
-                        aout{i} = array1{i} .* array2{i};
+                        aout{i} = Array.multiply(array1{i},array2{i});
                     end
+                    return
                 else
                     % --- Field({}).value * Field().value
                     % --- Field({}).value * TensorArray
@@ -484,15 +489,15 @@ classdef (Abstract) Array < Xhandle
                     for i = 1:length(array1)
                         aout{i} = Array.multiply(array1{i},array2);
                     end
+                    return
                 end
             else
                 if iscell(array2)
                     % --- Field({}).value * Field({}).value
-                    for i = 1:length(array1)
-                        aout{i} = array1{i} .* array2{i};
+                    for i = 1:length(array2)
+                        aout{i} = Array.multiply(array1,array2{i});
                     end
-                else
-                    aout = Array.multiply(array2,array1);
+                    return
                 end
             end
             % --------------------------------------------------------------
@@ -529,7 +534,7 @@ classdef (Abstract) Array < Xhandle
                 end
                 %------------------------------------------------------
             elseif strcmpi(type1,'tensor') && strcmpi(type2,'vector')
-                aout = multiply(array2,array1);
+                aout = Array.multiply(array2,array1);
             end
         end
         %-------------------------------------------------------------------
@@ -545,6 +550,7 @@ classdef (Abstract) Array < Xhandle
                     for i = 1:length(array1)
                         aout{i} = array1{i} ./ array2{i};
                     end
+                    return
                 else
                     % --- Field({}).value / Field().value
                     % --- Field({}).value / TensorArray
@@ -552,6 +558,7 @@ classdef (Abstract) Array < Xhandle
                     for i = 1:length(array1)
                         aout{i} = Array.divide(array1{i},array2);
                     end
+                    return
                 end
             else
                 if iscell(array2)
@@ -561,6 +568,7 @@ classdef (Abstract) Array < Xhandle
                     for i = 1:length(array2)
                         aout{i} = Array.divide(array1,array2{i});
                     end
+                    return
                 end
             end
             % --------------------------------------------------------------
@@ -568,11 +576,14 @@ classdef (Abstract) Array < Xhandle
             type2 = Array.type(array2);
             if strcmpi(type1,'scalar') && strcmpi(type2,'scalar') || ...
                strcmpi(type1,'scalar') && strcmpi(type2,'vector') || ...
-               strcmpi(type1,'scalar') && strcmpi(type2,'tensor') || ...
                strcmpi(type1,'vector') && strcmpi(type2,'scalar') || ...
                strcmpi(type1,'tensor') && strcmpi(type2,'scalar')
                 % ---
                 aout = array1 ./ array2;
+                % ---
+            elseif strcmpi(type1,'scalar') && strcmpi(type2,'tensor')
+                % ---
+                aout = array1 .* Array.inverse(array2);
                 % ---
             elseif strcmpi(type1,'vector') && strcmpi(type2,'vector')
                 % --- XTODO : make sense ?

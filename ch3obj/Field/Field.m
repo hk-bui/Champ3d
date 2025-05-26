@@ -46,7 +46,11 @@ classdef Field < Array
             switch gidstruct(1).type
                 case '()'
                     if isempty(gidstruct(1).subs)
-                        value_ = obj.cvalue;
+                        if ismethod(obj,'cvalue') || isprop(obj,'cvalue')
+                            value_ = obj.cvalue;
+                        else
+                            value_ = obj.value;
+                        end
                     else
                         gindex = gidstruct(1).subs{1};
                         if iscell(gindex)
@@ -54,14 +58,44 @@ classdef Field < Array
                             if iscell(gindex)
                                 % --- gvalue
                                 gindex = gindex{1};
-                                value_ = obj.gvalue(gindex);
+                                if ismethod(obj,'gvalue') || isprop(obj,'gvalue')
+                                    value_ = obj.gvalue(gindex);
+                                else
+                                    if iscell(obj.value)
+                                        for ic = 1:length(obj.value)
+                                            value_{ic} = obj.value{ic}(gindex,:);
+                                        end
+                                    else
+                                        value_ = obj.value(gindex,:);
+                                    end
+                                end
                             elseif isnumeric(gindex)
                                 % --- ivalue
-                                value_ = obj.ivalue(gindex);
+                                if ismethod(obj,'ivalue') || isprop(obj,'ivalue')
+                                    value_ = obj.ivalue(gindex);
+                                else
+                                    if iscell(obj.value)
+                                        for ic = 1:length(obj.value)
+                                            value_{ic} = obj.value{ic}(gindex,:);
+                                        end
+                                    else
+                                        value_ = obj.value(gindex,:);
+                                    end
+                                end
                             end
                         elseif isnumeric(gindex)
                             % --- cvalue
-                            value_ = obj.cvalue(gindex);
+                            if ismethod(obj,'cvalue') || isprop(obj,'cvalue')
+                                value_ = obj.cvalue(gindex);
+                            else
+                                if iscell(obj.value)
+                                    for ic = 1:length(obj.value)
+                                        value_{ic} = obj.value{ic}(gindex,:);
+                                    end
+                                else
+                                    value_ = obj.value(gindex,:);
+                                end
+                            end
                         end
                     end
                     % ---
@@ -77,6 +111,21 @@ classdef Field < Array
                     end
             end
         end
+    end
+    
+    % --- set/get
+    methods
+        %-------------------------------------------------------------------
+        function val = get.value(obj)
+            val = obj.value;
+        end
+        %-------------------------------------------------------------------
+        % get : value = obj(gindex).value
+        %-------------------------------------------------------------------
+        function value = uplus(obj)
+            value = obj.value;
+        end
+        %-------------------------------------------------------------------
     end
 
     % --- operators (overload)
