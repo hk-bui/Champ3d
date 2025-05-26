@@ -148,7 +148,7 @@ classdef LTensor < Xhandle
             dom = args.in_dom;
             % ---
             ginv = obj.getvalue('in_dom',dom);
-            ginv = TensorArray.inverse(ginv);
+            ginv = Array.inverse(ginv);
         end
         % -----------------------------------------------------------------
         function gtensor = gtensor(obj,ltensor)
