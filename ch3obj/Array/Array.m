@@ -217,6 +217,12 @@ classdef (Abstract) Array < Xhandle
                 args.nb_elem = 1
             end
             % ---
+            if isempty(array)
+                varray = [];
+                array_type = 'vector';
+                return
+            end
+            % ---
             nb_elem = args.nb_elem;
             array = squeeze(array); % !!!
             % ---
@@ -248,6 +254,12 @@ classdef (Abstract) Array < Xhandle
             arguments
                 array
                 args.nb_elem = 1
+            end
+            % ---
+            if isempty(array)
+                tarray = [];
+                array_type = 'scalar';
+                return
             end
             % ---
             nb_elem = args.nb_elem;
@@ -505,6 +517,11 @@ classdef (Abstract) Array < Xhandle
                 end
             end
             % --------------------------------------------------------------
+            if isempty(array1) || isempty(array2)
+                aout = [];
+                return
+            end
+            % --------------------------------------------------------------
             type1 = Array.type(array1);
             type2 = Array.type(array2);
             if strcmpi(type1,'scalar') && strcmpi(type2,'scalar') || ...
@@ -574,6 +591,11 @@ classdef (Abstract) Array < Xhandle
                     end
                     return
                 end
+            end
+            % --------------------------------------------------------------
+            if isempty(array1) || isempty(array2)
+                aout = [];
+                return
             end
             % --------------------------------------------------------------
             type1 = Array.type(array1);
