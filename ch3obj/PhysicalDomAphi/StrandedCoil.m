@@ -33,19 +33,20 @@ classdef StrandedCoil < Coil
         function getFlux(obj)
             it = obj.parent_model.ltime.it;
             gindex = obj.matrix.gindex;
-            A = obj.parent_model.field{it}.A.elem.gvalue(gindex);
-            N = obj.uJfield.gvalue(gindex);
             % ---
-            AN = zeros(8,length(gindex));
-            detJ = zeros(8,length(gindex));
-            for i = 1:length(A)
-                AN(i,:) = dot(A{i},N{i});
-                detJ(i,:) = obj.parent_model.parent_mesh.intkit.detJ{i}(gindex);
+            ANcell =+ (obj.parent_model.field{it}.A.elem({{gindex}}) * obj.uJfield(gindex));
+            % ---
+            nbG   = length(ANcell);
+            detJ  = zeros(nbG,length(gindex));
+            ANmat = zeros(nbG,length(gindex));
+            for i = 1:nbG
+                ANmat(i,:) = ANcell{i}; 
+                detJ(i,:)  = obj.parent_model.parent_mesh.intkit.detJ{i}(gindex);
             end
             % ---
             refelem = obj.parent_model.parent_mesh.refelem;
             wei = refelem.Weigh.';
-            obj.Flux(it) = sum(sum(wei.*detJ.*AN)) .* obj.nb_turn ./ obj.cs_area;
+            obj.Flux(it) = sum(sum(wei.*detJ.*ANmat)) .* obj.nb_turn ./ obj.cs_area;
             % ---
         end
     end
