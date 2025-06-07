@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VectorParameter < Parameter
+classdef ScalarParameter < Parameter
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
@@ -25,14 +25,11 @@ classdef VectorParameter < Parameter
     end
     % --- Contructor
     methods
-        function obj = VectorParameter(args)
+        function obj = ScalarParameter(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f = []
-                args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface','velem','sface','ledge',...
-                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
-                     'ltime'})}
+                args.depend_on char
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
@@ -41,12 +38,8 @@ classdef VectorParameter < Parameter
             obj = obj@Parameter;
             % ---
             if isnumeric(args.f)
-                s = size(args.f);
-                if isequal(s,[1 2]) || isequal(s,[2 1]) || ...
-                   isequal(s,[1 3]) || isequal(s,[3 1])
-                    args.f = f_tocolv(args.f);
-                else
-                    error('input is not a vector !');
+                if numel(args.f) > 1
+                    error('input is not a scalar !');
                 end
             end
             % ---
@@ -65,7 +58,7 @@ classdef VectorParameter < Parameter
                 args.in_dom = []
             end
             vout = getvalue@Parameter(obj,'in_dom',args.in_dom);
-            vout = Array.vector(vout);
+            vout = Array.tensor(vout);
             %--------------------------------------------------------------
             if any(isinf(vout))
                 f_fprintf(1,'Value has Inf ! \n');
@@ -83,7 +76,7 @@ classdef VectorParameter < Parameter
                 args.in_dom = []
             end
             vout = obj.getvalue('in_dom',args.in_dom);
-            vout = -vout;
+            vout = 1./vout;
         end
         %------------------------------------------------------------------
     end

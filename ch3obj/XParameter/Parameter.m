@@ -21,6 +21,7 @@ classdef Parameter < Xhandle
         parent_model
         f
         depend_on
+        at_it
         from
         varargin_list
         fvectorized
@@ -29,7 +30,7 @@ classdef Parameter < Xhandle
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','f','depend_on','from','varargin_list','fvectorized'};
+            argslist = {'parent_model','f','depend_on','at_it','from','varargin_list','fvectorized'};
         end
     end
     % --- Contructor
@@ -38,10 +39,7 @@ classdef Parameter < Xhandle
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f
-                args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface','velem','sface','ledge',...
-                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
-                     'ltime'})}
+                args.depend_on char
                 args.from
                 args.varargin_list
                 args.fvectorized
@@ -67,6 +65,7 @@ classdef Parameter < Xhandle
                     {'celem','cface','velem','sface','ledge',...
                      'J','V','I','Z','T','B','E','H','A','P','Phi',...
                      'ltime'})}
+                args.at_it
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
@@ -82,6 +81,15 @@ classdef Parameter < Xhandle
             % ---
             if ~isfield(args,'depend_on')
                 args.depend_on = '';
+            end
+            % ---
+            by_default_at_it = 0;
+            if ~isfield(args,'at_it')
+                by_default_at_it = 1;
+                args.depend_on = f_to_scellargin(args.depend_on);
+                for i = 1:length(args.depend_on)
+                    args.at_it{i} = 0;
+                end
             end
             % ---
             if isnumeric(args.f)
@@ -118,18 +126,44 @@ classdef Parameter < Xhandle
             obj.parent_model = args.parent_model;
             obj.f = args.f;
             obj.depend_on = f_to_scellargin(args.depend_on);
+            obj.at_it = f_to_scellargin(args.at_it);
             obj.from = f_to_scellargin(args.from);
             obj.varargin_list = f_to_scellargin(args.varargin_list);
             obj.fvectorized = args.fvectorized;
             % --- check
+            for i = 1:length(obj.at_it)
+                if ~isnumeric(obj.at_it{i})
+                    error('#at_it must be of form {[array],[array],...}');
+                end
+            end
+            % --- check
+            if length(obj.depend_on) ~= length(obj.at_it)
+                error('size of #at_it must corresponds to #depend_on');
+            end
+            % --- check
             nb_fargin = f_nargin(obj.f);
-            if nb_fargin > 0
-                if nb_fargin ~= length(obj.depend_on)
-                    error('Number of input arguments of #f must corresponds to #depend_on');
-                elseif nb_fargin ~= length(obj.from)
-                    error('Number of input arguments of #f must corresponds to #from');
-                elseif length(obj.depend_on) ~= length(obj.from)
-                    error('Number of elements in #depend_on must corresponds to #from');
+            if by_default_at_it
+                if nb_fargin > 0
+                    if nb_fargin ~= length(obj.depend_on)
+                        error('Number of input arguments of #f must corresponds to #depend_on');
+                    elseif nb_fargin ~= length(obj.from)
+                        error('Number of input arguments of #f must corresponds to #from');
+                    elseif length(obj.depend_on) ~= length(obj.from)
+                        error('Number of elements in #depend_on must corresponds to #from');
+                    end
+                end
+            else
+                % ---
+                len_it = 0;
+                for i = 1:length(obj.at_it)
+                    len_it = len_it + len_it(obj.at_it{i});
+                end
+                if nb_fargin > 0
+                    if nb_fargin ~= len_it
+                        error('Number of input arguments of #f must corresponds to #at_it');
+                    elseif length(obj.depend_on) ~= length(obj.from)
+                        error('Number of elements in #depend_on must corresponds to #from');
+                    end
                 end
             end
         end
