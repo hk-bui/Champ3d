@@ -21,10 +21,12 @@ classdef Parameter < Xhandle
         parent_model
         f
         depend_on
-        dit
         from
         varargin_list
         fvectorized
+        % ---
+        dit
+        id_coil
     end
     
     % --- Valid args list
@@ -40,7 +42,7 @@ classdef Parameter < Xhandle
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f
                 args.depend_on char
-                args.from
+                args.from {mustBeA(args.from,{'PhysicalModel','CplModel'})}
                 args.varargin_list
                 args.fvectorized
             end
@@ -59,40 +61,35 @@ classdef Parameter < Xhandle
         function setup(obj,args)
             arguments
                 obj
-                args.parent_model
+                args.parent_model = []
                 args.f = []
-                args.depend_on
+                args.depend_on = ''
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
             end
             % ---
-            if ~isfield(args,'parent_model')
-                error('#parent_model must be given !');
-            end
+            parent_model_ = args.parent_model;
+            varargin_list_ = args.varargin_list;
+            fvectorized_ = args.fvectorized;
             % ---
             if isempty(args.f)
                 error('#f must be given ! Give a function handle or numeric value');
             end
             % ---
-            if ~isfield(args,'depend_on')
-                args.depend_on = '';
-            end
-            % ---
-
-            % ---
+            from_ = [];
             if isnumeric(args.f)
                 const = args.f;
                 % ---
                 sizeconst = size(const);
                 % ---
                 if numel(const) == 1
-                    args.f = @()(const);
+                    f_ = @()(const);
                 elseif numel(const) == 2 || numel(const) == 3
                     const = f_tocolv(const);
-                    args.f = @()(const);
+                    f_ = @()(const);
                 elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
-                    args.f = @()(const);
+                    f_ = @()(const);
                 else
                     fprintf(['Constant parameter must be a single scalar, ' ...
                              'single vector or single tensor !\n' ...
@@ -100,61 +97,85 @@ classdef Parameter < Xhandle
                              'for general purpose. \n']);
                     error('constant parameter error');
                 end
-                % ---
-                args.f = @()(const);
             elseif isa(args.f,'function_handle')
+                f_ = args.f;
                 if isempty(args.from)
                     error('#from must be given ! Give EMModel, THModel, ... ');
                 else
-                    args.from = f_to_scellargin(args.from);
+                    from_ = f_to_scellargin(args.from);
                 end
             else
                 error('#f must be function handle or numeric value');
             end
             % ---
-            obj.parent_model = args.parent_model;
-            obj.f = args.f;
-            obj.depend_on = f_to_scellargin(args.depend_on);
-            obj.dit = f_to_scellargin(args.at_it);
-            obj.from = f_to_scellargin(args.from);
-            obj.varargin_list = f_to_scellargin(args.varargin_list);
-            obj.fvectorized = args.fvectorized;
-            % --- check
-            for i = 1:length(obj.dit)
-                if ~isnumeric(obj.dit{i})
-                    error('#at_it must be of form {[array],[array],...}');
-                end
-            end
-            % --- check
-            if length(obj.depend_on) ~= length(obj.dit)
-                error('size of #at_it must corresponds to #depend_on');
-            end
-            % --- check
-            nb_fargin = f_nargin(obj.f);
-            if by_default_it
-                if nb_fargin > 0
-                    if nb_fargin ~= length(obj.depend_on)
-                        error('Number of input arguments of #f must corresponds to #depend_on');
-                    elseif nb_fargin ~= length(obj.from)
-                        error('Number of input arguments of #f must corresponds to #from');
-                    elseif length(obj.depend_on) ~= length(obj.from)
-                        error('Number of elements in #depend_on must corresponds to #from');
-                    end
-                end
-            else
+            % depend_on =
+            % 'celem','cface','velem','sface','ledge'}
+            % 'E', 'E(0)', {'E(0)','E(-1)'}, {'E(0)','E(-1)','V(0).id_coil'}
+            % ---> idem. with : 'B','T','P','E','H','J','I','Z','A','Phi'
+            % 'ltime'
+            % ---
+            depon = f_to_scellargin(args.depend_on);
+            % ---
+            len_depon  = length(depon);
+            depend_on_ = cell(1,len_depon);
+            dit_       = cell(1,len_depon);
+            id_coil_   = cell(1,len_depon);
+            % ---
+            for i = 1:length(depon)
+                str00 = depon{i};
                 % ---
-                len_it = 0;
-                for i = 1:length(obj.dit)
-                    len_it = len_it + len_it(obj.dit{i});
+                str00 = split(str00,'.');
+                % ---
+                if length(str00) == 2
+                    id_coil_{i} = str00{2};
+                elseif length(str00) == 1
+                    id_coil_{i} = '';
+                else
+                    error("#depend_on must be of form : 'celem','B','B(i)','V.id_coil','V(i).id_coil','ltime',...");
                 end
-                if nb_fargin > 0
-                    if nb_fargin ~= len_it
-                        error('Number of input arguments of #f must corresponds to #at_it');
-                    elseif length(obj.depend_on) ~= length(obj.from)
-                        error('Number of elements in #depend_on must corresponds to #from');
-                    end
+                % ---
+                str00 = str00{1};
+                % ---
+                if contains(str00,'(')
+                    str01 = extractBetween(str00,'','(');
+                    depend_on_{i} = str01{1};
+                    % ---
+                    str02 = extractBetween(str00,'(',')');
+                    dit_{i} = str2double(str02{1});
+                else
+                    depend_on_{i} = str00;
+                    dit_{i} = 0;
                 end
             end
+            % --- check
+            nb_fargin = f_nargin(f_);
+            if nb_fargin > 0
+                if nb_fargin ~= length(depend_on_)
+                    error('Number of input arguments of #f must corresponds to #depend_on');
+                end
+                % ---
+                len_from = length(from_);
+                if len_from ~= len_depon
+                    if len_from == 1
+                        for i = 1:len_depon
+                            from_{i} = from_{1};
+                        end
+                    else
+                        error('Size if #from must be coherent with #depend_on');
+                    end
+                end
+                % ---
+            end
+            % ---
+            obj.parent_model = parent_model_;
+            obj.f = f_;
+            obj.depend_on = depend_on_;
+            obj.dit = dit_;
+            obj.id_coil = id_coil_;
+            obj.from = from_;
+            obj.varargin_list = varargin_list_;
+            obj.fvectorized = fvectorized_;
+            % ---
         end
     end
     % --- get
@@ -374,9 +395,9 @@ classdef Parameter < Xhandle
             target_dom   = meshdom;
             target_model = obj.parent_model;
             % ---
-            depon__ = obj.depend_on;
+            depon__   = obj.depend_on;
             id_coil__ = obj.id_coil;
-            dit__ = obj.dit;
+            dit__     = obj.dit;
             source_model_  = obj.from;
             for i = 1:length(depon__)
                 % ---
@@ -428,7 +449,7 @@ classdef Parameter < Xhandle
                     target_it = target_model.ltime.it - dit_;
                     it_max = target_model.ltime.it_max;
                     target_it = min(it_max,max(1,target_it));
-                    target_t_now = target_model.ltime.t_at(target_it);
+                    target_t = target_model.ltime.t_at(target_it);
                     % ---
                     if isequal(source_model, target_model)
                         % no interpolation
@@ -437,11 +458,11 @@ classdef Parameter < Xhandle
                         if isequal(source_model.parent_mesh, target_model.parent_mesh)
                             if isequal(source_model.ltime.t_array, target_model.ltime.t_array)
                                 % no interpolation
-                                fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
+                                fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
                             else
                                 % get by time interpolation
-                                next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                next_it = source_model.ltime.next_it(target_t);
+                                back_it = source_model.ltime.back_it(target_t);
                                 if next_it == back_it
                                     fargs{i} = source_model.field{back_it}.(depon_).(place).cvalue(id_place_target);
                                 else
@@ -453,7 +474,7 @@ classdef Parameter < Xhandle
                                     % ---
                                     delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                     % ---
-                                    dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                    dt = target_t - source_model.ltime.t_array(back_it);
                                     fargs{i} = val01 + delta_v./delta_t .* dt;
                                 end
                             end
@@ -482,8 +503,8 @@ classdef Parameter < Xhandle
                                     end
                                 end
                                 % --- time interpolated data
-                                next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                next_it = source_model.ltime.next_it(target_t);
+                                back_it = source_model.ltime.back_it(target_t);
                                 if next_it == back_it
                                     valcell = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
                                 else
@@ -498,7 +519,7 @@ classdef Parameter < Xhandle
                                     % ---
                                     delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                     % ---
-                                    dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                    dt = target_t - source_model.ltime.t_array(back_it);
                                     % ---
                                     for k = 1:length(val01)
                                         valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
@@ -605,8 +626,8 @@ classdef Parameter < Xhandle
                                 % ------------------------------------------------------------------
                                 if ~isempty(id_face_source)
                                     % --- time interpolated data
-                                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                    next_it = source_model.ltime.next_it(target_t);
+                                    back_it = source_model.ltime.back_it(target_t);
                                     if next_it == back_it
                                         valcell = source_model.field{back_it}.(depon_).face.ivalue(id_face_source);
                                     else
@@ -621,7 +642,7 @@ classdef Parameter < Xhandle
                                         % ---
                                         delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                         % ---
-                                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                        dt = target_t - source_model.ltime.t_array(back_it);
                                         % ---
                                         for k = 1:length(val01)
                                             valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
@@ -707,8 +728,8 @@ classdef Parameter < Xhandle
                                 elseif ~isempty(id_elem_source)
                                     % --- XTODO : not optimat code writing/organization
                                     % --- time interpolated data
-                                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                    next_it = source_model.ltime.next_it(target_t);
+                                    back_it = source_model.ltime.back_it(target_t);
                                     if next_it == back_it
                                         valcell = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
                                     else
@@ -723,7 +744,7 @@ classdef Parameter < Xhandle
                                         % ---
                                         delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                         % ---
-                                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                        dt = target_t - source_model.ltime.t_array(back_it);
                                         % ---
                                         for k = 1:length(val01)
                                             valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;

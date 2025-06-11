@@ -89,6 +89,7 @@ classdef PhysicalDom < Xhandle
                                 error('Parameter error');
                             end
                         else
+                            f_fprintf(1,'/!\\',0,'#parent_model of parameter unspecified --> use the same as physical dom \n');
                             obj.(param).parent_model = obj.parent_model;
                         end
                     end
