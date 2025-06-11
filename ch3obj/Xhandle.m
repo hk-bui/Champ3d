@@ -21,7 +21,7 @@ classdef Xhandle < matlab.mixin.Copyable
     properties
         id = '-'
     end
-    properties
+    properties (Hidden)
         dependent_obj = []
         defining_obj = []
     end
