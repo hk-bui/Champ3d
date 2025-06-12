@@ -199,6 +199,27 @@ classdef LTSpiceCircuit < Xhandle
     % ---
     methods
         %--------------------------------------------------------------------------
+        function tran(obj,args)
+            arguments
+                obj
+                args.Tstop  {mustBeNumeric,mustBeNonnegative} = 1
+                args.Tstart {mustBeNumeric,mustBeNonnegative} = 0
+                args.Tstep  {mustBeNumeric,mustBeNonnegative} = 0
+                args.dTmax  {mustBeNumeric,mustBeNonnegative} = 0
+                args.modifiers {mustBeMember(args.modifiers,{'','UIC','steady','nodiscard','startup','step'})} = ''
+            end
+            % ---
+            obj.sim.tran.Tstop     = args.Tstop;
+            obj.sim.tran.Tstart    = args.Tstart;
+            obj.sim.tran.Tstep     = args.Tstep;
+            obj.sim.tran.dTmax     = args.dTmax;
+            obj.sim.tran.modifiers = f_to_scellargin(args.modifiers);
+            % ---
+        end
+    end
+    % ---
+    methods
+        %--------------------------------------------------------------------------
         function run(obj,simulation)
             arguments
                 obj
@@ -220,24 +241,35 @@ classdef LTSpiceCircuit < Xhandle
             % --- write
             obj.write_tran;
             % --- delete old data
-            system(['rm ' obj.file.tran.RAW_file ' ' ...
-                          obj.file.tran.OPRAW_file ' ' ...
-                          obj.file.tran.LOG_file]);
+            try
+                fprintf('Cleaning ...\n');
+                system(['rm ' obj.file.tran.RAW_file ' ' ...
+                              obj.file.tran.OPRAW_file ' ' ...
+                              obj.file.tran.LOG_file]);
+                fprintf('Old data cleaned.\n');
+            catch
+                fprintf('Old data cleaned.\n');
+            end
             % ---
             call_LTSpice_run = [Ch3Config.ExecutableLTSpiceLocation ' -b ' obj.file.tran.NET_file];
             % ---
             try
+                fprintf('LTSpice running ... \n');
                 status = system(call_LTSpice_run);
+                fprintf('Done.\n');
                 if status == 0
                     k = 0;
                     while ~isfile(obj.file.tran.RAW_file)
                         if k == 0
-                            f_fprintf(0,'Waiting RAW file \n');
+                            f_fprintf(0,'Waiting RAW file ... \n');
                         end
                         k = 1;
                     end
                     % ---
                     obj.rawdata = LTspice2Matlab(obj.file.tran.RAW_file);
+                    % ---
+                    fprintf('Results ready. \n');
+                    % ---
                 end
             catch
                 f_fprintf(1,'/!\\',0,'can not run ',1,obj.file.tran.NET_file,0,'\n');
@@ -283,7 +315,20 @@ classdef LTSpiceCircuit < Xhandle
                     fprintf(fileID,'%s \n',obj.net.original.tran_line{i});
                 end
             else
-                % --- XTODO
+                % ---
+                fprintf(fileID,'%s ','.tran');
+                fprintf(fileID,'%.18f  %.18f  %.18f  %.18f',...
+                                obj.sim.tran.Tstep,...
+                                obj.sim.tran.Tstop,...
+                                obj.sim.tran.Tstart,...
+                                obj.sim.tran.dTmax);
+                % ---
+                for i = 1:length(obj.sim.tran.modifiers)
+                    fprintf(fileID,'%s ',obj.sim.tran.modifiers{i});
+                end
+                % ---
+                fprintf(fileID,'%s\n','');
+                % ---
             end
             % --- end of file
             fprintf(fileID,'%s \n','.backanno');
