@@ -27,7 +27,7 @@ switch elem_type
     case {44,'quad'}
         refelem = QuadMesh.reference;
     case {46,'tet','tetra'}
-        refelem = TetMesh.reference;
+        refelem = TetraMesh.reference;
     case {69,'prism'}
         refelem = PrismMesh.reference;
     case {812,'hex','hexa'}

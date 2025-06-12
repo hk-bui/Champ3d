@@ -49,7 +49,7 @@ classdef TetraMesh < Mesh3d
             % ---
             obj <= args;
             % ---
-            TetMesh.setup(obj);
+            TetraMesh.setup(obj);
             % ---
         end
     end
@@ -67,7 +67,7 @@ classdef TetraMesh < Mesh3d
     end
     methods (Access = public)
         function reset(obj)
-            TetMesh.setup(obj);
+            TetraMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
