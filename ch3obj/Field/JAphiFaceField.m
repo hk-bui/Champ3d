@@ -16,24 +16,25 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef GlobalQuantity < Xhandle
+classdef JAphiFaceField < VectorFaceField
     properties
         parent_model
-        dof
+        sibc
+        Efield
     end
     % --- Contructor
     methods
-        function obj = GlobalQuantity(args)
+        function obj = JAphiFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.dof {mustBeA(args.dof,'GlobalQuantityDof')}
+                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorFaceField')}
             end
             % ---
-            obj = obj@Xhandle;
+            obj = obj@VectorFaceField;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model') || ~isfield(args,'dof')
-                    error('#parent_model and #dof must be given !');
+                if ~isfield(args,'parent_model') || ~isfield(args,'Efield')
+                    error('#parent_model and #Efield must be given !');
                 end
             end
             % ---
@@ -44,16 +45,38 @@ classdef GlobalQuantity < Xhandle
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = cvalue(obj)
-            val = obj.dof.value;
+        function val = cvalue(obj,id_face)
+            % ---
+            if nargin <= 1
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
+            end
+            % ---
+            val = zeros(length(id_face),2);
+            % ---
+            if ~isempty(obj.sibc)
+                id_phydom_ = fieldnames(obj.sibc);
+                % ---
+                for iec = 1:length(id_phydom_)
+                    tarray = obj.sibc.(id_phydom_{iec}).sigma;
+                    % ---
+                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    val(lindex,:) =+ (obj.Efield(gindex) * tarray(lindex));
+                end
+            end
+            % ---
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj)
-            val = obj.dof.value;
+        function val = ivalue(obj,id_elem)
+
         end
         % -----------------------------------------------------------------
-        function val = gvalue(obj)
-            val = obj.dof.value;
+        function val = gvalue(obj,id_elem)
+
         end
         % -----------------------------------------------------------------
     end

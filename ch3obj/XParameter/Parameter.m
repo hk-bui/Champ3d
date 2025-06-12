@@ -24,12 +24,15 @@ classdef Parameter < Xhandle
         from
         varargin_list
         fvectorized
+        % ---
+        dit
+        id_coil
     end
     
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'parent_model','f','depend_on','from','varargin_list','fvectorized'};
+            argslist = {'parent_model','f','depend_on','at_it','from','varargin_list','fvectorized'};
         end
     end
     % --- Contructor
@@ -38,11 +41,8 @@ classdef Parameter < Xhandle
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f
-                args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface','velem','sface','ledge',...
-                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
-                     'ltime'})}
-                args.from
+                args.depend_on char
+                args.from {mustBeA(args.from,{'PhysicalModel','CplModel'})}
                 args.varargin_list
                 args.fvectorized
             end
@@ -61,41 +61,35 @@ classdef Parameter < Xhandle
         function setup(obj,args)
             arguments
                 obj
-                args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
+                args.parent_model = []
                 args.f = []
-                args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface','velem','sface','ledge',...
-                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
-                     'ltime'})}
+                args.depend_on = ''
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
             end
             % ---
-            if ~isfield(args,'parent_model')
-                error('#parent_model must be given !');
-            end
+            parent_model_ = args.parent_model;
+            varargin_list_ = args.varargin_list;
+            fvectorized_ = args.fvectorized;
             % ---
             if isempty(args.f)
                 error('#f must be given ! Give a function handle or numeric value');
             end
             % ---
-            if ~isfield(args,'depend_on')
-                args.depend_on = '';
-            end
-            % ---
+            from_ = [];
             if isnumeric(args.f)
                 const = args.f;
                 % ---
                 sizeconst = size(const);
                 % ---
                 if numel(const) == 1
-                    args.f = @()(const);
+                    f_ = @()(const);
                 elseif numel(const) == 2 || numel(const) == 3
                     const = f_tocolv(const);
-                    args.f = @()(const);
+                    f_ = @()(const);
                 elseif isequal(sizeconst,[2 2]) || isequal(sizeconst,[3 3])
-                    args.f = @()(const);
+                    f_ = @()(const);
                 else
                     fprintf(['Constant parameter must be a single scalar, ' ...
                              'single vector or single tensor !\n' ...
@@ -103,35 +97,85 @@ classdef Parameter < Xhandle
                              'for general purpose. \n']);
                     error('constant parameter error');
                 end
-                % ---
-                args.f = @()(const);
             elseif isa(args.f,'function_handle')
+                f_ = args.f;
                 if isempty(args.from)
                     error('#from must be given ! Give EMModel, THModel, ... ');
                 else
-                    args.from = f_to_scellargin(args.from);
+                    from_ = f_to_scellargin(args.from);
                 end
             else
                 error('#f must be function handle or numeric value');
             end
             % ---
-            obj.parent_model = args.parent_model;
-            obj.f = args.f;
-            obj.depend_on = f_to_scellargin(args.depend_on);
-            obj.from = f_to_scellargin(args.from);
-            obj.varargin_list = f_to_scellargin(args.varargin_list);
-            obj.fvectorized = args.fvectorized;
-            % --- check
-            nb_fargin = f_nargin(obj.f);
-            if nb_fargin > 0
-                if nb_fargin ~= length(obj.depend_on)
-                    error('Number of input arguments of #f must corresponds to #depend_on');
-                elseif nb_fargin ~= length(obj.from)
-                    error('Number of input arguments of #f must corresponds to #from');
-                elseif length(obj.depend_on) ~= length(obj.from)
-                    error('Number of elements in #depend_on must corresponds to #from');
+            % depend_on =
+            % 'celem','cface','velem','sface','ledge'}
+            % 'E', 'E(0)', {'E(0)','E(-1)'}, {'E(0)','E(-1)','V(0).id_coil'}
+            % ---> idem. with : 'B','T','P','E','H','J','I','Z','A','Phi'
+            % 'ltime'
+            % ---
+            depon = f_to_scellargin(args.depend_on);
+            % ---
+            len_depon  = length(depon);
+            depend_on_ = cell(1,len_depon);
+            dit_       = cell(1,len_depon);
+            id_coil_   = cell(1,len_depon);
+            % ---
+            for i = 1:length(depon)
+                str00 = depon{i};
+                % ---
+                str00 = split(str00,'.');
+                % ---
+                if length(str00) == 2
+                    id_coil_{i} = str00{2};
+                elseif length(str00) == 1
+                    id_coil_{i} = '';
+                else
+                    error("#depend_on must be of form : 'celem','B','B(i)','V.id_coil','V(i).id_coil','ltime',...");
+                end
+                % ---
+                str00 = str00{1};
+                % ---
+                if contains(str00,'(')
+                    str01 = extractBetween(str00,'','(');
+                    depend_on_{i} = str01{1};
+                    % ---
+                    str02 = extractBetween(str00,'(',')');
+                    dit_{i} = str2double(str02{1});
+                else
+                    depend_on_{i} = str00;
+                    dit_{i} = 0;
                 end
             end
+            % --- check
+            nb_fargin = f_nargin(f_);
+            if nb_fargin > 0
+                if nb_fargin ~= length(depend_on_)
+                    error('Number of input arguments of #f must corresponds to #depend_on');
+                end
+                % ---
+                len_from = length(from_);
+                if len_from ~= len_depon
+                    if len_from == 1
+                        for i = 1:len_depon
+                            from_{i} = from_{1};
+                        end
+                    else
+                        error('Size if #from must be coherent with #depend_on');
+                    end
+                end
+                % ---
+            end
+            % ---
+            obj.parent_model = parent_model_;
+            obj.f = f_;
+            obj.depend_on = depend_on_;
+            obj.dit = dit_;
+            obj.id_coil = id_coil_;
+            obj.from = from_;
+            obj.varargin_list = varargin_list_;
+            obj.fvectorized = fvectorized_;
+            % ---
         end
     end
     % --- get
@@ -150,16 +194,6 @@ classdef Parameter < Xhandle
             else
                 vout = obj.eval_fserial(dom);
             end
-            % ---
-            s = size(vout);
-            % ---
-            % if length(s) <= 2
-            %     if any(size(vout) == 1)
-            %         vout = f_tocolv(vout);
-            %     else
-            %         vout = f_torowv(vout);
-            %     end
-            % end
             % ---
         end
         %------------------------------------------------------------------
@@ -328,45 +362,50 @@ classdef Parameter < Xhandle
                 fargs = [];
                 return
             end
-            % ---
+            % -------------------------------------------------------------
             parameter_dependency_search = [];
-            if isa(dom,'PhysicalDom')
-                meshdom = dom.dom;
-                parameter_dependency_search = dom.parameter_dependency_search;
-            else
-                meshdom = dom;
+            meshdom = [];
+            place = [];
+            id_place_target = [];
+            if ~isempty(dom)
+                if isa(dom,'PhysicalDom')
+                    meshdom = dom.dom;
+                    parameter_dependency_search = dom.parameter_dependency_search;
+                else
+                    meshdom = dom;
+                end
+                % ---
+                if isempty(parameter_dependency_search)
+                    parameter_dependency_search = 'by_coordinates';
+                end
+                % ---
+                if isa(meshdom,'VolumeDom')
+                    place = 'elem';
+                    id_place_target = meshdom.gindex;
+                elseif isa(meshdom,'SurfaceDom')
+                    place = 'face';
+                    id_place_target = meshdom.gindex;
+                else
+                    error('must give #dom with .gindex or .gindex !');
+                end
             end
-            % ---
-            if isempty(parameter_dependency_search)
-                parameter_dependency_search = 'by_coordinates';
-            end
-            % ---
-            if isa(meshdom,'VolumeDom')
-                place = 'elem';
-                id_place_target = meshdom.gid_elem;
-            elseif isa(meshdom,'SurfaceDom')
-                place = 'face';
-                id_place_target = meshdom.gid_face;
-            elseif isprop(meshdom,'gid_elem')
-                place = 'elem';
-                id_place_target = meshdom.gid_elem;
-            elseif isprop(meshdom,'gid_face')
-                place = 'face';
-                id_place_target = meshdom.gid_face;
-            else
-                error('must give #dom with .gid_elem or .gid_face !');
-            end
-            % ---
+            % -------------------------------------------------------------
             fargs = cell(1,length(obj.depend_on));
             % ---
             target_dom   = meshdom;
             target_model = obj.parent_model;
             % ---
-            depon__ = obj.depend_on;
+            depon__   = obj.depend_on;
+            id_coil__ = obj.id_coil;
+            dit__     = obj.dit;
             source_model_  = obj.from;
             for i = 1:length(depon__)
-                depon_ = depon__{i};
-                source_model  = source_model_{i};
+                % ---
+                depon_       = depon__{i};
+                id_coil_     = id_coil__{i};
+                dit_         = dit__{i};
+                source_model = source_model_{i};
+                % ---
                 if any(f_strcmpi(depon_,{'celem','cface','cedge','velem','sface','ledge'}))
                     % take from paramater parent_model's mesh
                     fargs{i} = target_model.parent_mesh.(depon_)(:,id_place_target);
@@ -376,28 +415,24 @@ classdef Parameter < Xhandle
                 elseif any(f_strcmpi(depon_,{'fr'}))
                     % take from parent_model of paramater object
                     fargs{i} = target_model.fr;
-                elseif contains(depon_,{'V.','I.','Z.'})
-                    % --- id_coil
-                    depon_ = split(depon_,'.');
-                    quantity = depon_{1};
-                    id_coil = depon_{2};
+                elseif any(f_strcmpi(depon_,{'V','I','Z'}))
                     % ---
                     if ~isprop(source_model,'coil')
                         error('no coil in source model !');
                     else
-                        if ~isfield(source_model.coil,id_coil)
-                            error(['no #coil ' id_coil ' in source model !'])
+                        if ~isfield(source_model.coil,id_coil_)
+                            error(['no #coil ' id_coil_ ' in source model !'])
                         end
                     end
                     % get by time interpolation
                     next_it = source_model.ltime.next_it(target_model.ltime.t_now);
                     back_it = source_model.ltime.back_it(target_model.ltime.t_now);
                     if next_it == back_it
-                        fargs{i} = source_model.coil.(id_coil).(quantity){back_it};
+                        fargs{i} = source_model.coil.(id_coil_).(depon_){back_it};
                     else
                         % ---
-                        val01 = source_model.coil.(id_coil).(quantity){back_it};
-                        val02 = source_model.coil.(id_coil).(quantity){next_it};
+                        val01 = source_model.coil.(id_coil_).(depon_){back_it};
+                        val02 = source_model.coil.(id_coil_).(depon_){next_it};
                         % ---
                         delta_v = val02 - val01;
                         delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
@@ -411,18 +446,23 @@ classdef Parameter < Xhandle
                     % physical quantities
                     % must be able to take from other model with different ltime, mesh/dom
                     % ---
+                    target_it = target_model.ltime.it - dit_;
+                    it_max = target_model.ltime.it_max;
+                    target_it = min(it_max,max(1,target_it));
+                    target_t = target_model.ltime.t_at(target_it);
+                    % ---
                     if isequal(source_model, target_model)
                         % no interpolation
-                        fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
+                        fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
                     else
                         if isequal(source_model.parent_mesh, target_model.parent_mesh)
                             if isequal(source_model.ltime.t_array, target_model.ltime.t_array)
                                 % no interpolation
-                                fargs{i} = source_model.field{target_model.ltime.it}.(depon_).(place).cvalue(id_place_target);
+                                fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
                             else
                                 % get by time interpolation
-                                next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                next_it = source_model.ltime.next_it(target_t);
+                                back_it = source_model.ltime.back_it(target_t);
                                 if next_it == back_it
                                     fargs{i} = source_model.field{back_it}.(depon_).(place).cvalue(id_place_target);
                                 else
@@ -434,7 +474,7 @@ classdef Parameter < Xhandle
                                     % ---
                                     delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                     % ---
-                                    dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                    dt = target_t - source_model.ltime.t_array(back_it);
                                     fargs{i} = val01 + delta_v./delta_t .* dt;
                                 end
                             end
@@ -452,7 +492,7 @@ classdef Parameter < Xhandle
                                     id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                     for ids = 1:length(id_dom_source)
                                         if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                            id_elem_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_elem;
+                                            id_elem_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
                                         end
                                     end
                                     if isempty(id_elem_source)
@@ -463,8 +503,8 @@ classdef Parameter < Xhandle
                                     end
                                 end
                                 % --- time interpolated data
-                                next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                next_it = source_model.ltime.next_it(target_t);
+                                back_it = source_model.ltime.back_it(target_t);
                                 if next_it == back_it
                                     valcell = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
                                 else
@@ -479,7 +519,7 @@ classdef Parameter < Xhandle
                                     % ---
                                     delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                     % ---
-                                    dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                    dt = target_t - source_model.ltime.t_array(back_it);
                                     % ---
                                     for k = 1:length(val01)
                                         valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
@@ -487,25 +527,24 @@ classdef Parameter < Xhandle
                                     % ---
                                 end
                                 % --- space interpolation
-                                nbINoinEl = source_model.parent_mesh.refelem.nbI;
+                                interp_node = source_model.parent_mesh.prokit.node;
+                                nbINode = length(interp_node);
                                 nb_elem   = length(id_elem_source);
                                 % ---
-                                node_i = zeros(nbINoinEl * nb_elem, 3);
-                                % ---
-                                interp_node = source_model.parent_mesh.prokit.node;
+                                node_i = zeros(nbINode * nb_elem, 3);
                                 % ---
                                 id0 = 1:nb_elem;
-                                for k = 1:nbINoinEl
+                                for k = 1:nbINode
                                     idn = id0 + (k - 1) * nb_elem;
                                     node_i(idn,:) = interp_node{k}(id_elem_source,:);
                                 end
                                 % ---
                                 dim_ = size(valcell{1},2);
                                 if dim_ == 1
-                                    valx = zeros(nbINoinEl * nb_elem, 1);
+                                    valx = zeros(nbINode * nb_elem, 1);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         valx(idn) = valcell{k}(:,1);
                                     end
@@ -516,11 +555,11 @@ classdef Parameter < Xhandle
                                     fargs{i} = fxi(cnode_.');
                                     % ---
                                 elseif dim_ == 2
-                                    valx = zeros(nbINoinEl * nb_elem, 1);
-                                    valy = zeros(nbINoinEl * nb_elem, 1);
+                                    valx = zeros(nbINode * nb_elem, 1);
+                                    valy = zeros(nbINode * nb_elem, 1);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         valx(idn) = valcell{k}(:,1);
                                         valy(idn) = valcell{k}(:,2);
@@ -536,12 +575,12 @@ classdef Parameter < Xhandle
                                     fargs{i} = [vx_ vy_];
                                     % ---
                                 elseif dim_ == 3
-                                    valx = zeros(nbINoinEl * nb_elem, 1);
-                                    valy = zeros(nbINoinEl * nb_elem, 1);
-                                    valz = zeros(nbINoinEl * nb_elem, 1);
+                                    valx = zeros(nbINode * nb_elem, 1);
+                                    valy = zeros(nbINode * nb_elem, 1);
+                                    valz = zeros(nbINode * nb_elem, 1);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         valx(idn) = valcell{k}(:,1);
                                         valy(idn) = valcell{k}(:,2);
@@ -574,7 +613,7 @@ classdef Parameter < Xhandle
                                     id_dom_source = fieldnames(source_model.parent_mesh.dom);
                                     for ids = 1:length(id_dom_source)
                                         if f_strcmpi(id_dom_source{ids},target_dom.id)
-                                            id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gid_face;
+                                            id_face_source = source_model.parent_mesh.dom.(id_dom_source{ids}).gindex;
                                         end
                                     end
                                     if isempty(id_face_source)
@@ -587,8 +626,8 @@ classdef Parameter < Xhandle
                                 % ------------------------------------------------------------------
                                 if ~isempty(id_face_source)
                                     % --- time interpolated data
-                                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                    next_it = source_model.ltime.next_it(target_t);
+                                    back_it = source_model.ltime.back_it(target_t);
                                     if next_it == back_it
                                         valcell = source_model.field{back_it}.(depon_).face.ivalue(id_face_source);
                                     else
@@ -603,7 +642,7 @@ classdef Parameter < Xhandle
                                         % ---
                                         delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                         % ---
-                                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                        dt = target_t - source_model.ltime.t_array(back_it);
                                         % ---
                                         for k = 1:length(val01)
                                             valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
@@ -613,23 +652,23 @@ classdef Parameter < Xhandle
                                     % --- space interpolation
                                     % --- take interp_node from Field
                                     interp_node = source_model.field{back_it}.(depon_).face.inode(id_face_source);
-                                    nbINoinEl = length(interp_node);
-                                    nb_face   = length(id_face_source);
+                                    nbINode = length(interp_node);
+                                    nb_face = length(id_face_source);
                                     % ---
-                                    node_i = zeros(nbINoinEl * nb_face, 3);
+                                    node_i = zeros(nbINode * nb_face, 3);
                                     % ---
                                     id0 = 1:nb_face;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_face;
                                         node_i(idn,:) = interp_node{k};
                                     end
                                     % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
-                                        valx = zeros(nbINoinEl * nb_face, 1);
+                                        valx = zeros(nbINode * nb_face, 1);
                                         % ---
                                         id0 = 1:nb_face;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_face;
                                             valx(idn) = valcell{k}(:,1);
                                         end
@@ -640,11 +679,11 @@ classdef Parameter < Xhandle
                                         fargs{i} = fxi(cnode_.');
                                         % ---
                                     elseif dim_ == 2
-                                        valx = zeros(nbINoinEl * nb_face, 1);
-                                        valy = zeros(nbINoinEl * nb_face, 1);
+                                        valx = zeros(nbINode * nb_face, 1);
+                                        valy = zeros(nbINode * nb_face, 1);
                                         % ---
                                         id0 = 1:nb_face;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_face;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);
@@ -660,12 +699,12 @@ classdef Parameter < Xhandle
                                         fargs{i} = [vx_ vy_];
                                         % ---
                                     elseif dim_ == 3
-                                        valx = zeros(nbINoinEl * nb_face, 1);
-                                        valy = zeros(nbINoinEl * nb_face, 1);
-                                        valz = zeros(nbINoinEl * nb_face, 1);
+                                        valx = zeros(nbINode * nb_face, 1);
+                                        valy = zeros(nbINode * nb_face, 1);
+                                        valz = zeros(nbINode * nb_face, 1);
                                         % ---
                                         id0 = 1:nb_face;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_face;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);
@@ -689,8 +728,8 @@ classdef Parameter < Xhandle
                                 elseif ~isempty(id_elem_source)
                                     % --- XTODO : not optimat code writing/organization
                                     % --- time interpolated data
-                                    next_it = source_model.ltime.next_it(target_model.ltime.t_now);
-                                    back_it = source_model.ltime.back_it(target_model.ltime.t_now);
+                                    next_it = source_model.ltime.next_it(target_t);
+                                    back_it = source_model.ltime.back_it(target_t);
                                     if next_it == back_it
                                         valcell = source_model.field{back_it}.(depon_).elem.ivalue(id_elem_source);
                                     else
@@ -705,7 +744,7 @@ classdef Parameter < Xhandle
                                         % ---
                                         delta_t = source_model.ltime.t_array(next_it) - source_model.ltime.t_array(back_it);
                                         % ---
-                                        dt = target_model.ltime.t_now - source_model.ltime.t_array(back_it);
+                                        dt = target_t - source_model.ltime.t_array(back_it);
                                         % ---
                                         for k = 1:length(val01)
                                             valcell{k} = val01{k} + delta_v{k}./delta_t .* dt;
@@ -713,25 +752,24 @@ classdef Parameter < Xhandle
                                         % ---
                                     end
                                     % --- space interpolation
-                                    nbINoinEl = source_model.parent_mesh.refelem.nbI;
-                                    nb_elem   = length(id_elem_source);
-                                    % ---
-                                    node_i = zeros(nbINoinEl * nb_elem, 3);
-                                    % ---
                                     interp_node = source_model.parent_mesh.prokit.node;
+                                    nbINode = length(interp_node);
+                                    nb_elem = length(id_elem_source);
+                                    % ---
+                                    node_i = zeros(nbINode * nb_elem, 3);
                                     % ---
                                     id0 = 1:nb_elem;
-                                    for k = 1:nbINoinEl
+                                    for k = 1:nbINode
                                         idn = id0 + (k - 1) * nb_elem;
                                         node_i(idn,:) = interp_node{k}(id_elem_source,:);
                                     end
                                     % ---
                                     dim_ = size(valcell{1},2);
                                     if dim_ == 1
-                                        valx = zeros(nbINoinEl * nb_elem, 1);
+                                        valx = zeros(nbINode * nb_elem, 1);
                                         % ---
                                         id0 = 1:nb_elem;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_elem;
                                             valx(idn) = valcell{k}(:,1);
                                         end
@@ -742,11 +780,11 @@ classdef Parameter < Xhandle
                                         fargs{i} = fxi(cnode_.');
                                         % ---
                                     elseif dim_ == 2
-                                        valx = zeros(nbINoinEl * nb_elem, 1);
-                                        valy = zeros(nbINoinEl * nb_elem, 1);
+                                        valx = zeros(nbINode * nb_elem, 1);
+                                        valy = zeros(nbINode * nb_elem, 1);
                                         % ---
                                         id0 = 1:nb_elem;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_elem;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);
@@ -762,12 +800,12 @@ classdef Parameter < Xhandle
                                         fargs{i} = [vx_ vy_];
                                         % ---
                                     elseif dim_ == 3
-                                        valx = zeros(nbINoinEl * nb_elem, 1);
-                                        valy = zeros(nbINoinEl * nb_elem, 1);
-                                        valz = zeros(nbINoinEl * nb_elem, 1);
+                                        valx = zeros(nbINode * nb_elem, 1);
+                                        valy = zeros(nbINode * nb_elem, 1);
+                                        valz = zeros(nbINode * nb_elem, 1);
                                         % ---
                                         id0 = 1:nb_elem;
-                                        for k = 1:nbINoinEl
+                                        for k = 1:nbINode
                                             idn = id0 + (k - 1) * nb_elem;
                                             valx(idn) = valcell{k}(:,1);
                                             valy(idn) = valcell{k}(:,2);

@@ -315,7 +315,7 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.dof{it}.Phi = NodeDof('parent_model',obj);
             obj.dof{it}.B = FaceDof('parent_model',obj);
             obj.dof{it}.E = EdgeDof('parent_model',obj);
-            obj.dof{it}.V = GlobalQuantityDof('parent_model',obj);
+            obj.dof{it}.V = [];
             %--------------------------------------------------------------
             obj.field{it}.A.elem = ...
                 EdgeDofBasedVectorElemField('parent_model',obj,'dof',obj.dof{it}.A);
@@ -329,13 +329,15 @@ classdef FEM3dAphijw < FEM3dAphi
                 EdgeDofBasedVectorFaceField('parent_model',obj,'dof',obj.dof{it}.E);
             %--------------------------------------------------------------
             obj.field{it}.J.elem = ...
-                JAphiVectorElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
-            % obj.field{it}.J.face = ...
-            %     JAphiVectorFaceField('parent_model',obj,'Efield',obj.field{it}.E.elem);
-            % obj.field{it}.P.elem = ...
-            %     PAphiVectorElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
-            % obj.field{it}.P.face = ...
-            %     PAphiVectorFaceField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+                JAphiElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
+            obj.field{it}.J.face = ...
+                JAphiFaceField('parent_model',obj,'Efield',obj.field{it}.E.face);
+            obj.field{it}.P.elem = ...
+                PAphiElemField('parent_model',obj,'Efield',obj.field{it}.E.elem,...
+                'Jfield',obj.field{it}.J.elem);
+            obj.field{it}.P.face = ...
+                PAphiFaceField('parent_model',obj,'Efield',obj.field{it}.E.face,...
+                'Jfield',obj.field{it}.J.face);
             %--------------------------------------------------------------
             f_fprintf(0,'Solveone',1,class(obj),0,'it ---',1,num2str(it),0,'\n');
             %--------------------------------------------------------------
@@ -451,6 +453,7 @@ classdef FEM3dAphijw < FEM3dAphi
                               obj.parent_mesh.discrete.grad * obj.dof{it}.Phi.value);
                 %----------------------------------------------------------------------
                 obj.postpro;
+                %----------------------------------------------------------------------
             end
         end
         % -------------------------------------------------------------------------

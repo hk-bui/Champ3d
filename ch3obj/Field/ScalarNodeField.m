@@ -16,10 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef ScalarElemField < ElemField
+classdef ScalarNodeField < NodeField
+    % --- Contructor
     methods
-        function obj = ScalarElemField()
-            obj = obj@ElemField;
+        function obj = ScalarNodeField()
+            obj = obj@NodeField;
         end
     end
     % --- plot
@@ -31,6 +32,7 @@ classdef ScalarElemField < ElemField
                 args.meshdom_obj = []
                 args.id_meshdom = []
                 args.id_elem = []
+                args.id_face = []
                 args.show_dom = 1
             end
             % ---
@@ -39,24 +41,37 @@ classdef ScalarElemField < ElemField
                 % ---
                 if isempty(args.meshdom_obj)
                     if isempty(args.id_elem)
-                        text(0,0,'Nothing to plot !');
+                        if isempty(args.id_face)
+                            text(0,0,'Nothing to plot !');
+                            return
+                        else
+                            dom = SurfaceDom3d;
+                            gindex = args.id_face;
+                        end
                     else
+                        dom = VolumeDom3d;
                         gindex = args.id_elem;
                     end
                 else
                     dom = args.meshdom_obj;
+                    % ---
                     if isa(dom,'VolumeDom3d')
                         gindex = dom.gindex;
-                    else
-                        text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
+                    end
+                    % ---
+                    if isa(dom,'SurfaceDom3d')
+                        gindex = dom.gindex;
                     end
                 end
             else
                 dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
+                % ---
                 if isa(dom,'VolumeDom3d')
                     gindex = dom.gindex;
-                else
-                    text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
+                end
+                % ---
+                if isa(dom,'SurfaceDom3d')
+                    gindex = dom.gindex;
                 end
             end
             % ---
@@ -64,9 +79,19 @@ classdef ScalarElemField < ElemField
                 dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
             % ---
-            node_ = obj.parent_model.parent_mesh.node;
-            elem = obj.parent_model.parent_mesh.elem(:,gindex);
-            f_patch('node',node_,'elem',elem,'elem_field',obj.cvalue(gindex));
+            if isa(dom,'VolumeDom3d')
+                node_ = obj.parent_model.parent_mesh.node;
+                elem = obj.parent_model.parent_mesh.elem(:,gindex);
+                % ---
+                f_patch('node',node_,'elem',elem,'node_field',obj.cvalue);
+            end
+            % ---
+            if isa(dom,'SurfaceDom3d')
+                node_ = obj.parent_model.parent_mesh.node;
+                face = obj.parent_model.parent_mesh.face(:,gindex);
+                % ---
+                f_patch('node',node_,'face',face,'node_field',obj.cvalue);
+            end
         end
         % -----------------------------------------------------------------
     end

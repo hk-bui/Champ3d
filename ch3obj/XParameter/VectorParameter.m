@@ -29,10 +29,7 @@ classdef VectorParameter < Parameter
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f = []
-                args.depend_on {mustBeMember(args.depend_on,...
-                    {'celem','cface','velem','sface','ledge',...
-                     'J','V','I','Z','T','B','E','H','A','P','Phi',...
-                     'ltime'})}
+                args.depend_on char
                 args.from = []
                 args.varargin_list = []
                 args.fvectorized = 0
@@ -65,7 +62,7 @@ classdef VectorParameter < Parameter
                 args.in_dom = []
             end
             vout = getvalue@Parameter(obj,'in_dom',args.in_dom);
-            vout = TensorArray.vector(vout);
+            vout = Array.vector(vout);
             %--------------------------------------------------------------
             if any(isinf(vout))
                 f_fprintf(1,'Value has Inf ! \n');

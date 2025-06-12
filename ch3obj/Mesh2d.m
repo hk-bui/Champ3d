@@ -36,7 +36,7 @@ classdef Mesh2d < Mesh
                 args.id_yline = []
                 % ---
                 args.elem_code = []
-                args.gid_elem = []
+                args.gindex = []
                 args.condition char = []
                 % ---
                 args.dom_obj {mustBeA(args.dom_obj,{'VolumeDom2d'})}
@@ -75,7 +75,7 @@ classdef Mesh2d < Mesh
                 args.id_yline = []
                 % ---
                 args.elem_code = []
-                args.gid_elem = []
+                args.gindex = []
                 args.condition char = []
             end
             % ---
@@ -120,7 +120,7 @@ classdef Mesh2d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -196,7 +196,7 @@ classdef Mesh2d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -275,7 +275,7 @@ classdef Mesh2d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -380,7 +380,7 @@ classdef Mesh2d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbFa_inEl = refelem.nbFa_inEl;
@@ -487,10 +487,10 @@ classdef Mesh2d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
             %--------------------------------------------------------------
             if ~iscell(vector_field)
-                vector_field = TensorArray.vector(vector_field);
+                vector_field = Array.vector(vector_field);
             end
             %--------------------------------------------------------------
             refelem = obj.refelem;
@@ -619,10 +619,10 @@ classdef Mesh2d < Mesh
                 end
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
             %--------------------------------------------------------------
             if ~iscell(vector_field)
-                vector_field = TensorArray.vector(vector_field);
+                vector_field = Array.vector(vector_field);
             end
             %--------------------------------------------------------------
             refelem = obj.refelem;
@@ -755,8 +755,8 @@ classdef Mesh2d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
-            dof = TensorArray.tensor(dof);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
+            dof = Array.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbNo_inEl = refelem.nbNo_inEl;
@@ -854,8 +854,8 @@ classdef Mesh2d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
-            dof = TensorArray.tensor(dof);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
+            dof = Array.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbEd_inEl = refelem.nbEd_inEl;
@@ -977,8 +977,8 @@ classdef Mesh2d < Mesh
                 error('dof must be defined in whole mesh !');
             end
             %--------------------------------------------------------------
-            [coefficient, coef_array_type] = TensorArray.tensor(coefficient);
-            dof = TensorArray.tensor(dof);
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
+            dof = Array.tensor(dof);
             %--------------------------------------------------------------
             refelem = obj.refelem;
             nbFa_inEl = refelem.nbFa_inEl;

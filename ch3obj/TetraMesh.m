@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef TetMesh < Mesh3d
+classdef TetraMesh < Mesh3d
     properties (Access = private)
         build_done = 0
         % ---
@@ -33,7 +33,7 @@ classdef TetMesh < Mesh3d
     end
     % --- Constructors
     methods
-        function obj = TetMesh(args)
+        function obj = TetraMesh(args)
             arguments
                 args.id
                 args.node
@@ -49,7 +49,7 @@ classdef TetMesh < Mesh3d
             % ---
             obj <= args;
             % ---
-            TetMesh.setup(obj);
+            TetraMesh.setup(obj);
             % ---
         end
     end
@@ -67,7 +67,7 @@ classdef TetMesh < Mesh3d
     end
     methods (Access = public)
         function reset(obj)
-            TetMesh.setup(obj);
+            TetraMesh.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end

@@ -16,24 +16,27 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FaceDofBasedVectorElemField < VectorElemField
+classdef PAphiFaceField < ScalarFaceField
     properties
         parent_model
-        dof
+        sibc
+        Efield
+        Jfield
     end
     % --- Contructor
     methods
-        function obj = FaceDofBasedVectorElemField(args)
+        function obj = PAphiFaceField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.dof {mustBeA(args.dof,'FaceDof')}
+                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorFaceField')}
+                args.Jfield {mustBeA(args.Jfield,'JAphiFaceField')}
             end
             % ---
-            obj = obj@VectorElemField;
+            obj = obj@ScalarFaceField;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model') || ~isfield(args,'dof')
-                    error('#parent_model and #dof must be given !');
+                if ~isfield(args,'parent_model') || ~isfield(args,'Efield') || ~isfield(args,'Jfield')
+                    error('#parent_model, #Efield, #Jfield must be given !');
                 end
             end
             % ---
@@ -44,65 +47,44 @@ classdef FaceDofBasedVectorElemField < VectorElemField
     % --- get
     methods
         % -----------------------------------------------------------------
-        function val = cvalue(obj,id_elem)
+        function val = cvalue(obj,id_face)
             % ---
             if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            if isempty(id_elem)
+            if isempty(id_face)
                 val = [];
                 return
             end
             % ---
-            val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,...
-                  'on','center','id_elem',id_elem);
-            val = val(id_elem,:);
+            val = zeros(length(id_face),1);
+            % ---
+            if ~isempty(obj.sibc)
+                id_phydom_ = fieldnames(obj.sibc);
+                % ---
+                for iec = 1:length(id_phydom_)
+                    tarray = obj.sibc.(id_phydom_{iec}).skindepth;
+                    % ---
+                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    % ---
+                    val(lindex,:) =+ (1/2 * real(tarray(lindex) * ...
+                        obj.Efield(gindex) * conj(obj.Jfield(gindex))));
+                end
+            end
+            % ---
         end
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
             % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
+            % E = obj.Efield.cvalue(id_elem);
+            % Jconj = VectorArray.conjugate(obj.Jfield.cvalue(id_elem));
+            % val = Array.dot(E,conj(J));
             % ---
-            if isempty(id_elem)
-                val = [];
-                return
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,...
-                  'on','interpolation_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(id_elem,:);
-                end
-            end
-            % ---
-
         end
         % -----------------------------------------------------------------
         function val = gvalue(obj,id_elem)
-            % ---
-            if nargin <= 1
-                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
-            end
-            % ---
-            if isempty(id_elem)
-                val = [];
-                return
-            end
-            % ---
-            val = obj.parent_model.parent_mesh.field_wf('dof',obj.dof.value,...
-                  'on','gauss_points','id_elem',id_elem);
-            % ---
-            if length(id_elem) < obj.parent_model.parent_mesh.nb_elem
-                for i = 1:length(val)
-                    val{i} = val{i}(id_elem,:);
-                end
-            end
-            % ---
+            
         end
         % -----------------------------------------------------------------
     end

@@ -19,9 +19,6 @@
 classdef Econductor < PhysicalDom
     properties
         sigma
-        % ---
-        matrix
-        tarray
     end
     % ---
     properties (Access = private)
@@ -67,7 +64,7 @@ classdef Econductor < PhysicalDom
             obj.get_geodom;
             obj.dom.is_defining_obj_of(obj);
             % --- Initialization
-            obj.matrix.gid_elem = [];
+            obj.matrix.gindex = [];
             obj.matrix.gid_node_phi = [];
             obj.matrix.sigmawewe = [];
             obj.matrix.sigma_array = [];
@@ -91,42 +88,43 @@ classdef Econductor < PhysicalDom
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
-            gid_elem = dom.gid_elem;
+            gindex = dom.gindex;
             % ---
-            elem = parent_mesh.elem(:,gid_elem);
+            elem = parent_mesh.elem(:,gindex);
             % ---
             gid_node_phi = f_uniquenode(elem);
             % ---
             sigma_array = obj.sigma.getvalue('in_dom',dom);
             % --- check changes
             is_changed = 1;
-            % if isequal(sigma_array,obj.matrix.sigma_array{it}) && ...
-            %    isequal(gid_elem,obj.matrix.gid_elem) && ...
-            %    isequal(gid_node_phi,obj.matrix.gid_node_phi)
-            %     is_changed = 0;
-            % end
+            if isequal(sigma_array,obj.matrix.sigma_array) && ...
+               isequal(gindex,obj.matrix.gindex) && ...
+               isequal(gid_node_phi,obj.matrix.gid_node_phi)
+                is_changed = 0;
+            end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
                 return
             end
             %--------------------------------------------------------------
-            obj.matrix.gid_elem = gid_elem;
+            obj.matrix.gindex = gindex;
             obj.matrix.gid_node_phi = gid_node_phi;
-            obj.matrix.sigma_array{it} = sigma_array;
-            % obj.tarray{it}.sigma = TensorArray('');
+            obj.matrix.sigma_array = sigma_array;
+            %--------------------------------------------------------------
+            obj.tarray{it}.sigma = TensorArray(sigma_array,'parent_dom',obj);
             %--------------------------------------------------------------
             % local sigmawewe matrix
-            lmatrix = parent_mesh.cwewe('id_elem',gid_elem,'coefficient',sigma_array);
+            lmatrix = parent_mesh.cwewe('id_elem',gindex,'coefficient',sigma_array);
             %--------------------------------------------------------------
             id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
             id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
             nb_edge = obj.parent_model.parent_mesh.nb_edge;
             nbEd_inEl = obj.parent_model.parent_mesh.refelem.nbEd_inEl;
             %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             %--------------------------------------------------------------
-            [~,id_] = intersect(gid_elem,id_elem_nomesh);
-            gid_elem(id_) = [];
+            [~,id_] = intersect(gindex,id_elem_nomesh);
+            gindex(id_) = [];
             lmatrix(id_,:,:) = [];
             %--------------------------------------------------------------
             % global elementary sigmawewe matrix
@@ -135,7 +133,7 @@ classdef Econductor < PhysicalDom
             for i = 1:nbEd_inEl
                 for j = i+1 : nbEd_inEl
                     sigmawewe = sigmawewe + ...
-                        sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(j,gid_elem),...
+                        sparse(id_edge_in_elem(i,gindex),id_edge_in_elem(j,gindex),...
                         lmatrix(:,i,j),nb_edge,nb_edge);
                 end
             end
@@ -144,7 +142,7 @@ classdef Econductor < PhysicalDom
             % ---
             for i = 1:nbEd_inEl
                 sigmawewe = sigmawewe + ...
-                    sparse(id_edge_in_elem(i,gid_elem),id_edge_in_elem(i,gid_elem),...
+                    sparse(id_edge_in_elem(i,gindex),id_edge_in_elem(i,gindex),...
                     lmatrix(:,i,i),nb_edge,nb_edge);
             end
             %--------------------------------------------------------------
@@ -166,6 +164,9 @@ classdef Econductor < PhysicalDom
             obj.parent_model.matrix.id_node_phi = ...
                 unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);
             %--------------------------------------------------------------
+            it = obj.parent_model.ltime.it;
+            obj.parent_model.field{it}.J.elem.econductor.(obj.id).sigma = obj.tarray{it}.sigma;
+            %--------------------------------------------------------------
         end
     end
 
@@ -173,13 +174,13 @@ classdef Econductor < PhysicalDom
     methods
         function postpro(obj)
             %--------------------------------------------------------------
-            gid_elem = obj.matrix.gid_elem;
+            gindex = obj.matrix.gindex;
             sigma_array = obj.matrix.sigma_array;
             %--------------------------------------------------------------
-            [coef, coef_array_type] = TensorArray.tensor(sigma_array);
+            [coef, coef_array_type] = Array.tensor(sigma_array);
             %--------------------------------------------------------------
-            ev = obj.parent_model.field.ev(:,gid_elem);
-            jv = zeros(3,length(gid_elem));
+            ev = obj.parent_model.field.ev(:,gindex);
+            jv = zeros(3,length(gindex));
             %--------------------------------------------------------------
             if any(f_strcmpi(coef_array_type,{'scalar'}))
                 %----------------------------------------------------------
@@ -198,9 +199,9 @@ classdef Econductor < PhysicalDom
                           coef(:,3,3).' .* ev(3,:);
             end
             %--------------------------------------------------------------
-            obj.parent_model.field.jv(:,gid_elem) = jv;
+            obj.parent_model.field.jv(:,gindex) = jv;
             %--------------------------------------------------------------
-            obj.parent_model.field.pv(:,gid_elem) = ...
+            obj.parent_model.field.pv(:,gindex) = ...
                 real(1/2 .* sum(ev .* conj(jv)));
             %--------------------------------------------------------------
         end

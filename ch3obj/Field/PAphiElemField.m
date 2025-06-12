@@ -16,78 +16,61 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FaceTensorArray < TensorArray
+classdef PAphiElemField < ScalarElemField
     properties
-        gid_face = []
+        parent_model
+        Efield
+        Jfield
     end
     % --- Contructor
     methods
-        function obj = FaceTensorArray(args)
+        function obj = PAphiElemField(args)
             arguments
                 args.parent_model {mustBeA(args.parent_model,'PhysicalModel')}
-                args.gid_face
+                args.Efield {mustBeA(args.Efield,'EdgeDofBasedVectorElemField')}
+                args.Jfield {mustBeA(args.Jfield,'JAphiElemField')}
             end
             % ---
-            obj = obj@TensorArray;
+            obj = obj@ScalarElemField;
             % ---
             if nargin >1
-                if ~isfield(args,'parent_model')
-                    error('#parent_model must be given !');
+                if ~isfield(args,'parent_model') || ~isfield(args,'Efield') || ~isfield(args,'Jfield')
+                    error('#parent_model, #Efield, #Jfield must be given !');
                 end
             end
             % ---
-            obj.parent_model = args.parent_model;
-            if isfield(args,'gid_face')
-                obj.gid_face = args.gid_face;
-            end
+            obj <= args;
             % ---
         end
     end
-    % ---
+    % --- get
     methods
         % -----------------------------------------------------------------
-        function set.gid_face(obj,val)
-            obj.gid_face = val;
-            len = length(val);
-            obj.tarray = zeros(len,2,2);
-            obj.array_type = zeros(1,len);
-        end
-        % -----------------------------------------------------------------
-        function store(obj,array)
-            arguments
-                obj
-                array
+        function val = cvalue(obj,id_elem)
+            % ---
+            if nargin <= 1
+                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
             end
             % ---
-            [array, array_type_] = f_column_format(array);
-            % ---
-            switch array_type_
-                case 'scalar'
-                    obj.tarray(:,1,1) = array;
-                    obj.array_type(:) = 1;
-                case 'vector'
-                    obj.tarray(:,:,1) = array;
-                    obj.array_type(:) = 2;
-                case 'tensor'
-                    obj.tarray = array;
-                    obj.array_type(:) = 3;
+            if isempty(id_elem)
+                val = [];
+                return
             end
+            % ---
+            val =+ (1/2 * real(obj.Efield(id_elem) * conj(obj.Jfield(id_elem))));
             % ---
         end
         % -----------------------------------------------------------------
-    end
-    % ---
-    methods
+        function val = ivalue(obj,id_elem)
+            % ---
+            % E = obj.Efield.cvalue(id_elem);
+            % Jconj = VectorArray.conjugate(obj.Jfield.cvalue(id_elem));
+            % val = VectorArray.dot(E,conj(J));
+            % ---
+        end
         % -----------------------------------------------------------------
-        function txVf = cmultiply(obj,field_obj,id_face)
-            arguments
-                obj
-                field_obj {mustBeA(field_obj,{'VectorFaceField'})}
-                id_face
-            end
-            % ---
-            txVf = cmultiply@TensorArray(obj,field_obj,id_face);
-            % ---
+        function val = gvalue(obj,id_elem)
+            
         end
         % -----------------------------------------------------------------
     end

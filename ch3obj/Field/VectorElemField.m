@@ -16,12 +16,17 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef VectorElemField < ElemField
+classdef VectorElemField < ElemField & VectorField
     % --- Contructor
     methods
         function obj = VectorElemField()
             obj = obj@ElemField;
+            obj = obj@VectorField;
         end
+    end
+    % --- Utility Methods
+    methods
+        
     end
     % --- plot
     methods
@@ -42,12 +47,12 @@ classdef VectorElemField < ElemField
                     if isempty(args.id_elem)
                         text(0,0,'Nothing to plot !');
                     else
-                        gid_elem = args.id_elem;
+                        gindex = args.id_elem;
                     end
                 else
                     dom = args.meshdom_obj;
                     if isa(dom,'VolumeDom3d')
-                        gid_elem = dom.gid_elem;
+                        gindex = dom.gindex;
                     else
                         text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
                     end
@@ -55,7 +60,7 @@ classdef VectorElemField < ElemField
             else
                 dom = obj.parent_model.parent_mesh.dom.(args.id_meshdom);
                 if isa(dom,'VolumeDom3d')
-                    gid_elem = dom.gid_elem;
+                    gindex = dom.gindex;
                 else
                     text(0,0,'Nothing to plot, dom must be a VolumeDom3d !');
                 end
@@ -65,19 +70,19 @@ classdef VectorElemField < ElemField
                 dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
             end
             % ---
-            celem = obj.parent_model.parent_mesh.celem(:,gid_elem);
-            v_ = obj.cvalue(gid_elem);
+            celem = obj.parent_model.parent_mesh.celem(:,gindex);
+            v_ = obj.cvalue(gindex);
             if isreal(v_)
                 % ---
                 subplot(121)
                 title('Vector');
-                f_quiver(celem,obj.cvalue(gid_elem));
+                f_quiver(celem,obj.cvalue(gindex));
                 % ---
                 subplot(122)
                 title('Norm');
                 node_ = obj.parent_model.parent_mesh.node;
-                elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                v__ = TensorArray.norm(v_);
+                elem = obj.parent_model.parent_mesh.elem(:,gindex);
+                v__ = Array.norm(v_);
                 f_patch('node',node_,'elem',elem,'elem_field',v__);
             else
                 for i = 1:4
@@ -93,14 +98,14 @@ classdef VectorElemField < ElemField
                         f_quiver(celem,v__);
                     elseif i == 3
                         title('Max');
-                        v__ = TensorArray.maxvector(v_);
+                        v__ = VectorArray.max(v_);
                         f_quiver(celem,v__);
                     elseif i == 4
                         title('Max');
                         % ---
                         node_ = obj.parent_model.parent_mesh.node;
-                        elem = obj.parent_model.parent_mesh.elem(:,gid_elem);
-                        v__ = TensorArray.norm(TensorArray.maxvector(v_));
+                        elem = obj.parent_model.parent_mesh.elem(:,gindex);
+                        v__ = Array.norm(VectorArray.max(v_));
                         f_patch('node',node_,'elem',elem,'elem_field',v__);
                     end
                     % ---

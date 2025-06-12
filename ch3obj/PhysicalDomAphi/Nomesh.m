@@ -17,9 +17,6 @@
 %--------------------------------------------------------------------------
 
 classdef Nomesh < PhysicalDom
-    properties
-        matrix
-    end
     % ---
     properties (Access = private)
         build_done = 0

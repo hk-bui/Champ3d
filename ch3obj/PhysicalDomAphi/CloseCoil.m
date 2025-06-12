@@ -56,22 +56,22 @@ classdef CloseCoil < Coil
                     vdom = obj.shape_dom;
                 end
                 % ---
-                gid_elem = vdom.gid_elem;
-                gid_node_vdom = f_uniquenode(parent_mesh.elem(:,vdom.gid_elem));
-                lwewe = parent_mesh.cwewe('id_elem',gid_elem);
+                gindex = vdom.gindex;
+                gid_node_vdom = f_uniquenode(parent_mesh.elem(:,vdom.gindex));
+                lwewe = parent_mesh.cwewe('id_elem',gindex);
                 % ---
                 gwewe = sparse(nb_edge,nb_edge);
                 for j = 1:nbEd_inEl
                     for k = j+1 : nbEd_inEl
                         gwewe = gwewe + ...
-                            sparse(id_edge_in_elem(j,gid_elem),id_edge_in_elem(j,gid_elem),...
+                            sparse(id_edge_in_elem(j,gindex),id_edge_in_elem(j,gindex),...
                             lwewe(:,j,k),nb_edge,nb_edge);
                     end
                 end
                 gwewe = gwewe + gwewe.';
                 for j = 1:nbEd_inEl
                     gwewe = gwewe + ...
-                        sparse(id_edge_in_elem(j,gid_elem),id_edge_in_elem(j,gid_elem),...
+                        sparse(id_edge_in_elem(j,gindex),id_edge_in_elem(j,gindex),...
                         lwewe(:,j,j),nb_edge,nb_edge);
                 end
                 % ---
@@ -90,8 +90,8 @@ classdef CloseCoil < Coil
                 end
                 % ---
                 dofJs = - parent_mesh.discrete.grad * V;
-                vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gid_elem);
-                vJs = TensorArray.normalize(vJs);
+                vJs = parent_mesh.field_we('dof',dofJs,'id_elem',gindex);
+                vJs = Array.normalize(vJs);
                 % ---
                 unit_current_field = unit_current_field + vJs;
                 % --- XTODO
@@ -100,7 +100,7 @@ classdef CloseCoil < Coil
                 end
                 alpha = [];
             end
-            unit_current_field = TensorArray.normalize(unit_current_field);
+            unit_current_field = Array.normalize(unit_current_field);
         end
     end
     % --- Utility Methods
@@ -133,8 +133,8 @@ classdef CloseCoil < Coil
             % ---
             if isfield(obj.matrix,'unit_current_field')
                 if ~isempty(obj.matrix.unit_current_field)
-                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gid_elem), ...
-                             obj.matrix.unit_current_field(:,obj.matrix.gid_elem),'sfactor',0.2);
+                    f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gindex), ...
+                             obj.matrix.unit_current_field(:,obj.matrix.gindex),'sfactor',0.2);
                 end
             end
         end

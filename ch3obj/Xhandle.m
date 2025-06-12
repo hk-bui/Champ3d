@@ -21,7 +21,7 @@ classdef Xhandle < matlab.mixin.Copyable
     properties
         id = '-'
     end
-    properties
+    properties (Hidden)
         dependent_obj = []
         defining_obj = []
     end
@@ -50,10 +50,6 @@ classdef Xhandle < matlab.mixin.Copyable
                     obj.(fname{i}) = objx.(fname{i});
                 end
             end
-        end
-        %------------------------------------------------------------------
-        function objx = uplus(obj)
-            objx = copy(obj);
         end
         %------------------------------------------------------------------
         function objx = ctranspose(obj)

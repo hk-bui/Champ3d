@@ -16,11 +16,11 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef FaceField < Xhandle
+classdef FaceField < Field
     % --- Contructor
     methods
         function obj = FaceField()
-            obj = obj@Xhandle;
+            obj = obj@Field;
         end
     end
     % --- get
@@ -32,6 +32,11 @@ classdef FaceField < Xhandle
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
+            if isempty(id_face)
+                val = [];
+                return
+            end
+            % ---
             val = obj.parent_model.parent_mesh.cface(:,id_face).';
         end
         % -----------------------------------------------------------------
@@ -41,9 +46,14 @@ classdef FaceField < Xhandle
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            if isempty(id_face)
+                val = [];
+                return
+            end
             % ---
-            lnb_face = length(dom.gid_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
+            % ---
+            lnb_face = length(dom.gindex);
             % ---
             submesh = dom.submesh;
             % ---
@@ -56,11 +66,11 @@ classdef FaceField < Xhandle
                 sm = submesh{k};
                 sm.build_prokit;
                 % ---
-                lid_face = sm.lid_face;
+                lindex = sm.lindex;
                 inode = sm.prokit.node;
                 % ---
                 for i = 1:length(inode)
-                    val{i}(lid_face,:) = inode{i};
+                    val{i}(lindex,:) = inode{i};
                 end
                 % ---
             end
@@ -73,9 +83,14 @@ classdef FaceField < Xhandle
                 id_face = 1:obj.parent_model.parent_mesh.nb_face;
             end
             % ---
-            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gid_face',id_face);
+            if isempty(id_face)
+                val = [];
+                return
+            end
             % ---
-            lnb_face = length(dom.gid_face);
+            dom = SurfaceDom('parent_mesh',obj.parent_model.parent_mesh,'gindex',id_face);
+            % ---
+            lnb_face = length(dom.gindex);
             % ---
             submesh = dom.submesh;
             % ---
@@ -88,11 +103,11 @@ classdef FaceField < Xhandle
                 sm = submesh{k};
                 sm.build_intkit;
                 % ---
-                lid_face = sm.lid_face;
+                lindex = sm.lindex;
                 gnode = sm.intkit.node;
                 % ---
                 for i = 1:length(gnode)
-                    val{i}(lid_face,:) = gnode{i};
+                    val{i}(lindex,:) = gnode{i};
                 end
                 % ---
             end
