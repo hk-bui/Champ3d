@@ -251,7 +251,7 @@ classdef LTSpiceCircuit < Xhandle
                 fprintf('Old data cleaned.\n');
             end
             % ---
-            call_LTSpice_run = [Ch3Config.ExecutableLTSpiceLocation ' -b ' obj.file.tran.NET_file];
+            call_LTSpice_run = [Ch3Config.LTSpiceExecutable ' -b ' obj.file.tran.NET_file];
             % ---
             try
                 fprintf('LTSpice running ... \n');
