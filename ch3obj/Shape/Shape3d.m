@@ -18,8 +18,10 @@
 
 classdef Shape3d < Xhandle
     properties
-        geogmsh
+        gmshgeocode
         building_formular
+        % ---
+        transform
     end
     % --- Valid args list
     methods (Static)
@@ -46,11 +48,51 @@ classdef Shape3d < Xhandle
             obj.reset_dependent_obj;
         end
     end
-    % --- Methods
+    % --- Transformations
     methods
         % -----------------------------------------------------------------
         function build(obj)
 
+        end
+        % -----------------------------------------------------------------
+        function translate(obj,args)
+            arguments
+                obj
+                args.distance = [0 0 0]
+            end
+            % ---
+            obj.transform = struct('type','translate','distance',args.distance);
+            % ---
+        end
+        % -----------------------------------------------------------------
+        function rotate(obj,args)
+            arguments
+                obj
+                args.axis = [0 0 1];
+                args.origin = [0 0 0];
+                args.angle = 0;
+            end
+            % ---
+            obj.transform = struct('type','rotate',...
+                'axis',args.axis, ...
+                'origin',args.origin,'angle',args.angle);
+            % ---
+        end
+        % -----------------------------------------------------------------
+        function dilate(obj,args)
+            arguments
+                obj
+                args.origin = [0 0 0]
+                args.scale = [1 1 1]
+            end
+            % ---
+            if length(args.scale) == 1
+                args.scale = args.scale .* ones(size(args.origin));
+            end
+            % ---
+            obj.transform = struct('type','dilate',...
+                'origin',args.origin,'scale',args.scale);
+            % ---
         end
         % -----------------------------------------------------------------
     end

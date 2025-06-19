@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef GCube < Shape3d
+classdef BCube < Shape3d
     properties
 
         center
@@ -29,7 +29,7 @@ classdef GCube < Shape3d
     end
     % --- Constructors
     methods
-        function obj = GCube(args)
+        function obj = BCube(args)
             arguments
                 args.id
             end

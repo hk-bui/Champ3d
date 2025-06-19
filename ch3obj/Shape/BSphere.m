@@ -18,8 +18,11 @@
 
 classdef BSphere < Shape3d
     properties
-        r
+        r = 1
         center = [0, 0, 0]
+        bottom_cut_ratio = 0
+        top_cut_ratio = 0
+        opening_angle = 360
     end
     % --- Valid args list
     methods (Static)
@@ -31,8 +34,11 @@ classdef BSphere < Shape3d
     methods
         function obj = BSphere(args)
             arguments
-                args.r
+                args.r = 1
                 args.center = [0, 0, 0]
+                args.bottom_cut_ratio = 0
+                args.top_cut_ratio = 0
+                args.opening_angle = 360
             end
             % ---
             obj = obj@Shape3d;
@@ -50,9 +56,17 @@ classdef BSphere < Shape3d
     % --- setup/reset
     methods (Static)
         function setup(obj)
-            if isnumeric(obj.center)
-                % XTODO
-            end
+            % ---
+            r     = f_getvalue(obj.r);
+            c     = f_getvalue(obj.center);
+            bcut  = f_getvalue(obj.bottom_cut_ratio);
+            tcut  = f_getvalue(obj.top_cut_ratio);
+            angle = f_getvalue(obj.opening_angle);
+            % ---
+            geocode = GMSHInterface.bsphere(r,c,bcut,tcut,angle);
+            % ---
+            obj.gmshgeocode = geocode;
+            % ---
         end
     end
     methods (Access = public)
@@ -66,7 +80,7 @@ classdef BSphere < Shape3d
     methods
         %------------------------------------------------------------------
         function build(obj)
-            
+
         end
         %------------------------------------------------------------------
         %------------------------------------------------------------------
