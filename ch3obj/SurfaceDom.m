@@ -207,8 +207,6 @@ classdef SurfaceDom < MeshDom
             objy.gindex = f_unique([f_torowv(obj.gindex), f_torowv(objx.gindex)].');
             objy.build_from_gindex;
             % ---
-            %obj.transfer_dep_def(objx,objy);
-            % ---
             obj.is_defining_obj_of(objy);
             objx.is_defining_obj_of(objy);
             % ---
@@ -230,8 +228,6 @@ classdef SurfaceDom < MeshDom
             objy.gindex = f_unique(setdiff(f_torowv(obj.gindex),f_torowv(objx.gindex)).');
             objy.build_from_gindex;
             % ---
-            %obj.transfer_dep_def(objx,objy);
-            % ---
             obj.is_defining_obj_of(objy);
             objx.is_defining_obj_of(objy);
             % ---
@@ -252,8 +248,6 @@ classdef SurfaceDom < MeshDom
             objy = feval(class(obj),'parent_mesh',obj.parent_mesh);
             objy.gindex = f_unique(intersect(f_torowv(obj.gindex),f_torowv(objx.gindex)).');
             objy.build_from_gindex;
-            % ---
-            %obj.transfer_dep_def(objx,objy);
             % ---
             obj.is_defining_obj_of(objy);
             objx.is_defining_obj_of(objy);

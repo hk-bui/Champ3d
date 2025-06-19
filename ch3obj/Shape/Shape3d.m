@@ -18,7 +18,7 @@
 
 classdef Shape3d < Xhandle
     properties
-        geofile
+        geogmsh
         building_formular
     end
     % --- Valid args list
@@ -50,7 +50,7 @@ classdef Shape3d < Xhandle
     methods
         % -----------------------------------------------------------------
         function build(obj)
-            
+
         end
         % -----------------------------------------------------------------
     end
@@ -58,7 +58,18 @@ classdef Shape3d < Xhandle
     % --- Methods
     methods (Access = protected)
         % -----------------------------------------------------------------
-
+        % -----------------------------------------------------------------
+        function build_from_formular(obj)
+            switch obj.building_formular.operation
+                case '+'
+                    
+                case '-'
+                    
+                case '^'
+                    
+            end
+        end
+        % -----------------------------------------------------------------
         % -----------------------------------------------------------------
     end
 
@@ -76,6 +87,10 @@ classdef Shape3d < Xhandle
             % ---
             obj.is_defining_obj_of(objout);
             objx.is_defining_obj_of(objout);
+            % ---
+            objout.building_formular.arg1 = obj;
+            objout.building_formular.arg2 = objx;
+            objout.building_formular.operation = '+';
         end
         function objout = minus(obj,objx)
             objout = Shape3d;
