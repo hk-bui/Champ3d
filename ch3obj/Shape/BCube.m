@@ -42,7 +42,7 @@ classdef BCube < VolumeShape
             % ---
             obj <= args;
             % ---
-            Cube.setup(obj);
+            BCube.setup(obj);
             % ---
         end
     end
@@ -54,7 +54,7 @@ classdef BCube < VolumeShape
     end
     methods (Access = public)
         function reset(obj)
-            Cube.setup(obj);
+            BCube.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end

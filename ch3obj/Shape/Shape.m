@@ -18,7 +18,7 @@
 
 classdef Shape < Xhandle
     properties
-        gmshgeocode
+        geocode
         building_formular
         transform
     end
@@ -97,12 +97,20 @@ classdef Shape < Xhandle
             % ---
             obj.is_defining_obj_of(objout);
             objx.is_defining_obj_of(objout);
+            % ---
+            objout.building_formular.arg1 = obj;
+            objout.building_formular.arg2 = objx;
+            objout.building_formular.operation = '-';
         end
         function objout = mpower(obj,objx)
             objout = Shape3d;
             % ---
             obj.is_defining_obj_of(objout);
             objx.is_defining_obj_of(objout);
+            % ---
+            objout.building_formular.arg1 = obj;
+            objout.building_formular.arg2 = objx;
+            objout.building_formular.operation = '^';
         end
     end
 end

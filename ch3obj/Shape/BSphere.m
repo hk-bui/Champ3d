@@ -49,7 +49,7 @@ classdef BSphere < VolumeShape
             % ---
             obj <= args;
             % ---
-            Sphere.setup(obj);
+            BSphere.setup(obj);
             % ---
         end
     end
@@ -63,15 +63,13 @@ classdef BSphere < VolumeShape
             tcut  = f_getvalue(obj.top_cut_ratio);
             angle = f_getvalue(obj.opening_angle);
             % ---
-            gmshgeocode_ = GMSHInterface.bsphere(r,c,bcut,tcut,angle);
-            % ---
-            obj.gmshgeocode = gmshgeocode_;
+            obj.geocode = GMSHWriter.bsphere(r,c,bcut,tcut,angle);
             % ---
         end
     end
     methods (Access = public)
         function reset(obj)
-            Sphere.setup(obj);
+            BSphere.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end

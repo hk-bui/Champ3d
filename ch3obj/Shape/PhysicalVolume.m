@@ -18,7 +18,8 @@
 
 classdef PhysicalVolume < Xhandle
     properties
-        
+        id
+        volume_shape
     end
     % --- Valid args list
     methods (Static)
@@ -28,14 +29,31 @@ classdef PhysicalVolume < Xhandle
     end
     % --- Constructors
     methods
-        function obj = PhysicalVolume()
+        function obj = PhysicalVolume(args)
+            arguments
+                args.id = ''
+                args.volume_shape (1,1) {mustBeA(args.volume_shape,'Shape')}
+            end
             obj = obj@Xhandle;
+            % ---
+            if isempty(args.id)
+                error('#id must be given !');
+            end
+            % ---
+            if ~isfield(args,'volume_shape')
+                error('#volume_shape must be given !');
+            end
+            % ---
+            obj <= args;
+            % ---
         end
     end
     % --- setup/reset
     methods (Static)
         function setup(obj)
-
+            % ---
+            obj.volume_shape.is_defining_obj_of(obj);
+            % ---
         end
     end
     methods (Access = public)

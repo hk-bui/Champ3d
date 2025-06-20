@@ -28,6 +28,7 @@ classdef TetraMeshFromGMSH < TetraMesh
     methods
         function obj = TetraMeshFromGMSH(args)
             arguments
+                args.id = ''
                 args.physical_volume {mustBeA(args.physical_volume,'PhysicalVolume')}
                 args.mesh_file char = ''
             end
@@ -41,9 +42,15 @@ classdef TetraMeshFromGMSH < TetraMesh
             if isfield(args,'physical_volume')
                 args.physical_volume = f_to_scellargin(args.physical_volume);
                 obj.build_from = 'physical_volume';
-            else
+            elseif ~isempty(args.mesh_file)
                 args.physical_volume = [];
                 obj.build_from = 'mesh_file';
+            else
+                error('#physical_volume or #mesh_file must be given !');
+            end
+            % ---
+            if isempty(args.id)
+                args.id = f_uqid();
             end
             % ---
             obj <= args;
@@ -57,67 +64,13 @@ classdef TetraMeshFromGMSH < TetraMesh
         function setup(obj)
             % ---
             if strcmpi(obj.build_from,'mesh_file')
-                mesh_file_ = which(obj.mesh_file);
-                if isfile(mesh_file_)
-                    if contains(mesh_file_,'.m')
-                        % ---
-                        run(mesh_file_);
-                        % ---
-                        node_ = msh.POS.';
-                        elem_ = msh.TETS(:,1:4).';
-                        elem_code_ = f_torowv(msh.TETS(:,5));
-                        %--------------------------------------------------------------
-                        nb_elem = length(elem_code_);
-                        celem_ = mean(reshape(node_(:,elem_(1:4,:)),3,4,nb_elem),2);
-                        celem_ = squeeze(celem_);
-                        %--------------------------------------------------------------
-                        face_ = f_face(elem_,'elem_type','tetra');
-                        nb_face = size(face_,2);
-                        cface_ = mean(reshape(node_(:,face_(1:3,:)),3,3,nb_face),2);
-                        cface_ = squeeze(cface_);
-                        %--------------------------------------------------------------
-                        edge_ = f_edge(elem_,'elem_type','tetra');
-                        nb_edge = size(edge_,2);
-                        cedge_ = mean(reshape(node_(:,edge_(1:2,:)),3,2,nb_edge),2);
-                        cedge_ = squeeze(cedge_);
-                        %--------------------------------------------------------------
-                        obj.node = node_;
-                        obj.elem = elem_;
-                        obj.elem_code = elem_code_;
-                        obj.edge = edge_;
-                        obj.face = face_;
-                        obj.celem = celem_;
-                        obj.cedge = cedge_;
-                        obj.cface = cface_;
-                        % ---
-                        obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
-                        obj.sface = f_area(node_,face_);
-                        obj.ledge = f_ledge(node_,edge_);
-                        % ---
-                    else
-                        f_fprintf(1,'/!\\',0,'Only .m mesh file is acceptable !\n');
-                        error(['Can not run #mesh_file ' obj.mesh_file]);
-                    end
-                else
-                    error(['#mesh_file ' obj.mesh_file ' not found !']);
-                end
+                obj.build_from_mesh_file;
                 % ---
                 return
             end
             % ---
             if strcmpi(obj.build_from,'physical_volume')
-                % ---
-                if isempty(obj.mesh_file)
-                    obj.mesh_file = [f_uqid() '.m'];
-                end
-                % ---
-                obj.physical_volume = f_to_scellargin(obj.physical_volume);
-                % ---
-                for i = 1:length(obj.physical_volume)
-                    phyvol = obj.physical_volume{i};
-                    id_phyvol = f_str2code(phyvol.id,'code_type','integer');
-                    
-                end
+                obj.build_from_physical_volume;
             end
         end
     end
@@ -129,12 +82,80 @@ classdef TetraMeshFromGMSH < TetraMesh
         end
     end
     % --- Methods
-    methods
+    methods (Access = protected)
         %------------------------------------------------------------------
-        function build(obj)
-
+        function build_from_mesh_file(obj)
+            mesh_file_ = which(obj.mesh_file);
+            if isfile(mesh_file_)
+                if contains(mesh_file_,'.m')
+                    % ---
+                    run(mesh_file_);
+                    % ---
+                    node_ = msh.POS.';
+                    elem_ = msh.TETS(:,1:4).';
+                    elem_code_ = f_torowv(msh.TETS(:,5));
+                    %--------------------------------------------------------------
+                    nb_elem = length(elem_code_);
+                    celem_ = mean(reshape(node_(:,elem_(1:4,:)),3,4,nb_elem),2);
+                    celem_ = squeeze(celem_);
+                    %--------------------------------------------------------------
+                    face_ = f_face(elem_,'elem_type','tetra');
+                    nb_face = size(face_,2);
+                    cface_ = mean(reshape(node_(:,face_(1:3,:)),3,3,nb_face),2);
+                    cface_ = squeeze(cface_);
+                    %--------------------------------------------------------------
+                    edge_ = f_edge(elem_,'elem_type','tetra');
+                    nb_edge = size(edge_,2);
+                    cedge_ = mean(reshape(node_(:,edge_(1:2,:)),3,2,nb_edge),2);
+                    cedge_ = squeeze(cedge_);
+                    %--------------------------------------------------------------
+                    obj.node = node_;
+                    obj.elem = elem_;
+                    obj.elem_code = elem_code_;
+                    obj.edge = edge_;
+                    obj.face = face_;
+                    obj.celem = celem_;
+                    obj.cedge = cedge_;
+                    obj.cface = cface_;
+                    % ---
+                    obj.velem = f_volume(node_,elem_,'elem_type',obj.elem_type);
+                    obj.sface = f_area(node_,face_);
+                    obj.ledge = f_ledge(node_,edge_);
+                    % ---
+                else
+                    f_fprintf(1,'/!\\',0,'Only .m mesh file is acceptable !\n');
+                    error(['Can not run #mesh_file ' obj.mesh_file]);
+                end
+            else
+                error(['#mesh_file ' obj.mesh_file ' not found !']);
+            end
         end
         %------------------------------------------------------------------
+        function build_from_physical_volume(obj)
+            % ---
+            geoname = [obj.id '.geo'];
+            mshname = [obj.id '.m'];
+            if isfile(geoname)
+                fprintf('Cleaning ...\n');
+                system(['rm ' geoname ' ' mshname]);
+                fprintf('Old data cleaned.\n');
+            end
+            % ---
+            geofile = fopen(geoname,'w');
+            
+
+
+            % --- Init
+            % id_volume_list = 0;
+            % ---
+            obj.physical_volume = f_to_scellargin(obj.physical_volume);
+            % ---
+            for i = 1:length(obj.physical_volume)
+                phyvol = obj.physical_volume{i};
+                id_phyvol = f_str2code(phyvol.id,'code_type','integer');
+                
+            end
+        end
         %------------------------------------------------------------------
     end
 end
