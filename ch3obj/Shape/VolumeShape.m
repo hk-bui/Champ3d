@@ -16,10 +16,9 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BCube < VolumeShape
+classdef VolumeShape < Shape
     properties
-
-        center
+        
     end
     % --- Valid args list
     methods (Static)
@@ -29,21 +28,8 @@ classdef BCube < VolumeShape
     end
     % --- Constructors
     methods
-        function obj = BCube(args)
-            arguments
-                args.id
-            end
-            % ---
-            obj = obj@VolumeShape;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            obj <= args;
-            % ---
-            Cube.setup(obj);
-            % ---
+        function obj = VolumeShape()
+            obj = obj@Shape;
         end
     end
     % --- setup/reset
@@ -54,21 +40,27 @@ classdef BCube < VolumeShape
     end
     methods (Access = public)
         function reset(obj)
-            Cube.setup(obj);
+            VolumeShape.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
-    end
-    % --- Methods
-    methods
-        % -----------------------------------------------------------------
-        %------------------------------------------------------------------
     end
 
     % --- Methods
     methods (Access = protected)
         % -----------------------------------------------------------------
-        
+        % -----------------------------------------------------------------
+        function build_from_formular(obj)
+            switch obj.building_formular.operation
+                case '+'
+                    
+                case '-'
+                    
+                case '^'
+                    
+            end
+        end
+        % -----------------------------------------------------------------
         % -----------------------------------------------------------------
     end
 
@@ -78,4 +70,5 @@ classdef BCube < VolumeShape
             % XTODO
         end
     end
+
 end

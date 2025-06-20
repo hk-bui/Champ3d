@@ -391,7 +391,15 @@ classdef Parameter < Xhandle
             end
             % -------------------------------------------------------------
             fargs = cell(1,length(obj.depend_on));
-            % ---
+            % -------------------------------------------------------------
+            if isempty(obj.parent_model)
+                % --- free defined parameter
+                for i = 1:length(obj.depend_on)
+                    fargs{i} = obj.from{i}.(obj.depend_on{i});
+                end
+                return
+            end
+            % -------------------------------------------------------------
             target_dom   = meshdom;
             target_model = obj.parent_model;
             % ---
@@ -399,6 +407,7 @@ classdef Parameter < Xhandle
             id_coil__ = obj.id_coil;
             dit__     = obj.dit;
             source_model_  = obj.from;
+            % -------------------------------------------------------------
             for i = 1:length(depon__)
                 % ---
                 depon_       = depon__{i};

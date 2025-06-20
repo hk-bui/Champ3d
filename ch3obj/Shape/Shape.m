@@ -16,66 +16,47 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef Shape3d < Xhandle
+classdef Shape < Xhandle
     properties
         gmshgeocode
         building_formular
-        % ---
         transform
-    end
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'id'};
-        end
     end
     % --- Constructors
     methods
-        function obj = Shape3d()
+        function obj = Shape()
             obj = obj@Xhandle;
         end
     end
-    % --- setup/reset
-    methods (Static)
-        function setup(obj)
-
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            Shape3d.setup(obj);
-            % --- reset dependent obj
-            obj.reset_dependent_obj;
-        end
-    end
-    % --- Transformations
+    % --- Methods
     methods
-        % -----------------------------------------------------------------
-        function build(obj)
-
-        end
         % -----------------------------------------------------------------
         function translate(obj,args)
             arguments
                 obj
                 args.distance = [0 0 0]
+                args.nb_copy = 0
             end
             % ---
-            obj.transform = struct('type','translate','distance',args.distance);
+            obj.transform = struct('type','translate', ...
+                'distance',args.distance, ...
+                'nb_copy',args.nb_copy);
             % ---
         end
         % -----------------------------------------------------------------
         function rotate(obj,args)
             arguments
                 obj
-                args.axis = [0 0 1];
-                args.origin = [0 0 0];
-                args.angle = 0;
+                args.axis = [0 0 1]
+                args.origin = [0 0 0]
+                args.angle = 0
+                args.nb_copy = 0
             end
             % ---
-            obj.transform = struct('type','rotate',...
+            obj.transform = struct('type','rotate', ...
                 'axis',args.axis, ...
-                'origin',args.origin,'angle',args.angle);
+                'origin',args.origin,'angle',args.angle, ...
+                'nb_copy',args.nb_copy);
             % ---
         end
         % -----------------------------------------------------------------
@@ -84,6 +65,7 @@ classdef Shape3d < Xhandle
                 obj
                 args.origin = [0 0 0]
                 args.scale = [1 1 1]
+                args.nb_copy = 0
             end
             % ---
             if length(args.scale) == 1
@@ -91,45 +73,11 @@ classdef Shape3d < Xhandle
             end
             % ---
             obj.transform = struct('type','dilate',...
-                'origin',args.origin,'scale',args.scale);
+                'origin',args.origin,'scale',args.scale, ...
+                'nb_copy',args.nb_copy);
             % ---
         end
         % -----------------------------------------------------------------
-        function duplicate(obj,args)
-            arguments
-                obj
-                args
-            end
-            % ---
-            obj.transform = struct('type','duplicate');
-            % ---
-        end
-        % -----------------------------------------------------------------
-    end
-
-    % --- Methods
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
-        function build_from_formular(obj)
-            switch obj.building_formular.operation
-                case '+'
-                    
-                case '-'
-                    
-                case '^'
-                    
-            end
-        end
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
-    end
-
-    % --- Methods
-    methods
-        function plot(obj,args)
-            % XTODO
-        end
     end
 
     % --- Methods

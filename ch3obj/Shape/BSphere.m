@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BSphere < Shape3d
+classdef BSphere < VolumeShape
     properties
         r = 1
         center = [0, 0, 0]
@@ -27,7 +27,7 @@ classdef BSphere < Shape3d
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {r','center'};
+            argslist = {'r','center'};
         end
     end
     % --- Constructors
@@ -41,7 +41,7 @@ classdef BSphere < Shape3d
                 args.opening_angle = 360
             end
             % ---
-            obj = obj@Shape3d;
+            obj = obj@VolumeShape;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -63,9 +63,9 @@ classdef BSphere < Shape3d
             tcut  = f_getvalue(obj.top_cut_ratio);
             angle = f_getvalue(obj.opening_angle);
             % ---
-            geocode = GMSHInterface.bsphere(r,c,bcut,tcut,angle);
+            gmshgeocode_ = GMSHInterface.bsphere(r,c,bcut,tcut,angle);
             % ---
-            obj.gmshgeocode = geocode;
+            obj.gmshgeocode = gmshgeocode_;
             % ---
         end
     end

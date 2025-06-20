@@ -16,25 +16,24 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BCube < VolumeShape
+classdef TetraMeshFromGMSH < TetraMesh
     properties
-
-        center
-    end
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'id'};
-        end
+        gmshgeocode
+        building_formular
+        transform
     end
     % --- Constructors
     methods
-        function obj = BCube(args)
+        function obj = TetraMeshFromGMSH(args)
             arguments
-                args.id
+                args.r = 1
+                args.center = [0, 0, 0]
+                args.bottom_cut_ratio = 0
+                args.top_cut_ratio = 0
+                args.opening_angle = 360
             end
             % ---
-            obj = obj@VolumeShape;
+            obj = obj@TetraMesh;
             % ---
             if isempty(fieldnames(args))
                 return
@@ -42,40 +41,30 @@ classdef BCube < VolumeShape
             % ---
             obj <= args;
             % ---
-            Cube.setup(obj);
+            TetraMeshFromGMSH.setup(obj);
             % ---
         end
     end
     % --- setup/reset
     methods (Static)
         function setup(obj)
-
+            
         end
     end
     methods (Access = public)
         function reset(obj)
-            Cube.setup(obj);
+            TetraMeshFromGMSH.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
     end
     % --- Methods
     methods
-        % -----------------------------------------------------------------
         %------------------------------------------------------------------
-    end
+        function build(obj)
 
-    % --- Methods
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        
-        % -----------------------------------------------------------------
-    end
-
-    % --- Methods
-    methods
-        function plot(obj,args)
-            % XTODO
         end
+        %------------------------------------------------------------------
+        %------------------------------------------------------------------
     end
 end
