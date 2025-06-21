@@ -178,7 +178,7 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             try
                 fprintf('GMSH running ... \n');
-                status = system(call_GMSH_run);
+                [status, cmdout] = system(call_GMSH_run);
                 fprintf('Done.\n');
                 if status == 0
                     k = 0;
@@ -188,8 +188,6 @@ classdef TetraMeshFromGMSH < TetraMesh
                         end
                         k = 1;
                     end
-                    % ---
-                    fprintf('Done.\n');
                     % ---
                     obj.build_from_mesh_file;
                     % ---
