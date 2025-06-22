@@ -54,15 +54,7 @@ classdef BSphere < VolumeShape
     % --- setup/reset
     methods (Static)
         function setup(obj)
-            % ---
-            r     = f_getvalue(obj.r);
-            c     = f_getvalue(obj.center);
-            bcut  = f_getvalue(obj.bottom_cut_ratio);
-            tcut  = f_getvalue(obj.top_cut_ratio);
-            angle = f_getvalue(obj.opening_angle);
-            % ---
-            obj.geocode = GMSHWriter.bsphere(r,c,bcut,tcut,angle);
-            % ---
+            obj.set_parameter;
         end
     end
     methods (Access = public)
@@ -75,10 +67,18 @@ classdef BSphere < VolumeShape
     % --- Methods
     methods
         %------------------------------------------------------------------
-        function build(obj)
-
+        function geocode = geocode(obj)
+            r     = obj.r.getvalue;
+            c     = obj.center.getvalue;
+            bcut  = obj.bottom_cut_ratio.getvalue;
+            tcut  = obj.top_cut_ratio.getvalue;
+            angle = obj.opening_angle.getvalue;
+            % ---
+            geocode = GMSHWriter.bsphere(r,c,bcut,tcut,angle);
+            % ---
+            geocode = obj.transformgeocode(geocode);
+            % ---
         end
-        %------------------------------------------------------------------
         %------------------------------------------------------------------
     end
 

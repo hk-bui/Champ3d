@@ -28,6 +28,11 @@ classdef GMSHWriter
                 angle = 360
             end
             % ---
+            if r <= 0
+                geocode = '';
+                return
+            end
+            % ---
             bcut  = max(0, min(1, bcut));
             tcut  = max(0, min(1, tcut));
             angle = max(0, min(2*pi, angle*pi/180));
@@ -35,9 +40,8 @@ classdef GMSHWriter
             angle_1 = interp1([0 1], [-pi/2 0], bcut);
             angle_2 = interp1([1 0], [0 +pi/2], tcut);
             % ---
-            geocode = fileread('__BSphere.geo');
-            % ---
-            
+            geocode = newline;
+            geocode = [geocode fileread('__BSphere.geo')];
             % ---
             geocode = GMSHWriter.write_scalar_parameter(geocode,'radius',r);
             geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
@@ -45,25 +49,85 @@ classdef GMSHWriter
             geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_2',angle_2);
             geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_3',angle);
             % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = bbar(r,c,bcut,tcut,angle)
+            arguments
+                r = 1
+                c = [0 0 0]
+                bcut = 0
+                tcut = 0
+                angle = 360
+            end
+            % ---
+            bcut  = max(0, min(1, bcut));
+            tcut  = max(0, min(1, tcut));
+            angle = max(0, min(2*pi, angle*pi/180));
+            % ---
+            angle_1 = interp1([0 1], [-pi/2 0], bcut);
+            angle_2 = interp1([1 0], [0 +pi/2], tcut);
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__BSphere.geo')];
+            % ---
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'radius',r);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_1',angle_1);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_2',angle_2);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'opening_angle_3',angle);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = rotate(origin,axis,angle,nb_copy)
+            arguments
+                origin = [0, 0, 0]
+                axis = [0, 0, 0]
+                angle = 0
+                nb_copy = 0
+            end
+            % ---
+            if isequal(f_torowv(axis),[0 0 0])
+                geocode = '';
+                return
+            end
+            % ---
+            angle = angle*pi/180;
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__rotate.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'origin',origin);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'axis',axis);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'angle',angle);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'nb_copy',nb_copy);
+            % ---
+            geocode = [geocode newline];
+            % ---
         end
         %------------------------------------------------------------------
         %------------------------------------------------------------------
         %------------------------------------------------------------------
         %------------------------------------------------------------------
-        %------------------------------------------------------------------
-        %------------------------------------------------------------------
-        function geocode = write_final(geocode,mesh_file_name)
+        function geocode = final(mesh_file_name)
             arguments
-                geocode char
                 mesh_file_name char
             end
             finalcode = fileread('__final.geo');
-            %finalcode = regexprep(finalcode,'Save[\s]*[\w]*[^;]*',['Save "' mesh_file_name '"']);
-            geocode = [geocode newline ...
+            geocode = [newline ...
                        finalcode newline ...
                        'Save "' mesh_file_name '";' newline ...
-                       'Exit;'];
+                       'Exit;' ...
+                       newline];
         end
+        %------------------------------------------------------------------
+    end
+
+    % --- Utility
+    methods (Static)
         %------------------------------------------------------------------
         function geocode = write_scalar_parameter(geocode,pname,pvalue)
             arguments
@@ -72,7 +136,7 @@ classdef GMSHWriter
                 pvalue
             end
             pcode   = [pname ' = ' num2str(pvalue,16)];
-            geocode = regexprep(geocode,[pname '[\s]*=[\s]*[\w]*[^;]*'],pcode);
+            geocode = regexprep(geocode,[pname '[\s]*=(?!\=)[\s]*[\w]*[^;]*'],pcode);
         end
         %------------------------------------------------------------------
         function geocode = write_vector_parameter(geocode,pname,pvalue)
@@ -85,7 +149,7 @@ classdef GMSHWriter
                       '{' num2str(pvalue(1),16) ', ' ...
                           num2str(pvalue(2),16) ', ' ...
                           num2str(pvalue(3),16) '}'];
-            geocode   = regexprep(geocode,[pname '[\s]*=[\s]*[\w]*[^;]*'],pcode);
+            geocode   = regexprep(geocode,[pname '[\s]*=(?!\=)[\s]*[\w]*[^;]*'],pcode);
         end
         %------------------------------------------------------------------
     end

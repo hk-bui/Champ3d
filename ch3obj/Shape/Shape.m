@@ -18,14 +18,14 @@
 
 classdef Shape < Xhandle
     properties
-        geocode
         building_formular
-        transform
+        transform = {}
     end
     % --- Constructors
     methods
         function obj = Shape()
             obj = obj@Xhandle;
+            obj.transform = {};
         end
     end
     % --- Methods
@@ -38,7 +38,7 @@ classdef Shape < Xhandle
                 args.nb_copy = 0
             end
             % ---
-            obj.transform = struct('type','translate', ...
+            obj.transform{end + 1} = struct('type','translate', ...
                 'distance',args.distance, ...
                 'nb_copy',args.nb_copy);
             % ---
@@ -53,7 +53,7 @@ classdef Shape < Xhandle
                 args.nb_copy = 0
             end
             % ---
-            obj.transform = struct('type','rotate', ...
+            obj.transform{end + 1} = struct('type','rotate', ...
                 'axis',args.axis, ...
                 'origin',args.origin,'angle',args.angle, ...
                 'nb_copy',args.nb_copy);
@@ -72,7 +72,7 @@ classdef Shape < Xhandle
                 args.scale = args.scale .* ones(size(args.origin));
             end
             % ---
-            obj.transform = struct('type','dilate',...
+            obj.transform{end + 1} = struct('type','dilate',...
                 'origin',args.origin,'scale',args.scale, ...
                 'nb_copy',args.nb_copy);
             % ---
@@ -81,11 +81,63 @@ classdef Shape < Xhandle
     end
 
     % --- Methods
-    methods
+    methods (Access = protected)
+        % -----------------------------------------------------------------
+        function set_parameter(obj)
+            % --- XTODO
+            % should put list in config file ?
+            paramlist = {'r','center','bottom_cut_ratio','top_cut_ratio','opening_angle',...
+                         };
+            % ---
+            for i = 1:length(paramlist)
+                param = paramlist{i};
+                if isprop(obj,param)
+                    if isnumeric(obj.(param))
+                        if ~isempty(obj.(param))
+                            obj.(param) = Parameter('f',obj.(param));
+                        end
+                    elseif ~isa(obj.(param),'Parameter')
+                        f_fprintf(1,'/!\\',0,'parameter must be numeric or Parameter !\n');
+                        error('Parameter error');
+                    end
+                end
+            end
+        end
+        % -----------------------------------------------------------------
+        function geocode = transformgeocode(obj,geocode)
+            arguments
+                obj
+                geocode
+            end
+            % ---
+            for i = 1:length(obj.transform)
+                t = obj.transform{i};
+                switch t.type
+                    case 'translate'
+                    case 'rotate'
+                        geocode = [geocode ...
+                            GMSHWriter.rotate(t.origin,t.axis,t.angle,t.nb_copy)];
+                    case 'dilate'
+                end
+            end
+        end
+        % -----------------------------------------------------------------
+    end
+
+    % --- Methods
+    methods (Sealed)
         function objout = plus(obj,objx)
             % ---
-            if isa(obj,'VolumeShape')
+            if isa(obj,'VolumeShape') && isa(objx,'VolumeShape')
                 objout = VolumeShape;
+            elseif isa(obj,'SurfaceShape') && isa(objx,'SurfaceShape')
+                objout = SurfaceShape;
+            elseif isa(obj,'CurveShape') && isa(objx,'CurveShape')
+                objout = CurveShape;
+            else
+                % --- XTODO
+                objout = [];
+                return
             end
             % ---
             obj.is_defining_obj_of(objout);
@@ -97,8 +149,15 @@ classdef Shape < Xhandle
         end
         function objout = minus(obj,objx)
             % ---
-            if isa(obj,'VolumeShape')
+            if isa(obj,'VolumeShape') && isa(objx,'VolumeShape')
                 objout = VolumeShape;
+            elseif isa(obj,'SurfaceShape') && isa(objx,'SurfaceShape')
+                objout = SurfaceShape;
+            elseif isa(obj,'CurveShape') && isa(objx,'CurveShape')
+                objout = CurveShape;
+            else
+                objout = [];
+                return
             end
             % ---
             obj.is_defining_obj_of(objout);
@@ -110,8 +169,15 @@ classdef Shape < Xhandle
         end
         function objout = mpower(obj,objx)
             % ---
-            if isa(obj,'VolumeShape')
+            if isa(obj,'VolumeShape') && isa(objx,'VolumeShape')
                 objout = VolumeShape;
+            elseif isa(obj,'SurfaceShape') && isa(objx,'SurfaceShape')
+                objout = SurfaceShape;
+            elseif isa(obj,'CurveShape') && isa(objx,'CurveShape')
+                objout = CurveShape;
+            else
+                objout = [];
+                return
             end
             % ---
             obj.is_defining_obj_of(objout);

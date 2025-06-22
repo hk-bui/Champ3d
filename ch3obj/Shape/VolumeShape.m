@@ -17,35 +17,12 @@
 %--------------------------------------------------------------------------
 
 classdef VolumeShape < Shape
-    properties
-        
-    end
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'id'};
-        end
-    end
     % --- Constructors
     methods
         function obj = VolumeShape()
             obj = obj@Shape;
         end
     end
-    % --- setup/reset
-    methods (Static)
-        function setup(obj)
-
-        end
-    end
-    methods (Access = public)
-        function reset(obj)
-            VolumeShape.setup(obj);
-            % --- reset dependent obj
-            obj.reset_dependent_obj;
-        end
-    end
-
     % --- Methods
     methods (Access = protected)
         % -----------------------------------------------------------------
@@ -70,5 +47,4 @@ classdef VolumeShape < Shape
             % XTODO
         end
     end
-
 end

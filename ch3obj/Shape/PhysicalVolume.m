@@ -20,7 +20,6 @@ classdef PhysicalVolume < Xhandle
     properties
         volume_shape
         mesh_size
-        geocode
     end
     % --- Valid args list
     methods (Static)
@@ -62,16 +61,6 @@ classdef PhysicalVolume < Xhandle
             % ---
             obj.volume_shape.is_defining_obj_of(obj);
             % ---
-            obj.geocode = obj.volume_shape.geocode;
-            % ---
-            id_phyvol = f_str2code(obj.id,'code_type','integer');
-            obj.geocode = [obj.geocode newline '// ---' newline];
-            obj.geocode = [obj.geocode 'id_dom_string = "' obj.id '";' newline];
-            obj.geocode = [obj.geocode 'id_dom_number = ' num2str(id_phyvol,'%d') ';' newline];
-            obj.geocode = [obj.geocode 'Physical Volume(Str(id_dom_string), id_dom_number) = {volume_list~{id_volume_list}()};' newline];
-            obj.geocode = [obj.geocode '// ---' newline];
-            obj.geocode = [obj.geocode 'MeshSize{ PointsOf{ Volume{volume_list~{id_volume_list}()}; } } = ' num2str(obj.mesh_size,16) ';' newline];
-            % ---
         end
     end
     methods (Access = public)
@@ -79,6 +68,22 @@ classdef PhysicalVolume < Xhandle
             PhysicalVolume.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
+        end
+    end
+
+    % --- Methods
+    methods (Access = public)
+        function geocode = geocode(obj)
+            geocode = obj.volume_shape.geocode;
+            % ---
+            id_phyvol = f_str2code(obj.id,'code_type','integer');
+            geocode = [geocode newline '// ---' newline];
+            geocode = [geocode 'id_dom_string = "' obj.id '";' newline];
+            geocode = [geocode 'id_dom_number = ' num2str(id_phyvol,'%d') ';' newline];
+            geocode = [geocode 'Physical Volume(Str(id_dom_string), id_dom_number) = {volume_list~{id_volume_list}()};' newline];
+            geocode = [geocode '// ---' newline];
+            geocode = [geocode 'MeshSize{ PointsOf{ Volume{volume_list~{id_volume_list}()}; } } = ' num2str(obj.mesh_size,16) ';' newline];
+            % ---
         end
     end
 

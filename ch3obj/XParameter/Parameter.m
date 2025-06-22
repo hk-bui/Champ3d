@@ -395,7 +395,14 @@ classdef Parameter < Xhandle
             if isempty(obj.parent_model)
                 % --- free defined parameter
                 for i = 1:length(obj.depend_on)
-                    fargs{i} = obj.from{i}.(obj.depend_on{i});
+                    pvalue__ = obj.from{i}.(obj.depend_on{i});
+                    if isnumeric(pvalue__)
+                        fargs{i} = pvalue__;
+                    elseif isa(pvalue__,'Parameter')
+                        fargs{i} = pvalue__.getvalue;
+                    else
+                        fargs{i} = [];
+                    end
                 end
                 return
             end

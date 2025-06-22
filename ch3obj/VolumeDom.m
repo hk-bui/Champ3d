@@ -381,12 +381,16 @@ classdef VolumeDom < MeshDom
                 submesh_{i}.plot(argu{:}); hold on
                 % ---
                 celem = submesh_{i}.cal_celem;
-                celem = celem(:,1);
+                dim   = size(celem,1);
                 id = replace(obj.id,'_','-');
-                if length(celem) == 2
+                if dim == 2
+                    [~, imax] = max(celem(2,:));
+                    celem = celem(:,imax);
                     t = text(celem(1),celem(2),id);
                     t.FontWeight = 'bold';
-                elseif length(celem) == 3
+                elseif dim == 3
+                    [~, imax] = max(celem(3,:));
+                    celem = celem(:,imax);
                     t = text(celem(1),celem(2),celem(3),id);
                     t.FontWeight = 'bold';
                 end

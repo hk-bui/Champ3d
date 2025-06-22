@@ -171,7 +171,7 @@ classdef TetraMeshFromGMSH < TetraMesh
                 fprintf(geofile,'%s \n',phyvol.geocode);
             end
             % --- Final
-            fprintf(geofile,'%s \n',GMSHWriter.write_final('',mshname));
+            fprintf(geofile,'%s \n',GMSHWriter.final(mshname));
             fclose(geofile);
             % ---
             call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
