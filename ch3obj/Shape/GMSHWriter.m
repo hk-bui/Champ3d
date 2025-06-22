@@ -35,7 +35,7 @@ classdef GMSHWriter
             angle_1 = interp1([0 1], [-pi/2 0], bcut);
             angle_2 = interp1([1 0], [0 +pi/2], tcut);
             % ---
-            geocode = fileread('BSphere_.geo');
+            geocode = fileread('__BSphere.geo');
             % ---
             
             % ---
@@ -57,9 +57,12 @@ classdef GMSHWriter
                 geocode char
                 mesh_file_name char
             end
-            finalcode = fileread('final_.geo');
-            finalcode = regexprep(finalcode,'Save[\s]*[\w]*[^;]*',['Save "' mesh_file_name '"']);
-            geocode = [geocode newline finalcode];
+            finalcode = fileread('__final.geo');
+            %finalcode = regexprep(finalcode,'Save[\s]*[\w]*[^;]*',['Save "' mesh_file_name '"']);
+            geocode = [geocode newline ...
+                       finalcode newline ...
+                       'Save "' mesh_file_name '";' newline ...
+                       'Exit;'];
         end
         %------------------------------------------------------------------
         function geocode = write_scalar_parameter(geocode,pname,pvalue)

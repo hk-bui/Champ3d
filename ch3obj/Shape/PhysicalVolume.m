@@ -19,6 +19,7 @@
 classdef PhysicalVolume < Xhandle
     properties
         volume_shape
+        mesh_size
         geocode
     end
     % --- Valid args list
@@ -33,6 +34,7 @@ classdef PhysicalVolume < Xhandle
             arguments
                 args.id = ''
                 args.volume_shape (1,1) {mustBeA(args.volume_shape,'Shape')}
+                args.mesh_size = 1e22
             end
             obj = obj@Xhandle;
             % ---
@@ -42,6 +44,10 @@ classdef PhysicalVolume < Xhandle
             % ---
             if ~isfield(args,'volume_shape')
                 error('#volume_shape must be given !');
+            end
+            % ---
+            if args.mesh_size <= 0
+                args.mesh_size = 1e22;
             end
             % ---
             obj <= args;
@@ -59,9 +65,12 @@ classdef PhysicalVolume < Xhandle
             obj.geocode = obj.volume_shape.geocode;
             % ---
             id_phyvol = f_str2code(obj.id,'code_type','integer');
+            obj.geocode = [obj.geocode newline '// ---' newline];
             obj.geocode = [obj.geocode 'id_dom_string = "' obj.id '";' newline];
             obj.geocode = [obj.geocode 'id_dom_number = ' num2str(id_phyvol,'%d') ';' newline];
             obj.geocode = [obj.geocode 'Physical Volume(Str(id_dom_string), id_dom_number) = {volume_list~{id_volume_list}()};' newline];
+            obj.geocode = [obj.geocode '// ---' newline];
+            obj.geocode = [obj.geocode 'MeshSize{ PointsOf{ Volume{volume_list~{id_volume_list}()}; } } = ' num2str(obj.mesh_size,16) ';' newline];
             % ---
         end
     end

@@ -24,12 +24,6 @@ classdef BSphere < VolumeShape
         top_cut_ratio = 0
         opening_angle = 360
     end
-    % --- Valid args list
-    methods (Static)
-        function argslist = validargs()
-            argslist = {'r','center'};
-        end
-    end
     % --- Constructors
     methods
         function obj = BSphere(args)
