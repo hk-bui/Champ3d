@@ -41,8 +41,8 @@ classdef Parameter < Xhandle
             arguments
                 args.parent_model {mustBeA(args.parent_model,{'PhysicalModel','CplModel'})}
                 args.f
-                args.depend_on char
-                args.from {mustBeA(args.from,{'PhysicalModel','CplModel'})}
+                args.depend_on
+                args.from
                 args.varargin_list
                 args.fvectorized
             end

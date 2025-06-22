@@ -163,6 +163,8 @@ classdef TetraMeshFromGMSH < TetraMesh
             for i = 1:length(obj.physical_volume)
                 phyvol = obj.physical_volume{i};
                 % ---
+                phyvol.is_defining_obj_of(obj);
+                % ---
                 elem_code(i) = f_str2code(phyvol.id,'code_type','integer');
                 id_vdom{i} = phyvol.id;
                 % ---
@@ -174,7 +176,7 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
                              geoname ' ' ...
-                             '-nopopup -n'];
+                             '-nopopup -n -v 0 -'];
             % ---
             try
                 fprintf('GMSH running ... \n');

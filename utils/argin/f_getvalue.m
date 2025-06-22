@@ -19,7 +19,7 @@
 function val = f_getvalue(parameter)
     if isnumeric(parameter)
         val = parameter;
-    elseif isa(obj.center,'Parameter')
+    elseif isa(parameter,'Parameter')
         val = parameter.getvalue;
     else
         val = [];
