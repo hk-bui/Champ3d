@@ -136,7 +136,7 @@ classdef GMSHWriter
                 pvalue
             end
             pcode   = [pname ' = ' num2str(pvalue,16)];
-            geocode = regexprep(geocode,[pname '[\s]*=(?!\=)[\s]*[\w]*[^;]*'],pcode);
+            geocode = regexprep(geocode,[pname '[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
         end
         %------------------------------------------------------------------
         function geocode = write_vector_parameter(geocode,pname,pvalue)
@@ -149,7 +149,7 @@ classdef GMSHWriter
                       '{' num2str(pvalue(1),16) ', ' ...
                           num2str(pvalue(2),16) ', ' ...
                           num2str(pvalue(3),16) '}'];
-            geocode   = regexprep(geocode,[pname '[\s]*=(?!\=)[\s]*[\w]*[^;]*'],pcode);
+            geocode   = regexprep(geocode,[pname '[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
         end
         %------------------------------------------------------------------
     end
