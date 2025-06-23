@@ -1,0 +1,13 @@
+General.NumThreads = 0;
+Mesh.ElementOrder = 1;
+Mesh.MeshSizeFactor = 1;
+//Mesh.MeshSizeMin = 0;
+Mesh.MeshSizeMax = 1e22;
+//Mesh.MeshSizeFromCurvature = 20;
+Mesh.MeshSizeFromPoints = 1;
+Mesh.Format = 50;
+Mesh.SaveAll = 0;
+Mesh 3;
+//Coherence Mesh;
+//RenumberMeshNodes;
+//RenumberMeshElements;
