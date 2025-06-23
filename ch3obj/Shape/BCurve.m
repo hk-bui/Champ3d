@@ -16,7 +16,7 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BCurveByCompass < CurveShape
+classdef BCurve < CurveShape
     properties
         start_point = [0 0]
         go = {}
@@ -25,7 +25,7 @@ classdef BCurveByCompass < CurveShape
     end
     % --- Constructors
     methods
-        function obj = BCurveByCompass(args)
+        function obj = BCurve(args)
             arguments
                 args.start_point = []
             end
@@ -49,7 +49,7 @@ classdef BCurveByCompass < CurveShape
     end
     methods (Access = public)
         function reset(obj)
-            BCurveByCompass.setup(obj);
+            BCurve.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
@@ -94,10 +94,11 @@ classdef BCurveByCompass < CurveShape
                 args.angle (1,1) = 180
                 args.center
                 args.dnum (1,1) = 5
+                args.dir {mustBeMember(args.dir,{'auto','ccw','clock'})} = 'auto'
             end
             % ---
             obj.go{end + 1} = struct('type','ago','angle',args.angle, ...
-                'center',args.center,'dnum',args.dnum);
+                'center',args.center,'dnum',args.dnum,'dir',args.dir);
             % ---
         end
         %------------------------------------------------------------------
@@ -147,6 +148,15 @@ classdef BCurveByCompass < CurveShape
                         end
                     case 'ago'
                         angle = go_.angle;
+                        dir = go_.dir;
+                        % ---
+                        switch dir
+                            case 'ccw'
+                                angle = abs(angle);
+                            case 'clock'
+                                angle = -abs(angle);
+                        end
+                        % ---
                         dnum  = go_.dnum;
                         da    = angle/dnum;
                         center = f_torowv(go_.center);
@@ -155,22 +165,23 @@ classdef BCurveByCompass < CurveShape
                             for ida = 1:dnum
                                 r = norm(p0 - center);
                                 lOx = (p0 - center);
+                                gOx = [1 0];
+                                rot_angle = acosd(dot(lOx,gOx) / (norm(lOx) * norm(gOx)));
+                                rot_axis = cross([1 0 0],[lOx 0]);
                                 % ---
                                 lvmove = [0 0];
-                                lvmove(1) = r * cosd(i*da);
-                                lvmove(2) = r * sind(i*da);
+                                lvmove(1) = r * cosd(ida*da);
+                                lvmove(2) = r * sind(ida*da);
                                 % ---
                                 dv = lvmove - [r 0];
                                 % ---
-                                rot_axis = cross([1 0 0],[lOx 0]);
-                                rot_angle = acosd(lOx(1) / r);
                                 dv = f_rotaroundaxis(dv.','rot_angle',rot_angle, ...
-                                    'rot_axis',rot_axis,'axis_origin',[center 0]);
+                                    'rot_axis',rot_axis,'axis_origin',[0 0 0]);
                                 dx = dv(1);
                                 dy = dv(2);
                                 % ---
-                                x_{end + 1} = p0 + dx;
-                                y_{end + 1} = p0 + dy;
+                                x_{end + 1} = p0(1) + dx;
+                                y_{end + 1} = p0(2) + dy;
                             end
                         end
                 end

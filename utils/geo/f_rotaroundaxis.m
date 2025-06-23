@@ -20,10 +20,10 @@ function rotated_node = f_rotaroundaxis(node,args)
 %--------------------------------------------------------------------------
 
 arguments
-    node                              % n x 2,3
+    node                          % 2,3 x n
     args.axis_origin = [0 0 0];   % rot around o-->axis
-    args.rot_axis   = [1 0 0];
-    args.rot_angle  =  0;             % deg, counterclockwise convention
+    args.rot_axis    = [1 0 0];
+    args.rot_angle   =  0;        % deg, counterclockwise convention
 end
 %--------------------------------------------------------------------------
 axis_origin = args.axis_origin;
