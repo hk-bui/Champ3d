@@ -19,26 +19,34 @@
 classdef BCurve < CurveShape
     properties
         start_point = [0 0]
+        type
         go = {}
         x
         y
+        z
     end
     % --- Constructors
     methods
         function obj = BCurve(args)
             arguments
                 args.start_point = []
+                args.type {mustBeMember(args.type,{'open','closed'})}
             end
             % ---
             obj = obj@CurveShape;
             % ---
             if isempty(args.start_point)
                 error('#start_point must be given !');
-            elseif length(args.start_point) ~= 2
-                error('#start_point must have dim 2 !');
+            elseif length(args.start_point) ~= 3
+                error('#start_point must be of dim 3 !');
+            end
+            % ---
+            if ~isfield(args,'type')
+                error('#type must be given !');
             end
             % ---
             obj <= args;
+            % ---
         end
     end
     % --- setup/reset
@@ -61,9 +69,10 @@ classdef BCurve < CurveShape
             arguments
                 obj
                 args.len (1,1) = 0
+                args.dnum (1,1) = 1
             end
             % ---
-            obj.go{end + 1} = struct('type','xgo','len',args.len);
+            obj.go{end + 1} = struct('type','xgo','len',args.len,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -71,9 +80,21 @@ classdef BCurve < CurveShape
             arguments
                 obj
                 args.len (1,1) = 0
+                args.dnum (1,1) = 1
             end
             % ---
-            obj.go{end + 1} = struct('type','ygo','len',args.len);
+            obj.go{end + 1} = struct('type','ygo','len',args.len,'dnum',args.dnum);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function zgo(obj,args)
+            arguments
+                obj
+                args.len (1,1) = 0
+                args.dnum (1,1) = 1
+            end
+            % ---
+            obj.go{end + 1} = struct('type','zgo','len',args.len,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -82,13 +103,51 @@ classdef BCurve < CurveShape
                 obj
                 args.lenx (1,1) = 0
                 args.leny (1,1) = 0
+                args.dnum (1,1) = 1
             end
             % ---
-            obj.go{end + 1} = struct('type','xygo','lenx',args.lenx,'leny',args.leny);
+            obj.go{end + 1} = struct('type','xygo','lenx',args.lenx,'leny',args.leny,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
-        function ago(obj,args)
+        function xzgo(obj,args)
+            arguments
+                obj
+                args.lenx (1,1) = 0
+                args.lenz (1,1) = 0
+                args.dnum (1,1) = 1
+            end
+            % ---
+            obj.go{end + 1} = struct('type','xzgo','lenx',args.lenx,'lenz',args.lenz,'dnum',args.dnum);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function yzgo(obj,args)
+            arguments
+                obj
+                args.leny (1,1) = 0
+                args.lenz (1,1) = 0
+                args.dnum (1,1) = 1
+            end
+            % ---
+            obj.go{end + 1} = struct('type','yzgo','leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function xyzgo(obj,args)
+            arguments
+                obj
+                args.lenx (1,1) = 0
+                args.leny (1,1) = 0
+                args.lenz (1,1) = 0
+                args.dnum (1,1) = 1
+            end
+            % ---
+            obj.go{end + 1} = struct('type','xyzgo','lenx',args.lenx,'leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function ago_xy(obj,args)
             arguments
                 obj
                 args.angle (1,1) = 180
@@ -97,7 +156,35 @@ classdef BCurve < CurveShape
                 args.dir {mustBeMember(args.dir,{'auto','ccw','clock'})} = 'auto'
             end
             % ---
-            obj.go{end + 1} = struct('type','ago','angle',args.angle, ...
+            obj.go{end + 1} = struct('type','ago_xy','angle',args.angle, ...
+                'center',args.center,'dnum',args.dnum,'dir',args.dir);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function ago_xz(obj,args)
+            arguments
+                obj
+                args.angle (1,1) = 180
+                args.center
+                args.dnum (1,1) = 5
+                args.dir {mustBeMember(args.dir,{'auto','ccw','clock'})} = 'auto'
+            end
+            % ---
+            obj.go{end + 1} = struct('type','ago_xz','angle',args.angle, ...
+                'center',args.center,'dnum',args.dnum,'dir',args.dir);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function ago_yz(obj,args)
+            arguments
+                obj
+                args.angle (1,1) = 180
+                args.center
+                args.dnum (1,1) = 5
+                args.dir {mustBeMember(args.dir,{'auto','ccw','clock'})} = 'auto'
+            end
+            % ---
+            obj.go{end + 1} = struct('type','ago_yz','angle',args.angle, ...
                 'center',args.center,'dnum',args.dnum,'dir',args.dir);
             % ---
         end
@@ -120,9 +207,11 @@ classdef BCurve < CurveShape
     end
     % --- 
     methods (Access = private)
+        %------------------------------------------------------------------
         function get_curve(obj)
-            x_{1} = obj.start_point(1);
-            y_{1} = obj.start_point(2);
+            x_ = {obj.start_point(1)};
+            y_ = {obj.start_point(2)};
+            z_ = {obj.start_point(3)};
             for i = 1:length(obj.go)
                 go_ = obj.go{i};
                 switch go_.type
@@ -132,12 +221,21 @@ classdef BCurve < CurveShape
                         if len ~= 0
                             x_{end + 1} = x_{end} + len;
                             y_{end + 1} = y_{end};
+                            z_{end + 1} = z_{end};
                         end
                     case 'ygo'
                         len = go_.len;
                         if len ~= 0
                             x_{end + 1} = x_{end};
                             y_{end + 1} = y_{end} + len;
+                            z_{end + 1} = z_{end};
+                        end
+                    case 'zgo'
+                        len = go_.len;
+                        if len ~= 0
+                            x_{end + 1} = x_{end};
+                            y_{end + 1} = y_{end};
+                            z_{end + 1} = z_{end} + len;
                         end
                     case 'xygo'
                         lenx = go_.lenx;
@@ -145,58 +243,169 @@ classdef BCurve < CurveShape
                         if lenx ~= 0 || leny ~= 0
                             x_{end + 1} = x_{end} + lenx;
                             y_{end + 1} = y_{end} + leny;
+                            z_{end + 1} = z_{end};
                         end
-                    case 'ago'
+                    case 'xzgo'
+                        lenx = go_.lenx;
+                        lenz = go_.lenz;
+                        if lenx ~= 0 || lenz ~= 0
+                            x_{end + 1} = x_{end} + lenx;
+                            y_{end + 1} = y_{end};
+                            z_{end + 1} = z_{end} + lenz;
+                        end
+                    case 'yzgo'
+                        leny = go_.leny;
+                        lenz = go_.lenz;
+                        if leny ~= 0 || lenz ~= 0
+                            x_{end + 1} = x_{end};
+                            y_{end + 1} = y_{end} + leny;
+                            z_{end + 1} = z_{end} + lenz;
+                        end
+                    case 'xyzgo'
+                        lenx = go_.lenx;
+                        leny = go_.leny;
+                        lenz = go_.lenz;
+                        if lenx ~= 0 || leny ~= 0 || lenz ~= 0
+                            x_{end + 1} = x_{end} + lenx;
+                            y_{end + 1} = y_{end} + leny;
+                            z_{end + 1} = z_{end} + lenz;
+                        end
+                    case 'ago_xy'
                         angle = go_.angle;
                         dir = go_.dir;
                         % ---
                         switch dir
                             case 'ccw'
-                                angle = abs(angle);
+                                angle = +abs(angle);
                             case 'clock'
                                 angle = -abs(angle);
                         end
                         % ---
-                        dnum  = go_.dnum;
-                        da    = angle/dnum;
-                        center = f_torowv(go_.center);
-                        if angle ~= 0 && ~isequal(center,[x_{end} y_{end}])
-                            p0 = [x_{end} y_{end}];
-                            for ida = 1:dnum
-                                r = norm(p0 - center);
-                                lOx = (p0 - center);
-                                gOx = [1 0];
-                                rot_angle = acosd(dot(lOx,gOx) / (norm(lOx) * norm(gOx)));
-                                rot_axis = cross([1 0 0],[lOx 0]);
-                                % ---
-                                lvmove = [0 0];
-                                lvmove(1) = r * cosd(ida*da);
-                                lvmove(2) = r * sind(ida*da);
-                                % ---
-                                dv = lvmove - [r 0];
-                                % ---
-                                dv = f_rotaroundaxis(dv.','rot_angle',rot_angle, ...
-                                    'rot_axis',rot_axis,'axis_origin',[0 0 0]);
-                                dx = dv(1);
-                                dy = dv(2);
-                                % ---
-                                x_{end + 1} = p0(1) + dx;
-                                y_{end + 1} = p0(2) + dy;
-                            end
+                        dnum   = go_.dnum;
+                        da     = angle/dnum;
+                        center = [go_.center(1) go_.center(2)];
+                        p0 = [x_{end} y_{end}];
+                        % ---
+                        [dx, dy] = obj.cal_ago2d(da,dnum,p0,center);
+                        % ---
+                        for idx = 1:length(dx)
+                            x_{end + 1} = p0(1) + dx(idx);
+                            y_{end + 1} = p0(2) + dy(idx);
+                            z_{end + 1} = z_{end};
                         end
+                        % ---
+                    case 'ago_xz'
+                        angle = go_.angle;
+                        dir = go_.dir;
+                        % ---
+                        switch dir
+                            case 'ccw'
+                                angle = +abs(angle);
+                            case 'clock'
+                                angle = -abs(angle);
+                        end
+                        % ---
+                        dnum   = go_.dnum;
+                        da     = angle/dnum;
+                        center = [go_.center(1) go_.center(3)];
+                        p0 = [x_{end} z_{end}];
+                        % ---
+                        [dx, dz] = obj.cal_ago2d(da,dnum,p0,center);
+                        % ---
+                        for idx = 1:length(dx)
+                            x_{end + 1} = p0(1) + dx(idx);
+                            y_{end + 1} = y_{end};
+                            z_{end + 1} = p0(2) + dz(idx);
+                        end
+                        % ---
+                    case 'ago_yz'
+                        angle = go_.angle;
+                        dir = go_.dir;
+                        % ---
+                        switch dir
+                            case 'ccw'
+                                angle = +abs(angle);
+                            case 'clock'
+                                angle = -abs(angle);
+                        end
+                        % ---
+                        dnum   = go_.dnum;
+                        da     = angle/dnum;
+                        center = [go_.center(2) go_.center(3)];
+                        p0 = [y_{end} z_{end}];
+                        % ---
+                        [dy, dz] = obj.cal_ago2d(da,dnum,p0,center);
+                        % ---
+                        for idy = 1:length(dy)
+                            x_{end + 1} = x_{end};
+                            y_{end + 1} = p0(1) + dy(idy);
+                            z_{end + 1} = p0(2) + dz(idy);
+                        end
+                        % ---
                 end
             end
             % ---
-            obj.x = cell2mat(x_);
-            obj.y = cell2mat(y_);
+            x_ = cell2mat(x_);
+            y_ = cell2mat(y_);
+            z_ = cell2mat(z_);
+            % ---
+            switch obj.type
+                % --- XTODO : put tol in config
+                case 'open'
+                    if norm([x_(1) y_(1) z_(1)] - [x_(end) y_(end) z_(end)]) < 1e-9
+                        f_fprintf(1,'/!\\',0,'bcurve terminals very close, d < 1e-9 !\n');
+                    end
+                case 'closed'
+                    f_fprintf(1,'/!\\',0,'Force last point = first point !\n');
+                    x_(end) = x_(1);
+                    y_(end) = y_(1);
+                    z_(end) = z_(1);
+            end
+            % ---
+            obj.x = x_;
+            obj.y = y_;
+            obj.z = z_;
             % ---
         end
+        %------------------------------------------------------------------
+        function [dx, dy] = cal_ago2d(obj,da,dnum,p0,center)
+            % ---
+            if dnum == 0 || norm(p0 - center) < 1e-9
+                dx = [];
+                dy = [];
+                return
+            end
+            % ---
+            dx = zeros(1,dnum);
+            dy = zeros(1,dnum);
+            % ---
+            for i = 1:dnum
+                r = norm(p0 - center);
+                lOx = (p0 - center);
+                gOx = [1 0];
+                rot_angle = acosd(dot(lOx,gOx) / (norm(lOx) * norm(gOx)));
+                rot_axis = cross([1 0 0],[lOx 0]);
+                if norm(rot_axis) < 1e-12
+                    rot_axis = [0 0 -sign(dot([1 0 0],[lOx 0]))];
+                end
+                % ---
+                lvmove = [r * cosd(i*da), r * sind(i*da)];
+                % ---
+                dv = lvmove - [r 0];
+                dv = f_rotaroundaxis(dv.','rot_angle',rot_angle, ...
+                    'rot_axis',rot_axis,'axis_origin',[0 0 0]);
+                % ---
+                dx(i) = dv(1);
+                dy(i) = dv(2);
+            end
+        end
+        %------------------------------------------------------------------
     end
     % --- Plot
     methods
         function plot(obj)
             obj.get_curve;
-            plot(obj.x,obj.y,'-c','LineWidth',3);
+            plot3(obj.x,obj.y,obj.z,'-c','LineWidth',3);
         end
     end
 end
