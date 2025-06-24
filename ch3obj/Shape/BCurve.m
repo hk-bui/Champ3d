@@ -25,6 +25,7 @@ classdef BCurve < CurveShape
         y
         z
         flag
+        fit = []
     end
     % --- Constructors
     methods
@@ -71,9 +72,10 @@ classdef BCurve < CurveShape
                 obj
                 args.len (1,1) = 0
                 args.dnum (1,1) = 1
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','xgo','len',args.len,'dnum',args.dnum);
+            obj.go{end + 1} = struct('id',args.id,'type','xgo','len',args.len,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -82,9 +84,10 @@ classdef BCurve < CurveShape
                 obj
                 args.len (1,1) = 0
                 args.dnum (1,1) = 1
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','ygo','len',args.len,'dnum',args.dnum);
+            obj.go{end + 1} = struct('id',args.id,'type','ygo','len',args.len,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -93,9 +96,10 @@ classdef BCurve < CurveShape
                 obj
                 args.len (1,1) = 0
                 args.dnum (1,1) = 1
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','zgo','len',args.len,'dnum',args.dnum);
+            obj.go{end + 1} = struct('id',args.id,'type','zgo','len',args.len,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -105,9 +109,10 @@ classdef BCurve < CurveShape
                 args.lenx (1,1) = 0
                 args.leny (1,1) = 0
                 args.dnum (1,1) = 1
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','xygo','lenx',args.lenx,'leny',args.leny,'dnum',args.dnum);
+            obj.go{end + 1} = struct('id',args.id,'type','xygo','lenx',args.lenx,'leny',args.leny,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -117,9 +122,10 @@ classdef BCurve < CurveShape
                 args.lenx (1,1) = 0
                 args.lenz (1,1) = 0
                 args.dnum (1,1) = 1
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','xzgo','lenx',args.lenx,'lenz',args.lenz,'dnum',args.dnum);
+            obj.go{end + 1} = struct('id',args.id,'type','xzgo','lenx',args.lenx,'lenz',args.lenz,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -129,9 +135,10 @@ classdef BCurve < CurveShape
                 args.leny (1,1) = 0
                 args.lenz (1,1) = 0
                 args.dnum (1,1) = 1
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','yzgo','leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            obj.go{end + 1} = struct('id',args.id,'type','yzgo','leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -142,9 +149,10 @@ classdef BCurve < CurveShape
                 args.leny (1,1) = 0
                 args.lenz (1,1) = 0
                 args.dnum (1,1) = 1
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','xyzgo','lenx',args.lenx,'leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
+            obj.go{end + 1} = struct('id',args.id,'type','xyzgo','lenx',args.lenx,'leny',args.leny,'lenz',args.lenz,'dnum',args.dnum);
             % ---
         end
         %------------------------------------------------------------------
@@ -155,9 +163,10 @@ classdef BCurve < CurveShape
                 args.center
                 args.dnum (1,1) = 5
                 args.dir {mustBeMember(args.dir,{'auto','ccw','clock'})} = 'auto'
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','ago_xy','angle',args.angle, ...
+            obj.go{end + 1} = struct('id',args.id,'type','ago_xy','angle',args.angle, ...
                 'center',args.center,'dnum',args.dnum,'dir',args.dir);
             % ---
         end
@@ -169,9 +178,10 @@ classdef BCurve < CurveShape
                 args.center
                 args.dnum (1,1) = 5
                 args.dir {mustBeMember(args.dir,{'auto','ccw','clock'})} = 'auto'
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','ago_xz','angle',args.angle, ...
+            obj.go{end + 1} = struct('id',args.id,'type','ago_xz','angle',args.angle, ...
                 'center',args.center,'dnum',args.dnum,'dir',args.dir);
             % ---
         end
@@ -183,10 +193,24 @@ classdef BCurve < CurveShape
                 args.center
                 args.dnum (1,1) = 5
                 args.dir {mustBeMember(args.dir,{'auto','ccw','clock'})} = 'auto'
+                args.id char = ''
             end
             % ---
-            obj.go{end + 1} = struct('type','ago_yz','angle',args.angle, ...
+            obj.go{end + 1} = struct('id',args.id,'type','ago_yz','angle',args.angle, ...
                 'center',args.center,'dnum',args.dnum,'dir',args.dir);
+            % ---
+        end
+        %------------------------------------------------------------------
+        function flagfit(obj,args)
+            arguments
+                obj
+                args.id_flag char
+                args.destination
+                args.orientation
+            end
+            % ---
+            obj.fit = struct('id_flag',args.id_flag,...
+                'destination',args.destination,'orientation',args.orientation);
             % ---
         end
         %------------------------------------------------------------------
@@ -388,6 +412,9 @@ classdef BCurve < CurveShape
                         flag_{idflag+1}.vector = [1 0 0];
                         % ---
                 end
+                % ---
+                flag_{idflag+1}.id = go_.id;
+                % ---
             end
             % ---
             x_ = cell2mat(x_);
@@ -407,9 +434,33 @@ classdef BCurve < CurveShape
                     z_(end) = z_(1);
             end
             % ---
-            obj.x = x_;
-            obj.y = y_;
-            obj.z = z_;
+            node = [x_; y_; z_];
+            % ---
+            if ~isempty(obj.fit)
+                idflag = obj.fit.id_flag;
+                for i = 1:length(flag_)
+                    if strcmpi(flag_{i}.id,idflag)
+                        node = node + f_tocolv(obj.fit.destination) - f_tocolv(flag_{i}.node);
+                        % ---
+                        fv  = flag_{i}.vector;
+                        ori = obj.fit.orientation;
+                        % ---
+                        rot_angle = acosd(dot(fv,ori) / (norm(fv) * norm(ori)));
+                        rot_axis = cross(ori,fv);
+                        if norm(rot_axis) < 1e-12
+                            rot_axis = [0 0 -sign(dot([1 0 0],[lOx 0]))];
+                        end
+                        % ---
+                        node = f_rotaroundaxis(node,'rot_angle',rot_angle, ...
+                            'rot_axis',rot_axis,'axis_origin',obj.fit.destination);
+                        % ---
+                    end
+                end
+            end
+            % ---
+            obj.x = node(1,:);
+            obj.y = node(2,:);
+            obj.z = node(3,:);
             obj.flag = flag_;
             % ---
         end
@@ -452,18 +503,19 @@ classdef BCurve < CurveShape
         function plot(obj)
             obj.get_curve;
             plot3(obj.x,obj.y,obj.z,'-b','LineWidth',3); hold on;
-            nbflag = length(obj.flag);
-            node = zeros(3,nbflag);
-            vect = zeros(3,nbflag);
-            for i = 1:length(obj.flag)
-                node(:,i) = obj.flag{i}.node.';
-                vect(:,i) = obj.flag{i}.vector.';
-            end
             % ---
             dx = diff(obj.x); dy = diff(obj.y); dz = diff(obj.z);
             dmax = max(norm([dx;dy;dz]));
-            % ---
-            f_quiver(node,vect,'sfactor',dmax/40); colorbar off;
+            for i = 1:length(obj.flag)
+                id_flag = obj.flag{i}.id;
+                if ~isempty(id_flag)
+                    node = obj.flag{i}.node.';
+                    vect = obj.flag{i}.vector.';
+                    % ---
+                    text(node(1),node(2),node(3),id_flag);
+                    f_quiver(node,vect,'sfactor',dmax/20); colorbar off;
+                end
+            end
         end
     end
 end

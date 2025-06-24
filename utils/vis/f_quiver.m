@@ -87,6 +87,9 @@ if strcmpi(vtype,'equal')
     for i = 2:dim
         dmax = max(dmax, max(node(i,:)) - min(node(i,:)));
     end
+    if dmax == 0
+        dmax = 1;
+    end
     %----- size of arrows
     if isempty(vsize)
         vsize = sfactor * dmax / nbNode^(1/(dim));
@@ -107,7 +110,7 @@ if strcmpi(vtype,'equal')
     dbase2 = f_normalize(cross(dvec,dbase1));
     p1 = zeros(dim,nbNode); p2 = zeros(dim,nbNode); p3 = zeros(dim,nbNode);
     p4 = zeros(dim,nbNode); p5 = zeros(dim,nbNode);
-
+    % ---
     for i = 1:dim
         p1(i,:) = endnode(i,:) + vsize/2 .* dvec(i,:);
         p2(i,:) = endnode(i,:) + vsize/2/afactor .* +dbase1(i,:);
@@ -115,11 +118,11 @@ if strcmpi(vtype,'equal')
         p4(i,:) = endnode(i,:) + vsize/2/afactor .* +dbase2(i,:);
         p5(i,:) = endnode(i,:) + vsize/2/afactor .* -dbase2(i,:);
     end
-
+    % ---
     pynode = [p1 p2 p3 p4 p5];
     pylvec = [lvec lvec lvec lvec];
     itri = [1 2 4; 1 2 5; 1 3 4; 1 3 5];
-
+    % ---
     pytri = zeros(3, 4*nbNode);
     for i = 1:4
         elem = [];
@@ -129,7 +132,7 @@ if strcmpi(vtype,'equal')
         end
         pytri(:,(i-1)*nbNode + 1 : i*nbNode) = elem;
     end
-
+    % ---
     clear patchinfo
     patchinfo.Vertices = pynode.';
     patchinfo.Faces = pytri.';
@@ -150,6 +153,9 @@ else
     for i = 2:dim
         dmax = max(dmax, max(node(i,:)) - min(node(i,:)));
     end
+    if dmax == 0
+        dmax = 1;
+    end
     %----- direction and lenght
     dvec = f_normalize(vector);
     lvec = f_norm(vector);
@@ -168,7 +174,7 @@ else
     dbase2 = f_normalize(cross(dvec,dbase1));
     p1 = zeros(dim,nbNode); p2 = zeros(dim,nbNode); p3 = zeros(dim,nbNode);
     p4 = zeros(dim,nbNode); p5 = zeros(dim,nbNode);
-
+    % ---
     for i = 1:dim
         p1(i,:) = endnode(i,:) + vsize./2 .* dvec(i,:);
         p2(i,:) = endnode(i,:) + vsize./2/afactor .* +dbase1(i,:);
@@ -176,11 +182,11 @@ else
         p4(i,:) = endnode(i,:) + vsize./2/afactor .* +dbase2(i,:);
         p5(i,:) = endnode(i,:) + vsize./2/afactor .* -dbase2(i,:);
     end
-
+    % ---
     pynode = [p1 p2 p3 p4 p5];
     pylvec = [lvec lvec lvec lvec];
     itri = [1 2 4; 1 2 5; 1 3 4; 1 3 5];
-
+    % ---
     pytri = zeros(3, 4*nbNode);
     for i = 1:4
         elem = [];
@@ -190,7 +196,7 @@ else
         end
         pytri(:,(i-1)*nbNode + 1 : i*nbNode) = elem;
     end
-
+    % ---
     clear patchinfo
     patchinfo.Vertices = pynode.';
     patchinfo.Faces = pytri.';
