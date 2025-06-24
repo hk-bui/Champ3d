@@ -24,6 +24,7 @@ classdef BCurve < CurveShape
         x
         y
         z
+        flag
     end
     % --- Constructors
     methods
@@ -356,7 +357,7 @@ classdef BCurve < CurveShape
                         f_fprintf(1,'/!\\',0,'bcurve terminals very close, d < 1e-9 !\n');
                     end
                 case 'closed'
-                    f_fprintf(1,'/!\\',0,'Force last point = first point !\n');
+                    f_fprintf(1,'/!\\',0,'Champ3d has forced last point = first point !\n');
                     x_(end) = x_(1);
                     y_(end) = y_(1);
                     z_(end) = z_(1);
@@ -405,7 +406,7 @@ classdef BCurve < CurveShape
     methods
         function plot(obj)
             obj.get_curve;
-            plot3(obj.x,obj.y,obj.z,'-c','LineWidth',3);
+            plot3(obj.x,obj.y,obj.z,'-b','LineWidth',3);
         end
     end
 end
