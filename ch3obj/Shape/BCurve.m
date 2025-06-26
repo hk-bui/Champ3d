@@ -244,7 +244,12 @@ classdef BCurve < CurveShape
         function geocode = geocode(obj)
             obj.geonode;
             % ---
-            geocode = GMSHWriter.bcurve(obj.x, obj.y, obj.z, obj.type);
+            if strcmpi(obj.type,'open')
+                type_ = 0;
+            else
+                type_ = 1;
+            end
+            geocode = GMSHWriter.bcurve(obj.x, obj.y, obj.z, type_);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---

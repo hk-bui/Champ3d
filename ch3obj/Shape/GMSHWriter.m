@@ -193,7 +193,7 @@ classdef GMSHWriter
                 x = [0 1]
                 y = [0 1]
                 z = [0 1]
-                type {mustBeMember(type,{'open','closed'})} = 'open'
+                type = 0
             end
             % ---
             geocode = newline;
@@ -202,7 +202,7 @@ classdef GMSHWriter
             geocode = GMSHWriter.write_vector_parameter(geocode,'x',x);
             geocode = GMSHWriter.write_vector_parameter(geocode,'y',y);
             geocode = GMSHWriter.write_vector_parameter(geocode,'z',z);
-            geocode = GMSHWriter.write_string_parameter(geocode,'type',type);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'type',type);
             % ---
             geocode = [geocode newline];
             % ---
@@ -307,16 +307,14 @@ classdef GMSHWriter
                 pvalue 
             end
             % ---
-            ntrail = 1;
             pcode = [pname ' = {'];
             for i = 1:length(pvalue)
                 pcode  = [pcode num2str(pvalue(i),16) ', '];
                 if mod(i,10) == 0
-                    ntrail = length(pname)+4;
-                    pcode = [pcode newline repmat(' ',1,ntrail)];
+                    pcode = [pcode newline];
                 end
             end
-            pcode(end-ntrail:end) = [];
+            pcode(end-1:end) = []; % ',newline'
             pcode = [pcode '}'];
             geocode = regexprep(geocode,['(?<!\w)' pname '(?!\w)[\s]*=(?!=)[\s]*[\w]*[^;]*'],pcode);
         end
