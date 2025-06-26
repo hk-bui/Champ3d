@@ -65,10 +65,10 @@ classdef BBox < VolumeShape
         %------------------------------------------------------------------
         function geocode = geocode(obj)
             c   = obj.center.getvalue;
-            len = obj.len.getvalue;
-            orientation = obj.orientation.getvalue;
+            len_ = obj.len.getvalue;
+            orientation_ = obj.orientation.getvalue;
             % ---
-            geocode = GMSHWriter.bbox(c,len,orientation);
+            geocode = GMSHWriter.bbox(c,len_,orientation_);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---

@@ -16,38 +16,34 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BSphere < VolumeShape
+classdef BHollowDisk < SurfaceShape
     properties
-        r = 1
         center = [0, 0, 0]
-        bottom_cut_ratio = 0
-        top_cut_ratio = 0
-        opening_angle = 360
+        ri     = 1
+        ro     = 2
     end
     % --- Constructors
     methods
-        function obj = BSphere(args)
+        function obj = BHollowDisk(args)
             arguments
-                args.r = 1
                 args.center = [0, 0, 0]
-                args.bottom_cut_ratio = 0
-                args.top_cut_ratio = 0
-                args.opening_angle = 360
+                args.ri     = 1
+                args.ro     = 2
             end
             % ---
-            obj = obj@VolumeShape;
+            obj = obj@SurfaceShape;
             % ---
             if isempty(fieldnames(args))
                 return
             end
             % ---
-            if (args.bottom_cut_ratio == 1 && args.top_cut_ratio == 1)
-                error('Degenerated sphere ! #bottom_cut_ratio = 1, #top_cut_ratio = 1');
+            if (args.ri < 0) || (args.ro <= 0)
+                error('Degenerated hollow cylinder !');
             end
             % ---
             obj <= args;
             % ---
-            BSphere.setup(obj);
+            BHollowDisk.setup(obj);
             % ---
         end
     end
@@ -59,7 +55,7 @@ classdef BSphere < VolumeShape
     end
     methods (Access = public)
         function reset(obj)
-            BSphere.setup(obj);
+            BHollowDisk.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
@@ -68,13 +64,11 @@ classdef BSphere < VolumeShape
     methods
         %------------------------------------------------------------------
         function geocode = geocode(obj)
-            r_    = obj.r.getvalue;
-            c     = obj.center.getvalue;
-            bcut  = obj.bottom_cut_ratio.getvalue;
-            tcut  = obj.top_cut_ratio.getvalue;
-            angle = obj.opening_angle.getvalue;
+            c  = obj.center.getvalue;
+            ri_ = obj.ri.getvalue;
+            ro_ = obj.ro.getvalue;
             % ---
-            geocode = GMSHWriter.bsphere(c,r_,bcut,tcut,angle);
+            geocode = GMSHWriter.bhollowdisk(c,ri_,ro_);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---
@@ -82,7 +76,7 @@ classdef BSphere < VolumeShape
         %------------------------------------------------------------------
     end
 
-    % --- Methods
+    % --- Plot
     methods
         function plot(obj)
             % XTODO

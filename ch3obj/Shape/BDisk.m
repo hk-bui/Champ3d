@@ -35,19 +35,35 @@ classdef BDisk < SurfaceShape
             % ---
             obj <= args;
             % ---
+            BDisk.setup(obj);
+            % ---
         end
     end
     % --- setup/reset
-    methods (Access = private)
+    methods (Static)
         function setup(obj)
             obj.set_parameter;
         end
     end
     methods (Access = public)
         function reset(obj)
-            obj.setup;
+            BDisk.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
+    end
+    % --- Methods
+    methods
+        %------------------------------------------------------------------
+        function geocode = geocode(obj)
+            r_    = obj.r.getvalue;
+            c     = obj.center.getvalue;
+            % ---
+            geocode = GMSHWriter.bdisk(c,r_);
+            % ---
+            geocode = obj.transformgeocode(geocode);
+            % ---
+        end
+        %------------------------------------------------------------------
     end
 end

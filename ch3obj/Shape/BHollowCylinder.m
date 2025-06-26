@@ -71,13 +71,13 @@ classdef BHollowCylinder < VolumeShape
         %------------------------------------------------------------------
         function geocode = geocode(obj)
             c  = obj.center.getvalue;
-            ri = obj.ri.getvalue;
-            ro = obj.ro.getvalue;
-            hei = obj.hei.getvalue;
-            opening_angle = obj.opening_angle.getvalue;
-            orientation = obj.orientation.getvalue;
+            ri_ = obj.ri.getvalue;
+            ro_ = obj.ro.getvalue;
+            hei_ = obj.hei.getvalue;
+            opening_angle_ = obj.opening_angle.getvalue;
+            orientation_ = obj.orientation.getvalue;
             % ---
-            geocode = GMSHWriter.bhollowcylinder(c,ri,ro,hei,opening_angle,orientation);
+            geocode = GMSHWriter.bhollowcylinder(c,ri_,ro_,hei_,opening_angle_,orientation_);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---

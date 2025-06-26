@@ -17,12 +17,13 @@
 %--------------------------------------------------------------------------
 
 classdef GMSHWriter
+    % --- base shape
     methods (Static)
         %------------------------------------------------------------------
-        function geocode = bsphere(r,c,bcut,tcut,angle)
+        function geocode = bsphere(c,r,bcut,tcut,angle)
             arguments
-                r = 1
                 c = [0 0 0]
+                r = 1
                 bcut = 0
                 tcut = 0
                 angle = 360
@@ -60,7 +61,7 @@ classdef GMSHWriter
                 orientation = [0 0 1]
             end
             % ---
-            if any(len == 0)
+            if any(len <= 0)
                 geocode = '';
                 return
             end
@@ -188,6 +189,110 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+        function geocode = bdisk(c,r)
+            arguments
+                c = [0 0]
+                r = 1
+            end
+            % ---
+            if length(c) == 2
+                c = [c(1) c(2) 0];
+            end
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__BDisk.geo')];
+            % ---
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'radius',r);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = brectangle(c,len,orientation,r_corner)
+            arguments
+                c   = [0 0]
+                len = [1 1]
+                orientation = [1 0]
+                r_corner = 0
+            end
+            % ---
+            if length(orientation) == 2
+                orientation = [orientation(1) orientation(2) 0];
+            end
+            % ---
+            if length(len) > 2
+                error('#len must be of dim 2 : [lenx leny].')
+            end
+            % ---
+            if any(len <= 0)
+                f_fprintf(1,'/!\\',0,'#len must be positive \n');
+                geocode = '';
+                return
+            end
+            % ---
+            if r_corner > min(len)/2
+                r_corner = min(len)/2 - min(len)/100; % tol
+            end
+            % ---
+            if length(c) == 2
+                corner = [c(1)-len(1)/2, c(2)-len(2)/2, 0];
+                c = [c(1) c(2) 0];
+            elseif length(c) == 3
+                corner = [c(1)-len(1)/2, c(2)-len(2)/2, c(3)];
+            end
+            % ---
+            oori = [1 0 0];
+            axis = cross(oori,orientation);
+            angle = acos(dot(oori,orientation) / (norm(oori) * norm(orientation)));
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__BRectangle.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'corner',corner);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'len',len);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'r_corner',r_corner);
+            geocode = GMSHWriter.write_vector_parameter(geocode,'axis',axis);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'angle',angle);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
+        function geocode = bhollowdisk(c,ri,ro)
+            arguments
+                c  = [0 0]
+                ri = 1
+                ro = 2
+            end
+            % ---
+            if (ri < 0) || (ro <= 0) || (ro <= ri)
+                f_fprintf(1,'/!\\',0,'degenerated hollow disk !\n');
+                geocode = '';
+                return
+            end
+            % ---
+            if length(c) == 2
+                c = [c(1) c(2) 0];
+            end
+            % ---
+            if ri == 0
+                geocode = GMSHWriter.bdisk(c,ro);
+                return
+            end
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__BHollowDisk.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'center',c);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'ri',ri);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'ro',ro);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
         function geocode = bcurve(x,y,z,type)
             arguments
                 x = [0 1]
@@ -208,12 +313,17 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+    end
+
+    % --- transform
+    methods (Static)
+        %------------------------------------------------------------------
         function geocode = rotate_volume(origin,axis,angle,nb_copy)
             arguments
                 origin  = [0, 0, 0]
                 axis    = [0, 0, 0]
                 angle   = 0
-                nb_copy = 0
+                nb_copy = 1
             end
             % ---
             if isequal(f_torowv(axis),[0 0 0])
@@ -254,7 +364,7 @@ classdef GMSHWriter
         function geocode = translate_volume(distance,nb_copy)
             arguments
                 distance = [0, 0, 0]
-                nb_copy  = 0
+                nb_copy = 1
             end
             % ---
             if isequal(f_torowv(distance),[0 0 0])
@@ -276,7 +386,7 @@ classdef GMSHWriter
             arguments
                 origin  = [0, 0]
                 angle   = 0
-                nb_copy = 0
+                nb_copy = 1
             end
             % ---
             origin = [origin(1) origin(2) 0];
@@ -321,7 +431,7 @@ classdef GMSHWriter
         function geocode = translate_surface(distance,nb_copy)
             arguments
                 distance = [0, 0, 0]
-                nb_copy  = 0
+                nb_copy = 1
             end
             % ---
             distance = [distance(1) distance(2) 0];

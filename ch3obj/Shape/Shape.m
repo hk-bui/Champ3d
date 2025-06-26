@@ -35,7 +35,7 @@ classdef Shape < Xhandle
             arguments
                 obj
                 args.distance = [0 0 0]
-                args.nb_copy = 0
+                args.nb_copy = 1
             end
             % ---
             obj.transform{end + 1} = struct('type','translate', ...
@@ -50,7 +50,7 @@ classdef Shape < Xhandle
                 args.axis = [0 0 1]
                 args.origin = [0 0 0]
                 args.angle = 0
-                args.nb_copy = 0
+                args.nb_copy = 1
             end
             % ---
             obj.transform{end + 1} = struct('type','rotate', ...
@@ -89,7 +89,8 @@ classdef Shape < Xhandle
                          'rtorus','rsection', ...
                          'hei', ...
                          'ri','ro', ...
-                         'start_point'};
+                         'start_point',...
+                         'r_corner'};
             % ---
             for i = 1:length(paramlist)
                 param = paramlist{i};

@@ -16,38 +16,30 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BSphere < VolumeShape
+classdef BRectangle < SurfaceShape
     properties
-        r = 1
-        center = [0, 0, 0]
-        bottom_cut_ratio = 0
-        top_cut_ratio = 0
-        opening_angle = 360
+        center = [0 0 0]
+        len = [1 1]
+        orientation = [1 0 0]
+        r_corner = 0
+        fit = []
+        rmin
     end
     % --- Constructors
     methods
-        function obj = BSphere(args)
+        function obj = BRectangle(args)
             arguments
-                args.r = 1
-                args.center = [0, 0, 0]
-                args.bottom_cut_ratio = 0
-                args.top_cut_ratio = 0
-                args.opening_angle = 360
+                args.center = [0 0 0]
+                args.len = [1 1]
+                args.orientation = [1 0]
+                args.r_corner = 0
             end
             % ---
-            obj = obj@VolumeShape;
-            % ---
-            if isempty(fieldnames(args))
-                return
-            end
-            % ---
-            if (args.bottom_cut_ratio == 1 && args.top_cut_ratio == 1)
-                error('Degenerated sphere ! #bottom_cut_ratio = 1, #top_cut_ratio = 1');
-            end
+            obj = obj@SurfaceShape;
             % ---
             obj <= args;
             % ---
-            BSphere.setup(obj);
+            BRectangle.setup(obj);
             % ---
         end
     end
@@ -59,7 +51,7 @@ classdef BSphere < VolumeShape
     end
     methods (Access = public)
         function reset(obj)
-            BSphere.setup(obj);
+            BRectangle.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
@@ -68,24 +60,16 @@ classdef BSphere < VolumeShape
     methods
         %------------------------------------------------------------------
         function geocode = geocode(obj)
-            r_    = obj.r.getvalue;
-            c     = obj.center.getvalue;
-            bcut  = obj.bottom_cut_ratio.getvalue;
-            tcut  = obj.top_cut_ratio.getvalue;
-            angle = obj.opening_angle.getvalue;
+            c    = obj.center.getvalue;
+            len_ = obj.len.getvalue;
+            orientation_ = obj.orientation.getvalue;
+            r_corner_ = obj.r_corner.getvalue;
             % ---
-            geocode = GMSHWriter.bsphere(c,r_,bcut,tcut,angle);
+            geocode = GMSHWriter.brectangle(c,len_,orientation_,r_corner_);
             % ---
             geocode = obj.transformgeocode(geocode);
             % ---
         end
         %------------------------------------------------------------------
-    end
-
-    % --- Methods
-    methods
-        function plot(obj)
-            % XTODO
-        end
     end
 end

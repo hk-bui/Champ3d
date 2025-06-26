@@ -49,13 +49,13 @@ classdef SurfaceShape < Shape
                 switch t.type
                     case 'translate'
                         geocode = [geocode ...
-                            GMSHWriter.translate_volume(t.distance,t.nb_copy)];
+                            GMSHWriter.translate_surface(t.distance,t.nb_copy)];
                     case 'rotate'
                         geocode = [geocode ...
-                            GMSHWriter.rotate_volume(t.origin,t.axis,t.angle,t.nb_copy)];
+                            GMSHWriter.rotate_surface(t.origin,t.angle,t.nb_copy)];
                     case 'dilate'
                         geocode = [geocode ...
-                            GMSHWriter.dilate_volume(t.origin,t.scale)];
+                            GMSHWriter.dilate_surface(t.origin,t.scale)];
                 end
             end
         end
