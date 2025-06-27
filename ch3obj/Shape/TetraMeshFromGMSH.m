@@ -150,9 +150,8 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             geofile = fopen(geoname,'w');
             % --- Init
-            fprintf(geofile,'%s \n','// Init');
-            fprintf(geofile,'%s \n','SetFactory("OpenCASCADE");');
-            fprintf(geofile,'%s \n','id_volume_list = 0;');
+            initgeocode = GMSHWriter.init;
+            fprintf(geofile,'%s \n',initgeocode);
             % ---
             obj.physical_volume = f_to_scellargin(obj.physical_volume);
             % ---

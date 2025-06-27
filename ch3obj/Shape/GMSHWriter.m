@@ -451,6 +451,48 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+    end
+    % --- init/final
+    methods (Static)
+        %------------------------------------------------------------------
+        function geocode = union_volume()
+            geocode = fileread('__unionVolume.geo');
+            geocode = [geocode newline];
+        end
+        %------------------------------------------------------------------
+        function geocode = difference_volume()
+            geocode = fileread('__differenceVolume.geo');
+            geocode = [geocode newline];
+        end
+        %------------------------------------------------------------------
+        function geocode = intersection_volume()
+            geocode = fileread('__intersectionVolume.geo');
+            geocode = [geocode newline];
+        end
+        %------------------------------------------------------------------
+        function geocode = union_surface()
+            geocode = fileread('__unionSurface.geo');
+            geocode = [geocode newline];
+        end
+        %------------------------------------------------------------------
+        function geocode = difference_surface()
+            geocode = fileread('__differenceSurface.geo');
+            geocode = [geocode newline];
+        end
+        %------------------------------------------------------------------
+        function geocode = intersection_surface()
+            geocode = fileread('__intersectionSurface.geo');
+            geocode = [geocode newline];
+        end
+        %------------------------------------------------------------------
+    end
+    % --- init/final
+    methods (Static)
+        %------------------------------------------------------------------
+        function geocode = init()
+            geocode = fileread('__init.geo');
+            geocode = [geocode newline];
+        end
         %------------------------------------------------------------------
         function geocode = final(mesh_file_name)
             arguments
@@ -465,7 +507,6 @@ classdef GMSHWriter
         end
         %------------------------------------------------------------------
     end
-
     % --- Utility
     methods (Static)
         %------------------------------------------------------------------

@@ -19,7 +19,7 @@
 classdef PhysicalVolume < Xhandle
     properties
         volume_shape
-        mesh_size
+        mesh_size = 0
     end
     % --- Valid args list
     methods (Static)
@@ -33,7 +33,7 @@ classdef PhysicalVolume < Xhandle
             arguments
                 args.id = ''
                 args.volume_shape (1,1) {mustBeA(args.volume_shape,'Shape')}
-                args.mesh_size = 1e22
+                args.mesh_size = 0
             end
             obj = obj@Xhandle;
             % ---
@@ -47,7 +47,7 @@ classdef PhysicalVolume < Xhandle
             % ---
             if isnumeric(args.mesh_size)
                 if args.mesh_size <= 0
-                    args.mesh_size = 1e22;
+                    args.mesh_size = 0;
                 end
             end
             % ---
@@ -87,7 +87,10 @@ classdef PhysicalVolume < Xhandle
             geocode = [geocode 'id_dom_number = ' num2str(id_phyvol,'%d') ';' newline];
             geocode = [geocode 'Physical Volume(Str(id_dom_string), id_dom_number) = {volume_list~{id_volume_list}()};' newline];
             geocode = [geocode '// ---' newline];
-            geocode = [geocode 'MeshSize{ PointsOf{ Volume{volume_list~{id_volume_list}()}; } } = ' num2str(mshsize,16) ';' newline];
+            % --- XTODO : tol
+            if mshsize > 1e-9
+                geocode = [geocode 'MeshSize{ PointsOf{ Volume{volume_list~{id_volume_list}()}; } } = ' num2str(mshsize,16) ';' newline];
+            end
             % ---
         end
     end
@@ -114,19 +117,6 @@ classdef PhysicalVolume < Xhandle
                 end
             end
         end
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
-        function build_from_formular(obj)
-            switch obj.building_formular.operation
-                case '+'
-                    
-                case '-'
-                    
-                case '^'
-                    
-            end
-        end
-        % -----------------------------------------------------------------
         % -----------------------------------------------------------------
     end
 

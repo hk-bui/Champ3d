@@ -23,20 +23,42 @@ classdef SurfaceShape < Shape
             obj = obj@Shape;
         end
     end
+
     % --- Methods
-    methods (Access = protected)
-        % -----------------------------------------------------------------
-        % -----------------------------------------------------------------
-        function build_from_formular(obj)
-            switch obj.building_formular.operation
-                case '+'
-                    
-                case '-'
-                    
-                case '^'
-                    
+    methods
+        %------------------------------------------------------------------
+        function geocode = geocode(obj)
+            if ~isempty(obj.building_formular)
+                geocode = obj.build_from_formular;
             end
         end
+        %------------------------------------------------------------------
+    end
+
+    % --- Methods
+    methods (Access = private)
+        % -----------------------------------------------------------------
+        function geocode = build_from_formular(obj)
+            gcode1 = obj.building_formular.arg1.geocode;
+            gcode2 = obj.building_formular.arg2.geocode;
+            switch obj.building_formular.operation
+                case '+'
+                    geocode = [gcode1 newline gcode2];
+                    opecode = GMSHWriter.union_surface;
+                    geocode = [geocode newline opecode newline];
+                case '-'
+                    geocode = [gcode1 newline gcode2];
+                    opecode = GMSHWriter.difference_surface;
+                    geocode = [geocode newline opecode newline];
+                case '^'
+                    geocode = [gcode1 newline gcode2];
+                    opecode = GMSHWriter.intersection_surface;
+                    geocode = [geocode newline opecode newline];
+            end
+        end
+        % -----------------------------------------------------------------
+    end
+    methods (Access = protected)
         % -----------------------------------------------------------------
         function geocode = transformgeocode(obj,geocode)
             arguments
