@@ -501,7 +501,7 @@ classdef BCurve < CurveShape
                                 angle = -abs(angle);
                         end
                         % ---
-                        center = g.center.getvalue;
+                        cen3d = g.center.getvalue;
                         % ---
                         p03d = node{end};
                         % ---
@@ -514,41 +514,42 @@ classdef BCurve < CurveShape
                 % --- continued...
                 switch g.type
                     case 'ago_xy'
-                        center = center([1 2]);
-                        p02d   = p03d([1 2]);
                         % ---
-                        [dx, dy] = obj.calform_ago2d(angle,30,p02d,center); % 30 may be enough
-                        dx0 = dx(1);   dy0 = dy(1);
-                        dx1 = dx(end); dy1 = dy(end);
+                        rot_axis = [0 0 1];
                         % ---
-                        [ddx, ddy] = obj.calform_ago2d(angle,1,p02d,center);
+                        cen2d = cen3d([1 2]);
+                        p02d  = p03d([1 2]);
+                        % ---
+                        [ddx, ddy] = obj.calform_ago2d(angle,1,p02d,cen2d);
                     case 'ago_xz'
-                        center = center([1 3]);
-                        p02d   = p03d([1 3]);
                         % ---
-                        [dx, dz] = obj.calform_ago2d(angle,30,p02d,center);
-                        dx0 = dx(1);   dz0 = dz(1);
-                        dx1 = dx(end); dz1 = dz(end);
+                        rot_axis = [0 1 0];
                         % ---
-                        [ddx, ddz] = obj.calform_ago2d(angle,1,p02d,center);
+                        cen2d = cen3d([1 3]);
+                        p02d  = p03d([1 3]);
+                        % ---
+                        [ddx, ddz] = obj.calform_ago2d(angle,1,p02d,cen2d);
                     case 'ago_yz'
-                        center = center([2 3]);
-                        p02d   = p03d([2 3]);
                         % ---
-                        [dy, dz] = obj.calform_ago2d(angle,30,p02d,center);
-                        dy0 = dy(1);   dz0 = dz(1);
-                        dy1 = dy(end); dz1 = dz(end);
+                        rot_axis = [1 0 0];
                         % ---
-                        [ddy, ddz] = obj.calform_ago2d(angle,1,p02d,center);
+                        cen2d = cen3d([2 3]);
+                        p02d  = p03d([2 3]);
+                        % ---
+                        [ddy, ddz] = obj.calform_ago2d(angle,1,p02d,cen2d);
                 end
 
                 % --- continued...
                 switch g.type
                     case {'ago_xy','ago_xz','ago_yz'}
-                        dmove0 = [dx0; dy0; dz0];
-                        dmove1 = [dx1; dy1; dz1];
-                        g.vi = dmove0; g.vi = g.vi ./ norm(g.vi);
-                        g.vf = dmove1; g.vf = g.vf ./ norm(g.vf);
+                        % ---
+                        vi = cross(p03d - cen3d,rot_axis);
+                        if angle > 0
+                            vi = - vi;
+                        end
+                        g.vi = vi ./ norm(vi);
+                        vf = f_rotaroundaxis(f_tocolv(vi),'rot_angle',angle,'rot_axis',rot_axis);
+                        g.vf = vf ./ norm(vf);
                         % ---
                         ddmove = [ddx; ddy; ddz];
                         flagnode = p03d + ddmove./2;
