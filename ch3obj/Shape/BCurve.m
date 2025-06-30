@@ -250,8 +250,8 @@ classdef BCurve < CurveShape
                 type_ = 1;
             end
             geocode = GMSHWriter.bcurve(obj.x, obj.y, obj.z, type_);
-            % ---
-            geocode = obj.transformgeocode(geocode);
+            % --- XTODO
+            % geocode = obj.transformgeocode(geocode);
             % ---
         end
         %------------------------------------------------------------------
@@ -285,7 +285,7 @@ classdef BCurve < CurveShape
                         rot_angle = acosd(dot(fv,ori) / (norm(fv) * norm(ori)));
                         rot_axis = cross(ori,fv);
                         if norm(rot_axis) < 1e-12
-                            rot_axis = [0 0 -sign(dot([1 0 0],[lOx 0]))];
+                            rot_axis = [0 0 -sign(dot([1 0 0],[fv(1) fv(2) 0]))];
                         end
                         % ---
                         node = f_rotaroundaxis(node,'rot_angle',rot_angle, ...

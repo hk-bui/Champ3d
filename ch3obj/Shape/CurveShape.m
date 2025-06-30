@@ -60,5 +60,27 @@ classdef CurveShape < Shape
             % ---
         end
         % -----------------------------------------------------------------
+        function geocode = transformgeocode(obj,geocode)
+            arguments
+                obj
+                geocode
+            end
+            % --- XTODO
+            for i = 1:length(obj.transform)
+                t = obj.transform{i};
+                switch t.type
+                    case 'translate'
+                        geocode = [geocode ...
+                            GMSHWriter.translate_curve(t.distance,t.nb_copy)];
+                    case 'rotate'
+                        geocode = [geocode ...
+                            GMSHWriter.rotate_curve(t.origin,t.axis,t.angle,t.nb_copy)];
+                    case 'dilate'
+                        geocode = [geocode ...
+                            GMSHWriter.dilate_curve(t.origin,t.scale)];
+                end
+            end
+        end
+        % -----------------------------------------------------------------
     end
 end
