@@ -16,25 +16,30 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef BDisk < SurfaceShape
+classdef BCoilShape < VolumeShape
     properties
-        r
-        center
-        rmin
+        curve_shape
+        cross_section
+        rotation = 0
     end
     % --- Constructors
     methods
-        function obj = BDisk(args)
+        function obj = BCoilShape(args)
             arguments
-                args.r = 1
-                args.center = [0 0 0]
+                args.curve_shape BCurve
+                args.cross_section SurfaceShape
+                args.rotation
             end
             % ---
-            obj = obj@SurfaceShape;
+            obj = obj@VolumeShape;
+            % ---
+            if ~isfield(args,'curve_shape') || ~isfield(args,'cross_section')
+                error('#curve_shape and #cross_section must be given !');
+            end
             % ---
             obj <= args;
             % ---
-            BDisk.setup(obj);
+            BCoilShape.setup(obj);
             % ---
         end
     end
@@ -46,7 +51,7 @@ classdef BDisk < SurfaceShape
     end
     methods (Access = public)
         function reset(obj)
-            BDisk.setup(obj);
+            BCoilShape.setup(obj);
             % --- reset dependent obj
             obj.reset_dependent_obj;
         end
@@ -55,13 +60,23 @@ classdef BDisk < SurfaceShape
     methods
         %------------------------------------------------------------------
         function geocode = geocode(obj)
-            r_    = obj.r.getvalue;
-            c     = obj.center.getvalue;
+            geocode = [newline obj.curve_shape.geocode newline];
+            geocode = [geocode obj.cross_section.geocode newline];
             % ---
-            geocode = GMSHWriter.bdisk(c,r_);
+            vcs  = [0 0 1];
+            vcur = [obj.curve_shape.x(2) - obj.curve_shape.x(1), ...
+                    obj.curve_shape.y(2) - obj.curve_shape.y(1), ...
+                    obj.curve_shape.z(2) - obj.curve_shape.z(1)];
             % ---
-            geocode = obj.transformgeocode(geocode);
+            fit_axis = cross(vcs, vcur);
+            fit_angle = acosd(dot(vcs,vcur) / (norm(vcs) * norm(vcur)));
             % ---
+            if norm(fit_axis) < 1e-12
+                fit_axis = [0 0 1];
+                fit_angle = 0;
+            end
+            rotation_ = obj.rotation.getvalue;
+            geocode = [geocode GMSHWriter.finish_coilshape(fit_axis,fit_angle,rotation_) newline];
         end
         %------------------------------------------------------------------
     end

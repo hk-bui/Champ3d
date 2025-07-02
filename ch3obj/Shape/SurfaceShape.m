@@ -17,6 +17,11 @@
 %--------------------------------------------------------------------------
 
 classdef SurfaceShape < Shape
+    properties
+        flag
+        fit = []
+    end
+
     % --- Constructors
     methods
         function obj = SurfaceShape()

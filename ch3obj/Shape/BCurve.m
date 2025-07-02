@@ -35,6 +35,7 @@ classdef BCurve < CurveShape
             arguments
                 args.start_node = []
                 args.type {mustBeMember(args.type,{'open','closed'})}
+                args.rmin
             end
             % ---
             obj = obj@CurveShape;
@@ -291,6 +292,11 @@ classdef BCurve < CurveShape
                         node = f_rotaroundaxis(node,'rot_angle',rot_angle, ...
                             'rot_axis',rot_axis,'axis_origin',obj.fit.destination);
                         % ---
+                        if obj.fit.rotation ~= 0
+                            node = f_rotaroundaxis(node,'rot_angle',obj.fit.rotation, ...
+                            'rot_axis',obj.fit.orientation,'axis_origin',obj.fit.destination);
+                        end
+                        % ---
                     end
                 end
             end
@@ -302,6 +308,8 @@ classdef BCurve < CurveShape
         end
         %------------------------------------------------------------------
         function gobase(obj)
+            % ---
+            obj.get_go;
             % ---
             rmin_ = obj.rmin.getvalue;
             cutfactor_ = obj.cutfactor.getvalue;
@@ -416,6 +424,7 @@ classdef BCurve < CurveShape
         end
         %------------------------------------------------------------------
         function where2cut(obj)
+            % ---
             lengo = length(obj.go);
             for i = 1:lengo
                 % ---
@@ -660,19 +669,10 @@ classdef BCurve < CurveShape
         function plot(obj)
             % ---
             obj.get_go;
+            obj.geonode;
             % ---
-            x = []; y = []; z = [];
-            for i = 1:length(obj.go)
-                g = obj.go{i};
-                x = [x g.ni(1)]; y = [y g.ni(2)]; z = [z g.ni(3)];
-                if i == length(obj.go)
-                    x = [x g.nf(1)]; y = [y g.nf(2)]; z = [z g.nf(3)];
-                end
-            end
+            plot3(obj.x,obj.y,obj.z,'-b','LineWidth',3); hold on;
             % ---
-            plot3(x,y,z,'-b','LineWidth',3); hold on;
-            % ---
-            obj.gobase;
             for i = 1:length(obj.go)
                 g = obj.go{i};
                 plot3(g.node(1,:),g.node(2,:),g.node(3,:),'-r','LineWidth',3); hold on;
@@ -689,7 +689,17 @@ classdef BCurve < CurveShape
                 end
             end
             % ---
-
+            % obj.get_go;
+            % x = []; y = []; z = [];
+            % for i = 1:length(obj.go)
+            %     g = obj.go{i};
+            %     x = [x g.ni(1)]; y = [y g.ni(2)]; z = [z g.ni(3)];
+            %     if i == length(obj.go)
+            %         x = [x g.nf(1)]; y = [y g.nf(2)]; z = [z g.nf(3)];
+            %     end
+            % end
+            % figure
+            % plot3(x,y,z,'-b','LineWidth',3); hold on;
             % ---
         end
     end

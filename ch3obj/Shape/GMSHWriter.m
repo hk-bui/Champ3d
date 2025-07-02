@@ -451,6 +451,27 @@ classdef GMSHWriter
             % ---
         end
         %------------------------------------------------------------------
+        function geocode = finish_coilshape(fit_axis,fit_angle,rotation)
+            arguments
+                fit_axis
+                fit_angle
+                rotation
+            end
+            % ---
+            fit_angle = fit_angle*pi/180;
+            rotation  = rotation*pi/180;
+            % ---
+            geocode = newline;
+            geocode = [geocode fileread('__finishCoilShape.geo')];
+            % ---
+            geocode = GMSHWriter.write_vector_parameter(geocode,'fit_axis',fit_axis);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'fit_angle',fit_angle);
+            geocode = GMSHWriter.write_scalar_parameter(geocode,'rotation',rotation);
+            % ---
+            geocode = [geocode newline];
+            % ---
+        end
+        %------------------------------------------------------------------
     end
     % --- init/final
     methods (Static)

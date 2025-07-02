@@ -22,7 +22,6 @@ classdef BRectangle < SurfaceShape
         len = [1 1]
         orientation = [1 0 0]
         r_corner = 0
-        fit = []
         rmin
     end
     % --- Constructors
