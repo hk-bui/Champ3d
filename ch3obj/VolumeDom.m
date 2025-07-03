@@ -386,12 +386,12 @@ classdef VolumeDom < MeshDom
                 if dim == 2
                     [~, imax] = max(celem(2,:));
                     celem = celem(:,imax);
-                    t = text(celem(1),celem(2),id);
+                    t = text(celem(1),celem(2),['<-----' id]);
                     t.FontWeight = 'bold';
                 elseif dim == 3
                     [~, imax] = max(celem(3,:));
                     celem = celem(:,imax);
-                    t = text(celem(1),celem(2),celem(3),id);
+                    t = text(celem(1),celem(2),celem(3),['<-----' id]);
                     t.FontWeight = 'bold';
                 end
             end
