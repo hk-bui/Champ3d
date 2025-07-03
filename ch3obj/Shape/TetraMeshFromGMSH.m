@@ -40,7 +40,7 @@ classdef TetraMeshFromGMSH < TetraMesh
                 args.physical_volume
                 args.airbox_volume (1,1) {mustBeA(args.airbox_volume,{'AirboxVolume'})}
                 args.mesh_file char = ''
-                args.use_bounding_box_airbox {mustBeMember(args.use_bounding_box_airbox,{0,1})}
+                args.use_bounding_box_airbox (1,1) {mustBeNumericOrLogical} = 0
                 args.tol_mesh_size = 1e-9
             end
             % ---
