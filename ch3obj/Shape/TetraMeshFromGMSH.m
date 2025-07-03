@@ -161,11 +161,14 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             obj.mesh_file = mshname;
             % ---
+            fprintf('Cleaning ...\n');
             if isfile(geoname)
-                fprintf('Cleaning ...\n');
-                system(['rm ' geoname ' ' mshname]);
-                fprintf('Old data cleaned.\n');
+                system(['rm ' geoname]);
             end
+            if isfile(mshname)
+                system(['rm ' mshname]);
+            end
+            fprintf('Old data cleaned.\n');
             % ---
             geofile = fopen(geoname,'w');
             % --- Init
