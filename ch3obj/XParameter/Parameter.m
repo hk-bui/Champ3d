@@ -580,7 +580,7 @@ classdef Parameter < Xhandle
                                 % --- space interpolation
                                 interp_node = source_model.parent_mesh.prokit.node;
                                 nbINode = length(interp_node);
-                                nb_elem   = length(id_elem_source);
+                                nb_elem = length(id_elem_source);
                                 % ---
                                 node_i = zeros(nbINode * nb_elem, 3);
                                 % ---
@@ -638,16 +638,23 @@ classdef Parameter < Xhandle
                                         valz(idn) = valcell{k}(:,3);
                                     end
                                     % ---
-                                    fxi = scatteredInterpolant(node_i,valx,'linear','linear');
+                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
                                     fyi = fxi;
                                     fyi.Values = valy;
                                     fzi = fxi;
                                     fzi.Values = valz;
                                     % ---
+                                    fxi = scatteredInterpolant(node_i,valx,'linear','none');
+                                    fyi = scatteredInterpolant(node_i,valy,'linear','none');
+                                    fzi = scatteredInterpolant(node_i,valz,'linear','none');
+                                    % ---
                                     cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
                                     vx_ = fxi(cnode_.');
                                     vy_ = fyi(cnode_.');
                                     vz_ = fzi(cnode_.');
+                                    vx_(isnan(vx_)) = 0;
+                                    vy_(isnan(vy_)) = 0;
+                                    vz_(isnan(vz_)) = 0;
                                     fargs{i} = [vx_ vy_ vz_];
                                     % ---
                                 end
