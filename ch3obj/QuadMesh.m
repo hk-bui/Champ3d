@@ -182,8 +182,8 @@ classdef QuadMesh < Mesh2d
             e = 1e-6;
             refelem.nU = [-1 +1 +1 -1];
             refelem.nV = [-1 -1 +1 +1];
-            refelem.iU = [(1-e) * refelem.nU    0];
-            refelem.iV = [(1-e) * refelem.nV    0];
+            refelem.iU = [(1+e) * refelem.nU    0];
+            refelem.iV = [(1+e) * refelem.nV    0];
             % ---
             refelem.N{1} = @(u,v) 1/4 * (1-u) .* (1-v);
             refelem.N{2} = @(u,v) 1/4 * (1+u) .* (1-v);
