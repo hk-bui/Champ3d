@@ -104,6 +104,7 @@ classdef Econductor < PhysicalDom
             end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
+                obj.tarray{it}.sigma = TensorArray(sigma_array,'parent_dom',obj);
                 return
             end
             %--------------------------------------------------------------
