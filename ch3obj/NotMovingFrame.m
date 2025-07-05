@@ -26,35 +26,35 @@ classdef NotMovingFrame < MovingFrame
 
     % --- Methods
     methods
-        function moved = movenode(obj,node,it)
+        function moved = movenode(obj,node,t)
             arguments
                 obj
                 node
-                it = []
+                t = []
             end
             moved = node;
         end
-        function moved = inverse_movenode(obj,node,it)
+        function moved = inverse_movenode(obj,node,t)
             arguments
                 obj
                 node
-                it = []
+                t = []
             end
             moved = node;
         end
-        function moved = movevector(obj,vector,it)
+        function moved = movevector(obj,vector,t)
             arguments
                 obj
                 vector
-                it = []
+                t = []
             end
             moved = vector;
         end
-        function moved = inverse_movevector(obj,vector,it)
+        function moved = inverse_movevector(obj,vector,t)
             arguments
                 obj
                 vector
-                it = []
+                t = []
             end
             moved = vector;
         end

@@ -429,13 +429,17 @@ classdef Parameter < Xhandle
                     if isa(obj.depend_on{i},'Parameter')
                         fargs{i} = obj.depend_on{i}.getvalue;
                     else
+                        % --- XTODO : need more generic
                         pvalue__ = obj.from{i}.(obj.depend_on{i});
-                        if isnumeric(pvalue__)
-                            fargs{i} = pvalue__;
-                        elseif isa(pvalue__,'Parameter')
+                        if isa(pvalue__,'Parameter')
                             fargs{i} = pvalue__.getvalue;
+                        elseif isa(pvalue__,'LTime')
+                            fargs{i} = obj.from{i}.(obj.depend_on{i}).t_now;
+                        elseif isnumeric(pvalue__)
+                            fargs{i} = pvalue__;
                         else
-                            fargs{i} = [];
+                            error('Cannot evaluate parameter value !');
+                            %fargs{i} = [];
                         end
                     end
                 end
@@ -597,6 +601,7 @@ classdef Parameter < Xhandle
                                 end
                                 % ---
                                 cnode_ = target_model.parent_mesh.celem(:,id_elem_target);
+                                cnode_ = source_model.moving_frame.inverse_movenode(cnode_,target_t);
                                 % ---
                                 dim_ = size(valcell{1},2);
                                 if dim_ == 1
@@ -634,6 +639,8 @@ classdef Parameter < Xhandle
                                     vx_(isnan(vx_)) = 0;
                                     vy_(isnan(vy_)) = 0;
                                     fargs{i} = [vx_ vy_];
+                                    % ---
+                                    fargs{i} = source_model.moving_frame.movevector(fargs{i},target_t);
                                     % ---
                                 elseif dim_ == 3
                                     valx = zeros(nbINode * nb_elem, 1);

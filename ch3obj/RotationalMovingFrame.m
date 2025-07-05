@@ -41,8 +41,8 @@ classdef RotationalMovingFrame < MovingFrame
             % ---
             obj = obj@MovingFrame;
             % ---
-            if isnumeric(args.rot_origin)
-                args.rot_origin = Parameter('f',args.rot_origin);
+            if isnumeric(args.axis_origin)
+                args.axis_origin = Parameter('f',args.axis_origin);
             end
             % ---
             if isnumeric(args.rot_axis)
@@ -60,144 +60,158 @@ classdef RotationalMovingFrame < MovingFrame
 
     % --- Methods
     methods
-        function movnode = move(obj,fixnode)
-            ori = obj.axis_origin.getvalue;
-            axi = obj.rot_axis.getvalue;
-            ang = obj.rot_angle.getvalue;
-            movnode = f_rotaroundaxis(fixnode, ...
-                'axis_origin',ori, ...
-                'rot_axis',axi, ...
-                'rot_angle',+ang);
-        end
-        function movnode = inverse_move(obj,fixnode)
-            ori = obj.axis_origin.getvalue;
-            axi = obj.rot_axis.getvalue;
-            ang = obj.rot_angle.getvalue;
-            movnode = f_rotaroundaxis(fixnode, ...
-                'axis_origin',ori, ...
-                'rot_axis',axi, ...
-                'rot_angle',-ang);
-        end
-        function moved = movenode(obj,node,it)
+        function moved = movenode(obj,node,t)
             arguments
                 obj
                 node
-                it = []
+                t = []
             end
             % ---
-            if isempty(it)
-                ori = obj.axis_origin.getvalue;
-                axi = obj.rot_axis.getvalue;
-                ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(node, ...
-                    'axis_origin',ori, ...
-                    'rot_axis',axi, ...
-                    'rot_angle',+ang);
-            else
-                it0 = obj.parent_model.ltime.it;
-                % ---
-                obj.parent_model.ltime.it = it;
-                ori = obj.axis_origin.getvalue;
-                axi = obj.rot_axis.getvalue;
-                ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(node, ...
-                    'axis_origin',ori, ...
-                    'rot_axis',axi, ...
-                    'rot_angle',+ang);
-                % ---
-                obj.parent_model.ltime.it = it0;
-            end
-            % ---
+            moved = obj.move(node,'direct','node',t);
         end
-        function moved = inverse_movenode(obj,node,it)
+        function moved = inverse_movenode(obj,node,t)
             arguments
                 obj
                 node
-                it = []
+                t = []
             end
             % ---
-            if isempty(it)
-                ori = obj.axis_origin.getvalue;
-                axi = obj.rot_axis.getvalue;
-                ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(node, ...
-                    'axis_origin',ori, ...
-                    'rot_axis',axi, ...
-                    'rot_angle',-ang);
-            else
-                it0 = obj.parent_model.ltime.it;
-                % ---
-                obj.parent_model.ltime.it = it;
-                ori = obj.axis_origin.getvalue;
-                axi = obj.rot_axis.getvalue;
-                ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(node, ...
-                    'axis_origin',ori, ...
-                    'rot_axis',axi, ...
-                    'rot_angle',-ang);
-                % ---
-                obj.parent_model.ltime.it = it0;
-            end
-            % ---
+            moved = obj.move(node,'inverse','node',t);
         end
-        function moved = movevector(obj,vector,it)
+        function moved = movevector(obj,vector,t)
             arguments
                 obj
                 vector
-                it = []
+                t = []
             end
             % ---
-            if isempty(it)
-                axi = obj.rot_axis.getvalue;
-                ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(vector, ...
-                    'axis_origin',[0 0 0], ...
-                    'rot_axis',axi, ...
-                    'rot_angle',+ang);
-            else
-                it0 = obj.parent_model.ltime.it;
-                % ---
-                obj.parent_model.ltime.it = it;
-                axi = obj.rot_axis.getvalue;
-                ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(vector, ...
-                    'axis_origin',[0 0 0], ...
-                    'rot_axis',axi, ...
-                    'rot_angle',+ang);
-                % ---
-                obj.parent_model.ltime.it = it0;
-            end
-            % ---
+            moved = obj.move(vector,'direct','vector',t);
         end
-        function moved = inverse_movevector(obj,vector,it)
+        function moved = inverse_movevector(obj,vector,t)
             arguments
                 obj
                 vector
-                it = []
+                t = []
             end
             % ---
-            if isempty(it)
+            moved = obj.move(vector,'inverse','vector',t);
+        end
+    end
+
+    % --- 
+    methods (Access = private)
+        function moved = move(obj,value,sens,type,t)
+            arguments
+                obj
+                value
+                sens {mustBeMember(sens,{'direct','inverse'})}
+                type {mustBeMember(type,{'node','vector'})}
+                t
+            end
+            % ---
+            if isempty(t)
+                ori = obj.axis_origin.getvalue;
                 axi = obj.rot_axis.getvalue;
                 ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(vector, ...
-                    'axis_origin',[0 0 0], ...
+                % ---
+                switch type
+                    case 'vector'
+                        ori = [0 0 0].';
+                end
+                % ---
+                switch sens
+                    case 'inverse'
+                        ang = -ang;
+                end
+                % ---
+                moved = f_rotaroundaxis(value, ...
+                    'axis_origin',ori, ...
                     'rot_axis',axi, ...
-                    'rot_angle',-ang);
+                    'rot_angle',ang);
             else
-                it0 = obj.parent_model.ltime.it;
                 % ---
-                obj.parent_model.ltime.it = it;
-                axi = obj.rot_axis.getvalue;
-                ang = obj.rot_angle.getvalue;
-                moved = f_rotaroundaxis(vector, ...
-                    'axis_origin',[0 0 0], ...
-                    'rot_axis',axi, ...
-                    'rot_angle',-ang);
+                ltime = obj.parent_model.ltime;
+                it0 = ltime.it;
                 % ---
-                obj.parent_model.ltime.it = it0;
+                next_it = ltime.next_it(t);
+                back_it = ltime.back_it(t);
+                % ---
+                if next_it == back_it
+                    ltime.it = back_it;
+                    % ---
+                    ori = obj.axis_origin.getvalue;
+                    axi = obj.rot_axis.getvalue;
+                    ang = obj.rot_angle.getvalue;
+                    % ---
+                    switch type
+                        case 'vector'
+                            ori = [0 0 0].';
+                    end
+                    % ---
+                    switch sens
+                        case 'inverse'
+                            ang = -ang;
+                    end
+                    % ---
+                    moved = f_rotaroundaxis(value, ...
+                        'axis_origin',ori, ...
+                        'rot_axis',axi, ...
+                        'rot_angle',ang);
+                else
+                    % ---
+                    ltime.it = back_it;
+                    % ---
+                    ori = obj.axis_origin.getvalue;
+                    axi = obj.rot_axis.getvalue;
+                    ang = obj.rot_angle.getvalue;
+                    % ---
+                    switch type
+                        case 'vector'
+                            ori = [0 0 0].';
+                    end
+                    % ---
+                    switch sens
+                        case 'inverse'
+                            ang = -ang;
+                    end
+                    % ---
+                    move01 = f_rotaroundaxis(value, ...
+                        'axis_origin',ori, ...
+                        'rot_axis',axi, ...
+                        'rot_angle',ang);
+                    % ---
+                    ltime.it = next_it;
+                    % ---
+                    ori = obj.axis_origin.getvalue;
+                    axi = obj.rot_axis.getvalue;
+                    ang = obj.rot_angle.getvalue;
+                    % ---
+                    switch type
+                        case 'vector'
+                            ori = [0 0 0].';
+                    end
+                    % ---
+                    switch sens
+                        case 'inverse'
+                            ang = -ang;
+                    end
+                    % ---
+                    move02 = f_rotaroundaxis(value, ...
+                        'axis_origin',ori, ...
+                        'rot_axis',axi, ...
+                        'rot_angle',ang);
+                    % ---
+                    delta_t = ltime.t_array(next_it) - ltime.t_array(back_it);
+                    % ---
+                    dt = t - ltime.t_array(back_it);
+                    % ---
+                    moved = move01 + (move02 - move01)./delta_t * dt;
+                end
+                % ---
+                ltime.it = it0;
+                % ---
             end
             % ---
         end
     end
-
 end

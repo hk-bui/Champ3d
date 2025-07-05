@@ -54,65 +54,115 @@ classdef LinearMovingFrame < MovingFrame
 
     % --- Methods
     methods
-        function moved = movenode(obj,node,it)
+        function moved = movenode(obj,node,t)
             arguments
                 obj
                 node
-                it = []
+                t = []
             end
             % ---
-            if isempty(it)
+            if isempty(t)
                 ldir = obj.lin_dir.getvalue;
                 lstp = obj.lin_step.getvalue;
                 moved = node + lstp .* ldir;
             else
-                it0 = obj.parent_model.ltime.it;
                 % ---
-                obj.parent_model.ltime.it = it;
-                ldir = obj.lin_dir.getvalue;
-                lstp = obj.lin_step.getvalue;
-                moved = node + lstp .* ldir;
+                ltime = obj.parent_model.ltime;
+                it0 = ltime.it;
                 % ---
-                obj.parent_model.ltime.it = it0;
+                next_it = ltime.next_it(t);
+                back_it = ltime.back_it(t);
+                % ---
+                if next_it == back_it
+                    ltime.it = back_it;
+                    ldir = obj.lin_dir.getvalue;
+                    lstp = obj.lin_step.getvalue;
+                    moved = node + lstp .* ldir;
+                else
+                    % ---
+                    ltime.it = back_it;
+                    ldir01 = obj.lin_dir.getvalue;
+                    lstp01 = obj.lin_step.getvalue;
+                    move01 = node + lstp01 .* ldir01;
+                    % ---
+                    ltime.it = next_it;
+                    ldir02 = obj.lin_dir.getvalue;
+                    lstp02 = obj.lin_step.getvalue;
+                    move02 = node + lstp02 .* ldir02;
+                    % ---
+                    delta_t = ltime.t_array(next_it) - ltime.t_array(back_it);
+                    % ---
+                    dt = t - ltime.t_array(back_it);
+                    % ---
+                    moved = move01 + (move02 - move01)./delta_t * dt;
+                end
+                % ---
+                ltime.it = it0;
+                % ---
             end
             % ---
         end
-        function moved = inverse_movenode(obj,node,it)
+        function moved = inverse_movenode(obj,node,t)
             arguments
                 obj
                 node
-                it = []
+                t = []
             end
             % ---
-            if isempty(it)
-                ldir = obj.lin_dir.getvalue;
-                lstp = obj.lin_step.getvalue;
-                moved = node + lstp .* ldir;
-            else
-                it0 = obj.parent_model.ltime.it;
-                % ---
-                obj.parent_model.ltime.it = it;
+            if isempty(t)
                 ldir = obj.lin_dir.getvalue;
                 lstp = obj.lin_step.getvalue;
                 moved = node - lstp .* ldir;
+            else
                 % ---
-                obj.parent_model.ltime.it = it0;
+                ltime = obj.parent_model.ltime;
+                it0 = ltime.it;
+                % ---
+                next_it = ltime.next_it(t);
+                back_it = ltime.back_it(t);
+                % ---
+                if next_it == back_it
+                    ltime.it = back_it;
+                    ldir = obj.lin_dir.getvalue;
+                    lstp = obj.lin_step.getvalue;
+                    moved = node - lstp .* ldir;
+                else
+                    % ---
+                    ltime.it = back_it;
+                    ldir01 = obj.lin_dir.getvalue;
+                    lstp01 = obj.lin_step.getvalue;
+                    move01 = node - lstp01 .* ldir01;
+                    % ---
+                    ltime.it = next_it;
+                    ldir02 = obj.lin_dir.getvalue;
+                    lstp02 = obj.lin_step.getvalue;
+                    move02 = node - lstp02 .* ldir02;
+                    % ---
+                    delta_t = ltime.t_array(next_it) - ltime.t_array(back_it);
+                    % ---
+                    dt = t - ltime.t_array(back_it);
+                    % ---
+                    moved = move01 + (move02 - move01)./delta_t * dt;
+                end
+                % ---
+                ltime.it = it0;
+                % ---
             end
             % ---
         end
-        function moved = movevector(obj,vector,it)
+        function moved = movevector(obj,vector,t)
             arguments
                 obj
                 vector
-                it = []
+                t = []
             end
             moved = vector;
         end
-        function moved = inverse_movevector(obj,vector,it)
+        function moved = inverse_movevector(obj,vector,t)
             arguments
                 obj
                 vector
-                it = []
+                t = []
             end
             moved = vector;
         end
