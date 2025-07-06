@@ -146,11 +146,25 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
     % --- Utility Methods
     methods
         % -----------------------------------------------------------------
-        function plot(obj)
+        function plot(obj,args)
+            arguments
+                obj
+                args.edge_color = [0.4940 0.1840 0.5560]
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.9
+                args.field {mustBeMember(args.field,{'unit_current'})}
+            end
             % ---
-            plot@PhysicalDom(obj,'face_color','none'); hold on
+            plot@PhysicalDom(obj,...
+                'face_color',args.face_color, ...
+                'edge_color',args.edge_color, ...
+                'alpha',args.alpha); hold on
             % ---
-            plot@OpenCoil(obj);
+            if isfield(args,'field')
+                if strcmpi(args.field,'unit_current')
+                    plot@OpenCoil(obj);
+                end
+            end
             % ---
         end
     end

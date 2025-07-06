@@ -19,32 +19,32 @@
 classdef LinearMovingFrame < MovingFrame
     
     properties
-        lin_dir       % linear mov direction
-        lin_step      % linear mov step
+        dir       % linear mov direction
+        step      % linear mov step
     end
     
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'lin_dir','lin_step'};
+            argslist = {'dir','step'};
         end
     end
     % --- Contructor
     methods
         function obj = LinearMovingFrame(args)
             arguments
-                args.lin_dir  = 0
-                args.lin_step = 0
+                args.dir  = 0
+                args.step = 0
             end
             % ---
             obj = obj@MovingFrame;
             % ---
-            if isnumeric(args.lin_dir)
-                args.lin_dir = Parameter('f',args.lin_dir);
+            if isnumeric(args.dir)
+                args.dir = Parameter('f',args.dir);
             end
             % ---
-            if isnumeric(args.lin_step)
-                args.lin_step = Parameter('f',args.lin_step);
+            if isnumeric(args.step)
+                args.step = Parameter('f',args.step);
             end
             % ---
             obj <= args;
@@ -62,8 +62,8 @@ classdef LinearMovingFrame < MovingFrame
             end
             % ---
             if isempty(t)
-                ldir = obj.lin_dir.getvalue;
-                lstp = obj.lin_step.getvalue;
+                ldir = obj.dir.getvalue;
+                lstp = obj.step.getvalue;
                 moved = node + lstp .* ldir;
             else
                 % ---
@@ -75,19 +75,19 @@ classdef LinearMovingFrame < MovingFrame
                 % ---
                 if next_it == back_it
                     ltime.it = back_it;
-                    ldir = obj.lin_dir.getvalue;
-                    lstp = obj.lin_step.getvalue;
+                    ldir = obj.dir.getvalue;
+                    lstp = obj.step.getvalue;
                     moved = node + lstp .* ldir;
                 else
                     % ---
                     ltime.it = back_it;
-                    ldir01 = obj.lin_dir.getvalue;
-                    lstp01 = obj.lin_step.getvalue;
+                    ldir01 = obj.dir.getvalue;
+                    lstp01 = obj.step.getvalue;
                     move01 = node + lstp01 .* ldir01;
                     % ---
                     ltime.it = next_it;
-                    ldir02 = obj.lin_dir.getvalue;
-                    lstp02 = obj.lin_step.getvalue;
+                    ldir02 = obj.dir.getvalue;
+                    lstp02 = obj.step.getvalue;
                     move02 = node + lstp02 .* ldir02;
                     % ---
                     delta_t = ltime.t_array(next_it) - ltime.t_array(back_it);
@@ -111,8 +111,8 @@ classdef LinearMovingFrame < MovingFrame
             end
             % ---
             if isempty(t)
-                ldir = obj.lin_dir.getvalue;
-                lstp = obj.lin_step.getvalue;
+                ldir = obj.dir.getvalue;
+                lstp = obj.step.getvalue;
                 moved = node - lstp .* ldir;
             else
                 % ---
@@ -124,19 +124,19 @@ classdef LinearMovingFrame < MovingFrame
                 % ---
                 if next_it == back_it
                     ltime.it = back_it;
-                    ldir = obj.lin_dir.getvalue;
-                    lstp = obj.lin_step.getvalue;
+                    ldir = obj.dir.getvalue;
+                    lstp = obj.step.getvalue;
                     moved = node - lstp .* ldir;
                 else
                     % ---
                     ltime.it = back_it;
-                    ldir01 = obj.lin_dir.getvalue;
-                    lstp01 = obj.lin_step.getvalue;
+                    ldir01 = obj.dir.getvalue;
+                    lstp01 = obj.step.getvalue;
                     move01 = node - lstp01 .* ldir01;
                     % ---
                     ltime.it = next_it;
-                    ldir02 = obj.lin_dir.getvalue;
-                    lstp02 = obj.lin_step.getvalue;
+                    ldir02 = obj.dir.getvalue;
+                    lstp02 = obj.step.getvalue;
                     move02 = node - lstp02 .* ldir02;
                     % ---
                     delta_t = ltime.t_array(next_it) - ltime.t_array(back_it);
