@@ -31,12 +31,23 @@ classdef VectorElemField < ElemField & VectorField
     % --- plot
     methods
         % -----------------------------------------------------------------
+        function plot_real(obj,args)
+            arguments
+                obj
+                args.meshdom_obj = []
+                args.id_meshdom = []
+                args.gindex = []
+                args.show_dom = 1
+            end
+            % ---
+        end
+        % -----------------------------------------------------------------
         function plot(obj,args)
             arguments
                 obj
                 args.meshdom_obj = []
                 args.id_meshdom = []
-                args.id_elem = []
+                args.gindex = []
                 args.show_dom = 1
             end
             % ---
@@ -44,10 +55,10 @@ classdef VectorElemField < ElemField & VectorField
                 args.show_dom = 0;
                 % ---
                 if isempty(args.meshdom_obj)
-                    if isempty(args.id_elem)
+                    if isempty(args.gindex)
                         text(0,0,'Nothing to plot !');
                     else
-                        gindex = args.id_elem;
+                        gindex = args.gindex;
                     end
                 else
                     dom = args.meshdom_obj;

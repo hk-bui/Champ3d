@@ -80,14 +80,14 @@ classdef ScalarNodeField < NodeField
             end
             % ---
             if isa(dom,'VolumeDom3d')
-                node_ = obj.parent_model.parent_mesh.node;
+                node_ = obj.parent_model.moving_frame.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gindex);
                 % ---
                 f_patch('node',node_,'elem',elem,'node_field',obj.cvalue);
             end
             % ---
             if isa(dom,'SurfaceDom3d')
-                node_ = obj.parent_model.parent_mesh.node;
+                node_ = obj.parent_model.moving_frame.node;
                 face = obj.parent_model.parent_mesh.face(:,gindex);
                 % ---
                 f_patch('node',node_,'face',face,'node_field',obj.cvalue);

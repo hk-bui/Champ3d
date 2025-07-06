@@ -378,6 +378,7 @@ classdef VolumeDom < MeshDom
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args,'with_out','id');
             for i = 1:length(submesh_)
+                % ---
                 submesh_{i}.plot(argu{:}); hold on
                 % ---
                 celem = submesh_{i}.cal_celem;

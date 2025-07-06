@@ -148,7 +148,7 @@ classdef SolidOpenIsCoil < OpenCoil & SolidCoil & IsCoil
         % -----------------------------------------------------------------
         function plot(obj)
             % ---
-            obj.dom.plot('face_color','none'); hold on
+            plot@PhysicalDom(obj,'face_color','none'); hold on
             % ---
             plot@OpenCoil(obj);
             % ---

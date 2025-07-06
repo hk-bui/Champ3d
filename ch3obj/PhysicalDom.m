@@ -136,9 +136,34 @@ classdef PhysicalDom < Xhandle
                 args.face_color = 'c'
                 args.alpha {mustBeNumeric} = 0.9
             end
+            % ----------------------------------------------------
+            submesh_ = obj.dom.submesh;
+            for i = 1:length(submesh_)
+                % ---
+                submesh_{i}.node = obj.parent_model.moving_frame.movenode(submesh_{i}.node);
+                % ---
+                argu = f_to_namedarg(args,'with_out','id');
+                submesh_{i}.plot(argu{:}); hold on
+                % ---
+                celem = submesh_{i}.cal_celem;
+                dim   = size(celem,1);
+                id = replace(obj.id,'_','-');
+                if dim == 2
+                    [~, imax] = max(celem(2,:));
+                    celem = celem(:,imax);
+                    t = text(celem(1),celem(2),['<-----' id]);
+                    t.FontWeight = 'bold';
+                elseif dim == 3
+                    [~, imax] = max(celem(3,:));
+                    celem = celem(:,imax);
+                    t = text(celem(1),celem(2),celem(3),['<-----' id]);
+                    t.FontWeight = 'bold';
+                end
+            end
+            % ----------------------------------------------------
+            %argu = f_to_namedarg(args);
+            %obj.dom.plot(argu{:});
             % ---
-            argu = f_to_namedarg(args);
-            obj.dom.plot(argu{:});
         end
         % -----------------------------------------------------------------
         function plotjv(obj,args)

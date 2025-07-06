@@ -517,8 +517,8 @@ classdef Parameter < Xhandle
                         fargs{i} = source_model.field{target_it}.(depon_).(place).cvalue(id_place_target);
                     else
                         if isequal(source_model.parent_mesh, target_model.parent_mesh) && ...
-                           isa(source_model.moving_frame,'NotMovingFrame') && ...
-                           isa(target_model.moving_frame,'NotMovingFrame')
+                           ( (isa(source_model.moving_frame,'NotMovingFrame') && isa(target_model.moving_frame,'NotMovingFrame')) || ...
+                             isequal(source_model.moving_frame,target_model.moving_frame) )
                             % ---
                             if isequal(source_model.ltime.t_array, target_model.ltime.t_array)
                                 % no interpolation
@@ -550,7 +550,7 @@ classdef Parameter < Xhandle
                                 % --- take just what needed
                                 if f_strcmpi(parameter_dependency_search,'by_coordinates')
                                     id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
-                                                'in_box',target_model.parent_mesh.localbox(id_elem_target,target_t));
+                                                'in_box',target_model.moving_frame.localbox(id_elem_target,target_t));
                                 else
                                     id_elem_source = [];
                                     if f_strcmpi(parameter_dependency_search,'by_id_dom') && ...
@@ -571,7 +571,7 @@ classdef Parameter < Xhandle
                                 % ---
                                 if isempty(id_elem_source)
                                     id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
-                                        'in_box',target_model.parent_mesh.localbox(id_elem_target,target_t));
+                                        'in_box',target_model.moving_frame.localbox(id_elem_target,target_t));
                                 end
                                 % --- time interpolated data
                                 next_it = source_model.ltime.next_it(target_t);
@@ -696,7 +696,7 @@ classdef Parameter < Xhandle
                                 % ---
                                 if f_strcmpi(parameter_dependency_search,'by_coordinates')
                                     id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
-                                                'in_box',target_model.parent_mesh.localbox([],target_t));
+                                                'in_box',target_model.moving_frame.localbox([],target_t));
                                 else
                                     if f_strcmpi(parameter_dependency_search,'by_id_dom') && ...
                                        isa(source_model.moving_frame,'NotMovingFrame') && ...
@@ -711,13 +711,13 @@ classdef Parameter < Xhandle
                                             f_fprintf(0,'surfacedom',1,target_dom.id,0,'not found on source model !',...
                                                 0,'champ3d performs #parameter_dependency_search by_coordinates \n');
                                             id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
-                                                        'in_box',target_model.parent_mesh.localbox([],target_t));
+                                                        'in_box',target_model.moving_frame.localbox([],target_t));
                                         end
                                     else
                                         if isempty(id_face_source)
                                             % --- XTODO add log message
                                             id_elem_source = f_findelem(source_model.moving_frame.node(target_t),source_model.parent_mesh.elem,...
-                                                        'in_box',target_model.parent_mesh.localbox([],target_t));
+                                                        'in_box',target_model.moving_frame.localbox([],target_t));
                                         end
                                     end
                                 end

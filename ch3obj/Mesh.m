@@ -170,16 +170,16 @@ classdef Mesh < Xhandle
                 zmax = max(obj.node(3,id_node_));
             end
             % ---
-            if ~isempty(t) && isprop(obj,'parent_model')
-                limnodes = ...
-                    obj.parent_model.moving_frame.movenode([xmin xmax; ymin ymax; zmin; zmax],t);
-                xmin = limnodes(1,1);
-                xmax = limnodes(2,1);
-                ymin = limnodes(3,1);
-                ymax = limnodes(1,2);
-                zmin = limnodes(2,2);
-                zmax = limnodes(3,2);
-            end
+            % if ~isempty(t) && isprop(obj,'parent_model')
+            %     limnodes = ...
+            %         obj.parent_model.moving_frame.movenode([xmin xmax; ymin ymax; zmin zmax],t);
+            %     xmin = limnodes(1,1);
+            %     xmax = limnodes(2,1);
+            %     ymin = limnodes(3,1);
+            %     ymax = limnodes(1,2);
+            %     zmin = limnodes(2,2);
+            %     zmax = limnodes(3,2);
+            % end
             % ---
             lbox.xmin = xmin;
             lbox.xmax = xmax;
