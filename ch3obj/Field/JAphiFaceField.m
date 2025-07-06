@@ -82,11 +82,7 @@ classdef JAphiFaceField < VectorFaceField
                 return
             end
             % ---
-            nbI = obj.parent_model.parent_mesh.refelem.nbI;
             val = {};
-            for i = 1:nbI
-                val{i} = zeros(length(id_face),3);
-            end
             % ---
             if ~isempty(obj.sibc)
                 id_phydom_ = fieldnames(obj.sibc);
@@ -97,7 +93,12 @@ classdef JAphiFaceField < VectorFaceField
                     [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
                     vcell =+ (obj.Efield({gindex}) * tarray(lindex));
                     if iec == 1
-                        
+                        nbI = length(vcell);
+                    end
+                end
+                if isempty(val)
+                    for i = 1:nbI
+                        val{i} = zeros(length(id_face),2);
                     end
                 end
                 for i = 1:nbI
