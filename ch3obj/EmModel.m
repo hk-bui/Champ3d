@@ -30,6 +30,8 @@ classdef EmModel < PhysicalModel
         sibc
         embc
         % ---
+        airbox_bcon = 'nullfield'
+        % ---
     end
     properties (Dependent)
         jome

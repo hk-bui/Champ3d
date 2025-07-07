@@ -17,13 +17,11 @@
 %--------------------------------------------------------------------------
 
 classdef CplAphiModelByODDM < CplModel
-
     properties
         scheme
         source
         load
     end
-
     % --- Constructor
     methods
         function obj = CplAphiModelByODDM(args)
@@ -38,18 +36,36 @@ classdef CplAphiModelByODDM < CplModel
             obj.scheme = args.scheme;
             % ---
             if isfield(args,'source')
-                obj.source = args.source;
+                if ~iscell(args.source)
+                    if isa(args.source,'FEM3dAphi')
+                        obj.source{1} = args.source;
+                    else
+                        error('#source must be a FEM3dAphi model !');
+                    end
+                else
+                    for i = 1:length(args.source)
+                        if isa(args.source{i},'FEM3dAphi')
+                            obj.source{i} = args.source{i};
+                        else
+                            error('#source must be a FEM3dAphi model !');
+                        end
+                    end
+                end
             end
             % ---
             if isfield(args,'load')
                 if ~iscell(args.load)
                     if isa(args.load,'FEM3dAphi')
                         obj.load{1} = args.load;
+                    else
+                        error('#load must be a FEM3dAphi model !');
                     end
                 else
                     for i = 1:length(args.load)
                         if isa(args.load{i},'FEM3dAphi')
                             obj.load{i} = args.load{i};
+                        else
+                            error('#load must be a FEM3dAphi model !');
                         end
                     end
                 end
@@ -120,9 +136,6 @@ classdef CplAphiModelByODDM < CplModel
         end
         % ---
     end
-    
-    
-    
     % --- Methods
     methods
         % ---

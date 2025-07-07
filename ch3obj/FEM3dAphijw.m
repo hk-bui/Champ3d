@@ -36,6 +36,7 @@ classdef FEM3dAphijw < FEM3dAphi
             arguments
                 args.parent_mesh {mustBeA(args.parent_mesh,'Mesh3d')}
                 args.frequency = 0
+                args.airbox_bcon {mustBeMember(args.airbox_bcon,{'nullfield','free'})} = 'nullfield'
             end
             % ---
             obj@FEM3dAphi;
@@ -98,6 +99,7 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.id_inner_node_nomesh = [];
             obj.matrix.id_elem_airbox = [];
             obj.matrix.id_inner_edge_airbox = [];
+            obj.matrix.id_edge_airbox = [];
             obj.matrix.id_node_phi = [];
             obj.matrix.id_elem_mcon = [];
             obj.matrix.id_node_petrode = [];
@@ -310,6 +312,8 @@ classdef FEM3dAphijw < FEM3dAphi
                 obj.ltime.it = it;
             end
             %--------------------------------------------------------------
+            % ---
+            obj.parent_mesh.build;
             % ---
             obj.dof{it}.A = EdgeDof('parent_model',obj);
             obj.dof{it}.Phi = NodeDof('parent_model',obj);

@@ -328,7 +328,11 @@ classdef VolumeDom < MeshDom
             end
             % -------------------------------------------------------------
             obj.gindex  = unique(gindex_);
-            obj.elem_code = unique(obj.parent_mesh.elem_code(gindex_));
+            if isempty(obj.parent_mesh.elem_code)
+                obj.elem_code = ones(1,length(gindex_));
+            else
+                obj.elem_code = unique(obj.parent_mesh.elem_code(gindex_));
+            end
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
