@@ -1,16 +1,30 @@
 // ---
 If (use_user_defined_airbox == 1)
-    // Coherence
+    // ---
     v() = BooleanFragments{ Volume{:}; Delete; } {};
     // ---
-    id_air_dom_string = "by_default_air";
-    id_air_dom_number = 3660369;
-    Physical Volume(Str(id_air_dom_string), id_air_dom_number) = v(#v()-1);
+    airbox_volume_list() = {};
+    For i In {0 : #v()-1}
+        get_i = 1;
+        For j In {0 : #physical_volume_list()-1}
+            If (v(i) == physical_volume_list(j))
+                get_i = 0;
+            EndIf
+        EndFor
+        If (get_i == 1)
+            airbox_volume_list += v(i);
+        EndIf
+    EndFor
+    id_air_dom_string = "air";
+    id_air_dom_number = 2620322;
+    Physical Volume(Str(id_air_dom_string), id_air_dom_number) = {airbox_volume_list()};
     // ---
+    /*
     air_mesh_size = 0;
     If (air_mesh_size > tol_mesh_size)
-        MeshSize{ PointsOf{ Volume{v(#v()-1)}; } } = air_mesh_size;
+        MeshSize{ PointsOf{ Volume{airbox_volume_list()}; } } = air_mesh_size;
     EndIf
+    */
 Else
     If (use_bounding_box_airbox == 1)
         // ---
@@ -34,9 +48,21 @@ Else
         // Coherence
         v() = BooleanFragments{ Volume{:}; Delete; } {};
         // ---
+        airbox_volume_list() = {};
+        For i In {0 : #v()-1}
+            get_i = 1;
+            For j In {0 : #physical_volume_list()-1}
+                If (v(i) == physical_volume_list(j))
+                    get_i = 0;
+                EndIf
+            EndFor
+            If (get_i == 1)
+                airbox_volume_list += v(i);
+            EndIf
+        EndFor
         id_air_dom_string = "by_default_air";
         id_air_dom_number = 3660369;
-        Physical Volume(Str(id_air_dom_string), id_air_dom_number) = v(#v()-1);
+        Physical Volume(Str(id_air_dom_string), id_air_dom_number) = {airbox_volume_list()};
         // ---
         // air_mesh_size = 0;
         // If (air_mesh_size > tol_mesh_size)
@@ -56,7 +82,7 @@ Mesh.MeshSizeFactor = 1;
 Mesh.MeshSizeFromPoints = 1;
 Mesh.Format = 50;
 Mesh.SaveAll = 0;
-Mesh 3;
+//Mesh 3;
 //Coherence Mesh;
 //RenumberMeshNodes;
 //RenumberMeshElements;

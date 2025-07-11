@@ -35,6 +35,8 @@ classdef PhysicalModel < Xhandle
             obj@Xhandle;
             % --- initialization
             obj.ltime = LTime;
+            obj.moving_frame = NotMovingFrame;
+            obj.moving_frame.parent_model = obj;
         end
     end
     % --- Utility Methods
@@ -49,7 +51,19 @@ classdef PhysicalModel < Xhandle
             end
             % ---
             obj.ltime = ltime_obj;
+            obj.ltime.parent_model = obj;
             % ---
+        end
+        % ---
+        function add_movingframe(obj,movingframe_obj)
+            arguments
+                obj
+                % ---
+                movingframe_obj {mustBeA(movingframe_obj,'MovingFrame')}
+            end
+            % ---
+            obj.moving_frame = movingframe_obj;
+            obj.moving_frame.parent_model = obj;
         end
         % ---
         function add_visualdom(obj,args)

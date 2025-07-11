@@ -67,6 +67,7 @@ classdef Mconductor < PhysicalDom
             obj.matrix.nu0nurwfwf = [];
             obj.matrix.nur_array = [];
             obj.matrix.mur_array = [];
+            obj.tarray = [];
             % ---
             obj.build_done = 0;
             % ---
@@ -81,6 +82,8 @@ classdef Mconductor < PhysicalDom
     % --- build
     methods
         function build(obj)
+            % ---
+            it = obj.parent_model.ltime.it;
             % ---
             dom = obj.dom;
             parent_mesh = dom.parent_mesh;
@@ -101,12 +104,19 @@ classdef Mconductor < PhysicalDom
             end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
+                % obj.tarray{it}.nur = obj.tarray{it-1}.nur; % XTODO
+                % obj.tarray{it}.mur = obj.tarray{it-1}.mur;
+                obj.tarray{it}.nur = TensorArray(nur_array,'parent_dom',obj);
+                obj.tarray{it}.mur = TensorArray(mur_array,'parent_dom',obj);
                 return
             end
             %--------------------------------------------------------------
             obj.matrix.gindex = gindex;
             obj.matrix.nur_array = nur_array;
             obj.matrix.mur_array = mur_array;
+            %--------------------------------------------------------------
+            obj.tarray{it}.nur = TensorArray(nur_array,'parent_dom',obj);
+            obj.tarray{it}.mur = TensorArray(mur_array,'parent_dom',obj);
             %--------------------------------------------------------------
             % local nu0nurwfwf matrix
             lmatrix = parent_mesh.cwfwf('id_elem',gindex,'coefficient',nu0nur);
@@ -158,6 +168,10 @@ classdef Mconductor < PhysicalDom
             %--------------------------------------------------------------
             obj.parent_model.matrix.id_elem_mcon = ...
                 unique([obj.parent_model.matrix.id_elem_mcon, obj.matrix.gindex]);
+            %--------------------------------------------------------------
+            it = obj.parent_model.ltime.it;
+            obj.parent_model.field{it}.H.elem.mconductor.(obj.id).nur = obj.tarray{it}.nur;
+            obj.parent_model.field{it}.H.elem.mconductor.(obj.id).mur = obj.tarray{it}.mur;
             %--------------------------------------------------------------
         end
     end

@@ -63,9 +63,16 @@ classdef PAphiElemField < ScalarElemField
         % -----------------------------------------------------------------
         function val = ivalue(obj,id_elem)
             % ---
-            % E = obj.Efield.cvalue(id_elem);
-            % Jconj = VectorArray.conjugate(obj.Jfield.cvalue(id_elem));
-            % val = VectorArray.dot(E,conj(J));
+            if nargin <= 1
+                id_elem = 1:obj.parent_model.parent_mesh.nb_elem;
+            end
+            % ---
+            if isempty(id_elem)
+                val = [];
+                return
+            end
+            % ---
+            val =+ (1/2 * real(obj.Efield({id_elem}) * conj(obj.Jfield({id_elem}))));
             % ---
         end
         % -----------------------------------------------------------------

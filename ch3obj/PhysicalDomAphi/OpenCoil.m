@@ -152,7 +152,7 @@ classdef OpenCoil < Coil
             if isfield(obj.matrix,'unit_current_field')
                 if ~isempty(obj.matrix.unit_current_field)
                     f_quiver(obj.dom.parent_mesh.celem(:,obj.matrix.gindex), ...
-                             obj.matrix.unit_current_field(:,obj.matrix.gindex),'sfactor',0.2);
+                             obj.matrix.unit_current_field(obj.matrix.gindex,:),'sfactor',0.2);
                 end
             end
         end

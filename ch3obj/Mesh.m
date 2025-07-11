@@ -129,6 +129,30 @@ classdef Mesh < Xhandle
         end
         % ---
     end
+    % --- Utility
+    methods (Static)
+        % -----------------------------------------------------------------
+        function submesh = submesh(parent_mesh,id_elem)
+            arguments
+                parent_mesh
+                id_elem
+            end
+            % ---
+            if isa(parent_mesh,'HexMesh')
+                submesh = HexMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'PrismMesh')
+                submesh = PrismMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'TetraMesh')
+                submesh = TetraMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'TriMesh')
+                submesh = TriMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            elseif isa(parent_mesh,'QuadMesh')
+                submesh = QuadMesh('node',parent_mesh.node,'elem',parent_mesh.elem(:,id_elem));
+            end
+            % ---
+        end
+        % -----------------------------------------------------------------
+    end
     % --- Add
     methods
         % -----------------------------------------------------------------
@@ -149,40 +173,108 @@ classdef Mesh < Xhandle
     methods
         % -----------------------------------------------------------------
         function lbox = localbox(obj,id_elem)
-            if nargin <= 1
+            arguments
+                obj
+                id_elem = []
+            end
+            % ---
+            if isempty(id_elem)
                 id_node_ = 1:obj.nb_node;
             else
                 id_node_ = f_uniquenode(obj.elem(:,id_elem));
             end
-            lbox.xmin = min(obj.node(1,id_node_));
-            lbox.xmax = max(obj.node(1,id_node_));
-            lbox.ymin = min(obj.node(2,id_node_));
-            lbox.ymax = max(obj.node(2,id_node_));
+            % ---
+            xmin = min(obj.node(1,id_node_));
+            xmax = max(obj.node(1,id_node_));
+            ymin = min(obj.node(2,id_node_));
+            ymax = max(obj.node(2,id_node_));
             if size(obj.node,1) == 3
-                lbox.zmin = min(obj.node(3,id_node_));
-                lbox.zmax = max(obj.node(3,id_node_));
+                zmin = min(obj.node(3,id_node_));
+                zmax = max(obj.node(3,id_node_));
             end
+            % ---
+            lbox.xmin = xmin;
+            lbox.xmax = xmax;
+            lbox.ymin = ymin;
+            lbox.ymax = ymax;
+            if size(obj.node,1) == 3
+                lbox.zmin = zmin;
+                lbox.zmax = zmax;
+            end
+            % ---
         end
         % -----------------------------------------------------------------
         function lock_origin(obj,args)
             arguments
                 obj
-                args.origin = []
+                args.gcoordinates = []
             end
             % ---
-            origin = args.origin;
+            gcoordinates = f_tocolv(args.gcoordinates);
             % ---
             if isa(obj,'Mesh2d')
-                if isempty(origin)
+                if isempty(gcoordinates)
                     return
-                elseif any(origin ~= [0 0])
-                    obj.node = obj.node - origin.';
+                elseif any(gcoordinates ~= [0 0])
+                    obj.node = obj.node + gcoordinates;
                 end
             elseif isa(obj,'Mesh3d')
-                if isempty(origin)
+                if isempty(gcoordinates)
                     return
-                elseif any(origin ~= [0 0 0])
-                    obj.node = obj.node - origin.';
+                elseif any(gcoordinates ~= [0 0 0])
+                    obj.node = obj.node + gcoordinates;
+                end
+            end
+            % ---
+            obj.celem = obj.cal_celem;
+            obj.cface = obj.cal_cface;
+            obj.cedge = obj.cal_cedge;
+        end
+        % -----------------------------------------------------------------
+        function centering(obj,id_dom)
+            arguments
+                obj
+                id_dom = ''
+            end
+            % ---
+            if isempty(id_dom)
+                lbox = obj.localbox;
+            else
+                if isempty(obj.dom)
+                    lbox = obj.localbox;
+                else
+                    alldom = fieldnames(obj.dom);
+                    if any(f_strcmpi(id_dom,alldom))
+                        for idd = 1:length(alldom)
+                            if strcmpi(alldom{idd},id_dom)
+                                id_elem = obj.dom.(id_dom).gindex;
+                                lbox = obj.localbox(id_elem);
+                                break
+                            end
+                        end
+                    else
+                        error(['#dom ' id_dom ' not found !']);
+                    end
+                end
+            end
+            % ---
+            if isa(obj,'Mesh2d')
+                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2];
+            elseif isa(obj,'Mesh3d')
+                gcoordinates = [(lbox.xmax + lbox.xmin)/2; (lbox.ymax + lbox.ymin)/2; (lbox.zmax + lbox.zmin)/2];
+            end
+            % ---
+            if isa(obj,'Mesh2d')
+                if isempty(gcoordinates)
+                    return
+                elseif any(gcoordinates ~= [0 0])
+                    obj.node = obj.node - gcoordinates;
+                end
+            elseif isa(obj,'Mesh3d')
+                if isempty(gcoordinates)
+                    return
+                elseif any(gcoordinates ~= [0 0 0])
+                    obj.node = obj.node - gcoordinates;
                 end
             end
             % ---
@@ -208,7 +300,7 @@ classdef Mesh < Xhandle
             end
             % ---
             obj.node = f_rotaroundaxis(obj.node, ...
-                'rot_axis_origin',rot_axis_origin, ...
+                'axis_origin',rot_axis_origin, ...
                 'rot_axis',rot_axis,'rot_angle',rot_angle);
             % ---
             obj.celem = obj.cal_celem;
@@ -216,19 +308,8 @@ classdef Mesh < Xhandle
             obj.cedge = obj.cal_cedge;
         end
         % -----------------------------------------------------------------
-        function celem = cal_celem(obj,args)
-            arguments
-                obj
-                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'local'
-            end
-            % ---
-            coordinate_system = args.coordinate_system;
-            % ---
-            if f_strcmpi(coordinate_system,'local')
-                node_ = obj.node;
-            else
-                %node_ = obj.gnode;
-            end
+        function celem = cal_celem(obj)
+            node_ = obj.node;
             % ---
             dim_  = size(node_,1);
             elem_ = obj.elem;
@@ -242,19 +323,8 @@ classdef Mesh < Xhandle
             % ---
         end
         % ---
-        function cface = cal_cface(obj,args)
-            arguments
-                obj
-                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'local'
-            end
-            % ---
-            coordinate_system = args.coordinate_system;
-            % ---
-            if f_strcmpi(coordinate_system,'local')
-                node_ = obj.node;
-            else
-                %node_ = obj.gnode;
-            end
+        function cface = cal_cface(obj)
+            node_ = obj.node;
             % ---
             dim_  = size(node_,1);
             % ---
@@ -268,19 +338,8 @@ classdef Mesh < Xhandle
             end
         end
         % ---
-        function cedge = cal_cedge(obj,args)
-            arguments
-                obj
-                args.coordinate_system {mustBeMember(args.coordinate_system,{'local','global'})} = 'local'
-            end
-            % ---
-            coordinate_system = args.coordinate_system;
-            % ---
-            if f_strcmpi(coordinate_system,'local')
-                node_ = obj.node;
-            else
-                %node_ = obj.gnode;
-            end
+        function cedge = cal_cedge(obj)
+            node_ = obj.node;
             % ---
             dim_  = size(node_,1);
             % ---
@@ -290,8 +349,12 @@ classdef Mesh < Xhandle
             edge_ = obj.edge;
             nb_edge_ = size(edge_,2);
             % ---
-            cedge = mean(reshape(node_(:,edge_(1:nbNo_inEd,:)),dim_,nbNo_inEd,nb_edge_),2);
-            cedge = squeeze(cedge);
+            if ~isempty(edge_)
+                cedge = mean(reshape(node_(:,edge_(1:nbNo_inEd,:)),dim_,nbNo_inEd,nb_edge_),2);
+                cedge = squeeze(cedge);
+            else
+                cedge = [];
+            end
         end
         function cal_flatnode(obj)
             % ---

@@ -75,11 +75,41 @@ classdef PAphiFaceField < ScalarFaceField
             % ---
         end
         % -----------------------------------------------------------------
-        function val = ivalue(obj,id_elem)
+        function val = ivalue(obj,id_face)
             % ---
-            % E = obj.Efield.cvalue(id_elem);
-            % Jconj = VectorArray.conjugate(obj.Jfield.cvalue(id_elem));
-            % val = Array.dot(E,conj(J));
+            if nargin <= 1
+                id_face = 1:obj.parent_model.parent_mesh.nb_face;
+            end
+            % ---
+            if isempty(id_face)
+                val = [];
+                return
+            end
+            % ---
+            val = {};
+            % ---
+            if ~isempty(obj.sibc)
+                id_phydom_ = fieldnames(obj.sibc);
+                % ---
+                for iec = 1:length(id_phydom_)
+                    tarray = obj.sibc.(id_phydom_{iec}).skindepth;
+                    % ---
+                    [gindex,lindex] = intersect(id_face,tarray.parent_dom.gindex);
+                    vcell =+ (1/2 * real(tarray(lindex) * ...
+                        obj.Efield({gindex}) * conj(obj.Jfield({gindex}))));
+                    if iec == 1
+                        nbI = length(vcell);
+                    end
+                end
+                if isempty(val)
+                    for i = 1:nbI
+                        val{i} = zeros(length(id_face),1);
+                    end
+                end
+                for i = 1:nbI
+                    val{i}(lindex,:) = vcell{i};
+                end
+            end
             % ---
         end
         % -----------------------------------------------------------------

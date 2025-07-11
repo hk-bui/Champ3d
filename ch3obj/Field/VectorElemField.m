@@ -31,12 +31,26 @@ classdef VectorElemField < ElemField & VectorField
     % --- plot
     methods
         % -----------------------------------------------------------------
+        function plot_real(obj,args)
+            arguments
+                obj
+                args.meshdom_obj = []
+                args.id_meshdom = []
+                args.gindex = []
+                args.show_dom = 1
+                args.edge_color = [0.4940 0.1840 0.5560]
+                args.face_color = 'c'
+                args.alpha {mustBeNumeric} = 0.5
+            end
+            % ---
+        end
+        % -----------------------------------------------------------------
         function plot(obj,args)
             arguments
                 obj
                 args.meshdom_obj = []
                 args.id_meshdom = []
-                args.id_elem = []
+                args.gindex = []
                 args.show_dom = 1
             end
             % ---
@@ -44,10 +58,10 @@ classdef VectorElemField < ElemField & VectorField
                 args.show_dom = 0;
                 % ---
                 if isempty(args.meshdom_obj)
-                    if isempty(args.id_elem)
+                    if isempty(args.gindex)
                         text(0,0,'Nothing to plot !');
                     else
-                        gindex = args.id_elem;
+                        gindex = args.gindex;
                     end
                 else
                     dom = args.meshdom_obj;
@@ -67,10 +81,21 @@ classdef VectorElemField < ElemField & VectorField
             end
             % ---
             if args.show_dom
-                dom.plot('alpha',0.5,'edge_color',[0.9 0.9 0.9],'face_color','none')
+                pmsh = obj.parent_model.parent_mesh;
+                msh = Mesh.submesh(pmsh,gindex);
+                % ---
+                % msh.plot('face_color',args.face_color, ...
+                %          'edge_color',args.edge_color, ...
+                %          'alpha',args.alpha); hold on
+                % ---
+                msh.plot('face_color','c', ...
+                         'edge_color','k', ...
+                         'alpha',0.5); hold on
+                % ---
             end
             % ---
-            celem = obj.parent_model.parent_mesh.celem(:,gindex);
+            celem = obj.parent_model.moving_frame.celem;
+            celem = celem(:,gindex);
             v_ = obj.cvalue(gindex);
             if isreal(v_)
                 % ---
@@ -80,7 +105,7 @@ classdef VectorElemField < ElemField & VectorField
                 % ---
                 subplot(122)
                 title('Norm');
-                node_ = obj.parent_model.parent_mesh.node;
+                node_ = obj.parent_model.moving_frame.node;
                 elem = obj.parent_model.parent_mesh.elem(:,gindex);
                 v__ = Array.norm(v_);
                 f_patch('node',node_,'elem',elem,'elem_field',v__);
@@ -103,7 +128,7 @@ classdef VectorElemField < ElemField & VectorField
                     elseif i == 4
                         title('Max');
                         % ---
-                        node_ = obj.parent_model.parent_mesh.node;
+                        node_ = obj.parent_model.moving_frame.node;
                         elem = obj.parent_model.parent_mesh.elem(:,gindex);
                         v__ = Array.norm(VectorArray.max(v_));
                         f_patch('node',node_,'elem',elem,'elem_field',v__);

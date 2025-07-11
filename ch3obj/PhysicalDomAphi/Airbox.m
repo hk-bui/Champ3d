@@ -72,10 +72,13 @@ classdef Airbox < PhysicalDom
     methods
         function build(obj)
             % ---
+            it = obj.parent_model.ltime.it;
+            % ---
             dom = obj.dom;
             obj.dom.get_gid;
             obj.matrix.gid_elem = dom.gid.gid_elem;
             obj.matrix.gid_inner_edge = dom.gid.gid_inner_edge;
+            obj.matrix.gid_edge = dom.gid.gid_edge;
             % ---
             obj.build_done = 1;
         end
@@ -87,8 +90,17 @@ classdef Airbox < PhysicalDom
             % ---
             obj.parent_model.matrix.id_elem_airbox = ...
                 unique([obj.parent_model.matrix.id_elem_airbox, obj.matrix.gid_elem]);
-            obj.parent_model.matrix.id_inner_edge_airbox = ...
-                unique([obj.parent_model.matrix.id_inner_edge_airbox, obj.matrix.gid_inner_edge]);
+            switch obj.parent_model.airbox_bcon
+                case 'nullfield'
+                    obj.parent_model.matrix.id_inner_edge_airbox = ...
+                    unique([obj.parent_model.matrix.id_inner_edge_airbox, obj.matrix.gid_inner_edge]);
+                case 'free'
+                    obj.parent_model.matrix.id_inner_edge_airbox = ...
+                    unique([obj.parent_model.matrix.id_inner_edge_airbox, obj.matrix.gid_edge]);
+            end
+            % ---
+            obj.parent_model.matrix.id_edge_airbox = ...
+                unique([obj.parent_model.matrix.id_edge_airbox, obj.matrix.gid_edge]);
         end
     end
 end

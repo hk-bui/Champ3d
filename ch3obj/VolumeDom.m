@@ -328,7 +328,11 @@ classdef VolumeDom < MeshDom
             end
             % -------------------------------------------------------------
             obj.gindex  = unique(gindex_);
-            obj.elem_code = unique(obj.parent_mesh.elem_code(gindex_));
+            if isempty(obj.parent_mesh.elem_code)
+                obj.elem_code = ones(1,length(gindex_));
+            else
+                obj.elem_code = unique(obj.parent_mesh.elem_code(gindex_));
+            end
             % -------------------------------------------------------------
         end
         % -----------------------------------------------------------------
@@ -378,6 +382,7 @@ classdef VolumeDom < MeshDom
             submesh_ = obj.submesh;
             argu = f_to_namedarg(args,'with_out','id');
             for i = 1:length(submesh_)
+                % ---
                 submesh_{i}.plot(argu{:}); hold on
                 % ---
                 celem = submesh_{i}.cal_celem;

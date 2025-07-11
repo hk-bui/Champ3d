@@ -44,7 +44,8 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
                 args.id
                 args.parent_model
                 args.id_dom3d
-                args.etrode_equation
+                args.spin_vector
+                % args.etrode_equation
                 % ---
                 args.connexion {mustBeMember(args.connexion,{'serial','parallel'})}
                 args.cs_area
@@ -80,8 +81,6 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
                 end
             end
             % ---
-            obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
-            obj.etrode_equation = obj.etrode_equation{1};
             % --- call utility methods
             obj.set_parameter;
             obj.get_geodom;
@@ -89,10 +88,13 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             % XTODO - vdom
             % obj.etrode.is_defining_obj_of(obj);
             % --- specific
-            obj.get_electrode;
+            % obj.etrode_equation = f_to_scellargin(obj.etrode_equation);
+            % obj.etrode_equation = obj.etrode_equation{1};
+            % obj.get_electrode;
             % --- Initialization
-            obj.dofuJ = EdgeDof('parent_model',obj.parent_model);
-            obj.uJfield = EdgeDofBasedVectorElemField('parent_model',obj.parent_model,'dof',obj.dofuJ);
+            % obj.dofuJ = EdgeDof('parent_model',obj.parent_model);
+            % obj.uJfield = EdgeDofBasedVectorElemField('parent_model',obj.parent_model,'dof',obj.dofuJ);
+            obj.uJfield = Field;
             % --- Initialization
             obj.matrix.gindex = [];
             obj.matrix.js_array = [];
@@ -134,12 +136,13 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             %--------------------------------------------------------------
             % CloseCoil first, then JsCoil
             % ---
-            [unit_current_field,alpha,dofuJ_] = obj.get_uj_alpha;
+            [unit_current_field, alpha] = obj.get_uj_alpha;
             obj.matrix.unit_current_field = unit_current_field;
             obj.matrix.alpha = alpha;
             obj.matrix.current_turn_density = ...
                 obj.matrix.unit_current_field .* obj.nb_turn ./ obj.cs_area;
-            obj.dofuJ.value = dofuJ_;
+            % ---
+            obj.uJfield.value = unit_current_field;
             % ---
             if strcmpi(obj.coil_mode,'tx')
                 [t_js,wfjs] = obj.get_t_js;
@@ -156,8 +159,10 @@ classdef StrandedCloseJsCoil < CloseCoil & StrandedCoil & JsCoil
             % ---
             obj.build;
             %--------------------------------------------------------------
-            obj.parent_model.matrix.t_js = ...
-                obj.parent_model.matrix.t_js + obj.matrix.t_js;
+            if strcmpi(obj.coil_mode,'tx')
+                obj.parent_model.matrix.t_js = ...
+                    obj.parent_model.matrix.t_js + obj.matrix.t_js;
+            end
             %--------------------------------------------------------------
         end
     end

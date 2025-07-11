@@ -36,24 +36,25 @@ classdef FEM3dAphijw < FEM3dAphi
             arguments
                 args.parent_mesh {mustBeA(args.parent_mesh,'Mesh3d')}
                 args.frequency = 0
+                args.airbox_bcon {mustBeMember(args.airbox_bcon,{'nullfield','free'})} = 'nullfield'
             end
             % ---
             obj@FEM3dAphi;
             % ---
             obj <= args;
             % ---
-            
-            % ---
         end
     end
-    % --- setup
-    methods (Static)
-        function setup(obj)
-            obj.build_done = 0;
-            obj.base_matrix_done = 0;
-            obj.parent_mesh.is_defining_obj_of(obj);
-        end
-    end
+    
+    % --- XTODO : setup/reset
+    % methods (Static)
+    %     function setup(obj)
+    %         obj.build_done = 0;
+    %         obj.base_matrix_done = 0;
+    %         obj.parent_mesh.is_defining_obj_of(obj);
+    %     end
+    % end
+
     % --- build
     methods
         %------------------------------------------------------------------
@@ -98,6 +99,7 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.matrix.id_inner_node_nomesh = [];
             obj.matrix.id_elem_airbox = [];
             obj.matrix.id_inner_edge_airbox = [];
+            obj.matrix.id_edge_airbox = [];
             obj.matrix.id_node_phi = [];
             obj.matrix.id_elem_mcon = [];
             obj.matrix.id_node_petrode = [];
@@ -311,6 +313,8 @@ classdef FEM3dAphijw < FEM3dAphi
             end
             %--------------------------------------------------------------
             % ---
+            obj.parent_mesh.build;
+            % ---
             obj.dof{it}.A = EdgeDof('parent_model',obj);
             obj.dof{it}.Phi = NodeDof('parent_model',obj);
             obj.dof{it}.B = FaceDof('parent_model',obj);
@@ -328,6 +332,8 @@ classdef FEM3dAphijw < FEM3dAphi
             obj.field{it}.E.face = ...
                 EdgeDofBasedVectorFaceField('parent_model',obj,'dof',obj.dof{it}.E);
             %--------------------------------------------------------------
+            obj.field{it}.H.elem = ...
+                HAphiElemField('parent_model',obj,'Bfield',obj.field{it}.B.elem);
             obj.field{it}.J.elem = ...
                 JAphiElemField('parent_model',obj,'Efield',obj.field{it}.E.elem);
             obj.field{it}.J.face = ...

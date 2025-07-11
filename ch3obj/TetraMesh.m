@@ -63,6 +63,7 @@ classdef TetraMesh < Mesh3d
             obj.build_discrete_done = 0;
             obj.build_intkit_done = 0;
             obj.build_prokit_done = 0;
+            % ---
         end
     end
     methods (Access = public)
@@ -185,15 +186,24 @@ classdef TetraMesh < Mesh3d
             refelem.cW  = 1/4;
             refelem.cWeigh  = 1/6;
             refelem.nbG = length(refelem.U);
-            % ---
+            % --- XTODO : check why Duplicate data points have been detected
             refelem.nbI = 5;
             e = 1e-6;
-            refelem.nU = [ 0 +1  0  0];
-            refelem.nV = [ 0  0 +1  0];
-            refelem.nW = [ 0  0  0 +1];
-            refelem.iU = [(1-e) * refelem.nU    1/4];
-            refelem.iV = [(1-e) * refelem.nV    1/4];
-            refelem.iW = [(1-e) * refelem.nW    1/4];
+            refelem.nU = [ 0 +1  0  0 ];
+            refelem.nV = [ 0  0 +1  0 ];
+            refelem.nW = [ 0  0  0 +1 ];
+            refelem.iU = [ -e  +1+e  -e/4  -e/4  1/4];
+            refelem.iV = [ -e  -e/4  +1+e  -e/4  1/4];
+            refelem.iW = [ -e  -e/4  -e/4  +1+e  1/4];
+            % --- 
+            % refelem.nbI = 2;
+            % e = 1e-6;
+            % refelem.nU = [ 0 +1  0  0 ];
+            % refelem.nV = [ 0  0 +1  0 ];
+            % refelem.nW = [ 0  0  0 +1 ];
+            % refelem.iU = [1/4 1/5];
+            % refelem.iV = [1/4 1/5];
+            % refelem.iW = [1/4 1/5];
             %-----
             refelem.N{1} = @(u,v,w) 1-u-v-w;
             refelem.N{2} = @(u,v,w) u;

@@ -67,6 +67,7 @@ classdef TriMesh < Mesh2d
             obj.build_prokit_done = 0;
             % ---
             obj.cal_flatnode;
+            % ---
         end
     end
     % --- build
@@ -173,12 +174,19 @@ classdef TriMesh < Mesh2d
             % ---
             refelem.nbG = length(refelem.U);
             % ---
-            refelem.nbI = 5;
+            % refelem.nbI = 5;
+            % e = 1e-6;
+            % refelem.nU = [0 1 0];
+            % refelem.nV = [0 0 1];
+            % refelem.iU = [(1-e) * refelem.nU    1/3  5/12];
+            % refelem.iV = [(1-e) * refelem.nV    1/3  5/12];
+            % ---
+            refelem.nbI = 5; % must be same as quad
             e = 1e-6;
             refelem.nU = [0 1 0];
             refelem.nV = [0 0 1];
-            refelem.iU = [(1-e) * refelem.nU    1/3  2/3];
-            refelem.iV = [(1-e) * refelem.nV    1/3  2/3];
+            refelem.iU = [-e +1+e -e/2 1/3 5/12];
+            refelem.iV = [-e -e/2 +1+e 1/3 5/12];
             %-----
             refelem.N{1} = @(u,v) (1-u-v);
             refelem.N{2} = @(u,v) (    u);

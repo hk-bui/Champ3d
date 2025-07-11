@@ -161,11 +161,15 @@ classdef TetraMeshFromGMSH < TetraMesh
             % ---
             obj.mesh_file = mshname;
             % ---
+            fprintf('Cleaning ...\n');
+            fclose("all");
             if isfile(geoname)
-                fprintf('Cleaning ...\n');
-                system(['rm ' geoname ' ' mshname]);
-                fprintf('Old data cleaned.\n');
+                system(['rm ' geoname]);
             end
+            if isfile(mshname)
+                system(['rm ' mshname]);
+            end
+            fprintf('Old data cleaned.\n');
             % ---
             geofile = fopen(geoname,'w');
             % --- Init
@@ -208,14 +212,24 @@ classdef TetraMeshFromGMSH < TetraMesh
             end
             fclose(geofile);
             % ---
+            gmshargu = [geoname ' -3 -o ' mshname];
             call_GMSH_run = [Ch3Config.GMSHExecutable ' ' ...
-                             geoname ' ' ...
-                             '-v 0 -'];
+                             gmshargu];
+            fprintf([call_GMSH_run '\n']);
             % ---
             try
+                k = 0;
+                while ~isfile(geoname)
+                    if k == 0
+                        f_fprintf(0,'Waiting geo file ... \n');
+                    end
+                    k = 1;
+                end
+                fclose("all");
                 fprintf('GMSH running ... \n');
                 [status, cmdout] = system(call_GMSH_run);
                 fprintf('Done.\n');
+                fclose("all");
                 if status == 0
                     k = 0;
                     while ~isfile(mshname)
@@ -226,6 +240,7 @@ classdef TetraMeshFromGMSH < TetraMesh
                     end
                     % ---
                     obj.build_from_mesh_file;
+                    fclose("all");
                     % ---
                 end
             catch

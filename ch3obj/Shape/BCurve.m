@@ -316,7 +316,7 @@ classdef BCurve < CurveShape
             % ---
             obj.where2cut;
             % ---
-            nbp = 30; % XTODO : may be enough
+            nbp = 5; % XTODO : may be enough
             % ---
             lengo = length(obj.go);
             % ---
@@ -342,6 +342,8 @@ classdef BCurve < CurveShape
                         else
                             nstop = g.nf;
                         end
+                        % --- XTODO : compute npt from rmin
+                        % nbp = floor(norm(g.vlen)/rmin_);
                         % ---
                         g.node = ...
                         [linspace(nstart(1),nstop(1),nbp); ...
