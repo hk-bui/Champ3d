@@ -26,8 +26,8 @@ cmpresult = zeros(1,len);
 %--------------------------------------------------------------------------
 for i = 1:len
     s1 = str1{i};
-    if ischar(s1)
-        cmpresult(i) = any(strcmpi(s1,str2));
+    if ischar(s1) || isstring(s1)
+        cmpresult(i) = any(strcmpi(string(s1),string(str2)));
     else
         cmpresult(i) = 0;
     end
