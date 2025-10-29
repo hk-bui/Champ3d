@@ -60,7 +60,7 @@ classdef VolumeDom2d < VolumeDom
             % ---
             if ~isempty(obj.id_xline) && ~isempty(obj.id_yline)
                 obj.build_from_idmesh1d;
-            elseif ~isempty(obj.elem_code)
+            elseif ~isempty(obj.elem_code)      % check elem_code first !!
                 obj.build_from_elem_code;
             elseif ~isempty(obj.gindex)
                 obj.build_from_gindex;
