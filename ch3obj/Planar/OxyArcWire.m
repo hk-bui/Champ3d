@@ -62,7 +62,7 @@ classdef OxyArcWire < Xhandle
             lnode = obj.local_node(node);
             % ---
             rho = sqrt(lnode(1,:).^2 + lnode(2,:).^2);
-            rho(rho == 0) = 1e-8; % !!!
+            rho(rho <= 1e-6) = 1e-6; % !!!
             phi = acos(lnode(1,:)./rho) .* sign(lnode(2,:));
             dz  = lnode(3,:);
             % ---
@@ -94,7 +94,31 @@ classdef OxyArcWire < Xhandle
                                                  -( cos(phi).*f4_phi1 + sin(phi) .* f3_phi1 ) );
             By = mu0*obj.signI*I/(4*pi) .*c4 .* ( (-cos(phi).*f3_phi2 + sin(phi) .* f4_phi2 ) ...
                                                  -(-cos(phi).*f3_phi1 + sin(phi) .* f4_phi1 ) );
-            Bz = mu0*obj.signI*I/(4*pi)/obj.r .* (f5_phi2 - f5_phi1);
+            % --- formule 1
+            % Bz = mu0*obj.signI*I/(4*pi)/obj.r .* (f5_phi2 - f5_phi1);
+            % --- formule 2
+            Bz = mu0*obj.signI*I/(4*pi) .* (f5_phi2 - f5_phi1);
+            % ---
+            a2 = (rho + obj.r).^2+ dz.^2;
+            a  = sqrt(a2);
+            k2 = 4.*rho.*obj.r ./ a2;
+            k = sqrt(k2);
+            alpha1 = -(obj.phi1/180*pi - phi - pi)./2;
+            alpha2 = -(obj.phi2/180*pi - phi - pi)./2;
+            theta1 = abs(alpha1);
+            theta2 = abs(alpha2);
+            b = rho + obj.r;
+            kpr2 = (1 - k2);
+            kpr  = sqrt(kpr2);
+            % ---
+            F_theta1  = mpEllipticF(theta1,k);
+            F_theta2  = mpEllipticF(theta2,k);
+            W_theta1  = mpEllipticE(theta1,k) - k2.*sin(theta1).*cos(theta1)./sqrt(1 - k2.*sin(theta1));
+            W_theta2  = mpEllipticE(theta2,k) - k2.*sin(theta2).*cos(theta2)./sqrt(1 - k2.*sin(theta2));
+            Int1 = sign(alpha1) .* (rho.*kpr2.*F_theta1 - (rho - b.*k2./2) .* W_theta1);
+            Int2 = sign(alpha2) .* (rho.*kpr2.*F_theta2 - (rho - b.*k2./2) .* W_theta2);
+            % --- formule 3
+            % Bz = mu0*obj.signI*I/(4*pi) .* 1./(rho.*a.*kpr2) .* (Int2 - Int1);
             % ---
             B = [Bx;By;Bz];
         end
