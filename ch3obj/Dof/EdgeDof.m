@@ -20,6 +20,7 @@ classdef EdgeDof < Xhandle
     properties
         parent_model
         % ---
+        nb_edge
         value
     end
     % --- Contructor
@@ -37,6 +38,7 @@ classdef EdgeDof < Xhandle
             end
             % ---
             obj.parent_model = args.parent_model;
+            obj.nb_edge = obj.parent_model.parent_mesh.nb_edge;
             obj.value = args.value;
             % ---
         end
@@ -45,13 +47,12 @@ classdef EdgeDof < Xhandle
     methods
         % -----------------------------------------------------------------
         function set.value(obj,value)
-            nb_edge = obj.parent_model.parent_mesh.nb_edge;
             if isempty(value)
-                obj.value = zeros(nb_edge,1);
+                obj.value = zeros(obj.nb_edge,1);
             elseif numel(value) == 1
-                obj.value = value .* ones(nb_edge,1);
+                obj.value = value .* ones(obj.nb_edge,1);
             else
-                if numel(value) ~= nb_edge
+                if numel(value) ~= obj.nb_edge
                     error('#value must correspond to mesh edge, check size !');
                 else
                     obj.value = f_tocolv(value);

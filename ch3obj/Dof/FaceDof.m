@@ -20,6 +20,7 @@ classdef FaceDof < Xhandle
     properties
         parent_model
         % ---
+        nb_face
         value
     end
     % --- Contructor
@@ -37,6 +38,7 @@ classdef FaceDof < Xhandle
             end
             % ---
             obj.parent_model = args.parent_model;
+            obj.nb_face = obj.parent_model.parent_mesh.nb_face;
             obj.value = args.value;
             % ---
         end
@@ -45,13 +47,12 @@ classdef FaceDof < Xhandle
     methods
         % -----------------------------------------------------------------
         function set.value(obj,value)
-            nb_face = obj.parent_model.parent_mesh.nb_face;
             if isempty(value)
-                obj.value = zeros(nb_face,1);
+                obj.value = zeros(obj.nb_face,1);
             elseif numel(value) == 1
-                obj.value = value .* ones(nb_face,1);
+                obj.value = value .* ones(obj.nb_face,1);
             else
-                if numel(value) ~= nb_face
+                if numel(value) ~= obj.nb_face
                     error('#value must correspond to mesh face, check size !');
                 else
                     obj.value = f_tocolv(value);
