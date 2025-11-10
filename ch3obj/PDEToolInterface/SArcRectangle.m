@@ -90,19 +90,30 @@ classdef SArcRectangle < PDEToolShape2d
             nbp = length(x);
             gd = [2, nbp, x, y].';
             % --- XTODO
-            % da = (a(2) - a(1))/2;
-            % dr = 1e-6;
-            % r_in = obj.r * cosd(da) - dr;
+            e = 1e-3;
             % ---
-            dai = (ai(2) - ai(1))/2;
-            dao = (ao(2) - ao(1))/2;
-            dr = 1e-6;
-            r_in = obj.ri + dr;
-            r_ou = obj.ro * cosd(dao) - dr;
-            obj.bottom = [+r_in, 0] + obj.center;
-            obj.top    = [+r_ou, 0] + obj.center;
-            obj.left   = obj.center;
-            obj.right  = obj.center;
+            da = (ai(2) - ai(1))/2;
+            r_ = obj.ri * cosd(da) + e * obj.ri;
+            p = [+r_, 0] + obj.center;
+            bottom = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            da = (ao(2) - ao(1))/2;
+            r_ = obj.ri * cosd(da) - e * obj.ri;
+            p = [+r_, 0] + obj.center;
+            top = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            rmean = (obj.ri + obj.ro)/2;
+            hmin = min(obj.ri*sind(obj.openi/2), obj.ro*sind(obj.openo/2));
+            p = [rmean, +hmin] + obj.center;
+            left = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            p = [rmean, -hmin] + obj.center;
+            right = f_rotaroundaxis(p.',"axis_origin",obj.center,"rot_axis",[0 0 1],"rot_angle",obj.orientation);
+            % ---
+            obj.top = top;
+            obj.bottom = bottom;
+            obj.left = left;
+            obj.right = right;
         end
     end
 end
