@@ -913,6 +913,175 @@ classdef Mesh3d < Mesh
             end
         end
         % -----------------------------------------------------------------
+        function coefvfwfxwe = cvfwfxwe(obj,args)
+            arguments
+                obj
+                args.id_elem = []
+                args.coefficient = 1
+                args.vector_field = [1 1 1];
+                args.order = '0'
+            end
+            %--------------------------------------------------------------
+            id_elem = args.id_elem;
+            coefficient = args.coefficient;
+            order = args.order;
+            vector_field = args.vector_field;
+            %--------------------------------------------------------------
+            if isempty(id_elem)
+                nb_elem = obj.nb_elem;
+                id_elem = 1:nb_elem;
+            else
+                nb_elem = length(id_elem);
+            end
+            % ---
+            if isnumeric(order)
+                if order < 1
+                    order = '0';
+                else
+                    order = 'full';
+                end
+            end
+            %--------------------------------------------------------------
+            [coefficient, coef_array_type] = Array.tensor(coefficient);
+            %--------------------------------------------------------------
+            if ~iscell(vector_field)
+                vector_field = Array.vector(vector_field);
+            end
+            %--------------------------------------------------------------
+            refelem = obj.refelem;
+            nbEd_inEl = refelem.nbEd_inEl;
+            nbFa_inEl = refelem.nbFa_inEl;
+            %--------------------------------------------------------------
+            if isempty(obj.intkit.We) || isempty(obj.intkit.cWe) || ...
+                    isempty(obj.intkit.Wf) || isempty(obj.intkit.cWf)
+                obj.build_intkit;
+            end
+            %--------------------------------------------------------------
+            switch order
+                case '0'
+                    nbG = 1;
+                    Weigh = refelem.cWeigh;
+                    % ---
+                    We = cell(1,nbG);
+                    Wf = cell(1,nbG);
+                    detJ = cell(1,nbG);
+                    for iG = 1:nbG
+                        We{iG} = obj.intkit.cWe{iG}(id_elem,:,:);
+                        Wf{iG} = obj.intkit.cWf{iG}(id_elem,:,:);
+                        detJ{iG} = obj.intkit.cdetJ{iG}(id_elem,1);
+                    end
+                case 'full'
+                    nbG = refelem.nbG;
+                    Weigh = refelem.Weigh;
+                    % ---
+                    We = cell(1,nbG);
+                    Wf = cell(1,nbG);
+                    detJ = cell(1,nbG);
+                    for iG = 1:nbG
+                        We{iG} = obj.intkit.We{iG}(id_elem,:,:);
+                        Wf{iG} = obj.intkit.Wf{iG}(id_elem,:,:);
+                        detJ{iG} = obj.intkit.detJ{iG}(id_elem,1);
+                    end
+            end
+            %--------------------------------------------------------------
+            coefvfwfxwe = zeros(nb_elem,nbFa_inEl,nbEd_inEl);
+            %--------------------------------------------------------------
+            vfx = cell(nbG,1);
+            vfy = cell(nbG,1);
+            vfz = cell(nbG,1);
+            if ~iscell(vector_field)
+                for iG = 1:nbG
+                    if numel(vector_field) == 3
+                        vfx{iG} = vector_field(1);
+                        vfy{iG} = vector_field(2);
+                        vfz{iG} = vector_field(3);
+                    elseif size(vector_field,1) >  length(id_elem) && ...
+                            size(vector_field,1) == obj.nb_elem
+                        vfx{iG} = vector_field(id_elem,1);
+                        vfy{iG} = vector_field(id_elem,2);
+                        vfz{iG} = vector_field(id_elem,3);
+                    else
+                        vfx{iG} = vector_field(:,1);
+                        vfy{iG} = vector_field(:,2);
+                        vfz{iG} = vector_field(:,3);
+                    end
+                end
+            else
+                for iG = 1:nbG
+                    vfx{iG} = vector_field{iG}(:,1);
+                    vfy{iG} = vector_field{iG}(:,2);
+                    vfz{iG} = vector_field{iG}(:,3);
+                end
+            end
+            %--------------------------------------------------------------
+            if any(f_strcmpi(coef_array_type,{'scalar'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    dJ    = f_tocolv(detJ{iG});
+                    weigh = Weigh(iG);
+                    % ---
+                    vix = vfx{iG}(:,1);
+                    viy = vfy{iG}(:,1);
+                    viz = vfz{iG}(:,1);
+                    % ---
+                    for i = 1:nbFa_inEl 
+                        % weix = We{iG}(:,1,i);
+                        % weiy = We{iG}(:,2,i);
+                        % weiz = We{iG}(:,3,i);
+                        % ---
+                        wfix = Wf{iG}(:,1,i);
+                        wfiy = Wf{iG}(:,2,i);
+                        wfiz = Wf{iG}(:,3,i);
+                        for j = 1:nbEd_inEl % !!! 1
+                            % wfjx = Wf{iG}(:,1,j);
+                            % wfjy = Wf{iG}(:,2,j);
+                            % wfjz = Wf{iG}(:,3,j);
+                            % ---
+                            wejx = We{iG}(:,1,j);
+                            wejy = We{iG}(:,2,j);
+                            wejz = We{iG}(:,3,j);
+                            % ---
+                            coefvfwfxwe(:,i,j) = coefvfwfxwe(:,i,j) + ...
+                                weigh .* dJ .* ( coefficient .* ...
+                                ( vix .* (wfiy .* wejz - wfiz .* wejy) + ...
+                                  viy .* (wfiz .* wejx - wfix .* wejz) + ...
+                                  viz .* (wfix .* wejy - wfiy .* wejx) ));
+                        end
+                    end
+                end
+                %----------------------------------------------------------
+            elseif any(f_strcmpi(coef_array_type,{'tensor'}))
+                %----------------------------------------------------------
+                for iG = 1:nbG
+                    dJ    = f_tocolv(detJ{iG});
+                    weigh = Weigh(iG);
+                    for i = 1:nbEd_inEl
+                        wejx = We{iG}(:,1,i);
+                        wejy = We{iG}(:,2,i);
+                        wejz = We{iG}(:,3,i);
+                        for j = 1:nbFa_inEl % !!! 1
+                            wfix = Wf{iG}(:,1,j);
+                            wfiy = Wf{iG}(:,2,j);
+                            wfiz = Wf{iG}(:,3,j);
+                            % ---
+                            coefvfwfxwe(:,i,j) = coefvfwfxwe(:,i,j) + ...
+                                weigh .* dJ .* (...
+                                coefficient(:,1,1) .* wejx .* wfix +...
+                                coefficient(:,1,2) .* wejy .* wfix +...
+                                coefficient(:,1,3) .* wejz .* wfix +...
+                                coefficient(:,2,1) .* wejx .* wfiy +...
+                                coefficient(:,2,2) .* wejy .* wfiy +...
+                                coefficient(:,2,3) .* wejz .* wfiy +...
+                                coefficient(:,3,1) .* wejx .* wfiz +...
+                                coefficient(:,3,2) .* wejy .* wfiz +...
+                                coefficient(:,3,3) .* wejz .* wfiz );
+                        end
+                    end
+                end
+                %----------------------------------------------------------
+            end
+        end
+        % -----------------------------------------------------------------
     end
 
     % --- Methods - Get field

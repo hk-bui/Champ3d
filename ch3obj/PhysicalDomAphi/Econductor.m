@@ -19,6 +19,7 @@
 classdef Econductor < PhysicalDom
     properties
         sigma
+        speed = 0
     end
     % ---
     properties (Access = private)
@@ -27,7 +28,7 @@ classdef Econductor < PhysicalDom
     % --- Valid args list
     methods (Static)
         function argslist = validargs()
-            argslist = {'id','parent_model','id_dom3d','sigma','parameter_dependency_search'};
+            argslist = {'id','parent_model','id_dom3d','sigma','speed','parameter_dependency_search'};
         end
     end
     % --- Contructor
@@ -38,6 +39,7 @@ classdef Econductor < PhysicalDom
                 args.parent_model
                 args.id_dom3d
                 args.sigma
+                args.speed
                 args.parameter_dependency_search ...
                     {mustBeMember(args.parameter_dependency_search,{'by_coordinates','by_id_dom'})} ...
                     = 'by_id_dom'
@@ -68,6 +70,7 @@ classdef Econductor < PhysicalDom
             obj.matrix.gid_node_phi = [];
             obj.matrix.sigmawewe = [];
             obj.matrix.sigma_array = [];
+            obj.matrix.speed_array = [];
             obj.tarray = [];
             % ---
             obj.build_done = 0;
@@ -95,6 +98,7 @@ classdef Econductor < PhysicalDom
             gid_node_phi = f_uniquenode(elem);
             % ---
             sigma_array = obj.sigma.getvalue('in_dom',dom);
+            speed_array = obj.speed.getvalue('in_dom',dom);
             % --- check changes
             is_changed = 1;
             if isequal(sigma_array,obj.matrix.sigma_array) && ...
@@ -102,10 +106,18 @@ classdef Econductor < PhysicalDom
                isequal(gid_node_phi,obj.matrix.gid_node_phi)
                 is_changed = 0;
             end
+            if any(speed_array)
+                if isequal(speed_array,obj.matrix.speed_array) && ...
+                   isequal(gindex,obj.matrix.gindex) && ...
+                   isequal(gid_node_phi,obj.matrix.gid_node_phi)
+                    is_changed = 0;
+                end
+            end
             %--------------------------------------------------------------
             if ~is_changed && obj.build_done == 1
                 % obj.tarray{it}.sigma = obj.tarray{it-1}.sigma; % XTODO
                 obj.tarray{it}.sigma = TensorArray(sigma_array,'parent_dom',obj);
+                obj.tarray{it}.speed = VectorArray(speed_array,'parent_dom',obj);
                 return
             end
             %--------------------------------------------------------------
@@ -114,6 +126,7 @@ classdef Econductor < PhysicalDom
             obj.matrix.sigma_array = sigma_array;
             %--------------------------------------------------------------
             obj.tarray{it}.sigma = TensorArray(sigma_array,'parent_dom',obj);
+            obj.tarray{it}.speed = VectorArray(speed_array,'parent_dom',obj);
             %--------------------------------------------------------------
             % local sigmawewe matrix
             lmatrix = parent_mesh.cwewe('id_elem',gindex,'coefficient',sigma_array);
@@ -149,6 +162,40 @@ classdef Econductor < PhysicalDom
             end
             %--------------------------------------------------------------
             obj.matrix.sigmawewe = sigmawewe;
+            %--------------------------------------------------------------
+            if any(any(speed_array))
+                %--------------------------------------------------------------
+                % local sigmavwfxwe matrix
+                lmatrix = parent_mesh.cvfwfxwe('id_elem',gindex,'coefficient',sigma_array,'vector_field',speed_array);
+                %--------------------------------------------------------------
+                id_elem_nomesh = obj.parent_model.matrix.id_elem_nomesh;
+                id_edge_in_elem = obj.parent_model.parent_mesh.meshds.id_edge_in_elem;
+                nb_edge = obj.parent_model.parent_mesh.nb_edge;
+                nbEd_inEl = obj.parent_model.parent_mesh.refelem.nbEd_inEl;
+                % ---
+                id_face_in_elem = obj.parent_model.parent_mesh.meshds.id_face_in_elem;
+                nb_face = obj.parent_model.parent_mesh.nb_face;
+                nbFa_inEl = obj.parent_model.parent_mesh.refelem.nbFa_inEl;
+                %--------------------------------------------------------------
+                gindex = obj.matrix.gindex;
+                %--------------------------------------------------------------
+                [~,id_] = intersect(gindex,id_elem_nomesh);
+                gindex(id_) = [];
+                lmatrix(id_,:,:) = [];
+                %--------------------------------------------------------------
+                % global elementary sigmavwfxwe matrix
+                sigmavwfxwe = sparse(nb_face,nb_edge);
+                %--------------------------------------------------------------
+                for i = 1 : nbFa_inEl
+                    for j = 1 : nbEd_inEl
+                        sigmavwfxwe = sigmavwfxwe + ...
+                            sparse(id_face_in_elem(i,gindex),id_edge_in_elem(j,gindex),...
+                            lmatrix(:,i,j),nb_face,nb_edge);
+                    end
+                end
+                %--------------------------------------------------------------
+                obj.matrix.sigmavwfxwe = sigmavwfxwe;
+            end
             % ---
             obj.build_done = 1;
         end
@@ -163,11 +210,15 @@ classdef Econductor < PhysicalDom
             obj.parent_model.matrix.sigmawewe = ...
                 obj.parent_model.matrix.sigmawewe + obj.matrix.sigmawewe;
             %--------------------------------------------------------------
+            obj.parent_model.matrix.sigmavwfxwe = ...
+                obj.parent_model.matrix.sigmavwfxwe + obj.matrix.sigmavwfxwe;
+            %--------------------------------------------------------------
             obj.parent_model.matrix.id_node_phi = ...
                 unique([obj.parent_model.matrix.id_node_phi, obj.matrix.gid_node_phi]);
             %--------------------------------------------------------------
             it = obj.parent_model.ltime.it;
             obj.parent_model.field{it}.J.elem.econductor.(obj.id).sigma = obj.tarray{it}.sigma;
+            obj.parent_model.field{it}.J.elem.econductor.(obj.id).speed = obj.tarray{it}.speed;
             %--------------------------------------------------------------
         end
     end
