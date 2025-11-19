@@ -16,13 +16,13 @@
 % IREENA Lab - UR 4642, Nantes Universite'
 %--------------------------------------------------------------------------
 
-classdef OxyTurnT01 < OxyTurn
+classdef OxyTurnT01b < OxyTurn
     properties
         center = [0 0]
         z = 0
         r = 0
-        rwire = 1e-6
         pole = +1       % +1 or -1
+        rwire = 1e-6;
         % ---
         wire
         dom
@@ -36,12 +36,12 @@ classdef OxyTurnT01 < OxyTurn
         rmin = 1e-4
     end
     properties (Hidden)
-        rnum = 1000
+        rnum = 10
         anum = 1000
     end
     % --- Constructors
     methods
-        function obj = OxyTurnT01(args)
+        function obj = OxyTurnT01b(args)
             arguments
                 args.center {mustBeNumeric} = [0 0]
                 args.z {mustBeNumeric}      = 0
@@ -65,6 +65,45 @@ classdef OxyTurnT01 < OxyTurn
     % ---
     methods
         function turnflux = getflux(obj, args)
+            arguments
+                obj
+                args.turn_obj {mustBeA(args.turn_obj,"OxyTurn")}
+                args.I = 1
+            end
+            % ---
+            if isfield(args,"turn_obj")
+                turn_obj = args.turn_obj;
+                % ---
+                obj.setup;
+                turn_obj.setup;
+            else
+                turn_obj = obj;
+                % ---
+                obj.setup;
+            end
+            % ---
+            A = obj.getanode("node",turn_obj.dom.node,"I",args.I);
+            turnflux = sum( A(1,:).*obj.dom.len(1,:) + A(2,:).*obj.dom.len(2,:) + A(3,:).*obj.dom.len(3,:) ) ...
+                       .* turn_obj.pole; % ds = Oz = +1 (pole)
+        end
+        function A = getanode(obj, args)
+            arguments
+                obj
+                args.node (3,:) {mustBeNumeric}
+                args.I = 1
+            end
+            % ---
+            if ~isfield(args,"node")
+                A = [];
+                return
+            end
+            % ---
+            A = 0;
+            for i = 1:length(obj.wire)
+                A = A + obj.wire{i}.getanode("node",args.node,"I",args.I);
+            end
+        end
+        function turnflux = getbds(obj, args)
             arguments
                 obj
                 args.turn_obj {mustBeA(args.turn_obj,"OxyTurn")}
@@ -147,25 +186,35 @@ classdef OxyTurnT01 < OxyTurn
             obj.wire{end+1} = wire02;
             % -------------------------------------------------------------------
             % --- DOM
-            x_ = [];
-            y_ = [];
-            s_ = [];
-            rdiv = linspace(0,0.9999999*obj.r,obj.rnum);
-            dr = rdiv(2) - rdiv(1);
-            rcen = (rdiv(1:end-1) + rdiv(2:end))./2;
+            % x_ = [];
+            % y_ = [];
+            % s_ = [];
+            % rdiv = linspace(0,obj.r - obj.rwire,obj.rnum);
+            % dr = rdiv(2) - rdiv(1);
+            % rcen = (rdiv(1:end-1) + rdiv(2:end))./2;
+            % for i = 1:length(rcen)
+            %     adiv = linspace(0, 2*pi, obj.anum + i);
+            %     da = adiv(2) - adiv(1);
+            %     x_ = [x_, rcen(i) .* cos(adiv)];
+            %     y_ = [y_, rcen(i) .* sin(adiv)];
+            %     s_ = [s_, ((rdiv(i+1)^2 - rdiv(i)^2) .* da/pi) .* ones(1,length(adiv))];
+            % end
+            % % ---
+            % z_ = obj.z .* ones(size(x_));
+            % obj.dom.node = [x_+cen(1); y_+cen(2); z_];
+            % obj.dom.area = s_;
+            % ---
             adiv = linspace(0, 2*pi, obj.anum);
-            adiv = adiv(1:end-1);
-            for i = 1:length(rcen)
-                da = adiv(2) - adiv(1);
-                x_ = [x_, rcen(i) .* cos(adiv)];
-                y_ = [y_, rcen(i) .* sin(adiv)];
-                s_ = [s_, ((rdiv(i+1)^2 - rdiv(i)^2) .* da/pi) .* ones(1,length(adiv))];
-            end
+            rdiv = obj.r - obj.rwire;
+            x_ = rdiv .* cos(adiv) + cen(1);
+            y_ = rdiv .* sin(adiv) + cen(2);
             % ---
-            z_ = obj.z .* ones(size(x_));
-            obj.dom.node = [x_+cen(1); y_+cen(2); z_];
-            obj.dom.area = s_;
+            vdiv = zeros(3,length(adiv) - 1);
+            vdiv(1,:) = x_(2:end) - x_(1:end-1);
+            vdiv(2,:) = y_(2:end) - y_(1:end-1);
             % ---
+            obj.dom.node = [x_(1:end-1) ; y_(1:end-1); obj.z .* ones(1,length(x_)-1)];
+            obj.dom.len  = vdiv;
         end
     end
 end

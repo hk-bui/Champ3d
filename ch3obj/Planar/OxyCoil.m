@@ -143,6 +143,49 @@ classdef OxyCoil < Xhandle
                 obj.L = L;
             end
         end
+        function A = getanode(obj,args)
+            arguments
+                obj
+                args.node (3,:) {mustBeNumeric}
+            end
+            % ---
+            if ~isfield(args,"node")
+                A = [];
+                return
+            end
+            % --- XTODO
+            if isempty(obj.mplate)
+                id_in = 1:size(args.node,2);
+                id_up = [];
+                id_do = [];
+            else
+                [zdown, zup] = obj.zmplate;
+                % ---
+                id_in  = find(args.node(3,:) <= zup & args.node(3,:) >= zdown);
+                id_up  = find(args.node(3,:) > zup);
+                id_do  = find(args.node(3,:) < zdown);
+                % ---
+            end
+            A = zeros(3,size(args.node,2));
+            node_in   = args.node(:, id_in);
+            node_up   = args.node(:, id_up);
+            node_down = args.node(:, id_do);
+            % --- XTODO --- up, down
+            for i = 1:length(obj.turn)
+                tx = obj.turn{i};
+                A(:,id_in) = A(:,id_in) + tx.getanode("node",node_in,"I",obj.I);
+            end
+            % ---
+            obj.makeimage_in;
+            for j = 1:length(obj.imagecoil_in)
+                cx = obj.imagecoil_in{j};
+                for k = 1:length(cx.turn)
+                    tx = cx.turn{k};
+                    A(:,id_in) = A(:,id_in) + tx.getanode("node",node_in,"I",cx.I);
+                end
+            end
+            % ---
+        end
         function fl = getflux(obj,coil_obj)
             % ---
             if nargin <= 1 
@@ -173,7 +216,7 @@ classdef OxyCoil < Xhandle
                         for k = 1:length(cx.turn)
                             tx = cx.turn{k};
                             % ---
-                            ft_ = tx.getflux("turn_obj",rx,"I",obj.I);
+                            ft_ = tx.getflux("turn_obj",rx,"I",cx.I);
                             rx.B = rx.B + ft_.B;
                             rx.flux = rx.flux + ft_.flux;
                         end

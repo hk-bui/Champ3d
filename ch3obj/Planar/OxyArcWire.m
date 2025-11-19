@@ -62,9 +62,6 @@ classdef OxyArcWire < Xhandle
             lnode = obj.local_node(node);
             % ---
             rho = sqrt(lnode(1,:).^2 + lnode(2,:).^2);
-            % rho(abs(rho) <= 3e-3) = 3e-3; % !!!
-            rho((rho - obj.r <= +3e-3) & (rho - obj.r >= 0)) = obj.r + 3e-3;
-            rho((rho - obj.r >= -3e-3) & (rho - obj.r <= 0)) = obj.r - 3e-3;
             % ---
             phi = acos(lnode(1,:)./rho) .* sign(lnode(2,:));
             dz  = lnode(3,:);
@@ -99,29 +96,55 @@ classdef OxyArcWire < Xhandle
                                                  -(-cos(phi).*f3_phi1 + sin(phi) .* f4_phi1 ) );
             Bz = mu0*obj.signI*I/(4*pi) .* (f5_phi2 - f5_phi1);
             % ---
-            % a2 = (rho + obj.r).^2+ dz.^2;
-            % a  = sqrt(a2);
-            % k2 = 4.*rho.*obj.r ./ a2;
-            % k = sqrt(k2);
-            % alpha1 = -(obj.phi1/180*pi - phi - pi)./2;
-            % alpha2 = -(obj.phi2/180*pi - phi - pi)./2;
-            % theta1 = abs(alpha1);
-            % theta2 = abs(alpha2);
-            % b = rho + obj.r;
-            % kpr2 = (1 - k2);
-            % kpr  = sqrt(kpr2);
-            % % ---
-            % F_theta1  = mpEllipticF(theta1,k);
-            % F_theta2  = mpEllipticF(theta2,k);
-            % W_theta1  = mpEllipticE(theta1,k) - k2.*sin(theta1).*cos(theta1)./sqrt(1 - k2.*sin(theta1));
-            % W_theta2  = mpEllipticE(theta2,k) - k2.*sin(theta2).*cos(theta2)./sqrt(1 - k2.*sin(theta2));
-            % Int1 = sign(alpha1) .* (rho.*kpr2.*F_theta1 - (rho - b.*k2./2) .* W_theta1);
-            % Int2 = sign(alpha2) .* (rho.*kpr2.*F_theta2 - (rho - b.*k2./2) .* W_theta2);
-            % --- formule 2
-            % Bz = mu0*obj.signI*I/(4*pi) .* 1./(rho.*a.*kpr2) .* (Int2 - Int1);
-            % ---
             B = [Bx;By;Bz];
         end
+        % ---
+        function A = getanode(obj,args)
+            arguments
+                obj
+                args.node (3,:) {mustBeNumeric}
+                args.I = 1
+            end
+            % ---
+            if ~isfield(args,"node")
+                B = [];
+                return
+            end
+            % ---
+            node = args.node;
+            I = args.I;
+            % ---
+            lnode = obj.local_node(node);
+            % ---
+            rho = sqrt(lnode(1,:).^2 + lnode(2,:).^2);
+            % ---
+            phi = acos(lnode(1,:)./rho) .* sign(lnode(2,:));
+            dz  = lnode(3,:);
+            % ---
+            c1 = (obj.r + rho).^2 + dz.^2;
+            c2 = (obj.r).^2 + rho.^2 + dz.^2;
+            m  = 4*obj.r.*rho ./ c1;
+            aph1_ = (obj.phi1/180*pi - phi - pi)./2;
+            aph2_ = (obj.phi2/180*pi - phi - pi)./2;
+            elF_phi1  = mpEllipticF(aph1_,m);
+            elF_phi2  = mpEllipticF(aph2_,m);
+            elE_phi1  = mpEllipticE(aph1_,m);
+            elE_phi2  = mpEllipticE(aph2_,m);
+            % ---
+            f1_phi1 = sqrt(c2-2.*rho.*obj.r.*cos(obj.phi1/180*pi-phi));
+            f1_phi2 = sqrt(c2-2.*rho.*obj.r.*cos(obj.phi2/180*pi-phi));
+            % ---
+            f2_phi1 = (c2./sqrt(c1)).*elF_phi1-sqrt(c1).*elE_phi1 ;
+            f2_phi2 = (c2./sqrt(c1)).*elF_phi2-sqrt(c1).*elE_phi2 ;
+            mu0 = 4*pi*1e-7;
+            cst = mu0*obj.signI*I./(4*pi*rho);
+            % ---
+            Ax = cst.*(-f1_phi2.*cos(phi)-f2_phi2.*sin(phi)+f1_phi1.*cos(phi)+f2_phi1.*sin(phi));
+            Ay = cst.*(-f1_phi2.*sin(phi)+f2_phi2.*cos(phi)+f1_phi1.*sin(phi)-f2_phi1.*cos(phi));
+            Az = zeros(size(Ax));
+            A = [Ax; Ay; Az];
+        end
+        % ---
         function plot(obj,args)
             arguments
                 obj
