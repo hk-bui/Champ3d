@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% This code is written by: H-K. Bui, 2025
+% This code is written by: Nora TODJIHOUNDE, H-K.Bui, 2025
 % as a contribution to Champ3d code.
 %--------------------------------------------------------------------------
 % Champ3d is copyright (c) 2023-2025 H-K. Bui.
