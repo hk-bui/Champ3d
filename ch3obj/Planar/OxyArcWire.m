@@ -107,7 +107,7 @@ classdef OxyArcWire < Xhandle
             end
             % ---
             if ~isfield(args,"node")
-                B = [];
+                A = [];
                 return
             end
             % ---
