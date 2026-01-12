@@ -110,6 +110,62 @@ classdef OxyStraightWire < Xhandle
             lfield = [Bx;By;Bz];
             B = obj.global_field(lfield);
         end
+        function A = getanode(obj,args)
+            arguments
+                obj
+                args.node (3,:) {mustBeNumeric}
+                args.I = 1
+            end
+            % ---
+            if ~isfield(args,"node")
+                A = [];
+                return
+            end
+            % --- Formular 1
+            node = args.node;
+            I = args.I;
+            % ---
+            lnode = obj.local_node(node);
+            % ---
+            u  = lnode(2,:);
+            v  = lnode(3,:);
+            a2 = u.^2 + v.^2;
+            w1 =obj.P1(1)- lnode(1,:);
+            w2 = obj.P2(1)-lnode(1,:);
+            % ---
+            d1 = sqrt(a2 + w1.^2);
+            d2 = sqrt(a2 + w2.^2);
+            % ---
+            % d1(d1 == 0) = 1e-8;
+            % d2(d2 == 0) = 1e-8;
+            %a2(abs(a2) <= 9e-6) = 9e-6;
+            %d1(abs(d1) <= 3e-3) = 3e-3;
+            %d2(abs(d2) <= 3e-3) = 3e-3;
+            % ---
+            mu0 = 4*pi*1e-7;
+            Az= mu0*I*obj.signI/(4*pi) *(-asinh(w1./sqrt(a2))+asinh(w2./sqrt(a2)));
+            % ---
+            %lfield = [Az;zeros(size(Az));zeros(size(Az))];
+            u=[obj.P2(1)-obj.P1(1);obj.P2(2)-obj.P1(2);0]/norm(obj.P2-obj.P1);
+            A=Az.*u; 
+            % --- Formular 2
+            % ---
+            AB = [obj.P2(1)-obj.P1(1);obj.P2(2)-obj.P1(2);0];
+            alpha = norm(AB)^2;
+            % ---
+            A = [obj.P1(1); obj.P1(2); 0];
+            AM = A-node;
+            beta = 2*(AB(1).* AM (1,:)+ AB(2).* AM (2,:) + AB(3).* AM (3,:));
+            % ---
+            gamma = sum( AM .^2, 1);
+            deltak = (4*gamma.*alpha - beta.^2) ./ (4*alpha.^2);
+            % ---
+            mu0 = 4*pi*1e-7;
+            t0 = beta ./ (2*alpha);
+            t1 = 1 + t0;
+            % ---
+            A = (mu0*I*obj.signI)*AB *log( (t1 + sqrt(t1.^2 + deltak)) ./ (t0 + sqrt(t0.^2 + deltak)) ); 
+        end
         function plot(obj,args)
             arguments
                 obj
