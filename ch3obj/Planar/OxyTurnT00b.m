@@ -307,7 +307,7 @@ classdef OxyTurnT00b < OxyTurn
                 P21 = [ri*cosd(ai2); ri*sind(ai2)] + cen;   
                 P22 = [ro*cosd(ao2); ro*sind(ao2)] + cen;   
 
-                  X = []; Y = []; L = [];
+                  X = []; Y = []; L = []; X_bord=[] ; Y_bord=[];
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Arc externe  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
                 
                     n_ext = 2*onum;
@@ -331,8 +331,9 @@ classdef OxyTurnT00b < OxyTurn
                         uz=zeros(size(uy));
                         u=[ux;uy;uz];
                         L=[L u];
-                  
-
+                        
+                        X_bord=[X_bord xpoints];
+                        Y_bord=[Y_bord ypoints];
 
 %            
 %          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Coté oblique haut%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

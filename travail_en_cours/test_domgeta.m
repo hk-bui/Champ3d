@@ -7,7 +7,7 @@ mu0 = 4*pi*1e-7;
 wcoil = 5e-3;
 agap = 200e-3;
 dfer = 5e-3; % distance coil-ferrite
-mur = 1;
+mur = 1000;
 % ---
 tfer = 10e-3;
 tcoil = 5e-3;
@@ -21,7 +21,7 @@ turnA21.pole = -1;
 turnA21.rotate(180);
 figure
 turnA11.plot("color","r"); hold on
-%plot3(turnA11.dom.node(1,:),turnA11.dom.node(2,:),turnA11.dom.node(3,:),'o');hold on
+plot3(turnA11.dom.node(1,:),turnA11.dom.node(2,:),turnA11.dom.node(3,:),'o');hold on
 
 f_quiver(turnA11.dom.node,turnA11.dom.len);
 
