@@ -7,7 +7,7 @@ mu0 = 4*pi*1e-7;
 wcoil = 5e-3;
 agap = 200e-3;
 dfer = 5e-3; % distance coil-ferrite
-mur = 1000;
+mur = 1;
 % ---
 tfer = 10e-3;
 tcoil = 5e-3;
@@ -23,7 +23,7 @@ figure
 turnA11.plot("color","r"); hold on
 plot3(turnA11.dom.nodebord (1,:),turnA11.dom.nodebord (2,:),turnA11.dom.nodebord (3,:),'o');hold on
 plot3(turnA11.dom.node(1,:),turnA11.dom.node(2,:),turnA11.dom.node(3,:),'*');hold on
-quiver(turnA11.dom.node,turnA11.dom.len);
+%quiver(turnA11.dom.node,turnA11.dom.len);
 view(2)
 
 %%
@@ -44,6 +44,10 @@ coil1.add_mplate("z",-dfer-tcoil/2,"mur",mur);
 coil1.add_mplate("z",tcoil/2+agap+tcoil+dfer,"mur",mur);
 coil1.setup;
 L1a=coil1.getL
+mu0=4*pi*1e-7;
+
+Linterne=sum(vecnorm(turnA11.dom.len))*mu0/(8*pi);
+L=L1a+Linterne;
 % valeur reference avec mu=1000 2.1306
 % valeur de reference avec mu=1 1.3084
 %%
