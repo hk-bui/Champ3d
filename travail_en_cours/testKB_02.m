@@ -7,7 +7,7 @@ mu0 = 4*pi*1e-7;
 wcoil = 5e-3;
 agap = 200e-3;
 dfer = 5e-3; % distance coil-ferrite
-mur = 1;
+mur = 1000;
 % ---
 tfer = 10e-3;
 tcoil = 5e-3;
@@ -42,8 +42,8 @@ title("A");
 
 coil1 = OxyCoil4("I",1,"imagelevel",1);
 coil1.add_turn(turnA11);
-%coil1.add_mplate("z",-dfer-tcoil/2,"mur",mur);
-%coil1.add_mplate("z",tcoil/2+agap+tcoil+dfer,"mur",mur);
+coil1.add_mplate("z",-dfer-tcoil/2,"mur",mur);
+coil1.add_mplate("z",tcoil/2+agap+tcoil+dfer,"mur",mur);
 coil1.setup;
 L1a=coil1.getL
 
