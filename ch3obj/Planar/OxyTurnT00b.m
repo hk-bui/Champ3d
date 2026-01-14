@@ -275,7 +275,7 @@ classdef OxyTurnT00b < OxyTurn
             P21 = [obj.ri*cosd(ai2); obj.ri*sind(ai2)];
             P22 = [obj.ro*cosd(ao2); obj.ro*sind(ao2)];
             % -------------------------------------------------------------------
-            dl_min = 100e-3;
+            dl_min = 50e-3;
             % ---
             l12 = norm(P12-P11);
             u12 = (P12 - P11)./l12;
@@ -311,7 +311,7 @@ classdef OxyTurnT00b < OxyTurn
                 obj.wire{end+1} = wire01;
             end
             % -------------------------------------------------------------------
-            da_min = 30;
+            da_min = 20;
             % ---
             phi1_  = ai1;
             while (phi1_ + da_min < ai2)

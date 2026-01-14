@@ -9,8 +9,8 @@ Radius=5e-3; % rayon fil
 
 %spire source
 
-ndec_r=10; % nombre decoupages radial
-ndec_teta=20; % nombre decoupage axial
+ndec_r=100; % nombre decoupages radial
+ndec_teta=200; % nombre decoupage axial
 
 teta_out=linspace(pi/2+teta/2,pi/2-teta/2,ndec_teta);
 teta_in=linspace(pi/2-teta/2,pi/2+teta/2,ndec_teta);
