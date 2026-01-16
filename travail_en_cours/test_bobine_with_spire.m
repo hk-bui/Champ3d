@@ -10,13 +10,12 @@ mur = 1000;
 % ---
 tfer = 10e-3;
 tcoil = 5e-3;
-nspire=2;
-nbphase=2;
+nspire=1;
+nbphase=1;
 distance=wcoil+1e-6;
 distance1=wcoil+1e-6;
 %%
-
-turnA11 = OxyTurnT00b("center",[0 0],"dir",0,"ri",ri,"ro",ro,"rwire",wcoil,"z",0,"openi",90,"openo",90,"pole",+1);
+turnA11 = OxyTurnT00b("center",[0 0],"dir",0,"ri",ri,"ro",ro,"rwire",wcoil,"z",0,"openi",120,"openo",120,"pole",+1);
 
 turnA21 = turnA11';
 turnA21.pole = -1;

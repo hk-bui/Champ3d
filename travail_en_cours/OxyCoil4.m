@@ -157,6 +157,16 @@ classdef OxyCoil4 < Xhandle
        end
 
 
+        function M = getM(obj, coil_obj)
+            if nargin <= 1
+                error('Erreur : besoin de 2 bobines pour calculer la mutuelle');
+
+            end
+            % ---
+            obj.getflux(coil_obj);
+            M = coil_obj.flux/obj.I;
+            % ---
+        end
 
 
 

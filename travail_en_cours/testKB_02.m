@@ -1,5 +1,10 @@
 %% Geo parameters
 close all
+
+% valeur reference avec mu=1000 2.1306
+% valeur de reference avec mu=1 1.3084  
+
+
 I = 1;
 ri =100e-3;
 ro = 750e-3/2;
