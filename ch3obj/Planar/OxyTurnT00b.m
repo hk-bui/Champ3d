@@ -247,47 +247,16 @@ classdef OxyTurnT00b < OxyTurn
                 obj.z = obj.z + distance(3);
             end
         end
-        function scale(obj,distance)
-            % ---
-            ri0 = obj.ri;
-            ro0 = obj.ro;
-            % ---
-            argleni = ri0 * obj.openi/180*pi;
-            argleno = ro0 * obj.openo/180*pi;
-            if argleno <= 2*distance || ro0 <= ri0 + 2*distance
-                obj = OxyTurn;
-                return
-            end
-            % ---
-            a1 = argleni;
-            a2 = argleno;
-            % ---
-            b1 = a1*(ro0 - ri0)/(a2 - a1);
-            axi = 2*distance;
-            b2 = (axi - a1)*b1/a1;
-            % ---
-            ri_ = ri0 + b2;
-            if ri_ <= obj.ri + distance
-                obj.ri = obj.ri + distance;
-            else
-                obj.ri = ri_;
-            end
-            % ---
-            axi = a1*(b1 + (obj.ri - ri0))/b1;
-            % ---
-            obj.ro = obj.ro - distance;
-            % ---
-            oai = interp1([a1/ri0, a2/ro0], [sind(obj.openi), sind(obj.openo)], axi/obj.ri);
-            oai = asind(oai);
-            % ---
-            axo = a1*(b1 + (obj.ro - ri0))/b1;
-            oao = interp1([a1/ri0, a2/ro0], [sind(obj.openi), sind(obj.openo)], axo/obj.ro);
-            oao = asind(oao);
-            % ---
-            obj.openi = oai - distance/axi*oai;
-            obj.openo = oao - distance/axo*oao;
-            % ---
+        function scale(obj,d1,d)
+           
+            [obj.ri,obj.ro,obj.openi,obj.openo]=reduction(obj.ri,obj.ro,obj.openi,obj.openo,d1,d);
+
         end
+
+
+
+
+
         function plot(obj,args)
             arguments
                 obj
