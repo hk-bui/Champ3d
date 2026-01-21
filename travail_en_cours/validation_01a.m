@@ -53,7 +53,7 @@ shAirbox = SCircle("id","airbox","center",[0 0],"r",5*ro,"dnum",2*dnum,"choosed_
 
 %% 2d mesh
 m2d = TriMeshFromPDETool("shape",{shCoil01,shCoil02,shIron,shAirbox},"hgrad",1.3,"hmax",1);
-m2d.refine([1 2 4]);
+%m2d.refine([1 2 4]);
 
 %%
 % figure
@@ -62,8 +62,8 @@ m2d.refine([1 2 4]);
 %% mesh1d in z
 m1d_z = Mesh1d();
 % ---
-msize1 = 3;
-msize2 = 4;
+msize1 = 2;
+msize2 = 2;
 m1d_z.add_line1d("id","zabox_b" ,"len",agap,"dnum",msize2,"dtype","log-");
 m1d_z.add_line1d("id","ziron_b" ,"len",tfer,"dnum",msize1,"dtype","log-");
 m1d_z.add_line1d("id","zdfer_b" ,"len",dfer,"dnum",msize1,"dtype","lin");
