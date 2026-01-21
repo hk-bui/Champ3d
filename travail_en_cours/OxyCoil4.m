@@ -141,17 +141,18 @@ classdef OxyCoil4 < Xhandle
             % ---
 
 
-            Linterne=0;
-
-
-            for i = 1:length(obj.turn)
-               Linterne=Linterne + obj.turn{i}.getlinterne("I",1);
-            end
             
 
 
 
             if isequal(obj,coil_obj)
+                Linterne=0;
+
+
+                for i = 1:length(obj.turn)
+                   Linterne=Linterne + obj.turn{i}.getlinterne("I",1);
+                end
+            
                 L=L+Linterne;
                 obj.L = L;
             end

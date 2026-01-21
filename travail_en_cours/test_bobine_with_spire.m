@@ -1,4 +1,5 @@
 close all
+clear all
 I = 1;
 ri =100e-3;
 ro = 750e-3/2;
@@ -10,12 +11,12 @@ mur = 1000;
 % ---
 tfer = 10e-3;
 tcoil = 5e-3;
-nspire=1;
-nbphase=1;
+nspire=3;
+nbphase=2;
 distance=wcoil+1e-6;
 distance1=wcoil+1e-6;
 %%
-turnA11 = OxyTurnT00b("center",[0 0],"dir",0,"ri",ri,"ro",ro,"rwire",wcoil,"z",0,"openi",120,"openo",120,"pole",+1);
+turnA11 = OxyTurnT00b("center",[0 0],"dir",0,"ri",ri,"ro",ro,"rwire",wcoil,"z",0,"openi",90,"openo",90,"pole",+1);
 
 turnA21 = turnA11';
 turnA21.pole = -1;
@@ -78,10 +79,11 @@ for i = 1:nbphase
     ccopy = coil11';
     ccopy.rotate((i-1)*360/(2*nbphase));
     ccopy.setup;
+    coil2=ccopy';
     % ---
     coilarray{end+1} = ccopy;
 end
-
+M=coil11.getM(coil2)
 
 coil_system = OxyCoilSystem(); 
 coil_system.add_coil(coilarray);
