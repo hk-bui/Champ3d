@@ -113,7 +113,7 @@ J2 = 0;
 em_01 = FEM3dAphijw('parent_mesh',m3d,"frequency",0);
 
 % --- Physical dom
-%em_01.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
+em_01.add_mconductor("id","iron","id_dom3d","iron","mur",mur);
 % ---
 coil1 = StrandedCloseJsCoil("parent_model",em_01,"id_dom3d","coil1","cs_area",cs_area,...
                            "spin_vector",[0 0 1],"nb_turn",nb_turn, ...
@@ -123,7 +123,7 @@ em_01.add_coil('id','coil1','coil_obj',coil1);
 coil2 = StrandedCloseJsCoil("parent_model",em_01,"id_dom3d","coil2","cs_area",cs_area,...
                            "spin_vector",[0 0 1],"nb_turn",nb_turn, ...
                            "Js",J2);
-% em_01.add_coil('id','coil2','coil_obj',coil2);
+ %em_01.add_coil('id','coil2','coil_obj',coil2);
 % ---
 em_01.solve;
 

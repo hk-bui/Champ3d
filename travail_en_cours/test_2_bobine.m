@@ -37,7 +37,7 @@ M=coil1.getM(coil2)
 
 %%
 
-coil_system = OxyCoilSystemb(); 
+coil_system = OxyCoilSystem(); 
 coil_system.add_coil(coil1);
 coil_system.add_coil(coil2);
 coil_system.plot;
