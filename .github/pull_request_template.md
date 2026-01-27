@@ -3,7 +3,13 @@ Closes #
 
 (exemple: Closes #123)
 
-## Changes
+## Type
+- [ ] Bugfix
+- [ ] Feature
+- [ ] Docs
+- [ ] Coredev
+
+## Details of changes
 - ...
 
 ## Cause
